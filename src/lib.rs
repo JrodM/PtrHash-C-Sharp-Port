@@ -145,6 +145,7 @@ mod sort_buckets;
 pub mod stats;
 #[cfg(test)]
 mod test;
+pub mod ffi;
 
 use bitvec::{bitvec, vec::BitVec};
 use bucket_fn::BucketFn;

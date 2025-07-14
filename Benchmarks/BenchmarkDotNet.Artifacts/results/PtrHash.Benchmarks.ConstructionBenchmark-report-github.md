@@ -1,0 +1,36 @@
+```
+
+BenchmarkDotNet v0.13.12, Windows 11 (10.0.26100.4652)
+Unknown processor
+.NET SDK 9.0.301
+  [Host]   : .NET 8.0.0 (8.0.23.53103), X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
+  .NET 8.0 : .NET 8.0.0 (8.0.23.53103), X64 RyuJIT AVX-512F+CD+BW+DQ+VL+VBMI
+
+Runtime=.NET 8.0  
+
+```
+| Method                      | Job        | Toolchain              | KeyCount | Mean         | Error        | StdDev       | Ratio | RatioSD | Gen0     | Gen1     | Gen2     | Allocated  | Alloc Ratio |
+|---------------------------- |----------- |----------------------- |--------- |-------------:|-------------:|-------------:|------:|--------:|---------:|---------:|---------:|-----------:|------------:|
+| **DictionaryConstruction**      | **Job-ONMDCD** | **InProcessEmitToolchain** | **10000**    |     **97.00 μs** |     **1.257 μs** |     **1.176 μs** |  **1.00** |    **0.00** |  **76.9043** |  **76.9043** |  **76.9043** |   **283116 B** |       **1.000** |
+| PtrHashConstruction         | Job-ONMDCD | InProcessEmitToolchain | 10000    |    503.21 μs |     3.285 μs |     2.912 μs |  5.18 |    0.07 |        - |        - |        - |      466 B |       0.002 |
+| SentinelPtrHashConstruction | Job-ONMDCD | InProcessEmitToolchain | 10000    |    824.77 μs |     2.378 μs |     2.225 μs |  8.50 |    0.10 |  18.5547 |        - |        - |   162224 B |       0.573 |
+|                             |            |                        |          |              |              |              |       |         |          |          |          |            |             |
+| DictionaryConstruction      | .NET 8.0   | Default                | 10000    |     77.08 μs |     0.213 μs |     0.189 μs |  1.00 |    0.00 |  76.9043 |  76.9043 |  76.9043 |   283042 B |       1.000 |
+| PtrHashConstruction         | .NET 8.0   | Default                | 10000    |    481.46 μs |     6.713 μs |     6.279 μs |  6.24 |    0.07 |        - |        - |        - |      466 B |       0.002 |
+| SentinelPtrHashConstruction | .NET 8.0   | Default                | 10000    |    876.34 μs |     5.877 μs |     5.210 μs | 11.37 |    0.08 |  18.5547 |        - |        - |   162224 B |       0.573 |
+|                             |            |                        |          |              |              |              |       |         |          |          |          |            |             |
+| **DictionaryConstruction**      | **Job-ONMDCD** | **InProcessEmitToolchain** | **100000**   |  **1,306.37 μs** |    **18.179 μs** |    **16.115 μs** |  **1.00** |    **0.00** | **402.3438** | **402.3438** | **402.3438** |  **3042449 B** |       **1.000** |
+| PtrHashConstruction         | Job-ONMDCD | InProcessEmitToolchain | 100000   |  2,152.31 μs |    14.584 μs |    13.642 μs |  1.65 |    0.02 |        - |        - |        - |      475 B |       0.000 |
+| SentinelPtrHashConstruction | Job-ONMDCD | InProcessEmitToolchain | 100000   |  6,790.36 μs |    42.396 μs |    35.403 μs |  5.19 |    0.07 | 492.1875 | 492.1875 | 492.1875 |  1618152 B |       0.532 |
+|                             |            |                        |          |              |              |              |       |         |          |          |          |            |             |
+| DictionaryConstruction      | .NET 8.0   | Default                | 100000   |  1,360.16 μs |    26.049 μs |    33.872 μs |  1.00 |    0.00 | 390.6250 | 390.6250 | 390.6250 |  3041920 B |       1.000 |
+| PtrHashConstruction         | .NET 8.0   | Default                | 100000   |  2,114.34 μs |     8.674 μs |     7.690 μs |  1.55 |    0.04 |        - |        - |        - |      470 B |       0.000 |
+| SentinelPtrHashConstruction | .NET 8.0   | Default                | 100000   |  6,381.51 μs |    20.841 μs |    19.494 μs |  4.68 |    0.14 | 492.1875 | 492.1875 | 492.1875 |  1616922 B |       0.532 |
+|                             |            |                        |          |              |              |              |       |         |          |          |          |            |             |
+| **DictionaryConstruction**      | **Job-ONMDCD** | **InProcessEmitToolchain** | **1000000**  | **24,889.42 μs** |   **325.481 μs** |   **271.791 μs** |  **1.00** |    **0.00** | **500.0000** | **500.0000** | **500.0000** | **32556214 B** |       **1.000** |
+| PtrHashConstruction         | Job-ONMDCD | InProcessEmitToolchain | 1000000  | 23,588.99 μs |   436.714 μs |   408.503 μs |  0.95 |    0.02 |        - |        - |        - |      554 B |       0.000 |
+| SentinelPtrHashConstruction | Job-ONMDCD | InProcessEmitToolchain | 1000000  | 98,289.57 μs | 1,586.389 μs | 1,483.909 μs |  3.96 |    0.06 | 333.3333 | 333.3333 | 333.3333 | 16163401 B |       0.496 |
+|                             |            |                        |          |              |              |              |       |         |          |          |          |            |             |
+| DictionaryConstruction      | .NET 8.0   | Default                | 1000000  | 27,514.17 μs |   261.839 μs |   232.113 μs |  1.00 |    0.00 | 500.0000 | 500.0000 | 500.0000 | 32555525 B |       1.000 |
+| PtrHashConstruction         | .NET 8.0   | Default                | 1000000  | 23,953.71 μs |   243.846 μs |   228.094 μs |  0.87 |    0.01 |        - |        - |        - |      514 B |       0.000 |
+| SentinelPtrHashConstruction | .NET 8.0   | Default                | 1000000  | 92,525.54 μs | 1,198.988 μs | 1,062.872 μs |  3.36 |    0.05 | 333.3333 | 333.3333 | 333.3333 | 16162544 B |       0.496 |

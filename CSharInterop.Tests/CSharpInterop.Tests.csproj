@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../CSharpInterop/PtrHashNative.csproj" />
+  </ItemGroup>
+
+  <!-- Ensure native library is available for tests -->
+  <Target Name="EnsureNativeLibraryForTests" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Windows'))">dll</NativeLibExt>
+      <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Linux'))">so</NativeLibExt>
+      <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('OSX'))">dylib</NativeLibExt>
+      <NativeLibPath>..\target\release\ptrhash.$(NativeLibExt)</NativeLibPath>
+      <NativeLibPathDebug>..\target\debug\ptrhash.$(NativeLibExt)</NativeLibPathDebug>
+    </PropertyGroup>
+    
+    <Message Text="Checking for native library for tests..." Importance="high" />
+    
+    <!-- Check if cargo is available and build if needed -->
+    <Exec Command="cargo --version" 
+          ContinueOnError="true" 
+          IgnoreExitCode="true"
+          WorkingDirectory="..">
+      <Output TaskParameter="ExitCode" PropertyName="CargoExitCode" />
+    </Exec>
+    
+    <!-- Build if library doesn't exist and cargo is available -->
+    <Exec Command="cargo build --release" 
+          WorkingDirectory=".."
+          Condition="'$(CargoExitCode)' == '0' And !Exists('$(NativeLibPath)') And !Exists('$(NativeLibPathDebug)')" />
+    
+    <Warning Text="Native library not found and cargo unavailable. Tests may fail. Please run 'cargo build --release' manually."
+             Condition="'$(CargoExitCode)' != '0' And !Exists('$(NativeLibPath)') And !Exists('$(NativeLibPathDebug)')" />
+  </Target>
+
+</Project>

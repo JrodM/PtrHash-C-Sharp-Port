@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../CSharpInterop/PtrHashNative.csproj" />
+  </ItemGroup>
+
+  <!-- Ensure native library is available for benchmarks -->
+  <Target Name="EnsureNativeLibraryForBenchmarks" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Windows'))">dll</NativeLibExt>
+      <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Linux'))">so</NativeLibExt>
+      <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('OSX'))">dylib</NativeLibExt>
+      <NativeLibPath>..\target\release\ptrhash.$(NativeLibExt)</NativeLibPath>
+    </PropertyGroup>
+    
+    <Message Text="Checking for native library for benchmarks..." Importance="high" />
+    
+    <!-- Force release build for benchmarks -->
+    <Exec Command="cargo --version" 
+          ContinueOnError="true" 
+          IgnoreExitCode="true"
+          WorkingDirectory="..">
+      <Output TaskParameter="ExitCode" PropertyName="CargoExitCode" />
+    </Exec>
+    
+    <!-- Always build release for benchmarks -->
+    <Exec Command="cargo build --release" 
+          WorkingDirectory=".."
+          Condition="'$(CargoExitCode)' == '0'" />
+    
+    <Error Text="Cargo not found. Benchmarks require Rust. Please install Rust and ensure cargo is in PATH."
+           Condition="'$(CargoExitCode)' != '0'" />
+           
+    <Error Text="Native library not found at $(NativeLibPath). Rust build may have failed."
+           Condition="'$(CargoExitCode)' == '0' And !Exists('$(NativeLibPath)')" />
+  </Target>
+
+</Project>
