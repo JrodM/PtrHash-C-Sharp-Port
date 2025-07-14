@@ -1,0 +1,42 @@
+# Rust build artifacts
+/target/
+Cargo.lock
+
+# C# build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+.vscode/
+
+# Benchmark artifacts
+BenchmarkDotNet.Artifacts/
+*.log
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# Build outputs
+*.dll
+*.exe
+*.pdb
+*.so
+*.dylib
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp

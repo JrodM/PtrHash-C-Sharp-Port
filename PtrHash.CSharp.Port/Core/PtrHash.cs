@@ -385,7 +385,6 @@ namespace PtrHash.CSharp.Port.Core
                     continue;
                 }
                 
-                var bucketHashes = sortedHashes.AsSpan(bucketStart, bucketSize);
                 var evictions = 0;
                 
                 stack.Push(new BucketInfo((nuint)bucketSize, (nuint)bucket));
