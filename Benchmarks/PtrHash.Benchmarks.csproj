@@ -29,19 +29,25 @@
       <NativeLibPath>..\target\release\ptrhash.$(NativeLibExt)</NativeLibPath>
     </PropertyGroup>
     
+
+  <ItemGroup>
+    <ProjectReference Include="../CSharpInterop/PtrHashNative.csproj" />
+    <ProjectReference Include="../CSharpInterop/PtrHashNative.csproj" />
+  </ItemGroup>
+
     <Message Text="Checking for native library for benchmarks..." Importance="high" />
     
     <!-- Force release build for benchmarks -->
     <Exec Command="cargo --version" 
           ContinueOnError="true" 
           IgnoreExitCode="true"
-          WorkingDirectory="..">
+          WorkingDirectory="../PtrHash.CSharp.Interop">
       <Output TaskParameter="ExitCode" PropertyName="CargoExitCode" />
     </Exec>
     
     <!-- Always build release for benchmarks -->
     <Exec Command="cargo build --release" 
-          WorkingDirectory=".."
+          WorkingDirectory="../PtrHash.CSharp.Interop"
           Condition="'$(CargoExitCode)' == '0'" />
     
     <Error Text="Cargo not found. Benchmarks require Rust. Please install Rust and ensure cargo is in PATH."

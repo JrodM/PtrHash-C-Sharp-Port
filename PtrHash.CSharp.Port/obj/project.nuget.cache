@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "oPQ/QJPqpTWpQzhKc2kIWsWjHMd4WouYb8qPe4oc6j+nRNT5TAdqSA2GSWCRUnTq8TApUBW5aagXROGlkWp39Q==",
+  "success": true,
+  "projectFilePath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj",
+  "expectedPackageFiles": [
+    "/home/jared/.nuget/packages/system.io.hashing/8.0.0/system.io.hashing.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
