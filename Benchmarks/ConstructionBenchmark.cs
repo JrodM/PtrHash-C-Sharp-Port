@@ -69,6 +69,13 @@ namespace PtrHash.Benchmarks
             return new SentinelPtrHashU64<ulong>(_keys.AsSpan(), _keys.AsSpan(), 0UL, PtrHashConfig.Default);
         }
 
+        [Benchmark]
+        public SentinelPtrHashU64<ulong> SentinelPtrHashSinglePartConstruction()
+        {
+            var config = PtrHashConfig.Default with { SinglePart = true };
+            return new SentinelPtrHashU64<ulong>(_keys.AsSpan(), _keys.AsSpan(), 0UL, config);
+        }
+
 
         [GlobalCleanup]
         public void Cleanup()

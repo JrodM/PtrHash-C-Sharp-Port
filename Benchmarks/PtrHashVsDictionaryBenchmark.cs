@@ -33,8 +33,10 @@ namespace PtrHash.Benchmarks
         private Dictionary<ulong, ulong> _dictionary = null!;
         private PtrHashU64 _ptrHash = null!;
         private SentinelPtrHashU64<ulong> _sentinelPtrHash = null!;
+        private SentinelPtrHashU64<ulong> _sentinelPtrHashSinglePart = null!;
         private nuint[] _indicesBuffer = null!;
         private ulong[] _valuesBuffer = null!;
+        private ulong[] _valuesBuffer2 = null!;
         private bool[] _foundBuffer = null!;
 
         [GlobalSetup]
@@ -66,9 +68,17 @@ namespace PtrHash.Benchmarks
                 _values,
                 ulong.MaxValue, // Sentinel value
                 PtrHashConfig.Default);
+            
+            var singlePartConfig = PtrHashConfig.Default with { SinglePart = true };
+            _sentinelPtrHashSinglePart = new SentinelPtrHashU64<ulong>(
+                _keys,
+                _values,
+                ulong.MaxValue, // Sentinel value
+                singlePartConfig);
 
             _indicesBuffer = new nuint[lookupCount];
             _valuesBuffer = new ulong[lookupCount];
+            _valuesBuffer2 = new ulong[lookupCount];
             _foundBuffer = new bool[lookupCount];
         }
 
@@ -77,6 +87,7 @@ namespace PtrHash.Benchmarks
         {
             _ptrHash.Dispose();
             _sentinelPtrHash.Dispose();
+            _sentinelPtrHashSinglePart.Dispose();
         }
 
         [Benchmark(Baseline = true)]
@@ -90,12 +101,14 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong PtrHashBatchLookup()
+        public ulong PtrHashPointLookup()
         {
             ulong sum = 0;
-            _ptrHash.GetIndicesBatch(_lookupKeys.AsSpan(), _indicesBuffer, minimal: true);
-            for (int i = 0; i < _indicesBuffer.Length; i++)
-                sum += _values[_indicesBuffer[i]];
+            foreach (var key in _lookupKeys)
+            {
+                var index = _ptrHash.GetIndex(key);
+                sum += _values[index];
+            }
             return sum;
         }
 
@@ -122,6 +135,25 @@ namespace PtrHash.Benchmarks
             {
                 ulong v = _valuesBuffer[i];
                 if (v != _sentinelPtrHash.Sentinel)
+                    sum += v;
+            }
+ 
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong SentinelPtrHashSinglePartStreamLookup()
+        {
+            ulong sum = 0;
+            _sentinelPtrHashSinglePart.TryGetValueStream(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer2,
+                prefetchDistance: 32);
+
+            for (int i = 0; i < _valuesBuffer2.Length; i++)
+            {
+                ulong v = _valuesBuffer2[i];
+                if (v != _sentinelPtrHashSinglePart.Sentinel)
                     sum += v;
             }
  
