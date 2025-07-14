@@ -1,0 +1,10 @@
+{
+  "disabledMcpjsonServers": [
+    "memory"
+  ],
+  "permissions": {
+    "allow": [
+      "mcp__memory__read_graph"
+    ]
+  }
+}
