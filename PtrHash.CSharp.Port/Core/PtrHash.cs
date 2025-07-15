@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -89,6 +90,7 @@ namespace PtrHash.CSharp.Port.Core
     {
         // Cap parallelism to prevent thread explosion (Rust's rayon uses all cores by default)
         private static readonly int MaxParallelism = Math.Min(Environment.ProcessorCount, 8);
+        
         private readonly THasher _hasher;
         private readonly byte[] _pilots;
         private readonly LinearBucketFunction _bucketFunction;
@@ -654,36 +656,43 @@ namespace PtrHash.CSharp.Port.Core
         // CRITICAL: This must return the sorted hash array AND bucket starts/order that match it
         private (ulong[] sortedHashes, int[] bucketStarts, int[] bucketOrder) SortBucketsInPart(int part, ReadOnlySpan<ulong> partHashes)
         {
-            // Group hashes by bucket within this part
-            var keyBucketPairs = new List<(ulong hash, int bucket)>(partHashes.Length);
+            // Use ArrayPool for temporary allocations (better than new arrays)
+            var hashBucketPairPool = ArrayPool<(ulong hash, int bucket)>.Shared;
+            var hashBucketPairs = hashBucketPairPool.Rent(partHashes.Length);
             
-            foreach (var hash in partHashes)
+            var sortedHashes = new ulong[partHashes.Length]; // Result array - don't pool this
+            
+            // Compute bucket for each hash
+            for (int i = 0; i < partHashes.Length; i++)
             {
+                var hash = partHashes[i];
                 // EXACT RUST ALGORITHM: For LINEAR bucket functions, bucket_in_part uses rem_buckets.reduce(x)
-                // This gives us bucket index within the part [0, buckets_per_part)
                 var localBucket = (int)FastReduce.Reduce(hash, _bucketsPerPart);
-                
-                keyBucketPairs.Add((hash, localBucket));
+                hashBucketPairs[i] = (hash, localBucket);
             }
             
-            // Sort by bucket, then by hash for deterministic order
-            keyBucketPairs.Sort((a, b) => {
+            // Use Array.Sort with custom comparison (faster than List.Sort) - only sort actual data length
+            Array.Sort(hashBucketPairs, 0, partHashes.Length, Comparer<(ulong hash, int bucket)>.Create((a, b) => {
                 var bucketCompare = a.bucket.CompareTo(b.bucket);
                 return bucketCompare != 0 ? bucketCompare : a.hash.CompareTo(b.hash);
-            });
+            }));
             
-            // Extract the sorted hashes
-            var sortedHashes = keyBucketPairs.Select(p => p.hash).ToArray();
+            // Extract sorted hashes directly (no LINQ) - use actual data length, not pooled array length
+            for (int i = 0; i < partHashes.Length; i++)
+            {
+                sortedHashes[i] = hashBucketPairs[i].hash;
+            }
             
             // Create bucket starts array
             var bucketStarts = new int[_bucketsPerPart + 1]; // +1 for end sentinel
             var currentBucket = 0;
             var hashIndex = 0;
             
-            foreach (var (hash, bucket) in keyBucketPairs)
+            for (int i = 0; i < partHashes.Length; i++)
             {
+                var pair = hashBucketPairs[i];
                 // Fill in start positions for empty buckets
-                while (currentBucket <= bucket)
+                while (currentBucket <= pair.bucket)
                 {
                     bucketStarts[currentBucket] = hashIndex;
                     currentBucket++;
@@ -698,30 +707,49 @@ namespace PtrHash.CSharp.Port.Core
                 currentBucket++;
             }
             
-            // Create bucket order sorted by size (largest first)
-            var bucketSizes = new List<(int size, int bucket)>();
-            for (int i = 0; i < (int)_bucketsPerPart; i++)
+            // Create bucket order sorted by size (largest first) - use ArrayPool
+            var bucketSizePool = ArrayPool<(int size, int bucket)>.Shared;
+            var bucketSizes = bucketSizePool.Rent((int)_bucketsPerPart);
+            
+            try
             {
-                var size = bucketStarts[i + 1] - bucketStarts[i];
-                bucketSizes.Add((size, i));
+                for (int i = 0; i < (int)_bucketsPerPart; i++)
+                {
+                    var size = bucketStarts[i + 1] - bucketStarts[i];
+                    bucketSizes[i] = (size, i);
+                }
+                
+                // Sort by size descending, then by bucket index for deterministic order
+                Array.Sort(bucketSizes, 0, (int)_bucketsPerPart, Comparer<(int size, int bucket)>.Create((a, b) => {
+                    var sizeCompare = b.size.CompareTo(a.size); // Descending
+                    return sizeCompare != 0 ? sizeCompare : a.bucket.CompareTo(b.bucket);
+                }));
+                
+                // Extract bucket order directly (no LINQ)
+                var bucketOrder = new int[_bucketsPerPart]; // Result array - don't pool this
+                for (int i = 0; i < (int)_bucketsPerPart; i++)
+                {
+                    bucketOrder[i] = bucketSizes[i].bucket;
+                }
+                
+                return (sortedHashes, bucketStarts, bucketOrder);
             }
-            
-            // Sort by size descending, then by bucket index for deterministic order
-            bucketSizes.Sort((a, b) => {
-                var sizeCompare = b.size.CompareTo(a.size); // Descending
-                return sizeCompare != 0 ? sizeCompare : a.bucket.CompareTo(b.bucket);
-            });
-            
-            var bucketOrder = bucketSizes.Select(x => x.bucket).ToArray();
-            
-            return (sortedHashes, bucketStarts, bucketOrder);
+            finally
+            {
+                // Return pooled arrays
+                hashBucketPairPool.Return(hashBucketPairs);
+                bucketSizePool.Return(bucketSizes);
+            }
         }
         
         // Find a collision-free pilot for a bucket within a part
         private ulong? FindPilotInPart(ulong kmax, ReadOnlySpan<ulong> bucketHashes, int part, PartitionedBitVec taken)
         {
-            var random = new Random();
+            var random = new Random(); // Simple allocation - overhead is minimal compared to pilot search work
             var startPilot = (ulong)random.Next(256);
+            
+            // Pre-allocate fixed array for slot collision detection (much faster than HashSet)
+            Span<nuint> localSlots = stackalloc nuint[bucketHashes.Length];
             
             for (ulong delta = 0; delta < kmax; delta++)
             {
@@ -729,25 +757,68 @@ namespace PtrHash.CSharp.Port.Core
                 var hp = HashPilot(pilot);
                 
                 bool hasCollision = false;
-                var localSlots = new HashSet<nuint>();
+                int slotCount = 0;
                 
-                foreach (var hash in bucketHashes)
+                // Process chunks of 4 like Rust for better branch prediction
+                int i = 0;
+                int remainder = bucketHashes.Length % 4;
+                int unrolledEnd = bucketHashes.Length - remainder;
+                
+                // SIMD-like unrolled loop processing 4 elements at once (like Rust)
+                for (; i < unrolledEnd; i += 4)
                 {
-                    var localSlot = SlotInPartHp(hash, hp);
+                    var slot0 = SlotInPartHp(bucketHashes[i], hp);
+                    var slot1 = SlotInPartHp(bucketHashes[i + 1], hp);
+                    var slot2 = SlotInPartHp(bucketHashes[i + 2], hp);
+                    var slot3 = SlotInPartHp(bucketHashes[i + 3], hp);
                     
-                    // Check for internal collision within bucket
-                    if (!localSlots.Add(localSlot))
+                    // Check external collisions first (faster early exit)
+                    if (taken.GetLocal((nuint)part, slot0) || taken.GetLocal((nuint)part, slot1) ||
+                        taken.GetLocal((nuint)part, slot2) || taken.GetLocal((nuint)part, slot3))
                     {
                         hasCollision = true;
                         break;
                     }
                     
-                    // Check for external collision with existing slots (use local slot within part)
-                    if (taken.GetLocal((nuint)part, localSlot))
+                    // Store slots for internal collision check
+                    localSlots[slotCount++] = slot0;
+                    localSlots[slotCount++] = slot1;
+                    localSlots[slotCount++] = slot2;
+                    localSlots[slotCount++] = slot3;
+                }
+                
+                // Process remaining elements
+                if (!hasCollision)
+                {
+                    for (; i < bucketHashes.Length; i++)
                     {
-                        hasCollision = true;
-                        break;
+                        var slot = SlotInPartHp(bucketHashes[i], hp);
+                        
+                        if (taken.GetLocal((nuint)part, slot))
+                        {
+                            hasCollision = true;
+                            break;
+                        }
+                        
+                        localSlots[slotCount++] = slot;
                     }
+                }
+                
+                // Check for internal collisions using fast O(n²) check on small array
+                if (!hasCollision)
+                {
+                    for (int j = 0; j < slotCount - 1; j++)
+                    {
+                        for (int k = j + 1; k < slotCount; k++)
+                        {
+                            if (localSlots[j] == localSlots[k])
+                            {
+                                hasCollision = true;
+                                goto collision_found;
+                            }
+                        }
+                    }
+                    collision_found:;
                 }
                 
                 if (!hasCollision)
