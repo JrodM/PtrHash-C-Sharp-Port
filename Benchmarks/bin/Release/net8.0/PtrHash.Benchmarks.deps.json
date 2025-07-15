@@ -10,6 +10,7 @@
         "dependencies": {
           "BenchmarkDotNet": "0.13.12",
           "BenchmarkDotNet.Diagnostics.Windows": "0.13.12",
+          "PtrHash.CSharp.Port": "1.0.0",
           "PtrHashNative": "1.0.0"
         },
         "runtime": {
@@ -278,7 +279,7 @@
         "runtime": {
           "lib/netstandard2.0/Dia2Lib.dll": {
             "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.0"
+            "fileVersion": "0.0.0.0"
           },
           "lib/netstandard2.0/Microsoft.Diagnostics.FastSerialization.dll": {
             "assemblyVersion": "3.0.2.0",
@@ -420,6 +421,14 @@
         }
       },
       "System.Collections.Immutable/5.0.0": {},
+      "System.IO.Hashing/8.0.0": {
+        "runtime": {
+          "lib/net8.0/System.IO.Hashing.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        }
+      },
       "System.Management/5.0.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "5.0.0",
@@ -458,16 +467,21 @@
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {},
+      "PtrHash.CSharp.Port/1.0.0": {
+        "dependencies": {
+          "System.IO.Hashing": "8.0.0"
+        },
+        "runtime": {
+          "PtrHash.CSharp.Port.dll": {}
+        }
+      },
       "PtrHashNative/1.0.0": {
         "dependencies": {
           "System.Memory": "4.5.5",
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "runtime": {
-          "PtrHashNative.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
+          "PtrHashNative.dll": {}
         }
       }
     }
@@ -667,6 +681,13 @@
       "path": "system.collections.immutable/5.0.0",
       "hashPath": "system.collections.immutable.5.0.0.nupkg.sha512"
     },
+    "System.IO.Hashing/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ne1843evDugl0md7Fjzy6QjJrzsjh46ZKbhf8GwBXb5f/gw97J4bxMs0NQKifDuThh/f0bZ0e62NPl1jzTuRqA==",
+      "path": "system.io.hashing/8.0.0",
+      "hashPath": "system.io.hashing.8.0.0.nupkg.sha512"
+    },
     "System.Management/5.0.0": {
       "type": "package",
       "serviceable": true,
@@ -722,6 +743,11 @@
       "sha512": "sha512-zteT+G8xuGu6mS+mzDzYXbzS7rd3K6Fjb9RiZlYlJPam2/hU7JCBZBVEcywNuR+oZ1ncTvc/cq0faRr3P01OVg==",
       "path": "system.threading.tasks.extensions/4.5.4",
       "hashPath": "system.threading.tasks.extensions.4.5.4.nupkg.sha512"
+    },
+    "PtrHash.CSharp.Port/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "PtrHashNative/1.0.0": {
       "type": "project",

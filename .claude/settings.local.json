@@ -3,7 +3,9 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "mcp__memory__create_entities",
+      "Bash(dotnet test:*)"
     ],
     "deny": []
   }

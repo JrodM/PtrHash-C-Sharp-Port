@@ -4,51 +4,53 @@ using System.Runtime.CompilerServices;
 namespace PtrHash.CSharp.Port.Util
 {
     /// <summary>
-    /// Fast modular reduction operations for hash table sizing
+    /// Fast modular reduction operations for hash table sizing - exact Rust implementation
     /// </summary>
     public static class FastReduce
     {
         /// <summary>
-        /// Fast modular reduction using multiplication and shift
-        /// Equivalent to hash % n but faster for powers of 2 and other cases
+        /// FastReduce - exact implementation from Rust reduce.rs
+        /// Uses mul_high(self.d, h) which is ((a as u128 * b as u128) >> 64) as u64
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static nuint Reduce(ulong hash, nuint n)
         {
-            // For power of 2, use bitwise AND
-            if (IsPowerOfTwo(n))
-            {
-                return (nuint)(hash & ((ulong)n - 1));
-            }
-            
-            // General case: use division
-            return (nuint)(hash % (ulong)n);
+            var d = (ulong)n;
+            return (nuint)MulHigh(d, hash);
         }
 
         /// <summary>
-        /// Fast 32-bit modular reduction
+        /// Rust mul_high function: ((a as u128 * b as u128) >> 64) as u64
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ulong MulHigh(ulong a, ulong b)
+        {
+            return (ulong)(((UInt128)a * b) >> 64);
+        }
+
+        /// <summary>
+        /// FastMod32 for smaller moduli - exact implementation from Rust
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint Reduce32(ulong hash, uint n)
         {
-            if (IsPowerOfTwo(n))
-            {
-                return (uint)(hash & (n - 1));
-            }
-            
-            return (uint)(hash % n);
+            var d = (ulong)n;
+            var m = (ulong.MaxValue / d) + 1;
+            var lowbits = m * hash;
+            return (uint)(((UInt128)lowbits * d) >> 64);
         }
 
+        /// <summary>
+        /// Multiply a UInt128 by u64 and return the upper 64 bits of the result.
+        /// Rust: mul128_u64 function
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsPowerOfTwo(nuint value)
+        private static ulong Mul128U64(UInt128 lowbits, ulong d)
         {
-            return value != 0 && (value & (value - 1)) == 0;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsPowerOfTwo(uint value)
-        {
-            return value != 0 && (value & (value - 1)) == 0;
+            var botHalf = ((lowbits & ulong.MaxValue) * d) >> 64;
+            var topHalf = (lowbits >> 64) * d;
+            var bothHalves = botHalf + topHalf;
+            return (ulong)(bothHalves >> 64);
         }
     }
 }

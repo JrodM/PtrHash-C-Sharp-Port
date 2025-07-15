@@ -6,10 +6,10 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using PtrHash.Core;
-using PtrHash.PtrHash;
-using PtrHash.SentinelHashMap;
-using PtrHashImpl = PtrHash.PtrHash;
+using PtrHash.CSharp.Interop.Core;
+using PtrHash.CSharp.Interop.PtrHash;
+using PtrHash.CSharp.Interop.SentinelHashMap;
+using PtrHashImpl = PtrHash.CSharp.Interop.PtrHash;
 
 namespace PtrHash.Benchmarks
 {

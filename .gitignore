@@ -3,22 +3,39 @@
 Cargo.lock
 
 # C# build artifacts
-bin/
-obj/
+[Bb]in/
+[Oo]bj/
 *.user
 *.suo
 *.userprefs
 .vs/
 .vscode/
 
+# MSBuild artifacts
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
 # Benchmark artifacts
 BenchmarkDotNet.Artifacts/
 *.log
+*.csv
+*.html
+*.json
 
 # Test results
 TestResults/
 *.trx
 *.coverage
+*.coveragexml
+nunit_random_seed.tmp
 
 # Build outputs
 *.dll
@@ -26,6 +43,14 @@ TestResults/
 *.pdb
 *.so
 *.dylib
+*.deps.json
+*.runtimeconfig.json
+*.runtimeconfig.dev.json
+
+# Assembly info generated files
+**/AssemblyInfo.cs
+**/AssemblyAttributes.cs
+**/GlobalAssemblyInfo.cs
 
 # IDE files
 .idea/

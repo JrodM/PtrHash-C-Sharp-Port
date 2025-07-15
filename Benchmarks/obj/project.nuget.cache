@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "B1xxEKKemuOG5ePQqQ9rm2UIZb00k3VAeRq5QF6d0kiA9GtNfd/uq9HDyHWEXDsAkF7/AFL0vGcNWAImkcywlQ==",
+  "dgSpecHash": "An0pFAoRAlGTqJNmBKH2lMTej/zw6zCjgBT/XZ0CliV3fmPS8kOx26sPS21lIaimD5sMA9lcOSczmKbJqJJn2w==",
   "success": true,
   "projectFilePath": "/home/jared/Developer/PtrHash/Benchmarks/PtrHash.Benchmarks.csproj",
   "expectedPackageFiles": [
@@ -31,10 +31,11 @@
     "/home/jared/.nuget/packages/perfolizer/0.2.1/perfolizer.0.2.1.nupkg.sha512",
     "/home/jared/.nuget/packages/system.codedom/5.0.0/system.codedom.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.collections.immutable/5.0.0/system.collections.immutable.5.0.0.nupkg.sha512",
+    "/home/jared/.nuget/packages/system.io.hashing/8.0.0/system.io.hashing.8.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.management/5.0.0/system.management.5.0.0.nupkg.sha512",
-    "/home/jared/.nuget/packages/system.memory/4.5.4/system.memory.4.5.4.nupkg.sha512",
+    "/home/jared/.nuget/packages/system.memory/4.5.5/system.memory.4.5.5.nupkg.sha512",
     "/home/jared/.nuget/packages/system.reflection.metadata/5.0.0/system.reflection.metadata.5.0.0.nupkg.sha512",
-    "/home/jared/.nuget/packages/system.runtime.compilerservices.unsafe/5.0.0/system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512",
+    "/home/jared/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.security.accesscontrol/5.0.0/system.security.accesscontrol.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.security.principal.windows/5.0.0/system.security.principal.windows.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.text.encoding.codepages/4.5.1/system.text.encoding.codepages.4.5.1.nupkg.sha512",

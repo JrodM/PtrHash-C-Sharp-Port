@@ -15,9 +15,9 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="../CSharpInterop/PtrHashNative.csproj" />
+    <ProjectReference Include="../PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj" />
+    <ProjectReference Include="../PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj" />
   </ItemGroup>
 
   <!-- Ensure native library is available for benchmarks -->
@@ -26,14 +26,9 @@
       <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Windows'))">dll</NativeLibExt>
       <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Linux'))">so</NativeLibExt>
       <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('OSX'))">dylib</NativeLibExt>
-      <NativeLibPath>..\target\release\ptrhash.$(NativeLibExt)</NativeLibPath>
+      <NativeLibPath>..\PtrHash.CSharp.Interop\target\release\libptrhash.$(NativeLibExt)</NativeLibPath>
     </PropertyGroup>
     
-
-  <ItemGroup>
-    <ProjectReference Include="../CSharpInterop/PtrHashNative.csproj" />
-    <ProjectReference Include="../CSharpInterop/PtrHashNative.csproj" />
-  </ItemGroup>
 
     <Message Text="Checking for native library for benchmarks..." Importance="high" />
     

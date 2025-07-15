@@ -25,7 +25,14 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj": {
+                "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj"
+              },
+              "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj": {
+                "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -45,6 +52,138 @@
             "BenchmarkDotNet.Diagnostics.Windows": {
               "target": "Package",
               "version": "[0.13.12, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.117/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj",
+        "projectName": "PtrHashNative",
+        "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj",
+        "packagesPath": "/home/jared/.nuget/packages/",
+        "outputPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/jared/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "System.Memory": {
+              "target": "Package",
+              "version": "[4.5.5, )"
+            },
+            "System.Runtime.CompilerServices.Unsafe": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.36, 6.0.36]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.36, 6.0.36]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.117/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj",
+        "projectName": "PtrHash.CSharp.Port",
+        "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj",
+        "packagesPath": "/home/jared/.nuget/packages/",
+        "outputPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/jared/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "System.IO.Hashing": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [

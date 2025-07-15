@@ -5,9 +5,9 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using PtrHash.Core;
-using PtrHash.PtrHash;
-using PtrHash.SentinelHashMap;
+using PtrHash.CSharp.Interop.Core;
+using PtrHash.CSharp.Interop.PtrHash;
+using PtrHash.CSharp.Interop.SentinelHashMap;
 
 
 namespace PtrHash.Benchmarks

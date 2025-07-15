@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Util;
 using PtrHash.CSharp.Port.Native;
@@ -40,6 +41,17 @@ namespace PtrHash.CSharp.Port.Core
             _parts[part].Set(localSlot, value);
         }
         
+        // Direct access to part's BitVec for local slot operations
+        public bool GetLocal(nuint part, nuint localSlot)
+        {
+            return _parts[part].Get(localSlot);
+        }
+        
+        public void SetLocal(nuint part, nuint localSlot, bool value)
+        {
+            _parts[part].Set(localSlot, value);
+        }
+        
         public nuint CountOnes()
         {
             nuint total = 0;
@@ -75,6 +87,8 @@ namespace PtrHash.CSharp.Port.Core
     public sealed class PtrHash<TKey, THasher> : IPtrHash<TKey>
         where THasher : struct, IKeyHasher<TKey>
     {
+        // Cap parallelism to prevent thread explosion (Rust's rayon uses all cores by default)
+        private static readonly int MaxParallelism = Math.Min(Environment.ProcessorCount, 8);
         private readonly THasher _hasher;
         private readonly byte[] _pilots;
         private readonly LinearBucketFunction _bucketFunction;
@@ -142,7 +156,7 @@ namespace PtrHash.CSharp.Port.Core
                 _bucketsTotal = _parts * _bucketsPerPart;
             }
             
-            _bucketFunction = new LinearBucketFunction(_bucketsTotal);
+            _bucketFunction = new LinearBucketFunction(_bucketsPerPart);
             _pilots = new byte[_bucketsTotal];
 
             // Construct the hash function using hash-evict algorithm
@@ -150,6 +164,9 @@ namespace PtrHash.CSharp.Port.Core
             {
                 throw new PtrHashException("Failed to construct minimal perfect hash function. Try different parameters or check for duplicate keys.");
             }
+
+            // Validation can be enabled for debugging by uncommenting the line below
+            // ValidateHashFunction(keys);
 
             // Remap table will be created during construction if needed
 
@@ -183,11 +200,38 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexNoRemap(TKey key)
         {
             var hx = _hasher.Hash(key, _seed);
-            var bucket = _bucketFunction.GetBucket(hx);
+            var bucket = GetBucketGlobal(hx); // Use global bucket calculation like Rust
             var pilot = (ulong)_pilots[bucket]; // Convert byte to ulong (Pilot type)
             return ComputeSlot(hx, pilot);
         }
         
+        // Rust bucket() function - returns global bucket index
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private nuint GetBucketGlobal(ulong hx)
+        {
+            // Must match SortBucketsInPart calculation exactly!
+            // Construction: FastReduce.Reduce(hash, _bucketsPerPart) within each part
+            var part = GetPart(hx);
+            var localBucket = FastReduce.Reduce(hx, _bucketsPerPart);
+            return part * _bucketsPerPart + localBucket;
+        }
+        
+        // Rust bucket_in_part() function - returns bucket index within a part
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private nuint GetBucketInPart(ulong hx)
+        {
+            // For Linear bucket function: rem_buckets.reduce(x)
+            var high = hx >> 32; // Get high 32 bits
+            return FastModulo(high, _bucketsPerPart);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private nuint FastModulo(ulong value, nuint modulus)
+        {
+            // Simple modulo for now - can optimize later with FastReduce like Rust
+            return (nuint)(value % (ulong)modulus);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint ComputeSlot(ulong hx, ulong pilot)
         {
@@ -209,15 +253,16 @@ namespace PtrHash.CSharp.Port.Core
         private nuint SlotInPartHp(ulong hx, ulong hp)
         {
             // Rust: self.rem_slots.reduce(hx.low() ^ hp)
-            // Note: hx.low() in Rust extracts lower 64 bits, but we already have u64
-            return FastReduce.Reduce(hx ^ hp, _slotsPerPart);
+            // hx.low() in Rust returns lower 32 bits, rem_slots uses FM32, not FastReduce!
+            var hxLow = (uint)(hx & 0xFFFFFFFF); // Get lower 32 bits like Rust's hx.low()
+            return (nuint)FastReduce.Reduce32(hxLow ^ (uint)hp, (uint)_slotsPerPart);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint GetPart(ulong hx)
         {
-            // Rust uses: FastReduce.Reduce(hx, self.parts)
-            return FastReduce.Reduce(hx, _parts);
+            // Rust uses: rem_parts.reduce(hx.high()) - for u64, high() returns the full value
+            return FastModulo(hx, _parts);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -249,7 +294,7 @@ namespace PtrHash.CSharp.Port.Core
                     hx = _hasher.Hash(keys[idx], _seed);
                 }
                 nextHashes[idx] = hx;
-                nextBuckets[idx] = _bucketFunction.GetBucket(nextHashes[idx]);
+                nextBuckets[idx] = GetBucketGlobal(nextHashes[idx]);
                 
                 // Prefetch pilot for this bucket
                 unsafe
@@ -277,7 +322,7 @@ namespace PtrHash.CSharp.Port.Core
                     
                     // Update ring buffer with new values
                     nextHashes[idx] = nextHash;
-                    nextBuckets[idx] = _bucketFunction.GetBucket(nextHashes[idx]);
+                    nextBuckets[idx] = GetBucketGlobal(nextHashes[idx]);
                     
                     // Prefetch pilot for the new bucket
                     Prefetch.PrefetchRead(pilotsPtr + nextBuckets[idx]);
@@ -349,134 +394,46 @@ namespace PtrHash.CSharp.Port.Core
             // Reset pilots
             Array.Fill(_pilots, (byte)0);
 
-            // Group keys by bucket and get their hashes - following Rust's sort_buckets pattern
-            var (bucketStarts, sortedHashes) = SortBuckets(keys, seed);
+            // First, hash all keys and partition them by parts (like Rust's sort_parts)
+            var (allHashes, partStarts) = SortPartsByHashes(keys, seed);
             
             // Track taken slots using Vec<BitVec> like Rust - for ALL parts
             var taken = new PartitionedBitVec(_parts, _slotsPerPart);
             
-            // Track which bucket owns each slot - for ALL slots across ALL parts
-            var slots = new int[_slotsTotal];
-            Array.Fill(slots, -1); // -1 = NONE like Rust BucketIdx::NONE
-            
-            const ulong kmax = 256;
-            
-            // Create bucket order - sort by bucket size descending
-            var bucketOrder = CreateBucketOrderFromStarts(bucketStarts);
-            
-            // Process each bucket following Rust's build_part algorithm
-            var stack = new BinaryHeap<BucketInfo>();
-            var recent = new int[16];
-            Array.Fill(recent, -1);
-            
-            var rng = new Random();
-            var totalEvictions = 0;
-            
-            for (int bucketIdx = 0; bucketIdx < bucketOrder.Length; bucketIdx++)
+            // Process parts in parallel like Rust's par_chunks_exact_mut
+            var parallelOptions = new ParallelOptions
             {
-                var bucket = bucketOrder[bucketIdx];
-                var bucketStart = bucketStarts[bucket];
-                var bucketEnd = bucketStarts[bucket + 1];
-                var bucketSize = bucketEnd - bucketStart;
+                MaxDegreeOfParallelism = MaxParallelism
+            };
+            
+            var success = true;
+            var lockObject = new object();
+            
+            Parallel.For(0, (int)_parts, parallelOptions, part =>
+            {
+                if (!success) return; // Early exit if another thread failed
                 
-                if (bucketSize == 0)
+                var partStart = (int)partStarts[part];
+                var partEnd = (int)partStarts[part + 1];
+                var partHashes = allHashes.AsSpan(partStart, partEnd - partStart);
+                
+                // Get pilot slice for this part
+                var partPilotStart = part * (int)_bucketsPerPart;
+                var partPilots = _pilots.AsSpan(partPilotStart, (int)_bucketsPerPart);
+                
+                // Build this part using exact Rust build_part algorithm
+                if (!BuildPartRust(part, partHashes, partPilots, taken))
                 {
-                    _pilots[bucket] = 0;
-                    continue;
+                    lock (lockObject)
+                    {
+                        success = false;
+                    }
                 }
-                
-                var evictions = 0;
-                
-                stack.Push(new BucketInfo((nuint)bucketSize, (nuint)bucket));
-                Array.Fill(recent, -1);
-                var recentIdx = 0;
-                recent[0] = bucket;
-                
-                while (!stack.IsEmpty)
-                {
-                    if (evictions > (int)_slotsTotal && IsPowerOfTwo(evictions))
-                    {
-                        if (evictions >= 10 * (int)_slotsTotal)
-                        {
-                            return false; // Too many evictions, abort
-                        }
-                    }
-                    
-                    var bucketInfo = stack.Pop();
-                    var currentBucket = (int)bucketInfo.BucketId;
-                    var currentStart = bucketStarts[currentBucket];
-                    var currentEnd = bucketStarts[currentBucket + 1];
-                    var currentHashes = sortedHashes.AsSpan(currentStart, currentEnd - currentStart);
-                    
-                    if (currentHashes.Length == 0)
-                        continue;
-                    
-                    // 1) Hot path: find collision-free pilot (matching Rust find_pilot)
-                    var pilotResult = FindPilotRust(kmax, currentHashes, taken, slots);
-                    if (pilotResult.HasValue)
-                    {
-                        var (pilot, pilotHash) = pilotResult.Value;
-                        _pilots[currentBucket] = (byte)pilot;
-                        
-                        // Place bucket in slots using GLOBAL slot computation (matching Rust)
-                        foreach (var hash in currentHashes)
-                        {
-                            var globalSlot = ComputeSlot(hash, pilot); // Use global slot like Rust
-                            slots[globalSlot] = currentBucket;
-                            taken.Set(globalSlot, true);
-                        }
-                        continue;
-                    }
-                    
-                    // 2) Find pilot with minimal collisions (matching Rust)
-                    var bestResult = FindBestPilotRust(currentHashes, slots, taken, recent, rng, kmax, bucketStarts);
-                    if (bestResult.pilot == ulong.MaxValue)
-                    {
-                        return false; // Indistinguishable hashes
-                    }
-                    
-                    var bestPilot = bestResult.pilot;
-                    _pilots[currentBucket] = (byte)bestPilot;
-                    
-                    // Handle evictions and place bucket using GLOBAL slots (matching Rust)
-                    foreach (var hash in currentHashes)
-                    {
-                        var globalSlot = ComputeSlot(hash, bestPilot); // Use global slot like Rust
-                        var occupyingBucket = slots[globalSlot];
-                        
-                        if (occupyingBucket != -1 && occupyingBucket != currentBucket)
-                        {
-                            // Evict the existing bucket
-                            var evictedStart = bucketStarts[occupyingBucket];
-                            var evictedEnd = bucketStarts[occupyingBucket + 1];
-                            var evictedSize = evictedEnd - evictedStart;
-                            
-                            stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
-                            evictions++;
-                            
-                            // Remove evicted bucket from slots
-                            var evictedPilot = (ulong)_pilots[occupyingBucket];
-                            var evictedHashes = sortedHashes.AsSpan(evictedStart, evictedSize);
-                            
-                            foreach (var evictedHash in evictedHashes)
-                            {
-                                var evictedGlobalSlot = ComputeSlot(evictedHash, evictedPilot);
-                                slots[evictedGlobalSlot] = -1;
-                                taken.Set(evictedGlobalSlot, false);
-                            }
-                        }
-                        
-                        // Place current bucket
-                        slots[globalSlot] = currentBucket;
-                        taken.Set(globalSlot, true);
-                    }
-                    
-                    // Update recent buckets
-                    recentIdx = (recentIdx + 1) % recent.Length;
-                    recent[recentIdx] = currentBucket;
-                }
-                
-                totalEvictions += evictions;
+            });
+            
+            if (!success)
+            {
+                return false;
             }
             
             // After successful construction, create remap table if needed
@@ -493,23 +450,220 @@ namespace PtrHash.CSharp.Port.Core
             return value > 0 && (value & (value - 1)) == 0;
         }
         
-        // Exact Rust sort_buckets implementation
-        private (int[] bucketStarts, ulong[] sortedHashes) SortBuckets(ReadOnlySpan<TKey> keys, ulong seed)
+        // Hash all keys and partition by parts (like Rust's sort_parts)
+        private (ulong[] allHashes, uint[] partStarts) SortPartsByHashes(ReadOnlySpan<TKey> keys, ulong seed)
         {
-            // Hash all keys and group by bucket
-            var keyBucketPairs = new List<(ulong hash, int bucket)>(keys.Length);
+            // Convert to array for parallel processing (ReadOnlySpan can't be captured in lambda)
+            var keysArray = keys.ToArray();
+            var allHashes = new ulong[keysArray.Length];
             var seenKeys = new HashSet<TKey>();
             
-            foreach (var key in keys)
+            // First check for duplicates sequentially to maintain deterministic error reporting
+            for (int i = 0; i < keysArray.Length; i++)
             {
-                if (!seenKeys.Add(key))
+                if (!seenKeys.Add(keysArray[i]))
                 {
-                    throw new PtrHashException($"Duplicate key found: {key}");
+                    throw new PtrHashException($"Duplicate key found: {keysArray[i]}");
+                }
+            }
+            
+            // Hash keys in parallel like Rust's keys.par_iter()
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = MaxParallelism
+            };
+            
+            Parallel.For(0, keysArray.Length, parallelOptions, i =>
+            {
+                allHashes[i] = _hasher.Hash(keysArray[i], seed);
+            });
+            
+            // Sort by hash (like Rust radix sort)
+            Array.Sort(allHashes);
+            
+            // Find part starts using binary search (like Rust)
+            var partStarts = new uint[_parts + 1];
+            partStarts[0] = 0;
+            
+            for (nuint part = 1; part <= _parts; part++)
+            {
+                // Binary search for first hash belonging to this part
+                int left = 0, right = allHashes.Length;
+                while (left < right)
+                {
+                    int mid = (left + right) / 2;
+                    if (GetPart(allHashes[mid]) < part)
+                        left = mid + 1;
+                    else
+                        right = mid;
+                }
+                partStarts[part] = (uint)left;
+            }
+            
+            return (allHashes, partStarts);
+        }
+        
+        // Build a single part (like Rust's build_part)
+        private bool BuildPartRust(int part, ReadOnlySpan<ulong> partHashes, Span<byte> partPilots, PartitionedBitVec taken)
+        {
+            // Sort buckets within this part (like Rust's sort_buckets)
+            var (sortedHashes, bucketStarts, bucketOrder) = SortBucketsInPart(part, partHashes);
+            // Use the sorted hashes from here on - this is CRITICAL for matching Rust exactly
+            var hashesSpan = sortedHashes.AsSpan();
+            
+            const ulong kmax = 256;
+            var slots = new int[_slotsPerPart];
+            Array.Fill(slots, -1); // -1 = BucketIdx::NONE
+            
+            // EXACT RUST BINARY HEAP IMPLEMENTATION
+            var stack = new BinaryHeap<BucketInfo>();
+            var recent = new int[16];
+            Array.Fill(recent, -1); // -1 = BucketIdx::NONE
+            var rng = new Random();
+            var totalEvictions = 0;
+
+            // Process buckets in size order (largest first) - EXACT Rust pattern
+            for (int bucketIdx = 0; bucketIdx < bucketOrder.Length; bucketIdx++)
+            {
+                var newBucket = bucketOrder[bucketIdx];
+                var bucketStart = bucketStarts[newBucket];
+                var bucketEnd = bucketStarts[newBucket + 1];
+                var newBucketSize = bucketEnd - bucketStart;
+                
+                if (newBucketSize == 0)
+                {
+                    partPilots[newBucket] = 0;
+                    continue;
                 }
                 
-                var hash = _hasher.Hash(key, seed);
-                var bucket = _bucketFunction.GetBucket(hash);
-                keyBucketPairs.Add((hash, (int)bucket));
+                var evictions = 0;
+                
+                // Push initial bucket onto stack (Rust: stack.push((new_b_len, new_b)))
+                stack.Push(new BucketInfo((nuint)newBucketSize, (nuint)newBucket));
+                Array.Fill(recent, -1); // Rust: recent.fill(BucketIdx::NONE)
+                var recentIdx = 0;
+                recent[0] = newBucket; // Rust: recent[0] = new_b
+                
+                // Process eviction chain (Rust: while let Some((_b_len, b)) = stack.pop())
+                while (!stack.IsEmpty)
+                {
+                    // Rust termination condition
+                    if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
+                    {
+                        if (evictions >= 10 * (int)_slotsPerPart)
+                        {
+                            return false; // Too many evictions, abort
+                        }
+                    }
+                    
+                    var bucketInfo = stack.Pop();
+                    var currentBucket = (int)bucketInfo.BucketId;
+                    var currentStart = bucketStarts[currentBucket];
+                    var currentEnd = bucketStarts[currentBucket + 1];
+                    var currentBucketHashes = hashesSpan.Slice(currentStart, currentEnd - currentStart);
+                    
+                    if (currentBucketHashes.Length == 0)
+                        continue;
+                    
+                    // 1) Try collision-free pilot first (Rust hot path)
+                    var pilotResult = FindPilotInPart(kmax, currentBucketHashes, part, taken);
+                    if (pilotResult.HasValue)
+                    {
+                        var pilot = pilotResult.Value;
+                        partPilots[currentBucket] = (byte)pilot;
+                        
+                        // Place bucket in slots
+                        foreach (var hash in currentBucketHashes)
+                        {
+                            var localSlot = SlotInPartHp(hash, HashPilot(pilot));
+                            slots[localSlot] = currentBucket;
+                            
+                            // Mark slot as taken in part's BitVec (use local slot within part)
+                            taken.SetLocal((nuint)part, localSlot, true);
+                        }
+                        continue;
+                    }
+                    
+                    // 2) Find pilot with minimal collisions and evict (EXACT Rust collision handling)
+                    var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, part, bucketStarts);
+                    if (bestResult.pilot == ulong.MaxValue)
+                    {
+                        return false; // Failed to find suitable pilot (indistinguishable hashes)
+                    }
+                    
+                    var bestPilot = bestResult.pilot;
+                    partPilots[currentBucket] = (byte)bestPilot;
+                    var hp = HashPilot(bestPilot);
+                    
+                    // EXACT Rust eviction algorithm: Drop collisions and set new pilot
+                    foreach (var hash in currentBucketHashes)
+                    {
+                        var localSlot = SlotInPartHp(hash, hp);
+                        
+                        // THIS IS A HOT INSTRUCTION (Rust comment)
+                        var occupyingBucket = slots[localSlot];
+                        if (occupyingBucket >= 0) // b2.is_some() in Rust
+                        {
+                            if (occupyingBucket == currentBucket)
+                                throw new InvalidOperationException("Self-collision detected"); // assert!(b2 != b)
+                            
+                            // DROP BUCKET (Rust comment)
+                            var evictedStart = bucketStarts[occupyingBucket];
+                            var evictedEnd = bucketStarts[occupyingBucket + 1];
+                            var evictedSize = evictedEnd - evictedStart;
+                            
+                            // Push evicted bucket onto stack (Rust: stack.push((bucket_len(b2), b2)))
+                            stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
+                            evictions++;
+                            
+                            // Clear all slots occupied by evicted bucket (Rust: for p2 in slots_for_bucket)
+                            var evictedPilot = (ulong)partPilots[occupyingBucket];
+                            var evictedHp = HashPilot(evictedPilot);
+                            var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
+                            
+                            foreach (var evictedHash in evictedHashes)
+                            {
+                                var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
+                                slots[evictedLocalSlot] = -1; // BucketIdx::NONE
+                                
+                                // Clear slot from part's BitVec (use local slot within part)
+                                taken.SetLocal((nuint)part, evictedLocalSlot, false);
+                            }
+                        }
+                        
+                        // Place current bucket (Rust: *slots.get_unchecked_mut(slot) = b)
+                        slots[localSlot] = currentBucket;
+                        
+                        // Mark slot as taken (Rust: taken.set_unchecked(slot, true))
+                        taken.SetLocal((nuint)part, localSlot, true);
+                    }
+                    
+                    // Update recent buckets (EXACT Rust algorithm)
+                    recentIdx += 1; // recent_idx += 1
+                    recentIdx %= recent.Length; // recent_idx %= recent.len()
+                    recent[recentIdx] = currentBucket; // recent[recent_idx] = b
+                }
+                
+                totalEvictions += evictions;
+            }
+            
+            return true;
+        }
+
+        // Sort buckets within a single part (like Rust's sort_buckets)
+        // CRITICAL: This must return the sorted hash array AND bucket starts/order that match it
+        private (ulong[] sortedHashes, int[] bucketStarts, int[] bucketOrder) SortBucketsInPart(int part, ReadOnlySpan<ulong> partHashes)
+        {
+            // Group hashes by bucket within this part
+            var keyBucketPairs = new List<(ulong hash, int bucket)>(partHashes.Length);
+            
+            foreach (var hash in partHashes)
+            {
+                // EXACT RUST ALGORITHM: For LINEAR bucket functions, bucket_in_part uses rem_buckets.reduce(x)
+                // This gives us bucket index within the part [0, buckets_per_part)
+                var localBucket = (int)FastReduce.Reduce(hash, _bucketsPerPart);
+                
+                keyBucketPairs.Add((hash, localBucket));
             }
             
             // Sort by bucket, then by hash for deterministic order
@@ -518,12 +672,13 @@ namespace PtrHash.CSharp.Port.Core
                 return bucketCompare != 0 ? bucketCompare : a.hash.CompareTo(b.hash);
             });
             
-            // Create bucket starts array (like Rust)
-            var bucketStarts = new int[_bucketsPerPart + 1]; // +1 for end sentinel
-            var sortedHashes = new ulong[keys.Length];
+            // Extract the sorted hashes
+            var sortedHashes = keyBucketPairs.Select(p => p.hash).ToArray();
             
-            int currentBucket = 0;
-            int hashIndex = 0;
+            // Create bucket starts array
+            var bucketStarts = new int[_bucketsPerPart + 1]; // +1 for end sentinel
+            var currentBucket = 0;
+            var hashIndex = 0;
             
             foreach (var (hash, bucket) in keyBucketPairs)
             {
@@ -533,8 +688,6 @@ namespace PtrHash.CSharp.Port.Core
                     bucketStarts[currentBucket] = hashIndex;
                     currentBucket++;
                 }
-                
-                sortedHashes[hashIndex] = hash;
                 hashIndex++;
             }
             
@@ -545,14 +698,9 @@ namespace PtrHash.CSharp.Port.Core
                 currentBucket++;
             }
             
-            return (bucketStarts, sortedHashes);
-        }
-        
-        private int[] CreateBucketOrderFromStarts(int[] bucketStarts)
-        {
+            // Create bucket order sorted by size (largest first)
             var bucketSizes = new List<(int size, int bucket)>();
-            
-            for (int i = 0; i < bucketStarts.Length - 1; i++)
+            for (int i = 0; i < (int)_bucketsPerPart; i++)
             {
                 var size = bucketStarts[i + 1] - bucketStarts[i];
                 bucketSizes.Add((size, i));
@@ -560,117 +708,81 @@ namespace PtrHash.CSharp.Port.Core
             
             // Sort by size descending, then by bucket index for deterministic order
             bucketSizes.Sort((a, b) => {
-                var sizeCompare = b.size.CompareTo(a.size);
+                var sizeCompare = b.size.CompareTo(a.size); // Descending
                 return sizeCompare != 0 ? sizeCompare : a.bucket.CompareTo(b.bucket);
             });
             
-            return bucketSizes.Select(x => x.bucket).ToArray();
+            var bucketOrder = bucketSizes.Select(x => x.bucket).ToArray();
+            
+            return (sortedHashes, bucketStarts, bucketOrder);
         }
         
-        // Exact Rust find_pilot implementation with global slot computation
-        private (ulong pilot, ulong pilotHash)? FindPilotRust(ulong kmax, ReadOnlySpan<ulong> bucket, PartitionedBitVec taken, int[] slots)
+        // Find a collision-free pilot for a bucket within a part
+        private ulong? FindPilotInPart(ulong kmax, ReadOnlySpan<ulong> bucketHashes, int part, PartitionedBitVec taken)
         {
-            var r = bucket.Length / 4 * 4; // Round down to multiple of 4
-            
-            for (ulong p = 0; p < kmax; p++)
-            {
-                // Check function that tests if global slot is already taken
-                bool CheckSlot(ulong hx) => taken.Get(ComputeSlot(hx, p));
-                
-                // Process chunks of 4 bucket elements at a time (exact Rust algorithm)
-                bool hasCollision = false;
-                for (int i = 0; i < r; i += 4)
-                {
-                    // Check all 4 elements without early break
-                    var checks = new bool[4]
-                    {
-                        CheckSlot(bucket[i]),
-                        CheckSlot(bucket[i + 1]),
-                        CheckSlot(bucket[i + 2]),
-                        CheckSlot(bucket[i + 3])
-                    };
-                    
-                    if (checks[0] || checks[1] || checks[2] || checks[3])
-                    {
-                        hasCollision = true;
-                        break;
-                    }
-                }
-                
-                if (hasCollision)
-                    continue;
-                
-                // Check remaining elements
-                for (int i = r; i < bucket.Length; i++)
-                {
-                    if (CheckSlot(bucket[i]))
-                    {
-                        hasCollision = true;
-                        break;
-                    }
-                }
-                
-                if (hasCollision)
-                    continue;
-                
-                // No external collisions found, check internal collisions using global slots
-                if (TryTakePilotRust(bucket, p, taken))
-                {
-                    return (p, HashPilot(p));
-                }
-            }
-            
-            return null;
-        }
-        
-        
-        /// <summary>
-        /// Fill `taken` with the slots for pilot, but backtrack as soon as a
-        /// collision within the bucket is found.
-        /// Returns true on success.
-        /// Exact implementation of Rust's try_take_pilot with global slots
-        /// </summary>
-        private bool TryTakePilotRust(ReadOnlySpan<ulong> bucket, ulong pilot, PartitionedBitVec taken)
-        {
-            // This bucket does not collide with previous buckets, but it may still collide with itself.
-            for (int i = 0; i < bucket.Length; i++)
-            {
-                var hx = bucket[i];
-                var globalSlot = ComputeSlot(hx, pilot); // Use global slot computation
-                
-                if (taken.Get(globalSlot))
-                {
-                    // Collision within the bucket. Clean already set entries.
-                    for (int j = 0; j < i; j++)
-                    {
-                        var prevGlobalSlot = ComputeSlot(bucket[j], pilot);
-                        taken.Set(prevGlobalSlot, false);
-                    }
-                    return false;
-                }
-                taken.Set(globalSlot, true);
-            }
-            
-            return true;
-        }
-        
-        // Exact Rust best pilot finding with global slots
-        private (ulong score, ulong pilot) FindBestPilotRust(ReadOnlySpan<ulong> bucket, int[] slots, PartitionedBitVec taken, 
-            int[] recent, Random rng, ulong kmax, int[] bucketStarts)
-        {
-            var p0 = (ulong)rng.Next(256);
-            var best = (score: ulong.MaxValue, pilot: ulong.MaxValue);
+            var random = new Random();
+            var startPilot = (ulong)random.Next(256);
             
             for (ulong delta = 0; delta < kmax; delta++)
             {
-                var pilot = (p0 + delta) % kmax;
-                ulong collisionScore = 0;
+                var pilot = (startPilot + delta) % kmax;
+                var hp = HashPilot(pilot);
+                
+                bool hasCollision = false;
+                var localSlots = new HashSet<nuint>();
+                
+                foreach (var hash in bucketHashes)
+                {
+                    var localSlot = SlotInPartHp(hash, hp);
+                    
+                    // Check for internal collision within bucket
+                    if (!localSlots.Add(localSlot))
+                    {
+                        hasCollision = true;
+                        break;
+                    }
+                    
+                    // Check for external collision with existing slots (use local slot within part)
+                    if (taken.GetLocal((nuint)part, localSlot))
+                    {
+                        hasCollision = true;
+                        break;
+                    }
+                }
+                
+                if (!hasCollision)
+                {
+                    return pilot;
+                }
+            }
+            
+            return null; // No collision-free pilot found
+        }
+        // Find best pilot with minimal collisions (Rust-style eviction logic)
+        private (ulong score, ulong pilot) FindBestPilotWithEvictionInPart(ReadOnlySpan<ulong> bucketHashes, int[] slots, int[] recent, Random rng, ulong kmax, int part, int[] bucketStarts)
+        {
+            var bestScore = ulong.MaxValue;
+            var bestPilot = ulong.MaxValue;
+            var startPilot = (ulong)rng.Next(256);
+            
+            for (ulong delta = 0; delta < kmax; delta++)
+            {
+                var pilot = (startPilot + delta) % kmax;
+                var hp = HashPilot(pilot);
+                
+                // Check for internal collisions first
+                if (HasDuplicateSlotsInPart(bucketHashes, pilot, part))
+                {
+                    continue; // Skip pilots that cause internal collisions
+                }
+                
+                var collisionScore = 0UL;
                 bool skipPilot = false;
                 
-                foreach (var hash in bucket)
+                foreach (var hash in bucketHashes)
                 {
-                    var globalSlot = ComputeSlot(hash, pilot); // Use global slot computation
-                    var occupyingBucket = slots[globalSlot];
+                    var localSlot = SlotInPartHp(hash, hp);
+                    var occupyingBucket = slots[localSlot];
                     
                     if (occupyingBucket == -1)
                     {
@@ -684,12 +796,12 @@ namespace PtrHash.CSharp.Port.Core
                         break;
                     }
                     
-                    // Calculate collision score (bucket size squared)
+                    // Calculate collision score (bucket size squared - Rust style)
                     var bucketSize = bucketStarts[occupyingBucket + 1] - bucketStarts[occupyingBucket];
-                    var newScore = (ulong)(bucketSize * bucketSize);
-                    collisionScore += newScore;
+                    collisionScore += (ulong)(bucketSize * bucketSize);
                     
-                    if (collisionScore >= best.score)
+                    // Early termination if score is already worse than best
+                    if (collisionScore >= bestScore)
                     {
                         skipPilot = true;
                         break;
@@ -699,31 +811,72 @@ namespace PtrHash.CSharp.Port.Core
                 if (skipPilot)
                     continue;
                 
-                // Check for duplicate slots within this bucket (Rust duplicate_slots check)
-                if (!HasDuplicateSlotsRust(bucket, pilot))
+                // Update best if this pilot has lower collision score
+                if (collisionScore < bestScore)
                 {
-                    best = (collisionScore, pilot);
+                    bestScore = collisionScore;
+                    bestPilot = pilot;
                     
-                    // Early exit optimization
-                    var expectedScore = (ulong)(bucket.Length * bucket.Length);
-                    if (collisionScore == expectedScore)
+                    // If we found a collision-free solution, use it immediately
+                    if (collisionScore == 0)
                     {
                         break;
                     }
                 }
             }
             
-            return best;
+            return (bestScore, bestPilot);
         }
-        
-        private bool HasDuplicateSlotsRust(ReadOnlySpan<ulong> bucket, ulong pilot)
+
+        // Check for duplicate slots within a bucket (internal collisions)
+        private void ValidateHashFunction(ReadOnlySpan<TKey> keys)
         {
+            var indices = new HashSet<nuint>();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var key = keys[i];
+                var hx = _hasher.Hash(key, _seed);
+                var bucket = GetBucketGlobal(hx);
+                var pilot = (ulong)_pilots[bucket];
+                var part = GetPart(hx);
+                var localSlot = SlotInPart(hx, pilot);
+                var globalSlot = part * _slotsPerPart + localSlot;
+                var index = GetIndexNoRemap(key);
+                
+                
+                if (!indices.Add(index))
+                {
+                    // Find which other key produces the same index
+                    for (int j = 0; j < i; j++)
+                    {
+                        var otherIndex = GetIndexNoRemap(keys[j]);
+                        if (otherIndex == index)
+                        {
+                            var otherKey = keys[j];
+                            var otherHx = _hasher.Hash(otherKey, _seed);
+                            var otherBucket = GetBucketGlobal(otherHx);
+                            var otherPilot = (ulong)_pilots[otherBucket];
+                            var otherPart = GetPart(otherHx);
+                            var otherLocalSlot = SlotInPart(otherHx, otherPilot);
+                            var otherGlobalSlot = otherPart * _slotsPerPart + otherLocalSlot;
+                            
+                            break;
+                        }
+                    }
+                    throw new PtrHashException($"Hash function validation failed: Key {keys[i]} (position {i}) produces duplicate index {index}");
+                }
+            }
+        }
+
+        private bool HasDuplicateSlotsInPart(ReadOnlySpan<ulong> bucketHashes, ulong pilot, int part)
+        {
+            var hp = HashPilot(pilot);
             var slots = new HashSet<nuint>();
             
-            foreach (var hash in bucket)
+            foreach (var hash in bucketHashes)
             {
-                var globalSlot = ComputeSlot(hash, pilot); // Use global slot computation
-                if (!slots.Add(globalSlot))
+                var localSlot = SlotInPartHp(hash, hp);
+                if (!slots.Add(localSlot))
                 {
                     return true; // Duplicate found
                 }
@@ -824,6 +977,31 @@ namespace PtrHash.CSharp.Port.Core
         public void Dispose()
         {
             // Nothing to dispose in this implementation
+        }
+    }
+
+    /// <summary>
+    /// Information about a bucket for the BinaryHeap eviction algorithm
+    /// Comparable by size (largest first) to match Rust BinaryHeap behavior
+    /// </summary>
+    internal struct BucketInfo : IComparable<BucketInfo>
+    {
+        public nuint Size { get; }
+        public nuint BucketId { get; }
+
+        public BucketInfo(nuint size, nuint bucketId)
+        {
+            Size = size;
+            BucketId = bucketId;
+        }
+
+        // BinaryHeap in Rust is a max-heap, so we want larger sizes first
+        // Return negative for larger sizes to get max-heap behavior
+        public int CompareTo(BucketInfo other)
+        {
+            var sizeCompare = other.Size.CompareTo(Size); // Reverse for max-heap
+            if (sizeCompare != 0) return sizeCompare;
+            return other.BucketId.CompareTo(BucketId); // Reverse for deterministic order
         }
     }
 }
