@@ -28,7 +28,11 @@ BenchmarkDotNet.Artifacts/
 *.log
 *.csv
 *.html
-*.json
+
+# Benchmark result files (but keep config files)
+**/BenchmarkDotNet.Artifacts/**/*.json
+**/*-report*.json
+**/*-measurements*.json
 
 # Test results
 TestResults/

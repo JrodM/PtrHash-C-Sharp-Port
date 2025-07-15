@@ -24,7 +24,7 @@ namespace PtrHash.CSharp.Port.Tests
             var uniqueCount = indices.ToHashSet().Count;
             
             Assert.That(uniqueCount, Is.EqualTo(keys.Length), "All keys should produce unique indices");
-            Assert.That((int)info.MaxIndex, Is.GreaterThanOrEqualTo(keys.Length), "MaxIndex should be >= number of keys");
+            Assert.That(info.MaxIndex, Is.GreaterThanOrEqualTo((nuint)keys.Length), "MaxIndex should be >= number of keys");
             Assert.That(info.BitsPerKey, Is.LessThan(4.0), "Should use less than 4 bits per key for DefaultFast");
         }
     }
