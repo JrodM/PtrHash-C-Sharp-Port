@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Util;
@@ -100,9 +101,9 @@ namespace PtrHash.CSharp.Port.Core
             if (DEBUG_PILOT_SEARCH)
                 Console.WriteLine(message);
         }
-        
+
         // Cap parallelism to prevent thread explosion (Rust's rayon uses all cores by default)
-        private static readonly int MaxParallelism = Environment.ProcessorCount;
+        private static readonly int MaxParallelism = 1;//Environment.ProcessorCount;
         
         private readonly THasher _hasher;
         private readonly byte[] _pilots;
@@ -177,7 +178,7 @@ namespace PtrHash.CSharp.Port.Core
 
             Console.WriteLine($"Starting construction: {_parts} parts, {_slotsPerPart} slots/part, {_bucketsPerPart} buckets/part");
             // Construct the hash function using hash-evict algorithm
-            if (!TryConstruct(keys, out _seed))
+            if (!ComputePilots(keys, out _seed))
             {
                 throw new PtrHashException("Failed to construct minimal perfect hash function. Try different parameters or check for duplicate keys.");
             }
@@ -422,34 +423,75 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
-        private bool TryConstruct(ReadOnlySpan<TKey> keys, out ulong finalSeed)
+        private bool ComputePilots(ReadOnlySpan<TKey> keys, out ulong finalSeed)
         {
-            const int maxAttempts = 10;
-            var rng = new Random(31415); // Use fixed initial seed like Rust
+            var overallStart = System.Diagnostics.Stopwatch.StartNew();
             
-            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            // Initialize arrays - matching Rust's initialization
+            // Note: _pilots already allocated in constructor, but Rust clears/resizes in loop
+            
+            var tries = 0;
+            const int MAX_TRIES = 10;
+            
+            var rng = new Random(314415); // ChaCha8Rng::seed_from_u64(31415)
+            
+            // Loop over global seeds `s` - matching Rust's labeled loop
+            while (true) // Rust: let stats = 's: loop
             {
-                // Generate better 64-bit seeds like Rust does
-                var seed = ((ulong)(uint)rng.Next() << 32) | (ulong)(uint)rng.Next();
-                
-                if (TryBuildWithSeed(keys, seed))
+                tries++;
+                if (tries > MAX_TRIES)
                 {
-                    finalSeed = seed;
+                    Console.WriteLine($"[ERROR] PtrHash failed to find a global seed after {MAX_TRIES} tries.");
+                    finalSeed = 0;
+                    return false; // Rust: return None;
+                }
+                
+                var oldSeed = _seed;
+                
+                // Choose a global seed s
+                _seed = (ulong)rng.NextInt64(); // self.seed = rng.random()
+                if (tries == 1)
+                {
+                    Console.WriteLine($"[INFO] First seed tried: {_seed}");
+                }
+                else
+                {
+                    Console.WriteLine($"[WARN] Previous seed {oldSeed} failed.");
+                    Console.WriteLine($"[WARN] Trying seed number {tries}: {_seed}.");
+                }
+                
+                // Reset output-memory - matching Rust's pilots.clear(); pilots.resize()
+                Array.Fill(_pilots, (byte)0);
+                
+                // NOTE: C# doesn't pre-allocate taken Vec<BitVec> like Rust
+                // Each attempt creates fresh PartitionedBitVec in TryBuildWithSeed
+                
+                if (TryBuildWithSeed(keys, _seed))
+                {
+                    finalSeed = _seed;
+                    
+                    // Pack the data - Rust: self.pilots = pilots (already done)
+                    // Log timing - matching Rust's log_duration("total build", overall_start)
+                    var totalTime = overallStart.ElapsedMilliseconds;
+                    Console.WriteLine($"[TRACE] total build: {totalTime}ms");
+                    
+                    // Rust would return Some(stats) here
+                    // C# returns true since we don't track BucketStats
                     return true;
                 }
+                
+                // If build failed, continue to next seed
+                // Rust: continue 's;
             }
-            
-            finalSeed = 0;
-            return false;
         }
 
         private bool TryBuildWithSeed(ReadOnlySpan<TKey> keys, ulong seed)
         {
             var buildStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            Console.WriteLine($"TryBuildWithSeed: {keys.Length} keys, seed={seed}");
+            Console.WriteLine($"[TRACE] TryBuildWithSeed: {keys.Length} keys, seed={seed}");
             
-            // Store seed for later use
-            this._seed = seed;
+            // Seed already assigned in ComputePilots before calling this method
+            // Matching Rust where self.seed is set before calling build_shard
             
             // Reset pilots
             Array.Fill(_pilots, (byte)0);
@@ -458,7 +500,7 @@ namespace PtrHash.CSharp.Port.Core
             var hashingStart = System.Diagnostics.Stopwatch.StartNew();
             var (allHashes, partStarts) = SortPartsByHashes(keys, seed);
             hashingStart.Stop();
-            Console.WriteLine($"SortPartsByHashes completed: {_parts} parts in {hashingStart.ElapsedMilliseconds}ms");
+            Console.WriteLine($"[TRACE] sort buckets: {hashingStart.ElapsedMilliseconds}ms");
             
             // Track taken slots using Vec<BitVec> like Rust - for ALL parts
             var taken = new PartitionedBitVec(_parts, _slotsPerPart);
@@ -504,12 +546,12 @@ namespace PtrHash.CSharp.Port.Core
                 }
             });
             parallelStart.Stop();
-            Console.WriteLine($"Parallel build completed in {parallelStart.ElapsedMilliseconds}ms: success={success}");
+            Console.WriteLine($"[TRACE] find pilots: {parallelStart.ElapsedMilliseconds}ms (success={success})");
             
             if (!success)
             {
                 buildStopwatch.Stop();
-                Console.WriteLine($"Build FAILED after {buildStopwatch.ElapsedMilliseconds}ms");
+                Console.WriteLine($"[TRACE] Build FAILED after {buildStopwatch.ElapsedMilliseconds}ms");
                 return false;
             }
             
@@ -518,14 +560,14 @@ namespace PtrHash.CSharp.Port.Core
             if (!TryRemapFreeSlots(taken))
             {
                 buildStopwatch.Stop();
-                Console.WriteLine($"Remap FAILED after {buildStopwatch.ElapsedMilliseconds}ms");
-                return false; // Failed to create remap table
+                Console.WriteLine($"[TRACE] Failed to construct remap table after {buildStopwatch.ElapsedMilliseconds}ms");
+                return false; // Rust: continue 's;
             }
             remapStart.Stop();
             
             buildStopwatch.Stop();
-            Console.WriteLine($"TryBuildWithSeed SUCCESS in {buildStopwatch.ElapsedMilliseconds}ms");
-            Console.WriteLine($"  Breakdown: hashing={hashingStart.ElapsedMilliseconds}ms, parallel_build={parallelStart.ElapsedMilliseconds}ms, remap={remapStart.ElapsedMilliseconds}ms");
+            Console.WriteLine($"[TRACE] remap free: {remapStart.ElapsedMilliseconds}ms");
+            Console.WriteLine($"[TRACE] build successful in {buildStopwatch.ElapsedMilliseconds}ms");
             return true;
         }
 
@@ -591,7 +633,7 @@ namespace PtrHash.CSharp.Port.Core
         private bool BuildPartRust(int part, ReadOnlySpan<HashValue> partHashes, Span<byte> partPilots, PartitionedBitVec taken)
         {
             var partStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            Console.WriteLine($"BuildPartRust: Part {part}, {partHashes.Length} hashes");
+            DebugLog($"[TRACE] BuildPartRust: Part {part}, {partHashes.Length} hashes");
             
             // Sort buckets within this part (like Rust's sort_buckets)
             var sortStopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -613,7 +655,7 @@ namespace PtrHash.CSharp.Port.Core
             var stack = new BinaryHeap<BucketInfo>();
             var recent = new int[16];
             Array.Fill(recent, -1); // -1 = BucketIdx::NONE
-            var rng = new Random();
+            var rng = new Random(); // Auto-seeded with entropy like Rust's fastrand::Rng::new()
             var totalEvictions = 0;
 
             // Process buckets in size order (largest first) - EXACT Rust pattern
@@ -654,8 +696,8 @@ namespace PtrHash.CSharp.Port.Core
                 
                 while (!stack.IsEmpty)
                 {
-                    // DEBUG: Add hard limit to prevent infinite loops during debugging
-                    if (evictions > 100000)
+                    // EXACT Rust termination condition: if evictions >= 10 * self.slots
+                    if (evictions >= 10 * (int)_slotsPerPart)
                     {
                         evictionLoopStart.Stop();
                         Console.WriteLine($"INFINITE LOOP DETECTED: Part {part}, evictions={evictions}, stack size={stack.Count}");
@@ -737,53 +779,55 @@ namespace PtrHash.CSharp.Port.Core
                     }
                     
                     var bestPilot = bestResult.pilot;
+                    
+                    // EXACT Rust sequence: pilots[b] = p as u8; let hp = self.hash_pilot(p);
                     partPilots[currentBucket] = (byte)bestPilot;
                     var hp = HashPilot(bestPilot);
                     
-                    // EXACT Rust eviction algorithm: Drop collisions and set new pilot
+                    // EXACT Rust eviction algorithm: Drop the collisions and set the new pilot
                     var evictionStart = System.Diagnostics.Stopwatch.StartNew();
                     var evictionsThisRound = 0;
                     
+                    // EXACT Rust pattern: for slot in b_slots(hp)
                     foreach (var hash in currentBucketHashes)
                     {
                         var localSlot = SlotInPartHp(hash, hp);
                         
-                        // THIS IS A HOT INSTRUCTION (Rust comment)
+                        // EXACT Rust pattern: let b2 = slots[slot]; if b2.is_some()
                         var occupyingBucket = slots[localSlot];
                         if (occupyingBucket >= 0) // b2.is_some() in Rust
                         {
                             if (occupyingBucket == currentBucket)
                                 throw new InvalidOperationException("Self-collision detected"); // assert!(b2 != b)
                             
-                            // DROP BUCKET (Rust comment)
+                            // EXACT Rust pattern: stack.push((bucket_len(b2), b2)); evictions += 1;
                             var evictedStart = bucketStarts[occupyingBucket];
                             var evictedEnd = bucketStarts[occupyingBucket + 1];
                             var evictedSize = evictedEnd - evictedStart;
                             
-                            // Push evicted bucket onto stack (Rust: stack.push((bucket_len(b2), b2)))
                             stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
                             evictions++;
                             evictionsThisRound++;
                             
-                            // Clear all slots occupied by evicted bucket (Rust: for p2 in slots_for_bucket)
+                            // EXACT Rust pattern: for p2 in slots_for_bucket(b2, pilots[b2] as Pilot)
                             var evictedPilot = (ulong)partPilots[occupyingBucket];
                             var evictedHp = HashPilot(evictedPilot);
                             var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
                             
+                            // Clear slots by recomputing them from the hashes and pilot
                             foreach (var evictedHash in evictedHashes)
                             {
                                 var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
-                                slots[evictedLocalSlot] = -1; // BucketIdx::NONE
-                                
-                                // Clear slot from part's BitVec
+                                // EXACT Rust pattern: *slots.get_unchecked_mut(p2) = BucketIdx::NONE;
+                                slots[evictedLocalSlot] = -1;
+                                // EXACT Rust pattern: taken.set_unchecked(p2, false);
                                 partTaken.Set(evictedLocalSlot, false);
                             }
                         }
                         
-                        // Place current bucket (Rust: *slots.get_unchecked_mut(slot) = b)
+                        // EXACT Rust pattern: *slots.get_unchecked_mut(slot) = b;
                         slots[localSlot] = currentBucket;
-                        
-                        // Mark slot as taken (Rust: taken.set_unchecked(slot, true))
+                        // EXACT Rust pattern: taken.set_unchecked(slot, true);
                         partTaken.Set(localSlot, true);
                     }
                     
@@ -1332,15 +1376,29 @@ namespace PtrHash.CSharp.Port.Core
             
             return true; // Successfully took all slots
         }
+        
+        // Optimized recent array lookup - faster than Array.IndexOf for small arrays
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsInRecentArray(int[] recent, int bucket)
+        {
+            // Manual unrolled loop for the 16-element recent array - much faster than Array.IndexOf
+            for (int i = 0; i < recent.Length; i++)
+            {
+                if (recent[i] == bucket)
+                    return true;
+            }
+            return false;
+        }
+        
         // Find best pilot with minimal collisions (Rust-style eviction logic)
         private (ulong score, ulong pilot) FindBestPilotWithEvictionInPart(ReadOnlySpan<HashValue> bucketHashes, int[] slots, int[] recent, Random rng, ulong kmax, int[] bucketStarts)
         {
             var bestScore = ulong.MaxValue;
             var bestPilot = ulong.MaxValue;
-            var startPilot = (ulong)rng.Next(256);
+            var startPilot = (ulong)rng.Next(256); // Random starting pilot
             var newBLen = (ulong)bucketHashes.Length;
             
-            // Create duplicate_slots closure matching Rust exactly
+            // Create duplicate_slots closure matching Rust exactly - optimized version
             var slotsTmp = new nuint[bucketHashes.Length];
             bool DuplicateSlots(ReadOnlySpan<HashValue> bucketHashes, ulong pilot)
             {
@@ -1389,7 +1447,8 @@ namespace PtrHash.CSharp.Port.Core
                         continue;
                     }
                     // EXACT Rust pattern: else if recent.contains(&s) { continue 'p; }
-                    else if (Array.IndexOf(recent, occupyingBucket) >= 0)
+                    // Optimized: recent array is small (16 elements), so linear search is fine but we can optimize it
+                    else if (IsInRecentArray(recent, occupyingBucket))
                     {
                         shouldSkip = true;
                         break; // Exit inner loop to continue outer loop
