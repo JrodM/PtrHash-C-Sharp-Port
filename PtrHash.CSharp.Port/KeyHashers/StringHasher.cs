@@ -2,6 +2,7 @@ using System;
 using System.IO.Hashing;
 using System.Runtime.CompilerServices;
 using System.Text;
+using PtrHash.CSharp.Port.Core;
 
 namespace PtrHash.CSharp.Port.KeyHashers
 {
@@ -11,7 +12,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
     public readonly struct StringHasher : IKeyHasher<string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Hash(string key, ulong seed)
+        public HashValue Hash(string key, ulong seed)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
@@ -21,13 +22,13 @@ namespace PtrHash.CSharp.Port.KeyHashers
             {
                 Span<byte> buffer = stackalloc byte[Encoding.UTF8.GetMaxByteCount(key.Length)];
                 int bytesWritten = Encoding.UTF8.GetBytes(key, buffer);
-                return XxHash3.HashToUInt64(buffer[..bytesWritten], (long)seed);
+                return new HashValue(XxHash3.HashToUInt64(buffer[..bytesWritten], (long)seed));
             }
             else
             {
                 // For larger strings, fallback to allocation
                 var bytes = Encoding.UTF8.GetBytes(key);
-                return XxHash3.HashToUInt64(bytes, (long)seed);
+                return new HashValue(XxHash3.HashToUInt64(bytes, (long)seed));
             }
         }
     }

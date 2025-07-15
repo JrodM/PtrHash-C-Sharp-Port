@@ -1,3 +1,5 @@
+using PtrHash.CSharp.Port.Core;
+
 namespace PtrHash.CSharp.Port.KeyHashers
 {
     /// <summary>
@@ -7,8 +9,8 @@ namespace PtrHash.CSharp.Port.KeyHashers
     public interface IKeyHasher<TKey>
     {
         /// <summary>
-        /// Hash a key with a seed to a 64-bit value
+        /// Hash a key with a seed to a HashValue (with high/low parts)
         /// </summary>
-        ulong Hash(TKey key, ulong seed);
+        HashValue Hash(TKey key, ulong seed);
     }
 }

@@ -5,7 +5,16 @@
       "Bash(find:*)",
       "Bash(grep:*)",
       "mcp__memory__create_entities",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(mkdir:*)",
+      "Bash(timeout 60s dotnet test:*)",
+      "Bash(verbosity=normal)",
+      "Bash(timeout 300s dotnet test ComparisonTests --filter \"Port_100K_StrongerIntHasher_Performance\" --logger console)",
+      "Bash(dotnet build)",
+      "Bash(timeout:*)",
+      "mcp__memory__search_nodes",
+      "mcp__memory__add_observations",
+      "Bash(dotnet build:*)"
     ],
     "deny": []
   }

@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -11,6 +11,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpInterop.Tests", "PtrHash.CSharp.Interop\CSharInterop.Tests\CSharpInterop.Tests.csproj", "{2CD704D6-15ED-6A18-D3A0-D733F6073BF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtrHash.Benchmarks", "Benchmarks\PtrHash.Benchmarks.csproj", "{C3D4E5F6-G7H8-9012-CDEF-345678901234}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComparisonTests", "ComparisonTests\ComparisonTests.csproj", "{59FCF4E1-E95E-4F4D-8E27-3911F6E53AA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{C3D4E5F6-G7H8-9012-CDEF-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3D4E5F6-G7H8-9012-CDEF-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3D4E5F6-G7H8-9012-CDEF-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59FCF4E1-E95E-4F4D-8E27-3911F6E53AA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59FCF4E1-E95E-4F4D-8E27-3911F6E53AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59FCF4E1-E95E-4F4D-8E27-3911F6E53AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59FCF4E1-E95E-4F4D-8E27-3911F6E53AA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

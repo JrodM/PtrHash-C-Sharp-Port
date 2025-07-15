@@ -240,7 +240,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var keys = Enumerable.Range(1, 100_000).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, Xxh3Hasher>(keys, PtrHashParams.DefaultFast);
+            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
 
             // Act
             var sampleKeys = keys.Where((_, i) => i % 100 == 0).ToArray(); // Every 100th key

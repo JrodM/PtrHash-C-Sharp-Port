@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using PtrHash.CSharp.Port.Core;
 
 namespace PtrHash.CSharp.Port.KeyHashers
 {
@@ -12,7 +13,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
         private const ulong C = 0x517cc1b727220a95UL; // FxHash constant from Rust
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Hash(ulong key, ulong seed)
+        public HashValue Hash(ulong key, ulong seed)
         {
             // EXACT Rust algorithm from hash.rs:
             // let r = (*x as u64 ^ seed) as u128 * C as u128;
@@ -24,7 +25,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
             var r = (UInt128)x * (UInt128)C; // 128-bit multiplication
             var low = (ulong)r;
             var high = (ulong)(r >> 64);
-            return (low ^ high).WrappingMul(C); // XOR low/high, then multiply by C
+            return new HashValue((low ^ high).WrappingMul(C)); // XOR low/high, then multiply by C
         }
     }
 }

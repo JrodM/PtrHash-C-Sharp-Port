@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using PtrHash.CSharp.Port.Core;
 
 namespace PtrHash.CSharp.Port.KeyHashers
 {
@@ -14,12 +15,12 @@ namespace PtrHash.CSharp.Port.KeyHashers
         private const ulong MULTIPLY = 0x51_7c_c1_b7_27_22_0a_95;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Hash(ulong key, ulong seed)
+        public HashValue Hash(ulong key, ulong seed)
         {
             ulong hash = seed == 0 ? FX_HASH_SEED : seed;
             hash = RotateLeft(hash, ROTATE) ^ key;
             hash = hash.WrappingMul(MULTIPLY);
-            return hash;
+            return new HashValue(hash);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,6 +1,7 @@
 using System;
 using System.IO.Hashing;
 using System.Runtime.CompilerServices;
+using PtrHash.CSharp.Port.Core;
 
 namespace PtrHash.CSharp.Port.KeyHashers
 {
@@ -10,11 +11,11 @@ namespace PtrHash.CSharp.Port.KeyHashers
     public readonly struct Xxh3Hasher : IKeyHasher<ulong>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Hash(ulong key, ulong seed)
+        public HashValue Hash(ulong key, ulong seed)
         {
             Span<byte> keyBytes = stackalloc byte[8];
             BitConverter.TryWriteBytes(keyBytes, key);
-            return XxHash3.HashToUInt64(keyBytes, (long)seed);
+            return new HashValue(XxHash3.HashToUInt64(keyBytes, (long)seed));
         }
     }
 }
