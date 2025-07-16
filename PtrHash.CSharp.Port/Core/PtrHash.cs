@@ -116,6 +116,11 @@ namespace PtrHash.CSharp.Port.Core
         private readonly nuint _bucketsPerPart;
         private readonly nuint _bucketsTotal;
         
+        // Pre-computed reduction structures (like Rust's rem_* fields)
+        private readonly FastReduceInstance _remParts; // rem_parts: Rp::new(parts)
+        private readonly FastReduceInstance _remBuckets; // rem_buckets: Rb::new(buckets_per_part)
+        private readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
+        
         private readonly nuint _numKeys;
         private uint[]? _remapTable;
         private readonly bool _minimal;
@@ -148,17 +153,21 @@ namespace PtrHash.CSharp.Port.Core
             else
             {
                 // Multi-part mode - exact Rust calculation
+                var shards = 1; // Sharding::None => 1
+                
+                // Formula of Vigna, eps-cost-sharding: https://arxiv.org/abs/2503.18397
+                // (1-alpha)/2, so that on average we still have some room to play with.
                 var eps = (1.0 - parameters.Alpha) / 2.0;
                 var x = (double)_numKeys * eps * eps / 2.0;
                 var targetParts = x / Math.Log(x);
-                var shards = 1; // Single shard for now
-                // Handle edge case where targetParts is negative or invalid
-                var partsPerShard = targetParts > 0 ? 
-                    Math.Max(1, (nuint)Math.Floor(targetParts) / (nuint)shards) : 
-                    1;
-                _parts = partsPerShard * (nuint)shards;
+                Console.WriteLine($"[DEBUG] Multi-part calc: n={_numKeys}, eps={eps:F6}, x={x:F6}, ln(x)={Math.Log(x):F6}, targetParts={targetParts:F6}");
+                // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly
+                var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
+                _parts = Math.Max(1, partsPerShard) * (nuint)shards;
+                Console.WriteLine($"[DEBUG] Parts calculation: targetParts={targetParts:F6} -> partsPerShard={partsPerShard} -> parts={_parts}");
                 
                 var keysPerPart = _numKeys / _parts;
+                partsPerShard = _parts / (nuint)shards; // Recalculate like Rust
                 var slotsPerPart = (nuint)((double)keysPerPart / parameters.Alpha);
                 
                 // Avoid powers of two, since then %S does not depend on all bits
@@ -169,14 +178,23 @@ namespace PtrHash.CSharp.Port.Core
                 
                 _slotsPerPart = slotsPerPart;
                 _slotsTotal = _parts * _slotsPerPart;
+                // Add a few extra buckets to avoid collisions for small n.
                 _bucketsPerPart = (nuint)Math.Ceiling((double)keysPerPart / parameters.Lambda) + 3;
                 _bucketsTotal = _parts * _bucketsPerPart;
             }
             
             _bucketFunction = new LinearBucketFunction(_bucketsPerPart);
             _pilots = new byte[_bucketsTotal];
+            
+            // Initialize reduction structures like Rust does
+            _remParts = new FastReduceInstance(_parts);
+            _remBuckets = new FastReduceInstance(_bucketsPerPart);
+            _remSlots = new FM32(Math.Max(1, _slotsPerPart));
 
             Console.WriteLine($"Starting construction: {_parts} parts, {_slotsPerPart} slots/part, {_bucketsPerPart} buckets/part");
+            Console.WriteLine($"  Alpha: {parameters.Alpha}, Lambda: {parameters.Lambda}");
+            Console.WriteLine($"  Keys per part: {_numKeys / _parts}, Total slots: {_slotsTotal}");
+            Console.WriteLine($"  Real alpha: {(double)_numKeys / (double)_slotsTotal:F4}");
             // Construct the hash function using hash-evict algorithm
             if (!ComputePilots(keys, out _seed))
             {
@@ -232,16 +250,16 @@ namespace PtrHash.CSharp.Port.Core
             // Rust: if BF::LINEAR { return self.rem_buckets_total.reduce(hx.high()); }
             if (_parts == 1)
             {
-                // Single part - use direct reduction (Rust fast path)
-                return FastReduce.Reduce(hx.High(), _bucketsPerPart);
+                // Single part - use direct reduction with pre-computed instance
+                return _remBuckets.Reduce(hx.High());
             }
             
             // Multi-part: Extract high bits for part selection; do normal bucket computation within the part
             // Rust: let (part, hx) = self.rem_parts.reduce_with_remainder(hx.high());
             //       let bucket = self.bucket_in_part(hx);
             //       part * self.buckets + bucket
-            var (part, remainder) = FastReduce.ReduceWithRemainder(hx.High(), _parts);
-            var localBucket = FastReduce.Reduce(remainder, _bucketsPerPart);
+            var (part, remainder) = _remParts.ReduceWithRemainder(hx.High());
+            var localBucket = _remBuckets.Reduce(remainder);
             return part * _bucketsPerPart + localBucket;
         }
         
@@ -251,47 +269,11 @@ namespace PtrHash.CSharp.Port.Core
         {
             // For Linear bucket function: rem_buckets.reduce(hx.high())
             // For u64, high() returns the full value
-            return FastReduce.Reduce(hx.High(), _bucketsPerPart);
+            return _remBuckets.Reduce(hx.High());
         }
     
         
-        /// <summary>
-        /// FastReduce implementation from Rust - reduces using high bits multiplication
-        /// </summary>
-        private static class FastReduce
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static nuint Reduce(ulong hash, nuint modulus)
-            {
-                // Rust: mul_high(d, h) = (d as u128 * h as u128) >> 64
-                var result = (UInt128)modulus * (UInt128)hash;
-                return (nuint)(result >> 64);
-            }
-            
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static (nuint reduced, ulong remainder) ReduceWithRemainder(ulong hash, nuint modulus)
-            {
-                var result = (UInt128)modulus * (UInt128)hash;
-                return ((nuint)(result >> 64), (ulong)result);
-            }
-        }
         
-        /// <summary>
-        /// FastMod32 implementation from Rust - used for slots reduction
-        /// </summary>
-        private static class FastMod32
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static nuint Reduce(ulong hash, nuint modulus)
-            {
-                // Rust FM32: let lowbits = self.m.wrapping_mul(h as u64);
-                //           ((lowbits as u128 * self.d as u128) >> 64) as usize
-                // Where m = (u64::MAX / d as u64).wrapping_add(1)
-                var m = (ulong.MaxValue / (ulong)modulus) + 1;
-                var lowbits = m * hash;
-                return (nuint)((UInt128)lowbits * (UInt128)modulus >> 64);
-            }
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Slot(HashValue hx, ulong pilot)
@@ -311,8 +293,7 @@ namespace PtrHash.CSharp.Port.Core
         private nuint SlotInPartHp(HashValue hx, ulong hp)
         {
             // Rust: self.rem_slots.reduce(hx.low() ^ hp)
-            // rem_slots uses FM32, not FastReduce!
-            return FastMod32.Reduce(hx.Low() ^ hp, _slotsPerPart);
+            return _remSlots.Reduce(hx.Low() ^ hp);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -320,7 +301,7 @@ namespace PtrHash.CSharp.Port.Core
         {
             // Rust uses: rem_parts.reduce(hx.high())
             // For u64, high() returns the full value, not just high 32 bits
-            return FastReduce.Reduce(hx.High(), _parts);
+            return _remParts.Reduce(hx.High());
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -433,7 +414,7 @@ namespace PtrHash.CSharp.Port.Core
             var tries = 0;
             const int MAX_TRIES = 10;
             
-            var rng = new Random(314415); // ChaCha8Rng::seed_from_u64(31415)
+            var rng = new Random(31415); // ChaCha8Rng::seed_from_u64(31415)
             
             // Loop over global seeds `s` - matching Rust's labeled loop
             while (true) // Rust: let stats = 's: loop
@@ -693,6 +674,7 @@ namespace PtrHash.CSharp.Port.Core
                 // Process eviction chain (Rust: while let Some((_b_len, b)) = stack.pop())
                 var maxEvictionsForBucket = 0;
                 var evictionLoopStart = System.Diagnostics.Stopwatch.StartNew();
+                var cycleDetection = new Dictionary<int, int>(); // Track how many times each bucket is processed
                 
                 while (!stack.IsEmpty)
                 {
@@ -701,10 +683,12 @@ namespace PtrHash.CSharp.Port.Core
                     {
                         evictionLoopStart.Stop();
                         Console.WriteLine($"INFINITE LOOP DETECTED: Part {part}, evictions={evictions}, stack size={stack.Count}");
-                        Console.WriteLine($"  Bucket {bucketIdx}/{totalBuckets}, size={newBucketSize}, time={bucketStartTime.ElapsedMilliseconds}ms");
+                        Console.WriteLine($"  Bucket {bucketIdx}/{totalBuckets} (id={newBucket}), size={newBucketSize}, time={bucketStartTime.ElapsedMilliseconds}ms");
                         Console.WriteLine($"  Recent array: [{string.Join(",", recent.Where(r => r != -1))}]");
                         Console.WriteLine($"  Max evictions for this bucket: {maxEvictionsForBucket}");
                         Console.WriteLine($"  Total time in eviction loop: {evictionLoopStart.ElapsedMilliseconds}ms");
+                        // Show current stack size info
+                        Console.WriteLine($"  Stack contains {stack.Count} buckets waiting to be processed");
                         return false;
                     }
                     
@@ -715,7 +699,12 @@ namespace PtrHash.CSharp.Port.Core
                     // DEBUG: Log progress periodically
                     if (evictions > 0 && evictions % 5000 == 0)
                     {
-                        Console.WriteLine($"Part {part}: {evictions} evictions, stack size={stack.Count}, bucket {bucketIdx}/{totalBuckets}, elapsed={bucketStartTime.ElapsedMilliseconds}ms");
+                        Console.WriteLine($"Part {part}: {evictions} evictions, stack size={stack.Count}, bucket {bucketIdx}/{totalBuckets} (id={newBucket}), elapsed={bucketStartTime.ElapsedMilliseconds}ms");
+                        // Additional diagnostic when we're deep in evictions
+                        if (stack.Count > 10)
+                        {
+                            Console.WriteLine($"  Stack depth is high: {stack.Count} buckets waiting");
+                        }
                     }
                     
                     // EXACT Rust termination condition (nested structure)
@@ -732,6 +721,17 @@ namespace PtrHash.CSharp.Port.Core
                     
                     var bucketInfo = stack.Pop();
                     var currentBucket = (int)bucketInfo.BucketId;
+                    
+                    // Track cycle detection
+                    if (!cycleDetection.ContainsKey(currentBucket))
+                        cycleDetection[currentBucket] = 0;
+                    cycleDetection[currentBucket]++;
+                    
+                    if (cycleDetection[currentBucket] > 10)
+                    {
+                        Console.WriteLine($"  WARNING: Bucket {currentBucket} processed {cycleDetection[currentBucket]} times - possible cycle!");
+                    }
+                    
                     var currentStart = bucketStarts[currentBucket];
                     var currentEnd = bucketStarts[currentBucket + 1];
                     var currentBucketHashes = hashesSpan.Slice(currentStart, currentEnd - currentStart);
@@ -996,244 +996,53 @@ namespace PtrHash.CSharp.Port.Core
         }
         
         // Size-specialized versions for fixed-size buckets (1-8 elements)
+        // In Rust, all find_pilot_array methods just call find_pilot_slice
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray1(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                
-                if (!taken.GetUnchecked(slot0))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray2(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            var hash1 = bucketHashes[1];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                var slot1 = SlotInPartHp(hash1, hp);
-                
-                if (!taken.GetUnchecked(slot0) && !taken.GetUnchecked(slot1))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray3(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            var hash1 = bucketHashes[1];
-            var hash2 = bucketHashes[2];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                var slot1 = SlotInPartHp(hash1, hp);
-                var slot2 = SlotInPartHp(hash2, hp);
-                
-                if (!taken.GetUnchecked(slot0) && !taken.GetUnchecked(slot1) && !taken.GetUnchecked(slot2))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray4(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            var hash1 = bucketHashes[1];
-            var hash2 = bucketHashes[2];
-            var hash3 = bucketHashes[3];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                var slot1 = SlotInPartHp(hash1, hp);
-                var slot2 = SlotInPartHp(hash2, hp);
-                var slot3 = SlotInPartHp(hash3, hp);
-                
-                if (!taken.GetUnchecked(slot0) && !taken.GetUnchecked(slot1) && !taken.GetUnchecked(slot2) && !taken.GetUnchecked(slot3))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray5(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            var hash1 = bucketHashes[1];
-            var hash2 = bucketHashes[2];
-            var hash3 = bucketHashes[3];
-            var hash4 = bucketHashes[4];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                var slot1 = SlotInPartHp(hash1, hp);
-                var slot2 = SlotInPartHp(hash2, hp);
-                var slot3 = SlotInPartHp(hash3, hp);
-                var slot4 = SlotInPartHp(hash4, hp);
-                
-                if (!taken.GetUnchecked(slot0) && !taken.GetUnchecked(slot1) && !taken.GetUnchecked(slot2) && !taken.GetUnchecked(slot3) && !taken.GetUnchecked(slot4))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray6(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            var hash1 = bucketHashes[1];
-            var hash2 = bucketHashes[2];
-            var hash3 = bucketHashes[3];
-            var hash4 = bucketHashes[4];
-            var hash5 = bucketHashes[5];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                var slot1 = SlotInPartHp(hash1, hp);
-                var slot2 = SlotInPartHp(hash2, hp);
-                var slot3 = SlotInPartHp(hash3, hp);
-                var slot4 = SlotInPartHp(hash4, hp);
-                var slot5 = SlotInPartHp(hash5, hp);
-                
-                if (!taken.GetUnchecked(slot0) && !taken.GetUnchecked(slot1) && !taken.GetUnchecked(slot2) && !taken.GetUnchecked(slot3) && !taken.GetUnchecked(slot4) && !taken.GetUnchecked(slot5))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray7(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            var hash1 = bucketHashes[1];
-            var hash2 = bucketHashes[2];
-            var hash3 = bucketHashes[3];
-            var hash4 = bucketHashes[4];
-            var hash5 = bucketHashes[5];
-            var hash6 = bucketHashes[6];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                var slot1 = SlotInPartHp(hash1, hp);
-                var slot2 = SlotInPartHp(hash2, hp);
-                var slot3 = SlotInPartHp(hash3, hp);
-                var slot4 = SlotInPartHp(hash4, hp);
-                var slot5 = SlotInPartHp(hash5, hp);
-                var slot6 = SlotInPartHp(hash6, hp);
-                
-                if (!taken.GetUnchecked(slot0) && !taken.GetUnchecked(slot1) && !taken.GetUnchecked(slot2) && !taken.GetUnchecked(slot3) && !taken.GetUnchecked(slot4) && !taken.GetUnchecked(slot5) && !taken.GetUnchecked(slot6))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray8(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            pilotsChecked = 0;
-            var hash0 = bucketHashes[0];
-            var hash1 = bucketHashes[1];
-            var hash2 = bucketHashes[2];
-            var hash3 = bucketHashes[3];
-            var hash4 = bucketHashes[4];
-            var hash5 = bucketHashes[5];
-            var hash6 = bucketHashes[6];
-            var hash7 = bucketHashes[7];
-            
-            for (ulong pilot = 0; pilot < kmax; pilot++)
-            {
-                pilotsChecked++;
-                var hp = HashPilot(pilot);
-                var slot0 = SlotInPartHp(hash0, hp);
-                var slot1 = SlotInPartHp(hash1, hp);
-                var slot2 = SlotInPartHp(hash2, hp);
-                var slot3 = SlotInPartHp(hash3, hp);
-                var slot4 = SlotInPartHp(hash4, hp);
-                var slot5 = SlotInPartHp(hash5, hp);
-                var slot6 = SlotInPartHp(hash6, hp);
-                var slot7 = SlotInPartHp(hash7, hp);
-                
-                if (!taken.GetUnchecked(slot0) && !taken.GetUnchecked(slot1) && !taken.GetUnchecked(slot2) && !taken.GetUnchecked(slot3) && !taken.GetUnchecked(slot4) && !taken.GetUnchecked(slot5) && !taken.GetUnchecked(slot6) && !taken.GetUnchecked(slot7))
-                {
-                    if (TryTakePilotInPart(bucketHashes, pilot, taken))
-                    {
-                        return (pilot, hp);
-                    }
-                }
-            }
-            return null;
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         // Variable-size bucket processing for larger buckets (renamed from FindPilotInPart)

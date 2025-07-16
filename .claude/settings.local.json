@@ -14,7 +14,8 @@
       "Bash(timeout:*)",
       "mcp__memory__search_nodes",
       "mcp__memory__add_observations",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run:*)"
     ],
     "deny": []
   }

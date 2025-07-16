@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PtrHash.CSharp.Port")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5cf6662b8ebdeeccf8989105ba345520bbe61cdc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+94faf80e644ddf2b8a28c578c9304d97dfd6d0e7")]
 [assembly: System.Reflection.AssemblyProductAttribute("PtrHash.CSharp.Port")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PtrHash.CSharp.Port")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
