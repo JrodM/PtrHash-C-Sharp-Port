@@ -12,97 +12,36 @@ using PtrHash.CSharp.Port.Native;
 namespace PtrHash.CSharp.Port.Core
 {
     /// <summary>
-    /// Helper class to mimic Rust's Vec<BitVec> functionality
+    /// Interface for compile-time minimal flag specialization
     /// </summary>
-    internal class PartitionedBitVec
+    public interface IMinimalFlag
     {
-        private readonly BitVec[] _parts;
-        private readonly nuint _slotsPerPart;
-        
-        public PartitionedBitVec(nuint parts, nuint slotsPerPart)
-        {
-            _parts = new BitVec[parts];
-            _slotsPerPart = slotsPerPart;
-            for (int i = 0; i < (int)parts; i++)
-            {
-                _parts[i] = new BitVec(slotsPerPart);
-            }
-        }
-        
-        public bool Get(nuint globalSlot)
-        {
-            var part = globalSlot / _slotsPerPart;
-            var localSlot = globalSlot % _slotsPerPart;
-            return _parts[part].Get(localSlot);
-        }
-        
-        public void Set(nuint globalSlot, bool value)
-        {
-            var part = globalSlot / _slotsPerPart;
-            var localSlot = globalSlot % _slotsPerPart;
-            _parts[part].Set(localSlot, value);
-        }
-        
-        // Direct access to part's BitVec for local slot operations
-        public bool GetLocal(nuint part, nuint localSlot)
-        {
-            return _parts[part].Get(localSlot);
-        }
-        
-        public void SetLocal(nuint part, nuint localSlot, bool value)
-        {
-            _parts[part].Set(localSlot, value);
-        }
-        
-        public nuint CountOnes()
-        {
-            nuint total = 0;
-            foreach (var part in _parts)
-            {
-                total += part.CountOnes();
-            }
-            return total;
-        }
-        
-        public nuint CountZeros()
-        {
-            nuint total = 0;
-            foreach (var part in _parts)
-            {
-                total += part.Length - part.CountOnes();
-            }
-            return total;
-        }
-        
-        public nuint TotalLength => (nuint)_parts.Length * _slotsPerPart;
-        
-        // Access to individual parts for remap algorithm
-        public BitVec[] Parts => _parts;
-        
-        // Get a specific part's BitVec
-        public BitVec GetPart(int partIndex) => _parts[partIndex];
+        bool IsMinimal { get; }
     }
     
+    /// <summary>
+    /// Compile-time minimal flag implementations
+    /// </summary>
+    public readonly struct MinimalTrue : IMinimalFlag
+    {
+        public bool IsMinimal => true;
+    }
+    
+    public readonly struct MinimalFalse : IMinimalFlag
+    {
+        public bool IsMinimal => false;
+    }
     /// <summary>
     /// Generic PtrHash minimal perfect hash function implementation
     /// Uses hash-evict construction algorithm with 8-bit pilots
     /// </summary>
     /// <typeparam name="TKey">Type of keys</typeparam>
     /// <typeparam name="THasher">Hash function implementation</typeparam>
-    public sealed class PtrHash<TKey, THasher> : IPtrHash<TKey>
+    public sealed unsafe class PtrHash<TKey, THasher> : IPtrHash<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
     {
         // Debug feature flags - set to false for production
         private const bool DEBUG_CONSTRUCTION = false;
-        private const bool DEBUG_PILOT_SEARCH = false;
-        private const bool DEBUG_COLLISION_DETAILS = false;
-        
-        [System.Diagnostics.Conditional("DEBUG")]
-        private static void DebugLog(string message)
-        {
-            if (DEBUG_PILOT_SEARCH)
-                Console.WriteLine(message);
-        }
         
         [System.Diagnostics.Conditional("DEBUG")]
         private static void DebugConstruction(string message)
@@ -110,20 +49,13 @@ namespace PtrHash.CSharp.Port.Core
             if (DEBUG_CONSTRUCTION)
                 Console.WriteLine(message);
         }
-        
-        [System.Diagnostics.Conditional("DEBUG")]
-        private static void DebugCollision(string message)
-        {
-            if (DEBUG_COLLISION_DETAILS)
-                Console.WriteLine(message);
-        }
 
         // Cap parallelism to prevent thread explosion (Rust's rayon uses all cores by default)
         private static readonly int MaxParallelism = Environment.ProcessorCount;
         
         private readonly THasher _hasher;
-        private readonly byte[] _pilots;
-        private readonly LinearBucketFunction _bucketFunction;
+        private byte* _pilots;
+        private uint* _remapTable;
         
         // Multi-part support fields (matching Rust implementation exactly)
         private readonly nuint _parts;
@@ -138,7 +70,7 @@ namespace PtrHash.CSharp.Port.Core
         private readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
         
         private readonly nuint _numKeys;
-        private uint[]? _remapTable;
+        private nuint _remapTableSize;
         private readonly bool _minimal;
         private readonly double _bitsPerKey;
         private ulong _seed;
@@ -148,7 +80,6 @@ namespace PtrHash.CSharp.Port.Core
         /// </summary>
         public PtrHash(ReadOnlySpan<TKey> keys, PtrHashParams parameters)
         {
-            DebugConstruction($"PtrHash constructor: {keys.Length} keys, minimal={parameters.Minimal}");
             if (keys.Length == 0)
                 throw new ArgumentException("Keys collection cannot be empty", nameof(keys));
 
@@ -176,11 +107,10 @@ namespace PtrHash.CSharp.Port.Core
                 var eps = (1.0 - parameters.Alpha) / 2.0;
                 var x = (double)_numKeys * eps * eps / 2.0;
                 var targetParts = x / Math.Log(x);
-                DebugConstruction($"Multi-part calc: n={_numKeys}, eps={eps:F6}, x={x:F6}, ln(x)={Math.Log(x):F6}, targetParts={targetParts:F6}");
+
                 // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly
                 var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
                 _parts = Math.Max(1, partsPerShard) * (nuint)shards;
-                DebugConstruction($"Parts calculation: targetParts={targetParts:F6} -> partsPerShard={partsPerShard} -> parts={_parts}");
                 
                 var keysPerPart = _numKeys / _parts;
                 partsPerShard = _parts / (nuint)shards; // Recalculate like Rust
@@ -199,23 +129,27 @@ namespace PtrHash.CSharp.Port.Core
                 _bucketsTotal = _parts * _bucketsPerPart;
             }
             
-            _pilots = new byte[_bucketsTotal];
+            // Allocate unmanaged memory for pilots (cache-aligned for better performance)
+            _pilots = (byte*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc((nuint)_bucketsTotal, 64);
+            // Initialize to zero (like Rust's Vec::new)
+            System.Runtime.InteropServices.NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
+            
+            // Will allocate remap table later if minimal=true
+            _remapTable = null;
+            _remapTableSize = 0;
             
             // Initialize reduction structures like Rust does
             _remParts = new FastReduceInstance(_parts);
             _remBuckets = new FastReduceInstance(_bucketsPerPart);
             _remSlots = new FM32(Math.Max(1, _slotsPerPart));
 
-            DebugConstruction($"Starting construction: {_parts} parts, {_slotsPerPart} slots/part, {_bucketsPerPart} buckets/part");
-            DebugConstruction($"  Alpha: {parameters.Alpha}, Lambda: {parameters.Lambda}");
-            DebugConstruction($"  Keys per part: {_numKeys / _parts}, Total slots: {_slotsTotal}");
-            DebugConstruction($"  Real alpha: {(double)_numKeys / (double)_slotsTotal:F4}");
+            
             // Construct the hash function using hash-evict algorithm
             if (!ComputePilots(keys, out _seed))
             {
                 throw new PtrHashException("Failed to construct minimal perfect hash function. Try different parameters or check for duplicate keys.");
             }
-            DebugConstruction("Construction completed successfully");
+
 
             // Validation can be enabled for debugging by uncommenting the line below
             // ValidateHashFunction(keys);
@@ -223,7 +157,9 @@ namespace PtrHash.CSharp.Port.Core
             // Remap table will be created during construction if needed
 
             // Calculate bits per key
-            var totalBits = (_pilots.Length * 8) + (_remapTable?.Length * 32 ?? 0);
+            var pilotBits = _bucketsTotal * 8;
+            var remapBits = _remapTable != null ? _remapTableSize * 32 : 0;
+            var totalBits = pilotBits + remapBits;
             _bitsPerKey = (double)totalBits / (double)_numKeys;
         }
 
@@ -328,7 +264,7 @@ namespace PtrHash.CSharp.Port.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, uint prefetchDistance = 32, bool minimal = true)
+        public void GetIndicesStreamV2(ReadOnlySpan<TKey> keys, Span<nuint> results, uint prefetchDistance = 32, bool minimal = true)
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
@@ -343,11 +279,11 @@ namespace PtrHash.CSharp.Port.Core
             
             fixed (TKey* keysPtr = keys)
             fixed (nuint* resultsPtr = results)
-            fixed (byte* pilotsPtr = _pilots)
-            fixed (uint* remapPtr = _remapTable)
             fixed (HashValue* hashesPtr = nextHashes)
             fixed (nuint* bucketsPtr = nextBuckets)
             {
+                var pilotsPtr = _pilots;
+                var remapPtr = _remapTable;
                 // Initialize and prefetch first B values (exact Rust pattern)
                 var keyEnumerator = 0;
                 var leftover = B;
@@ -429,7 +365,7 @@ namespace PtrHash.CSharp.Port.Core
         /// Simplified high-performance version without prefetch complexity
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void GetIndicesStreamV2(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
@@ -437,9 +373,9 @@ namespace PtrHash.CSharp.Port.Core
             var useMinimal = minimal && _minimal && _remapTable != null;
             var keysLength = keys.Length;
             
-            fixed (byte* pilotsPtr = _pilots)
-            fixed (uint* remapPtr = _remapTable)
             {
+                var pilotsPtr = _pilots;
+                var remapPtr = _remapTable;
                 for (int i = 0; i < keysLength; i++)
                 {
                     var hash = _hasher.Hash(keys[i], _seed);
@@ -458,45 +394,31 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
+        
         /// <summary>
-        /// Maximum performance version with raw pointers (no bounds checking)
+        /// Hardware-specific prefetch optimization
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void GetIndicesStreamV2Raw(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        private static unsafe void PrefetchOptimized(void* ptr)
         {
-            if (keys.Length != results.Length)
-                throw new ArgumentException("Keys and results spans must have the same length");
-
-            var useMinimal = minimal && _minimal && _remapTable != null;
-            var keysLength = keys.Length;
-            
-            fixed (nuint* resultsPtr = results)
-            fixed (byte* pilotsPtr = _pilots)
-            fixed (uint* remapPtr = _remapTable)
+            // Use hardware-specific prefetch hints when available
+            #if NET8_0_OR_GREATER
+            if (System.Runtime.Intrinsics.X86.Sse.IsSupported)
             {
-                for (int i = 0; i < keysLength; i++)
-                {
-                    var hash = _hasher.Hash(keys[i], _seed);
-                    var bucket = Bucket(hash);
-                    var pilot = (ulong)pilotsPtr[bucket];
-                    var slot = Slot(hash, pilot);
-                    
-                    // Apply remap if minimal and slot >= numKeys
-                    if (useMinimal && slot >= _numKeys)
-                    {
-                        slot = (nuint)remapPtr[slot - _numKeys];
-                    }
-                    
-                    resultsPtr[i] = slot;
-                }
+                System.Runtime.Intrinsics.X86.Sse.Prefetch0(ptr);
+            }
+            else
+            #endif
+            {
+                // Fallback to generic prefetch
+                System.Runtime.Intrinsics.X86.Sse.Prefetch0(ptr);
             }
         }
 
 
+
         private bool ComputePilots(ReadOnlySpan<TKey> keys, out ulong finalSeed)
         {
-            var overallStart = System.Diagnostics.Stopwatch.StartNew();
-            
             // Initialize arrays - matching Rust's initialization
             // Note: _pilots already allocated in constructor, but Rust clears/resizes in loop
             
@@ -538,9 +460,6 @@ namespace PtrHash.CSharp.Port.Core
                     finalSeed = _seed;
                     
                     // Pack the data - Rust: self.pilots = pilots (already done)
-                    // Log timing - matching Rust's log_duration("total build", overall_start)
-                    var totalTime = overallStart.ElapsedMilliseconds;
-                    DebugConstruction($"total build: {totalTime}ms");
                     
                     // Rust would return Some(stats) here
                     // C# returns true since we don't track BucketStats
@@ -554,22 +473,17 @@ namespace PtrHash.CSharp.Port.Core
 
         private bool TryBuildWithSeed(ReadOnlySpan<TKey> keys, ulong seed)
         {
-            var buildStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            DebugLog($"TryBuildWithSeed: {keys.Length} keys, seed={seed}");
-            
             // Seed already assigned in ComputePilots before calling this method
             // Matching Rust where self.seed is set before calling build_shard
             
             // Reset pilots
-            Array.Fill(_pilots, (byte)0);
+            System.Runtime.InteropServices.NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
+
             // Track taken slots using Vec<BitVec> like Rust - for ALL parts
             var taken = new PartitionedBitVec(_parts, _slotsPerPart);
 
             // First, hash all keys and partition them by parts (like Rust's sort_parts)
-            var hashingStart = System.Diagnostics.Stopwatch.StartNew();
             var (allHashes, partStarts) = SortPartsByHashes(keys, seed);
-            hashingStart.Stop();
-            DebugLog($"sort buckets: {hashingStart.ElapsedMilliseconds}ms");
             
             // Process parts in parallel like Rust's par_chunks_exact_mut
             var parallelOptions = new ParallelOptions
@@ -580,15 +494,6 @@ namespace PtrHash.CSharp.Port.Core
             var success = true;
             var lockObject = new object();
             
-            var parallelStart = System.Diagnostics.Stopwatch.StartNew();
-            DebugLog($"Starting parallel build of {_parts} parts...");
-            
-            // Log part sizes for analysis
-            for (int i = 0; i < (int)_parts; i++)
-            {
-                var partSize = partStarts[i + 1] - partStarts[i];
-                DebugLog($"  Part {i}: {partSize} hashes");
-            }
             
             Parallel.For(0, (int)_parts, parallelOptions, part =>
             {
@@ -600,7 +505,7 @@ namespace PtrHash.CSharp.Port.Core
                 
                 // Get pilot slice for this part
                 var partPilotStart = part * (int)_bucketsPerPart;
-                var partPilots = _pilots.AsSpan(partPilotStart, (int)_bucketsPerPart);
+                Span<byte> partPilots = new Span<byte>(_pilots + partPilotStart, (int)_bucketsPerPart);
                 
                 // Build this part using exact Rust build_part algorithm
                 if (!BuildPartRust(part, partHashes, partPilots, taken))
@@ -611,29 +516,18 @@ namespace PtrHash.CSharp.Port.Core
                     }
                 }
             });
-            parallelStart.Stop();
-            DebugLog($"find pilots: {parallelStart.ElapsedMilliseconds}ms (success={success})");
             
             if (!success)
             {
-                buildStopwatch.Stop();
-                DebugLog($"Build FAILED after {buildStopwatch.ElapsedMilliseconds}ms");
                 return false;
             }
             
             // After successful construction, create remap table if needed
-            var remapStart = System.Diagnostics.Stopwatch.StartNew();
             if (!TryRemapFreeSlots(taken))
             {
-                buildStopwatch.Stop();
-                DebugLog($"Failed to construct remap table after {buildStopwatch.ElapsedMilliseconds}ms");
                 return false; // Rust: continue 's;
             }
-            remapStart.Stop();
             
-            buildStopwatch.Stop();
-            DebugLog($"remap free: {remapStart.ElapsedMilliseconds}ms");
-            DebugLog($"build successful in {buildStopwatch.ElapsedMilliseconds}ms");
             return true;
         }
 
@@ -698,13 +592,8 @@ namespace PtrHash.CSharp.Port.Core
         // Build a single part (like Rust's build_part)
         private bool BuildPartRust(int part, ReadOnlySpan<HashValue> partHashes, Span<byte> partPilots, PartitionedBitVec taken)
         {
-            var partStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            DebugLog($"[TRACE] BuildPartRust: Part {part}, {partHashes.Length} hashes");
-            
             // Sort buckets within this part (like Rust's sort_buckets)
-            var sortStopwatch = System.Diagnostics.Stopwatch.StartNew();
             var (sortedHashes, bucketStarts, bucketOrder) = SortBucketsInPart(part, partHashes);
-            sortStopwatch.Stop();
             
             // Use the sorted hashes from here on - this is CRITICAL for matching Rust exactly
             var hashesSpan = sortedHashes.AsSpan();
@@ -730,7 +619,6 @@ namespace PtrHash.CSharp.Port.Core
             var recent = new int[16];
             Array.Fill(recent, -1); // -1 = BucketIdx::NONE
             var rng = new Random(); // Auto-seeded with entropy like Rust's fastrand::Rng::new()
-            var totalEvictions = 0;
 
             // Process buckets in size order (largest first) - EXACT Rust pattern
             if (isDebugPart)
@@ -739,13 +627,8 @@ namespace PtrHash.CSharp.Port.Core
                 DebugConstruction($"C# Part {part}: First 10 bucket IDs: {string.Join(", ", bucketOrder.Take(10))}");
             }
             
-            var bucketProcessingStopwatch = System.Diagnostics.Stopwatch.StartNew();
             var totalBuckets = bucketOrder.Length;
             var processedBuckets = 0;
-            var totalPilotSearchTime = 0L;
-            var totalEvictionTime = 0L;
-            var totalPilotAttempts = 0;
-            var bucketsRequiringManyPilots = 0;
             
             for (int bucketIdx = 0; bucketIdx < bucketOrder.Length; bucketIdx++)
             {
@@ -762,7 +645,6 @@ namespace PtrHash.CSharp.Port.Core
                 }
                 
                 var evictions = 0;
-                var bucketStartTime = System.Diagnostics.Stopwatch.StartNew();
                 
                 // Push initial bucket onto stack (Rust: stack.push((new_b_len, new_b)))
                 stack.Push(new BucketInfo((nuint)newBucketSize, (nuint)newBucket));
@@ -772,21 +654,16 @@ namespace PtrHash.CSharp.Port.Core
                 
                 // Process eviction chain (Rust: while let Some((_b_len, b)) = stack.pop())
                 var maxEvictionsForBucket = 0;
-                var evictionLoopStart = System.Diagnostics.Stopwatch.StartNew();
-                var cycleDetection = new Dictionary<int, int>(); // Track how many times each bucket is processed
                 
                 while (!stack.IsEmpty)
                 {
                     // EXACT Rust termination condition: if evictions >= 10 * self.slots
                     if (evictions >= 10 * (int)_slotsPerPart)
                     {
-                        evictionLoopStart.Stop();
                         DebugConstruction($"INFINITE LOOP DETECTED: Part {part}, evictions={evictions}, stack size={stack.Count}");
-                        DebugConstruction($"  Bucket {bucketIdx}/{totalBuckets} (id={newBucket}), size={newBucketSize}, time={bucketStartTime.ElapsedMilliseconds}ms");
+                        DebugConstruction($"  Bucket {bucketIdx}/{totalBuckets} (id={newBucket}), size={newBucketSize}");
                         DebugConstruction($"  Recent array: [{string.Join(",", recent.Where(r => r != -1))}]");
                         DebugConstruction($"  Max evictions for this bucket: {maxEvictionsForBucket}");
-                        DebugConstruction($"  Total time in eviction loop: {evictionLoopStart.ElapsedMilliseconds}ms");
-                        // Show current stack size info
                         DebugConstruction($"  Stack contains {stack.Count} buckets waiting to be processed");
                         return false;
                     }
@@ -827,12 +704,7 @@ namespace PtrHash.CSharp.Port.Core
                     }
                     
                     // 1) Try collision-free pilot first (Rust hot path)
-                    var pilotSearchStart = System.Diagnostics.Stopwatch.StartNew();
                     var pilotResult = FindPilot(kmax, currentBucketHashes, partTaken, out var pilotsChecked, currentBucket);
-                    pilotSearchStart.Stop();
-                    totalPilotSearchTime += pilotSearchStart.ElapsedTicks;
-                    totalPilotAttempts += pilotsChecked;
-                    if (pilotsChecked > 50) bucketsRequiringManyPilots++;
                     
                     if (pilotResult.HasValue)
                     {
@@ -851,10 +723,7 @@ namespace PtrHash.CSharp.Port.Core
                     }
                     
                     // 2) Find pilot with minimal collisions and evict (EXACT Rust collision handling)
-                    var bestPilotStart = System.Diagnostics.Stopwatch.StartNew();
                     var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, bucketStarts);
-                    bestPilotStart.Stop();
-                    totalPilotSearchTime += bestPilotStart.ElapsedTicks;
                     var bestPilot = bestResult.pilot;
                     
                     // EXACT Rust sequence: pilots[b] = p as u8; let hp = self.hash_pilot(p);
@@ -862,7 +731,6 @@ namespace PtrHash.CSharp.Port.Core
                     var hp = HashPilot(bestPilot);
                     
                     // EXACT Rust eviction algorithm: Drop the collisions and set the new pilot
-                    var evictionStart = System.Diagnostics.Stopwatch.StartNew();
                     var evictionsThisRound = 0;
                     
                     // EXACT Rust pattern: for slot in b_slots(hp)
@@ -908,8 +776,6 @@ namespace PtrHash.CSharp.Port.Core
                         partTaken.Set(localSlot, true);
                     }
                     
-                    evictionStart.Stop();
-                    totalEvictionTime += evictionStart.ElapsedTicks;
                     
                     // Update recent buckets (EXACT Rust algorithm)
                     recentIdx += 1; // recent_idx += 1
@@ -917,13 +783,9 @@ namespace PtrHash.CSharp.Port.Core
                     recent[recentIdx] = currentBucket; // recent[recent_idx] = b
                 }
                 
-                bucketStartTime.Stop();
                 processedBuckets++;
-                totalEvictions += evictions;
             }
             
-            bucketProcessingStopwatch.Stop();
-            partStopwatch.Stop();
             return true;
         }
 
@@ -1088,7 +950,6 @@ namespace PtrHash.CSharp.Port.Core
         }
 
         // Variable-size bucket processing for larger buckets (renamed from FindPilotInPart)
-        private int _collisionLogCount = 0;
         private (ulong pilot, ulong hashPilot)? FindPilotSlice(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
             // EXACT Rust algorithm: Sequential search from 0 to kmax-1 with 4x chunking
@@ -1117,19 +978,8 @@ namespace PtrHash.CSharp.Port.Core
                     bool t2 = taken.GetUnchecked(slot2);
                     bool t3 = taken.GetUnchecked(slot3);
 
-                    // DEBUG LOG
                     if (t0 || t1 || t2 || t3)
                     {
-                        if (_collisionLogCount < 100)
-                        {
-                            DebugCollision(
-                             $"[DEBUG Collision] pilot={pilot}, bucketIdx={bucketId}, " +
-                             $"i={i}..{i + 3}, " +
-                             $"slots=[{slot0},{slot1},{slot2},{slot3}], " +
-                             $"taken=[{t0},{t1},{t2},{t3}]"
-                         );
-                          _collisionLogCount++;
-                        }
                         hasCollision = true;
                         break;
                     }
@@ -1306,7 +1156,7 @@ namespace PtrHash.CSharp.Port.Core
         }
 
         // Check for duplicate slots within a bucket (internal collisions)
-        private void ValidateHashFunction(ReadOnlySpan<TKey> keys)
+        private unsafe void ValidateHashFunction(ReadOnlySpan<TKey> keys)
         {
             var indices = new HashSet<nuint>();
             for (int i = 0; i < keys.Length; i++)
@@ -1358,7 +1208,11 @@ namespace PtrHash.CSharp.Port.Core
             
             if (!_minimal || _slotsTotal == _numKeys)
             {
-                this._remapTable = Array.Empty<uint>();
+                unsafe
+                {
+                    this._remapTable = null;
+                    _remapTableSize = 0;
+                }
                 return true;
             }
             
@@ -1411,7 +1265,19 @@ namespace PtrHash.CSharp.Port.Core
                 v.Add((uint)i);
             }
             
-            this._remapTable = v.ToArray();
+            // Allocate unmanaged memory for remap table
+            var remapArray = v.ToArray();
+            unsafe
+            {
+                _remapTableSize = (nuint)remapArray.Length;
+                _remapTable = (uint*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc(_remapTableSize * 4, 64);
+                
+                // Copy data to unmanaged memory
+                fixed (uint* sourcePtr = remapArray)
+                {
+                    System.Runtime.InteropServices.NativeMemory.Copy(sourcePtr, _remapTable, _remapTableSize * 4);
+                }
+            }
             return true;
         }
 
@@ -1430,10 +1296,43 @@ namespace PtrHash.CSharp.Port.Core
             return (nuint)Math.Max(1, Math.Ceiling(lambda));
         }
 
+        #region IDisposable Support
+        private bool _disposed = false;
+
+        ~PtrHash()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
-            // Nothing to dispose in this implementation
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                unsafe
+                {
+                    if (_pilots != null)
+                    {
+                        System.Runtime.InteropServices.NativeMemory.Free(_pilots);
+                        _pilots = null;
+                    }
+
+                    if (_remapTable != null)
+                    {
+                        System.Runtime.InteropServices.NativeMemory.Free(_remapTable);
+                        _remapTable = null;
+                    }
+                }
+
+                _disposed = true;
+            }
+        }
+        #endregion
     }
 
     /// <summary>

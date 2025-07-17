@@ -64,9 +64,9 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHashMapU64<ulong> PortPtrHashMapFxConstruction()
+        public PtrHashDictionaryU64<ulong> PortPtrHashDictionaryFxConstruction()
         {
-            return new PtrHashMapU64<ulong>(_keys, _keys, 0UL, PtrHashParams.DefaultFast);
+            return new PtrHashDictionaryU64<ulong>(_keys, _keys, 0UL, PtrHashParams.DefaultFast);
         }
 
         [Benchmark]
@@ -77,10 +77,10 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHashMapU64<ulong> PortPtrHashMapFxSinglePartConstruction()
+        public PtrHashDictionaryU64<ulong> PortPtrHashDictionaryFxSinglePartConstruction()
         {
             var params_single = PtrHashParams.DefaultFast with { SinglePart = true };
-            return new PtrHashMapU64<ulong>(_keys, _keys, 0UL, params_single);
+            return new PtrHashDictionaryU64<ulong>(_keys, _keys, 0UL, params_single);
         }
 
         // C# port construction benchmarks using StrongerIntHasher
@@ -91,9 +91,9 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHashMap<ulong, ulong, StrongerIntHasher> PortPtrHashMapStrongerIntHasherConstruction()
+        public PtrHashDictionary<ulong, ulong, StrongerIntHasher> PortPtrHashDictionaryStrongerIntHasherConstruction()
         {
-            return new PtrHashMap<ulong, ulong, StrongerIntHasher>(_keys, _keys, 0UL, PtrHashParams.DefaultFast);
+            return new PtrHashDictionary<ulong, ulong, StrongerIntHasher>(_keys, _keys, 0UL, PtrHashParams.DefaultFast);
         }
 
         // Balanced parameters comparison

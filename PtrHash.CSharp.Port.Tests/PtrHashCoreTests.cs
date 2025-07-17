@@ -123,8 +123,8 @@ namespace PtrHash.CSharp.Port.Tests
             var results1 = new nuint[keys.Length];
             var results2 = new nuint[keys.Length];
             
-            ptrHash.GetIndicesStream(keys, results1, prefetchDistance: 16, minimal: true);
-            ptrHash.GetIndicesStream(keys, results2, prefetchDistance: 64, minimal: true);
+            ptrHash.GetIndicesStream(keys, results1, minimal: true);
+            ptrHash.GetIndicesStream(keys, results2, minimal: true);
 
             // Assert
             Assert.That(results1, Is.EqualTo(results2), 

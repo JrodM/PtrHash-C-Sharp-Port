@@ -40,9 +40,9 @@ namespace PtrHash.Benchmarks
         
         // C# port versions using FxHasher (default for interop)
         private global::PtrHash.CSharp.Port.Core.PtrHash<ulong, FxHasher> _portPtrHash = null!;
-        private PtrHashMapU64<ulong> _portPtrHashMap = null!;
+        private PtrHashDictionaryU64<ulong> _portPtrHashMap = null!;
         private global::PtrHash.CSharp.Port.Core.PtrHash<ulong, FxHasher> _portPtrHashSinglePart = null!;
-        private PtrHashMapU64<ulong> _portPtrHashMapSinglePart = null!;
+        private PtrHashDictionaryU64<ulong> _portPtrHashMapSinglePart = null!;
         
         private nuint[] _indicesBuffer = null!;
         private ulong[] _valuesBuffer = null!;
@@ -90,11 +90,11 @@ namespace PtrHash.Benchmarks
 
             // C# port versions using FxHasher (to match interop default)
             _portPtrHash = new global::PtrHash.CSharp.Port.Core.PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);
-            _portPtrHashMap = new PtrHashMapU64<ulong>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
+            _portPtrHashMap = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
             
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
             _portPtrHashSinglePart = new global::PtrHash.CSharp.Port.Core.PtrHash<ulong, FxHasher>(_keys, singlePartParams);
-            _portPtrHashMapSinglePart = new PtrHashMapU64<ulong>(_keys, _values, ulong.MaxValue, singlePartParams);
+            _portPtrHashMapSinglePart = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, singlePartParams);
 
             _indicesBuffer = new nuint[lookupCount];
             _valuesBuffer = new ulong[lookupCount];
@@ -126,7 +126,7 @@ namespace PtrHash.Benchmarks
         }
 
         // Native interop benchmarks
-        [Benchmark]
+        //[Benchmark]
         public ulong NativePtrHashPointLookup()
         {
             ulong sum = 0;
@@ -138,7 +138,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong NativePtrHashStreamLookup()
         {
             ulong sum = 0;
@@ -148,7 +148,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong NativeSentinelPtrHashStreamLookup()
         {
             ulong sum = 0;
@@ -167,7 +167,7 @@ namespace PtrHash.Benchmarks
         }
 
         // C# port benchmarks
-        [Benchmark]
+        //[Benchmark]
         public ulong PortPtrHashPointLookup()
         {
             ulong sum = 0;
@@ -179,41 +179,21 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PortPtrHashStreamLookup()
         {
             ulong sum = 0;
-            _portPtrHash.GetIndicesStream(_lookupKeys.AsSpan(), _indicesBuffer, prefetchDistance: 32, minimal: true);
+            _portPtrHash.GetIndicesStream(_lookupKeys.AsSpan(), _indicesBuffer, minimal: true);
             for (int i = 0; i < _indicesBuffer.Length; i++)
                 sum += _values[_indicesBuffer[i]];
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PortPtrHashStreamLookupV2()
         {
             ulong sum = 0;
             _portPtrHash.GetIndicesStreamV2(_lookupKeys.AsSpan(), _indicesBuffer, minimal: true);
-            for (int i = 0; i < _indicesBuffer.Length; i++)
-                sum += _values[_indicesBuffer[i]];
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong PortPtrHashStreamLookupV2Raw()
-        {
-            ulong sum = 0;
-            _portPtrHash.GetIndicesStreamV2Raw(_lookupKeys.AsSpan(), _indicesBuffer, minimal: true);
-            for (int i = 0; i < _indicesBuffer.Length; i++)
-                sum += _values[_indicesBuffer[i]];
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong PortPtrHashStreamLookupV3Minimal()
-        {
-            ulong sum = 0;
-            _portPtrHash.GetIndicesStreamV3Minimal(_lookupKeys.AsSpan(), _indicesBuffer);
             for (int i = 0; i < _indicesBuffer.Length; i++)
                 sum += _values[_indicesBuffer[i]];
             return sum;
@@ -233,7 +213,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong PortPtrHashMapStreamLookup()
         {
             ulong sum = 0;

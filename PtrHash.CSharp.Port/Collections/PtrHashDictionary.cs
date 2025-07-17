@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
@@ -7,31 +9,34 @@ using PtrHash.CSharp.Port.KeyHashers;
 namespace PtrHash.CSharp.Port.Collections
 {
     /// <summary>
-    /// A hash map implementation using PtrHash as the underlying mapping structure.
+    /// A dictionary implementation using PtrHash as the underlying mapping structure.
     /// Provides O(1) lookups with perfect hashing for a fixed set of keys.
     /// </summary>
-    public class PtrHashMap<TKey, TValue, THasher> : IDisposable
+    public class PtrHashDictionary<TKey, TValue, THasher> : IDictionary<TKey, TValue>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
+        where TKey : notnull
     {
         private readonly PtrHash<TKey, THasher> _ptrHash;
         private readonly TKey[] _keysByIndex;
         private readonly TValue[] _valuesByIndex;
         private readonly TValue _sentinel;
+        private readonly TKey[] _originalKeys;
+        private readonly TValue[] _originalValues;
         private bool _disposed;
 
         /// <summary>
-        /// The sentinel value returned for keys not found in the hash map
+        /// The sentinel value returned for keys not found in the dictionary
         /// </summary>
         public TValue Sentinel => _sentinel;
 
         /// <summary>
-        /// Creates a new PtrHashMap from the given keys and values
+        /// Creates a new PtrHashDictionary from the given keys and values
         /// </summary>
         /// <param name="keys">Array of unique keys</param>
         /// <param name="values">Array of values corresponding to keys</param>
         /// <param name="notFoundSentinel">Value to return when key is not found</param>
         /// <param name="parameters">PtrHash construction parameters</param>
-        public PtrHashMap(
+        public PtrHashDictionary(
             TKey[] keys,
             TValue[] values,
             TValue notFoundSentinel,
@@ -43,6 +48,9 @@ namespace PtrHash.CSharp.Port.Collections
                 throw new ArgumentException("Keys and values must have same length");
 
             _sentinel = notFoundSentinel;
+            _originalKeys = (TKey[])keys.Clone();
+            _originalValues = (TValue[])values.Clone();
+            
             _ptrHash = new PtrHash<TKey, THasher>(keys, parameters ?? PtrHashParams.DefaultFast);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;
@@ -66,11 +74,90 @@ namespace PtrHash.CSharp.Port.Collections
             }
         }
 
+        #region IDictionary<TKey, TValue> Implementation
+
+        public TValue this[TKey key]
+        {
+            get
+            {
+                if (TryGetValue(key, out TValue value))
+                    return value;
+                throw new KeyNotFoundException($"Key '{key}' was not found in the dictionary.");
+            }
+            set => throw new NotSupportedException("PtrHashDictionary is read-only. Values cannot be modified after construction.");
+        }
+
+        public ICollection<TKey> Keys => _originalKeys.ToList().AsReadOnly();
+
+        public ICollection<TValue> Values => _originalValues.ToList().AsReadOnly();
+
+        public int Count => _originalKeys.Length;
+
+        public bool IsReadOnly => true;
+
+        public void Add(TKey key, TValue value)
+        {
+            throw new NotSupportedException("PtrHashDictionary is read-only. Items cannot be added after construction.");
+        }
+
+        public void Add(KeyValuePair<TKey, TValue> item)
+        {
+            throw new NotSupportedException("PtrHashDictionary is read-only. Items cannot be added after construction.");
+        }
+
+        public void Clear()
+        {
+            throw new NotSupportedException("PtrHashDictionary is read-only. Items cannot be removed after construction.");
+        }
+
+        public bool Contains(KeyValuePair<TKey, TValue> item)
+        {
+            return TryGetValue(item.Key, out TValue value) && EqualityComparer<TValue>.Default.Equals(value, item.Value);
+        }
+
+        public bool ContainsKey(TKey key)
+        {
+            return TryGetValue(key, out _);
+        }
+
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+            if (array.Length - arrayIndex < Count) throw new ArgumentException("Destination array is too small.");
+
+            int index = arrayIndex;
+            for (int i = 0; i < _originalKeys.Length; i++)
+            {
+                array[index++] = new KeyValuePair<TKey, TValue>(_originalKeys[i], _originalValues[i]);
+            }
+        }
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            for (int i = 0; i < _originalKeys.Length; i++)
+            {
+                yield return new KeyValuePair<TKey, TValue>(_originalKeys[i], _originalValues[i]);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public bool Remove(TKey key)
+        {
+            throw new NotSupportedException("PtrHashDictionary is read-only. Items cannot be removed after construction.");
+        }
+
+        public bool Remove(KeyValuePair<TKey, TValue> item)
+        {
+            throw new NotSupportedException("PtrHashDictionary is read-only. Items cannot be removed after construction.");
+        }
+
         /// <summary>
         /// Attempts to get the value associated with the specified key
         /// </summary>
         /// <param name="key">The key to look up</param>
-        /// <param name="value">The value if found, or sentinel if not found</param>
+        /// <param name="value">The value if found, or default if not found</param>
         /// <returns>True if the key was found, false otherwise</returns>
         public bool TryGetValue(TKey key, out TValue value)
         {
@@ -85,9 +172,11 @@ namespace PtrHash.CSharp.Port.Collections
                 return true;
             }
             
-            value = _sentinel;
+            value = default(TValue)!;
             return false;
         }
+
+        #endregion
 
         /// <summary>
         /// Gets the value associated with the specified key, or sentinel if not found
@@ -96,8 +185,17 @@ namespace PtrHash.CSharp.Port.Collections
         /// <returns>The value if found, or sentinel if not found</returns>
         public TValue GetValueOrSentinel(TKey key)
         {
-            TryGetValue(key, out TValue value);
-            return value;
+            ThrowIfDisposed();
+            
+            int idx = (int)_ptrHash.GetIndex(key);
+            
+            // Verify the key matches (handles hash collisions)
+            if (idx < _keysByIndex.Length && EqualityComparer<TKey>.Default.Equals(_keysByIndex[idx], key))
+            {
+                return _valuesByIndex[idx];
+            }
+            
+            return _sentinel;
         }
 
         /// <summary>
@@ -124,7 +222,7 @@ namespace PtrHash.CSharp.Port.Collections
                 : new nuint[n];
 
             // Get all indices using streaming
-            _ptrHash.GetIndicesStream(keys, indices, prefetchDistance, minimal: true);
+            _ptrHash.GetIndicesStream(keys, indices, minimal: true);
             
             // Process indices and verify keys match
             ProcessIndices(keys, indices, values);
@@ -164,7 +262,7 @@ namespace PtrHash.CSharp.Port.Collections
         private void ThrowIfDisposed()
         {
             if (_disposed)
-                throw new ObjectDisposedException(nameof(PtrHashMap<TKey, TValue, THasher>));
+                throw new ObjectDisposedException(nameof(PtrHashDictionary<TKey, TValue, THasher>));
         }
 
         public void Dispose()
@@ -180,9 +278,9 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for UInt64 keys using StrongerIntHasher
     /// </summary>
-    public class PtrHashMapU64<TValue> : PtrHashMap<ulong, TValue, StrongerIntHasher>
+    public class PtrHashDictionaryU64<TValue> : PtrHashDictionary<ulong, TValue, StrongerIntHasher>
     {
-        public PtrHashMapU64(ulong[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null)
+        public PtrHashDictionaryU64(ulong[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null)
             : base(keys, values, notFoundSentinel, parameters)
         {
         }
@@ -191,9 +289,9 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for string keys using StringHasher
     /// </summary>
-    public class PtrHashMapString<TValue> : PtrHashMap<string, TValue, StringHasher>
+    public class PtrHashDictionaryString<TValue> : PtrHashDictionary<string, TValue, StringHasher>
     {
-        public PtrHashMapString(string[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null)
+        public PtrHashDictionaryString(string[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null)
             : base(keys, values, notFoundSentinel, parameters)
         {
         }

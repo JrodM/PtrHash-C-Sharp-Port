@@ -8,7 +8,7 @@ using System.Linq;
 namespace PtrHash.CSharp.Port.Tests
 {
     [TestFixture]
-    public class PtrHashMapCoreTests
+    public class PtrHashDictionaryCoreTests
     {
         [Test]
         public void Constructor_WithValidKeyValuePairs_ShouldCreateValidHashMap()
@@ -19,7 +19,7 @@ namespace PtrHash.CSharp.Port.Tests
             var sentinel = "NOT_FOUND";
 
             // Act
-            using var hashMap = new PtrHashMapU64<string>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<string>(keys, values, sentinel);
 
             // Assert
             Assert.That(hashMap.Sentinel, Is.EqualTo(sentinel));
@@ -36,7 +36,7 @@ namespace PtrHash.CSharp.Port.Tests
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => 
-                new PtrHashMapU64<string>(keys, values, "NOT_FOUND"));
+                new PtrHashDictionaryU64<string>(keys, values, "NOT_FOUND"));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Arrange
             var keys = Enumerable.Range(1, 500).Select(i => (ulong)i).ToArray();
             var values = keys.Select(k => (int)(k * 2)).ToArray();
-            using var hashMap = new PtrHashMapU64<int>(keys, values, -1);
+            using var hashMap = new PtrHashDictionaryU64<int>(keys, values, -1);
 
             // Act & Assert - Test all keys
             foreach (var (key, expectedValue) in keys.Zip(values))
@@ -63,7 +63,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = new ulong[] { 10, 20, 30 };
             var values = new string[] { "ten", "twenty", "thirty" };
             var sentinel = "MISSING";
-            using var hashMap = new PtrHashMapU64<string>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<string>(keys, values, sentinel);
 
             // Act & Assert - Test keys not in the map
             var invalidKeys = new ulong[] { 5, 15, 25, 35, 100 };
@@ -82,7 +82,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = new ulong[] { 100, 200, 300, 400 };
             var values = new double[] { 1.1, 2.2, 3.3, 4.4 };
             var sentinel = -999.0;
-            using var hashMap = new PtrHashMapU64<double>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<double>(keys, values, sentinel);
 
             // Act & Assert - Valid keys
             Assert.That(hashMap.GetValueOrSentinel(100), Is.EqualTo(1.1));
@@ -102,7 +102,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = Enumerable.Range(1, 200).Select(i => (ulong)i).ToArray();
             var values = keys.Select(k => $"item_{k}").ToArray();
             var sentinel = "NOT_FOUND";
-            using var hashMap = new PtrHashMapU64<string>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<string>(keys, values, sentinel);
 
             // Test with subset of keys in different order
             var queryKeys = new ulong[] { 50, 10, 150, 5, 200, 1, 100 };
@@ -123,7 +123,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = new ulong[] { 1, 3, 5, 7, 9 };
             var values = new int[] { 10, 30, 50, 70, 90 };
             var sentinel = -1;
-            using var hashMap = new PtrHashMapU64<int>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<int>(keys, values, sentinel);
 
             var queryKeys = new ulong[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }; // Mix of valid and invalid
             var results = new int[queryKeys.Length];
@@ -143,7 +143,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = Enumerable.Range(1, 300).Select(i => (ulong)i).ToArray();
             var values = keys.Select(k => (int)(k * 3)).ToArray();
             var sentinel = -999;
-            using var hashMap = new PtrHashMapU64<int>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<int>(keys, values, sentinel);
 
             var queryKeys = keys.Take(100).ToArray();
             var results1 = new int[queryKeys.Length];
@@ -165,7 +165,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = Enumerable.Range(1, 100).Select(i => (ulong)i).ToArray();
             var values = keys.Select(k => k.ToString()).ToArray();
             var sentinel = "EMPTY";
-            using var hashMap = new PtrHashMapU64<string>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<string>(keys, values, sentinel);
 
             var queryKeys = keys.Where((_, i) => i % 3 == 0).ToArray(); // Every 3rd key
             
@@ -187,7 +187,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = new string[] { "apple", "banana", "cherry", "date", "elderberry" };
             var values = new int[] { 1, 2, 3, 4, 5 };
             var sentinel = -1;
-            using var hashMap = new PtrHashMapString<int>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryString<int>(keys, values, sentinel);
 
             // Act & Assert - Valid keys
             Assert.That(hashMap.TryGetValue("apple", out int value1), Is.True);
@@ -211,7 +211,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = new string[] { "red", "green", "blue", "yellow", "purple", "orange" };
             var values = new string[] { "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#800080", "#FFA500" };
             var sentinel = "#UNKNOWN";
-            using var hashMap = new PtrHashMapString<string>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryString<string>(keys, values, sentinel);
 
             var queryKeys = new string[] { "red", "invalid", "blue", "missing", "yellow", "purple" };
             var results = new string[queryKeys.Length];
@@ -230,7 +230,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Arrange
             var keys = new ulong[] { 1, 2, 3 };
             var values = new string[] { "a", "b", "c" };
-            using var hashMap = new PtrHashMapU64<string>(keys, values, "EMPTY");
+            using var hashMap = new PtrHashDictionaryU64<string>(keys, values, "EMPTY");
 
             var queryKeys = new ulong[0];
             var results = new string[0];
@@ -245,7 +245,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Arrange
             var keys = new ulong[] { 1, 2, 3 };
             var values = new string[] { "a", "b", "c" };
-            using var hashMap = new PtrHashMapU64<string>(keys, values, "ERROR");
+            using var hashMap = new PtrHashDictionaryU64<string>(keys, values, "ERROR");
 
             var queryKeys = new ulong[] { 1, 2 };
             var results = new string[3]; // Different length
@@ -261,7 +261,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Arrange
             var keys = new ulong[] { 1, 2, 3 };
             var values = new string[] { "a", "b", "c" };
-            var hashMap = new PtrHashMapU64<string>(keys, values, "DISPOSED");
+            var hashMap = new PtrHashDictionaryU64<string>(keys, values, "DISPOSED");
 
             // Act
             hashMap.Dispose();
@@ -284,7 +284,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = Enumerable.Range(1, size).Select(i => (ulong)i).ToArray();
             var values = keys.Select(k => $"value_{k}").ToArray();
             var sentinel = "MISSING";
-            using var hashMap = new PtrHashMapU64<string>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionaryU64<string>(keys, values, sentinel);
 
             // Test random subset
             var random = new Random(42);
@@ -319,8 +319,8 @@ namespace PtrHash.CSharp.Port.Tests
             var sentinel = -1;
 
             // Act
-            using var hashMapFast = new PtrHashMapU64<int>(keys, values, sentinel, PtrHashParams.DefaultFast);
-            using var hashMapBalanced = new PtrHashMapU64<int>(keys, values, sentinel, PtrHashParams.DefaultBalanced);
+            using var hashMapFast = new PtrHashDictionaryU64<int>(keys, values, sentinel, PtrHashParams.DefaultFast);
+            using var hashMapBalanced = new PtrHashDictionaryU64<int>(keys, values, sentinel, PtrHashParams.DefaultBalanced);
 
             // Test subset of keys
             var testKeys = keys.Where((_, i) => i % 10 == 0).ToArray();
@@ -343,7 +343,7 @@ namespace PtrHash.CSharp.Port.Tests
             var values = keys.Select(k => k.ToString()).ToArray();
             var sentinel = "NOT_FOUND";
             
-            using var hashMap = new PtrHashMap<ulong, string, StrongerIntHasher>(keys, values, sentinel);
+            using var hashMap = new PtrHashDictionary<ulong, string, StrongerIntHasher>(keys, values, sentinel);
 
             // Act & Assert
             foreach (var (key, expectedValue) in keys.Zip(values))

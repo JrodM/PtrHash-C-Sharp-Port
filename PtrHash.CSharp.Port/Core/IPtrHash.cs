@@ -24,6 +24,6 @@ namespace PtrHash.CSharp.Port.Core
         /// <summary>
         /// Stream lookup with prefetching for maximum throughput
         /// </summary>
-        void GetIndicesStream(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, uint prefetchDistance = 32, bool minimal = true);
+        void GetIndicesStream(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, bool minimal = true);
     }
 }
