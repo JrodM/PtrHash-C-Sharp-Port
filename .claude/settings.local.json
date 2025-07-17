@@ -15,7 +15,11 @@
       "mcp__memory__search_nodes",
       "mcp__memory__add_observations",
       "Bash(dotnet build:*)",
-      "Bash(dotnet run:*)"
+      "Bash(dotnet run:*)",
+      "mcp__memory__create_relations",
+      "Bash(cargo test:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

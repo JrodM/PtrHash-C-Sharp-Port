@@ -8,7 +8,7 @@ namespace PtrHash.CSharp.Port.Util
     /// Taken from https://github.com/lemire/fastmod/blob/master/include/fastmod.h
     /// Matches Rust's FM32 implementation for slot reduction
     /// </summary>
-    internal readonly struct FM32
+    public readonly struct FM32
     {
         private readonly ulong d;
         private readonly ulong m;

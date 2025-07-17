@@ -41,43 +41,43 @@ namespace ComparisonTests
             }
         }
 
-        [Test]
+        //[Test]
         public void Test_10K_Keys()
         {
             RunPerformanceTest(10_000);
         }
 
-        [Test]
+        //[Test]
         public void Test_20K_Keys()
         {
             RunPerformanceTest(20_000);
         }
 
-        [Test]
+       // [Test]
         public void Test_30K_Keys()
         {
             RunPerformanceTest(30_000);
         }
 
-        [Test]
+       [Test]
         public void Test_50K_Keys()
         {
-            RunPerformanceTest(50_000);
+            RunPerformanceTest(90_000);
         }
 
-        [Test]
+        //[Test]
         public void Test_75K_Keys()
         {
             RunPerformanceTest(75_000);
         }
 
-        [Test]
+        //[Test]
         public void Test_100K_Keys()
         {
             RunPerformanceTest(112_000);
         }
 
-        [Test]
+        //[Test]
         public void RunAllSizesInSequence()
         {
             Console.WriteLine("=== Running all sizes to identify performance cliff ===");

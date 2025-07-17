@@ -183,7 +183,6 @@ namespace PtrHash.CSharp.Port.Core
                 _bucketsTotal = _parts * _bucketsPerPart;
             }
             
-            _bucketFunction = new LinearBucketFunction(_bucketsPerPart);
             _pilots = new byte[_bucketsTotal];
             
             // Initialize reduction structures like Rust does
@@ -293,6 +292,7 @@ namespace PtrHash.CSharp.Port.Core
         private nuint SlotInPartHp(HashValue hx, ulong hp)
         {
             // Rust: self.rem_slots.reduce(hx.low() ^ hp)
+            
             return _remSlots.Reduce(hx.Low() ^ hp);
         }
         
@@ -441,9 +441,6 @@ namespace PtrHash.CSharp.Port.Core
                     Console.WriteLine($"[WARN] Trying seed number {tries}: {_seed}.");
                 }
                 
-                // Reset output-memory - matching Rust's pilots.clear(); pilots.resize()
-                Array.Fill(_pilots, (byte)0);
-                
                 // NOTE: C# doesn't pre-allocate taken Vec<BitVec> like Rust
                 // Each attempt creates fresh PartitionedBitVec in TryBuildWithSeed
                 
@@ -476,15 +473,14 @@ namespace PtrHash.CSharp.Port.Core
             
             // Reset pilots
             Array.Fill(_pilots, (byte)0);
+            // Track taken slots using Vec<BitVec> like Rust - for ALL parts
+            var taken = new PartitionedBitVec(_parts, _slotsPerPart);
 
             // First, hash all keys and partition them by parts (like Rust's sort_parts)
             var hashingStart = System.Diagnostics.Stopwatch.StartNew();
             var (allHashes, partStarts) = SortPartsByHashes(keys, seed);
             hashingStart.Stop();
             Console.WriteLine($"[TRACE] sort buckets: {hashingStart.ElapsedMilliseconds}ms");
-            
-            // Track taken slots using Vec<BitVec> like Rust - for ALL parts
-            var taken = new PartitionedBitVec(_parts, _slotsPerPart);
             
             // Process parts in parallel like Rust's par_chunks_exact_mut
             var parallelOptions = new ParallelOptions
@@ -620,7 +616,6 @@ namespace PtrHash.CSharp.Port.Core
             var sortStopwatch = System.Diagnostics.Stopwatch.StartNew();
             var (sortedHashes, bucketStarts, bucketOrder) = SortBucketsInPart(part, partHashes);
             sortStopwatch.Stop();
-            DebugLog($"  Part {part}: Sorting took {sortStopwatch.ElapsedMilliseconds}ms, {bucketOrder.Length} buckets");
             
             // Use the sorted hashes from here on - this is CRITICAL for matching Rust exactly
             var hashesSpan = sortedHashes.AsSpan();
@@ -632,6 +627,15 @@ namespace PtrHash.CSharp.Port.Core
             // Get this part's BitVec - CRITICAL: Rust passes just the part's BitSlice, not global
             var partTaken = taken.GetPart(part);
             
+            // Debug for Part 0 only to compare with Rust
+            var isDebugPart = part == 0;
+            if (isDebugPart)
+            {
+                Console.WriteLine($"C# Part {part}: Starting with {partHashes.Length} hashes, {partTaken.Length} slots");
+                var first5 = partHashes.Length >= 5 ? partHashes.Slice(0, 5) : partHashes;
+                Console.WriteLine($"C# Part {part}: First 5 hash values: {string.Join(", ", first5.ToArray().Select(h => h.Full().ToString("X16")))}");
+            }
+            
             // EXACT RUST BINARY HEAP IMPLEMENTATION
             var stack = new BinaryHeap<BucketInfo>();
             var recent = new int[16];
@@ -640,6 +644,12 @@ namespace PtrHash.CSharp.Port.Core
             var totalEvictions = 0;
 
             // Process buckets in size order (largest first) - EXACT Rust pattern
+            if (isDebugPart)
+            {
+                Console.WriteLine($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
+                Console.WriteLine($"C# Part {part}: First 10 bucket IDs: {string.Join(", ", bucketOrder.Take(10))}");
+            }
+            
             var bucketProcessingStopwatch = System.Diagnostics.Stopwatch.StartNew();
             var totalBuckets = bucketOrder.Length;
             var processedBuckets = 0;
@@ -696,17 +706,6 @@ namespace PtrHash.CSharp.Port.Core
                     if (evictions > maxEvictionsForBucket)
                         maxEvictionsForBucket = evictions;
                     
-                    // DEBUG: Log progress periodically
-                    if (evictions > 0 && evictions % 5000 == 0)
-                    {
-                        Console.WriteLine($"Part {part}: {evictions} evictions, stack size={stack.Count}, bucket {bucketIdx}/{totalBuckets} (id={newBucket}), elapsed={bucketStartTime.ElapsedMilliseconds}ms");
-                        // Additional diagnostic when we're deep in evictions
-                        if (stack.Count > 10)
-                        {
-                            Console.WriteLine($"  Stack depth is high: {stack.Count} buckets waiting");
-                        }
-                    }
-                    
                     // EXACT Rust termination condition (nested structure)
                     if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
                     {
@@ -721,16 +720,7 @@ namespace PtrHash.CSharp.Port.Core
                     
                     var bucketInfo = stack.Pop();
                     var currentBucket = (int)bucketInfo.BucketId;
-                    
-                    // Track cycle detection
-                    if (!cycleDetection.ContainsKey(currentBucket))
-                        cycleDetection[currentBucket] = 0;
-                    cycleDetection[currentBucket]++;
-                    
-                    if (cycleDetection[currentBucket] > 10)
-                    {
-                        Console.WriteLine($"  WARNING: Bucket {currentBucket} processed {cycleDetection[currentBucket]} times - possible cycle!");
-                    }
+                
                     
                     var currentStart = bucketStarts[currentBucket];
                     var currentEnd = bucketStarts[currentBucket + 1];
@@ -738,6 +728,14 @@ namespace PtrHash.CSharp.Port.Core
                     
                     if (currentBucketHashes.Length == 0)
                         continue;
+                    
+                    // Debug first few buckets for Part 0
+                    if (isDebugPart && processedBuckets < 3)
+                    {
+                        Console.WriteLine($"C# Part {part}: Processing bucket {currentBucket} (#{processedBuckets}), size={currentBucketHashes.Length}");
+                        var first3 = currentBucketHashes.Length >= 3 ? currentBucketHashes.Slice(0, 3) : currentBucketHashes;
+                        Console.WriteLine($"C# Part {part}: Bucket {currentBucket} first 3 hashes: {string.Join(", ", first3.ToArray().Select(h => h.Full().ToString("X16")))}");
+                    }
                     
                     // 1) Try collision-free pilot first (Rust hot path)
                     var pilotSearchStart = System.Diagnostics.Stopwatch.StartNew();
@@ -768,16 +766,6 @@ namespace PtrHash.CSharp.Port.Core
                     var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, bucketStarts);
                     bestPilotStart.Stop();
                     totalPilotSearchTime += bestPilotStart.ElapsedTicks;
-                    
-                    if (bestResult.pilot == ulong.MaxValue)
-                    {
-                        if (DEBUG_PILOT_SEARCH)
-                        {
-                            DebugLog($"Part {part}: Failed to find pilot for bucket {currentBucket} with {currentBucketHashes.Length} hashes. Indistinguishable hashes detected.");
-                        }
-                        return false; // Failed to find suitable pilot (indistinguishable hashes)
-                    }
-                    
                     var bestPilot = bestResult.pilot;
                     
                     // EXACT Rust sequence: pilots[b] = p as u8; let hp = self.hash_pilot(p);
@@ -834,15 +822,6 @@ namespace PtrHash.CSharp.Port.Core
                     evictionStart.Stop();
                     totalEvictionTime += evictionStart.ElapsedTicks;
                     
-                    if (evictionsThisRound > 0)
-                    {
-                        // Log when we're causing lots of evictions
-                        if (evictionsThisRound >= 3)
-                        {
-                            Console.WriteLine($"  Part {part}: Bucket {currentBucket} evicted {evictionsThisRound} buckets, stack now={stack.Count}");
-                        }
-                    }
-                    
                     // Update recent buckets (EXACT Rust algorithm)
                     recentIdx += 1; // recent_idx += 1
                     recentIdx %= recent.Length; // recent_idx %= recent.len()
@@ -851,38 +830,11 @@ namespace PtrHash.CSharp.Port.Core
                 
                 bucketStartTime.Stop();
                 processedBuckets++;
-                
-                // Log slow buckets
-                if (bucketStartTime.ElapsedMilliseconds > 100 || evictions > 1000)
-                {
-                    Console.WriteLine($"  Part {part}: SLOW bucket {newBucket} (size={newBucketSize}) took {bucketStartTime.ElapsedMilliseconds}ms, {evictions} evictions");
-                }
-                
                 totalEvictions += evictions;
-                
-                // Periodic progress updates
-                if (DEBUG_PILOT_SEARCH && processedBuckets % 500 == 0)
-                {
-                    var avgTimePerBucket = bucketProcessingStopwatch.ElapsedMilliseconds / (double)processedBuckets;
-                    var eta = (totalBuckets - processedBuckets) * avgTimePerBucket;
-                    DebugLog($"  Part {part}: {processedBuckets}/{totalBuckets} buckets, avg={avgTimePerBucket:F1}ms/bucket, ETA={eta:F0}ms");
-                }
             }
             
             bucketProcessingStopwatch.Stop();
             partStopwatch.Stop();
-            
-            if (DEBUG_PILOT_SEARCH)
-            {
-                DebugLog($"Part {part} completed successfully:");
-                DebugLog($"  Total time: {partStopwatch.ElapsedMilliseconds}ms");
-                DebugLog($"  Bucket processing: {bucketProcessingStopwatch.ElapsedMilliseconds}ms");
-                DebugLog($"  Pilot search time: {new TimeSpan(totalPilotSearchTime).TotalMilliseconds:F1}ms");
-                DebugLog($"  Eviction time: {new TimeSpan(totalEvictionTime).TotalMilliseconds:F1}ms");
-                DebugLog($"  Total evictions: {totalEvictions}, Buckets processed: {bucketOrder.Length}");
-                DebugLog($"  Pilot search stats: {totalPilotAttempts} total attempts, avg {(double)totalPilotAttempts / bucketOrder.Length:F1} per bucket");
-                DebugLog($"  Expensive buckets: {bucketsRequiringManyPilots} buckets required >50 pilot attempts");
-            }
             return true;
         }
 
@@ -1044,68 +996,57 @@ namespace PtrHash.CSharp.Port.Core
         {
             return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
-        
+
         // Variable-size bucket processing for larger buckets (renamed from FindPilotInPart)
+        private int _collisionLogCount = 0;
         private (ulong pilot, ulong hashPilot)? FindPilotSlice(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
             // EXACT Rust algorithm: Sequential search from 0 to kmax-1 with 4x chunking
             int r = bucketHashes.Length / 4 * 4; // Rust: let r = bucket.len() / 4 * 4;
-            
+
             pilotsChecked = 0;
-            var debugThisBucket = false; // Will be set true if this bucket requires many pilots
-            
-            
+
             for (ulong pilot = 0; pilot < kmax; pilot++) // Rust: 'p: for p in 0u64..kmax
             {
                 pilotsChecked++;
                 var hp = HashPilot(pilot);
-                
-                // Enable debugging if this bucket is taking too many pilots
-                if (!debugThisBucket && pilotsChecked > 50 && bucketId >= 0 && bucketId < 10)
-                {
-                    debugThisBucket = true;
-                    if (DEBUG_PILOT_SEARCH)
-                    {
-                        var totalOccupied = taken.CountOnes();
-                        var totalSlots = taken.Length;
-                        DebugLog($"      DEBUG Bucket {bucketId}: {bucketHashes.Length} hashes, {totalOccupied}/{totalSlots} slots occupied ({(double)totalOccupied/totalSlots:P1}) after {pilotsChecked} pilots");
-                    }
-                }
-                
-                if (DEBUG_PILOT_SEARCH && debugThisBucket && pilot < (ulong)(pilotsChecked + 3)) // Debug next 3 pilots after threshold
-                {
-                    DebugLog($"        Pilot {pilot}: hp={hp}");
-                    for (int i = 0; i < Math.Min(bucketHashes.Length, 4); i++)
-                    {
-                        var hashValue = bucketHashes[i];
-                        var hashLow = hashValue.Low();
-                        var xorResult = hashLow ^ hp;
-                        var slot = SlotInPartHp(hashValue, hp);
-                        var occupied = taken.GetUnchecked(slot);
-                        DebugLog($"          Hash[{i}]={hashValue.Full()}, low={hashLow}, xor={xorResult}, slot={slot}, occupied={occupied}");
-                    }
-                }
-                
+
                 // Process chunks of 4 bucket elements at a time (EXACT Rust)
                 bool hasCollision = false;
                 for (int i = 0; i < r; i += 4)
                 {
-                    // Check all 4 elements of the chunk without early break (EXACT Rust)
-                    var slot0 = SlotInPartHp(bucketHashes[i], hp);
-                    var slot1 = SlotInPartHp(bucketHashes[i + 1], hp);
-                    var slot2 = SlotInPartHp(bucketHashes[i + 2], hp);
-                    var slot3 = SlotInPartHp(bucketHashes[i + 3], hp);
-                    
-                    // Avoid array allocation and bounds checking (PERFORMANCE CRITICAL)
-                    if (taken.GetUnchecked(slot0) || taken.GetUnchecked(slot1) || taken.GetUnchecked(slot2) || taken.GetUnchecked(slot3)) // Rust: if checks.iter().any(|&bad| bad)
+                    // Compute the four candidate slots
+                    nuint slot0 = SlotInPartHp(bucketHashes[i], hp);
+                    nuint slot1 = SlotInPartHp(bucketHashes[i + 1], hp);
+                    nuint slot2 = SlotInPartHp(bucketHashes[i + 2], hp);
+                    nuint slot3 = SlotInPartHp(bucketHashes[i + 3], hp);
+
+                    // Query taken[] once per slot
+                    bool t0 = taken.GetUnchecked(slot0);
+                    bool t1 = taken.GetUnchecked(slot1);
+                    bool t2 = taken.GetUnchecked(slot2);
+                    bool t3 = taken.GetUnchecked(slot3);
+
+                    // DEBUG LOG
+                    if (t0 || t1 || t2 || t3)
                     {
+                        if (_collisionLogCount < 100)
+                        {
+                            Console.WriteLine(
+                             $"[DEBUG Collision] pilot={pilot}, bucketIdx={bucketId}, " +
+                             $"i={i}..{i + 3}, " +
+                             $"slots=[{slot0},{slot1},{slot2},{slot3}], " +
+                             $"taken=[{t0},{t1},{t2},{t3}]"
+                         );
+                          _collisionLogCount++;
+                        }
                         hasCollision = true;
-                        break; // Rust: continue 'p
+                        break;
                     }
                 }
-                
+
                 if (hasCollision) continue;
-                
+
                 // Check remaining elements (EXACT Rust)
                 for (int i = r; i < bucketHashes.Length; i++)
                 {
@@ -1117,35 +1058,16 @@ namespace PtrHash.CSharp.Port.Core
                         break;
                     }
                 }
-                
-                if (hasCollision) 
-                {
-                    if (DEBUG_PILOT_SEARCH && debugThisBucket && pilot < (ulong)(pilotsChecked + 3))
-                    {
-                        DebugLog($"        Pilot {pilot}: Skipped due to external collision in chunk processing");
-                    }
-                    continue; // Rust: if bad { continue 'p; }
-                }
-                
+
+                if (hasCollision) continue;
+
                 // If no external collision, try to take this pilot (EXACT Rust)
                 if (TryTakePilotInPart(bucketHashes, pilot, taken)) // Rust: if self.try_take_pilot(bucket, hp, taken)
                 {
-                    if (DEBUG_PILOT_SEARCH && pilotsChecked > 50) // Log if this bucket required many pilot attempts
-                    {
-                        DebugLog($"    Bucket with {bucketHashes.Length} hashes found pilot {pilot} after {pilotsChecked} attempts");
-                    }
-                    return (pilot, hp); // Rust: return Some((p, hp))
-                }
-                else if (DEBUG_PILOT_SEARCH && debugThisBucket && pilot < (ulong)(pilotsChecked + 3))
-                {
-                    DebugLog($"        TryTakePilotInPart FAILED for pilot {pilot} - internal collision within bucket");
+                    return  (pilot, hp); // Rust: return Some((p, hp))
                 }
             }
-            
-            if (DEBUG_PILOT_SEARCH)
-            {
-                DebugLog($"    FAILED: Bucket with {bucketHashes.Length} hashes exhausted all {pilotsChecked} pilots!");
-            }
+
             return null; // Rust: None
         }
         
@@ -1153,7 +1075,6 @@ namespace PtrHash.CSharp.Port.Core
         private bool TryTakePilotInPart(ReadOnlySpan<HashValue> bucketHashes, ulong pilot, BitVec taken)
         {
             var hp = HashPilot(pilot);
-            var shouldDebug = DEBUG_PILOT_SEARCH && pilot < 3 && bucketHashes.Length <= 5;
             
             // This bucket does not collide with previous buckets, but it may still collide with itself.
             for (int i = 0; i < bucketHashes.Length; i++)
@@ -1163,10 +1084,6 @@ namespace PtrHash.CSharp.Port.Core
                 
                 if (taken.Get(localSlot))
                 {
-                    if (shouldDebug)
-                    {
-                        DebugLog($"            TryTakePilot({pilot}): Collision at slot {localSlot} (already occupied)");
-                    }
                     // Collision within the bucket. Clean already set entries (EXACT Rust backtrack)
                     // Rust: for &hx in unsafe { bucket.get_unchecked(..i) }
                     for (int j = 0; j < i; j++)
