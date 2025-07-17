@@ -5,6 +5,7 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using PtrHash.CSharp.Port.Native;
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace PtrHash.Benchmarks
 {
@@ -17,11 +18,12 @@ namespace PtrHash.Benchmarks
         {
             public Config()
             {
-                //AddJob(Job.Default.WithToolchain(InProcessEmitToolchain.Instance));
+                AddJob(Job.Default.WithToolchain(InProcessEmitToolchain.Instance));
             }
         }
 
-        private byte[] _data;
+        private byte[] _managedData;
+        private IntPtr _unmanagedData;
         private int[] _indices;
         private int _sum;
 
@@ -31,13 +33,16 @@ namespace PtrHash.Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            _data = new byte[Size];
+            _managedData = new byte[Size];
+            _unmanagedData = Marshal.AllocHGlobal(Size);
             _indices = new int[Size];
             
             var random = new Random(42);
             for (int i = 0; i < Size; i++)
             {
-                _data[i] = (byte)random.Next(0, 256);
+                byte value = (byte)random.Next(0, 256);
+                _managedData[i] = value;
+                Marshal.WriteByte(_unmanagedData, i, value);
                 _indices[i] = i;
             }
             
@@ -49,13 +54,23 @@ namespace PtrHash.Benchmarks
             }
         }
 
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            if (_unmanagedData != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_unmanagedData);
+            }
+        }
+
+        // Managed memory benchmarks
         [Benchmark]
-        public int Sequential_NoPrefetch()
+        public int Managed_Sequential_NoPrefetch()
         {
             _sum = 0;
             unsafe
             {
-                fixed (byte* dataPtr = _data)
+                fixed (byte* dataPtr = _managedData)
                 {
                     for (int i = 0; i < Size; i++)
                     {
@@ -67,12 +82,12 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public int Sequential_WithPrefetch()
+        public int Managed_Sequential_WithPrefetch()
         {
             _sum = 0;
             unsafe
             {
-                fixed (byte* dataPtr = _data)
+                fixed (byte* dataPtr = _managedData)
                 {
                     for (int i = 0; i < Size; i++)
                     {
@@ -88,18 +103,16 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public int WithHashing_NoPrefetch()
+        public int Managed_Random_NoPrefetch()
         {
             _sum = 0;
             unsafe
             {
-                fixed (byte* dataPtr = _data)
+                fixed (byte* dataPtr = _managedData)
                 {
                     for (int i = 0; i < Size; i++)
                     {
-                        int hash = _indices[i] * 31 + 17; // Simple hash operation
-                        int idx = (hash & 0x7FFFFFFF) % Size;
-                        _sum += dataPtr[idx];
+                        _sum += dataPtr[_indices[i]];
                     }
                 }
             }
@@ -107,27 +120,132 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public int WithHashing_WithPrefetch()
+        public int Managed_Random_WithPrefetch()
         {
             _sum = 0;
             unsafe
             {
-                fixed (byte* dataPtr = _data)
+                fixed (byte* dataPtr = _managedData)
                 {
                     for (int i = 0; i < Size; i++)
                     {
-                        int hash = _indices[i] * 31 + 17; // Simple hash operation
-                        int idx = (hash & 0x7FFFFFFF) % Size;
-                        
-                        if (i + 16 < Size) // Prefetch next hashed access
+                        if (i + 16 < Size) // Prefetch next access
                         {
-                            int nextHash = _indices[i + 16] * 31 + 17;
-                            int nextIdx = (nextHash & 0x7FFFFFFF) % Size;
-                            Prefetch.PrefetchRead(dataPtr + nextIdx);
+                            Prefetch.PrefetchRead(dataPtr + _indices[i + 16]);
                         }
-                        
-                        _sum += dataPtr[idx];
+                        _sum += dataPtr[_indices[i]];
                     }
+                }
+            }
+            return _sum;
+        }
+
+        // Unmanaged memory benchmarks
+        [Benchmark]
+        public int Unmanaged_Sequential_NoPrefetch()
+        {
+            _sum = 0;
+            unsafe
+            {
+                byte* dataPtr = (byte*)_unmanagedData;
+                for (int i = 0; i < Size; i++)
+                {
+                    _sum += dataPtr[i];
+                }
+            }
+            return _sum;
+        }
+
+        [Benchmark]
+        public int Unmanaged_Sequential_WithPrefetch()
+        {
+            _sum = 0;
+            unsafe
+            {
+                byte* dataPtr = (byte*)_unmanagedData;
+                for (int i = 0; i < Size; i++)
+                {
+                    if (i + 64 < Size) // Prefetch ahead
+                    {
+                        Prefetch.PrefetchRead(dataPtr + i + 64);
+                    }
+                    _sum += dataPtr[i];
+                }
+            }
+            return _sum;
+        }
+
+        [Benchmark]
+        public int Unmanaged_Random_NoPrefetch()
+        {
+            _sum = 0;
+            unsafe
+            {
+                byte* dataPtr = (byte*)_unmanagedData;
+                for (int i = 0; i < Size; i++)
+                {
+                    _sum += dataPtr[_indices[i]];
+                }
+            }
+            return _sum;
+        }
+
+        [Benchmark]
+        public int Unmanaged_Random_WithPrefetch()
+        {
+            _sum = 0;
+            unsafe
+            {
+                byte* dataPtr = (byte*)_unmanagedData;
+                for (int i = 0; i < Size; i++)
+                {
+                    if (i + 16 < Size) // Prefetch next access
+                    {
+                        Prefetch.PrefetchRead(dataPtr + _indices[i + 16]);
+                    }
+                    _sum += dataPtr[_indices[i]];
+                }
+            }
+            return _sum;
+        }
+
+        [Benchmark]
+        public int Unmanaged_WithHashing_NoPrefetch()
+        {
+            _sum = 0;
+            unsafe
+            {
+                byte* dataPtr = (byte*)_unmanagedData;
+                for (int i = 0; i < Size; i++)
+                {
+                    int hash = _indices[i] * 31 + 17; // Simple hash operation
+                    int idx = (hash & 0x7FFFFFFF) % Size;
+                    _sum += dataPtr[idx];
+                }
+            }
+            return _sum;
+        }
+
+        [Benchmark]
+        public int Unmanaged_WithHashing_WithPrefetch()
+        {
+            _sum = 0;
+            unsafe
+            {
+                byte* dataPtr = (byte*)_unmanagedData;
+                for (int i = 0; i < Size; i++)
+                {
+                    int hash = _indices[i] * 31 + 17; // Simple hash operation
+                    int idx = (hash & 0x7FFFFFFF) % Size;
+                    
+                    if (i + 16 < Size) // Prefetch next hashed access
+                    {
+                        int nextHash = _indices[i + 16] * 31 + 17;
+                        int nextIdx = (nextHash & 0x7FFFFFFF) % Size;
+                        Prefetch.PrefetchRead(dataPtr + nextIdx);
+                    }
+                    
+                    _sum += dataPtr[idx];
                 }
             }
             return _sum;

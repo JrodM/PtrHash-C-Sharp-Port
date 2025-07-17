@@ -48,10 +48,10 @@ namespace PtrHash.Benchmarks
                 //     BenchmarkRunner.Run<PtrHashVsDictionaryBenchmark>(config);
                 //     break;
 
-                // case "lookup-mixed":
-                //     Console.WriteLine("Running PtrHash vs Dictionary lookup benchmark (interop + port)...");
-                //     BenchmarkRunner.Run<PtrHashVsDictionaryWithPortBenchmark>(config);
-                //     break;
+                 case "lookup-mixed":
+                     Console.WriteLine("Running PtrHash vs Dictionary lookup benchmark (interop + port)...");
+                     BenchmarkRunner.Run<PtrHashVsDictionaryWithPortBenchmark>(config);
+                     break;
 
                 // case "lookup-port":
                 //     Console.WriteLine("Running PtrHash vs Dictionary lookup benchmark (C# port only)...");
@@ -63,10 +63,10 @@ namespace PtrHash.Benchmarks
                 //     BenchmarkRunner.Run<MemoryUsageBenchmark>(config);
                 //     break;
 
-                // case "construct":
-                //     Console.WriteLine("Running construction time benchmark (interop only)...");
-                //     BenchmarkRunner.Run<ConstructionBenchmark>(config);
-                //     break;
+                case "construct":
+                     Console.WriteLine("Running construction time benchmark (interop only)...");
+                     BenchmarkRunner.Run<ConstructionBenchmark>(config);
+                     break;
 
                 // case "construct-mixed":
                 //     Console.WriteLine("Running construction time benchmark (interop + port)...");

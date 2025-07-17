@@ -92,18 +92,34 @@ namespace PtrHash.CSharp.Port.Core
     public sealed class PtrHash<TKey, THasher> : IPtrHash<TKey>
         where THasher : struct, IKeyHasher<TKey>
     {
-        // Debug feature flag - set to false for production
-        private const bool DEBUG_PILOT_SEARCH = true;
+        // Debug feature flags - set to false for production
+        private const bool DEBUG_CONSTRUCTION = false;
+        private const bool DEBUG_PILOT_SEARCH = false;
+        private const bool DEBUG_COLLISION_DETAILS = false;
         
-        [System.Diagnostics.Conditional("DEBUG_PILOT_SEARCH")]
+        [System.Diagnostics.Conditional("DEBUG")]
         private static void DebugLog(string message)
         {
             if (DEBUG_PILOT_SEARCH)
                 Console.WriteLine(message);
         }
+        
+        [System.Diagnostics.Conditional("DEBUG")]
+        private static void DebugConstruction(string message)
+        {
+            if (DEBUG_CONSTRUCTION)
+                Console.WriteLine(message);
+        }
+        
+        [System.Diagnostics.Conditional("DEBUG")]
+        private static void DebugCollision(string message)
+        {
+            if (DEBUG_COLLISION_DETAILS)
+                Console.WriteLine(message);
+        }
 
         // Cap parallelism to prevent thread explosion (Rust's rayon uses all cores by default)
-        private static readonly int MaxParallelism = 1;//Environment.ProcessorCount;
+        private static readonly int MaxParallelism = Environment.ProcessorCount;
         
         private readonly THasher _hasher;
         private readonly byte[] _pilots;
@@ -132,7 +148,7 @@ namespace PtrHash.CSharp.Port.Core
         /// </summary>
         public PtrHash(ReadOnlySpan<TKey> keys, PtrHashParams parameters)
         {
-            Console.WriteLine($"PtrHash constructor: {keys.Length} keys, minimal={parameters.Minimal}");
+            DebugConstruction($"PtrHash constructor: {keys.Length} keys, minimal={parameters.Minimal}");
             if (keys.Length == 0)
                 throw new ArgumentException("Keys collection cannot be empty", nameof(keys));
 
@@ -160,11 +176,11 @@ namespace PtrHash.CSharp.Port.Core
                 var eps = (1.0 - parameters.Alpha) / 2.0;
                 var x = (double)_numKeys * eps * eps / 2.0;
                 var targetParts = x / Math.Log(x);
-                Console.WriteLine($"[DEBUG] Multi-part calc: n={_numKeys}, eps={eps:F6}, x={x:F6}, ln(x)={Math.Log(x):F6}, targetParts={targetParts:F6}");
+                DebugConstruction($"Multi-part calc: n={_numKeys}, eps={eps:F6}, x={x:F6}, ln(x)={Math.Log(x):F6}, targetParts={targetParts:F6}");
                 // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly
                 var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
                 _parts = Math.Max(1, partsPerShard) * (nuint)shards;
-                Console.WriteLine($"[DEBUG] Parts calculation: targetParts={targetParts:F6} -> partsPerShard={partsPerShard} -> parts={_parts}");
+                DebugConstruction($"Parts calculation: targetParts={targetParts:F6} -> partsPerShard={partsPerShard} -> parts={_parts}");
                 
                 var keysPerPart = _numKeys / _parts;
                 partsPerShard = _parts / (nuint)shards; // Recalculate like Rust
@@ -190,16 +206,16 @@ namespace PtrHash.CSharp.Port.Core
             _remBuckets = new FastReduceInstance(_bucketsPerPart);
             _remSlots = new FM32(Math.Max(1, _slotsPerPart));
 
-            Console.WriteLine($"Starting construction: {_parts} parts, {_slotsPerPart} slots/part, {_bucketsPerPart} buckets/part");
-            Console.WriteLine($"  Alpha: {parameters.Alpha}, Lambda: {parameters.Lambda}");
-            Console.WriteLine($"  Keys per part: {_numKeys / _parts}, Total slots: {_slotsTotal}");
-            Console.WriteLine($"  Real alpha: {(double)_numKeys / (double)_slotsTotal:F4}");
+            DebugConstruction($"Starting construction: {_parts} parts, {_slotsPerPart} slots/part, {_bucketsPerPart} buckets/part");
+            DebugConstruction($"  Alpha: {parameters.Alpha}, Lambda: {parameters.Lambda}");
+            DebugConstruction($"  Keys per part: {_numKeys / _parts}, Total slots: {_slotsTotal}");
+            DebugConstruction($"  Real alpha: {(double)_numKeys / (double)_slotsTotal:F4}");
             // Construct the hash function using hash-evict algorithm
             if (!ComputePilots(keys, out _seed))
             {
                 throw new PtrHashException("Failed to construct minimal perfect hash function. Try different parameters or check for duplicate keys.");
             }
-            Console.WriteLine("Construction completed successfully");
+            DebugConstruction("Construction completed successfully");
 
             // Validation can be enabled for debugging by uncommenting the line below
             // ValidateHashFunction(keys);
@@ -311,98 +327,171 @@ namespace PtrHash.CSharp.Port.Core
             return C * (pilot ^ _seed); // Rust: hash::C.wrapping_mul(p ^ self.seed)
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, uint prefetchDistance = 32, bool minimal = true)
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             var useMinimal = minimal && _minimal && _remapTable != null;
-            var B = (int)prefetchDistance;
+            var B = (int)Math.Min(prefetchDistance, keys.Length);
             
             // Ring buffers to cache the hash and bucket of upcoming queries (like Rust)
-            var nextHashes = new HashValue[B];
-            var nextBuckets = new nuint[B];
+            // Use stackalloc for better performance (no heap allocation)
+            Span<HashValue> nextHashes = stackalloc HashValue[B];
+            Span<nuint> nextBuckets = stackalloc nuint[B];
             
-            // Initialize and prefetch first B values
-            var leftover = Math.Min(B, keys.Length);
-            for (int idx = 0; idx < B; idx++)
-            {
-                HashValue hx = default;
-                if (idx < keys.Length)
-                {
-                    hx = _hasher.Hash(keys[idx], _seed);
-                }
-                nextHashes[idx] = hx;
-                nextBuckets[idx] = Bucket(nextHashes[idx]);
-                
-                // Prefetch pilot for this bucket
-                unsafe
-                {
-                    fixed (byte* pilotsPtr = _pilots)
-                    {
-                        Prefetch.PrefetchRead(pilotsPtr + nextBuckets[idx]);
-                    }
-                }
-            }
-            
+            fixed (TKey* keysPtr = keys)
+            fixed (nuint* resultsPtr = results)
             fixed (byte* pilotsPtr = _pilots)
             fixed (uint* remapPtr = _remapTable)
+            fixed (HashValue* hashesPtr = nextHashes)
+            fixed (nuint* bucketsPtr = nextBuckets)
             {
-                int keyIndex = 0;
+                // Initialize and prefetch first B values (exact Rust pattern)
+                var keyEnumerator = 0;
+                var leftover = B;
+                var keysLength = keys.Length;
                 
-                // Process main keys with ring buffer
-                for (int i = B; i < keys.Length; i++)
+                for (int idx = 0; idx < B; idx++)
                 {
-                    // Get next hash and update ring buffer
-                    var nextHash = _hasher.Hash(keys[i], _seed);
-                    var idx = keyIndex % B;
-                    var curHash = nextHashes[idx];
-                    var curBucket = nextBuckets[idx];
+                    HashValue hx = default;
+                    if (keyEnumerator < keysLength)
+                    {
+                        hx = _hasher.Hash(keysPtr[keyEnumerator], _seed);
+                        keyEnumerator++;
+                        leftover--;
+                    }
+                    hashesPtr[idx] = hx;
+                    bucketsPtr[idx] = Bucket(hashesPtr[idx]);
+                    // Prefetch pilot for this bucket (B steps ahead)
+                    Prefetch.PrefetchRead(pilotsPtr + bucketsPtr[idx]);
+                }
+                
+                int resultIndex = 0;
+                int i = 0;
+                
+                // Process remaining keys with ring buffer rotation (matching Rust fold pattern)
+                while (keyEnumerator < keysLength)
+                {
+                    var nextHash = _hasher.Hash(keysPtr[keyEnumerator], _seed);
+                    var idx = i % B;
+                    var curHash = hashesPtr[idx];
+                    var curBucket = bucketsPtr[idx];
                     
                     // Update ring buffer with new values
-                    nextHashes[idx] = nextHash;
-                    nextBuckets[idx] = Bucket(nextHashes[idx]);
+                    hashesPtr[idx] = nextHash;
+                    bucketsPtr[idx] = Bucket(nextHash);
+                    // Prefetch pilot for the new bucket (B steps ahead)
+                    Prefetch.PrefetchRead(pilotsPtr + bucketsPtr[idx]);
                     
-                    // Prefetch pilot for the new bucket
-                    Prefetch.PrefetchRead(pilotsPtr + nextBuckets[idx]);
-                    
-                    // Compute current slot using cached values
+                    // Process current hash/bucket (prefetched B iterations ago)
                     var pilot = (ulong)pilotsPtr[curBucket];
                     var slot = Slot(curHash, pilot);
                     
                     // Apply remap if minimal and slot >= numKeys
                     if (useMinimal && slot >= _numKeys)
                     {
-                        slot = (nuint)remapPtr![slot - _numKeys];
+                        slot = (nuint)remapPtr[slot - _numKeys];
                     }
                     
-                    results[keyIndex] = slot;
-                    keyIndex++;
+                    resultsPtr[resultIndex] = slot;
+                    resultIndex++;
+                    keyEnumerator++;
+                    i++;
                 }
                 
-                // Process remaining keys from ring buffer
-                for (int remaining = 0; remaining < leftover; remaining++)
+                // Process leftover keys from ring buffer (B - leftover remaining)
+                for (int remaining = 0; remaining < B - leftover; remaining++)
                 {
-                    var idx = keyIndex % B;
-                    var curHash = nextHashes[idx];
-                    var curBucket = nextBuckets[idx];
+                    var idx = i % B;
+                    var curHash = hashesPtr[idx];
+                    var curBucket = bucketsPtr[idx];
                     
+                    // Process current hash/bucket
                     var pilot = (ulong)pilotsPtr[curBucket];
                     var slot = Slot(curHash, pilot);
                     
+                    // Apply remap if minimal and slot >= numKeys
                     if (useMinimal && slot >= _numKeys)
                     {
-                        slot = (nuint)remapPtr![slot - _numKeys];
+                        slot = (nuint)remapPtr[slot - _numKeys];
                     }
                     
-                    if (keyIndex < results.Length)
-                    {
-                        results[keyIndex] = slot;
-                    }
-                    keyIndex++;
+                    resultsPtr[resultIndex] = slot;
+                    resultIndex++;
+                    i++;
                 }
             }
         }
+
+        /// <summary>
+        /// Simplified high-performance version without prefetch complexity
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe void GetIndicesStreamV2(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
+
+            var useMinimal = minimal && _minimal && _remapTable != null;
+            var keysLength = keys.Length;
+            
+            fixed (byte* pilotsPtr = _pilots)
+            fixed (uint* remapPtr = _remapTable)
+            {
+                for (int i = 0; i < keysLength; i++)
+                {
+                    var hash = _hasher.Hash(keys[i], _seed);
+                    var bucket = Bucket(hash);
+                    var pilot = (ulong)pilotsPtr[bucket];
+                    var slot = Slot(hash, pilot);
+                    
+                    // Apply remap if minimal and slot >= numKeys
+                    if (useMinimal && slot >= _numKeys)
+                    {
+                        slot = (nuint)remapPtr[slot - _numKeys];
+                    }
+                    
+                    results[i] = slot;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Maximum performance version with raw pointers (no bounds checking)
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public unsafe void GetIndicesStreamV2Raw(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
+
+            var useMinimal = minimal && _minimal && _remapTable != null;
+            var keysLength = keys.Length;
+            
+            fixed (nuint* resultsPtr = results)
+            fixed (byte* pilotsPtr = _pilots)
+            fixed (uint* remapPtr = _remapTable)
+            {
+                for (int i = 0; i < keysLength; i++)
+                {
+                    var hash = _hasher.Hash(keys[i], _seed);
+                    var bucket = Bucket(hash);
+                    var pilot = (ulong)pilotsPtr[bucket];
+                    var slot = Slot(hash, pilot);
+                    
+                    // Apply remap if minimal and slot >= numKeys
+                    if (useMinimal && slot >= _numKeys)
+                    {
+                        slot = (nuint)remapPtr[slot - _numKeys];
+                    }
+                    
+                    resultsPtr[i] = slot;
+                }
+            }
+        }
+
 
         private bool ComputePilots(ReadOnlySpan<TKey> keys, out ulong finalSeed)
         {
@@ -422,7 +511,7 @@ namespace PtrHash.CSharp.Port.Core
                 tries++;
                 if (tries > MAX_TRIES)
                 {
-                    Console.WriteLine($"[ERROR] PtrHash failed to find a global seed after {MAX_TRIES} tries.");
+                    DebugConstruction($"ERROR: PtrHash failed to find a global seed after {MAX_TRIES} tries.");
                     finalSeed = 0;
                     return false; // Rust: return None;
                 }
@@ -433,12 +522,12 @@ namespace PtrHash.CSharp.Port.Core
                 _seed = (ulong)rng.NextInt64(); // self.seed = rng.random()
                 if (tries == 1)
                 {
-                    Console.WriteLine($"[INFO] First seed tried: {_seed}");
+                    DebugConstruction($"First seed tried: {_seed}");
                 }
                 else
                 {
-                    Console.WriteLine($"[WARN] Previous seed {oldSeed} failed.");
-                    Console.WriteLine($"[WARN] Trying seed number {tries}: {_seed}.");
+                    DebugConstruction($"Previous seed {oldSeed} failed.");
+                    DebugConstruction($"Trying seed number {tries}: {_seed}.");
                 }
                 
                 // NOTE: C# doesn't pre-allocate taken Vec<BitVec> like Rust
@@ -451,7 +540,7 @@ namespace PtrHash.CSharp.Port.Core
                     // Pack the data - Rust: self.pilots = pilots (already done)
                     // Log timing - matching Rust's log_duration("total build", overall_start)
                     var totalTime = overallStart.ElapsedMilliseconds;
-                    Console.WriteLine($"[TRACE] total build: {totalTime}ms");
+                    DebugConstruction($"total build: {totalTime}ms");
                     
                     // Rust would return Some(stats) here
                     // C# returns true since we don't track BucketStats
@@ -466,7 +555,7 @@ namespace PtrHash.CSharp.Port.Core
         private bool TryBuildWithSeed(ReadOnlySpan<TKey> keys, ulong seed)
         {
             var buildStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            Console.WriteLine($"[TRACE] TryBuildWithSeed: {keys.Length} keys, seed={seed}");
+            DebugLog($"TryBuildWithSeed: {keys.Length} keys, seed={seed}");
             
             // Seed already assigned in ComputePilots before calling this method
             // Matching Rust where self.seed is set before calling build_shard
@@ -480,7 +569,7 @@ namespace PtrHash.CSharp.Port.Core
             var hashingStart = System.Diagnostics.Stopwatch.StartNew();
             var (allHashes, partStarts) = SortPartsByHashes(keys, seed);
             hashingStart.Stop();
-            Console.WriteLine($"[TRACE] sort buckets: {hashingStart.ElapsedMilliseconds}ms");
+            DebugLog($"sort buckets: {hashingStart.ElapsedMilliseconds}ms");
             
             // Process parts in parallel like Rust's par_chunks_exact_mut
             var parallelOptions = new ParallelOptions
@@ -523,12 +612,12 @@ namespace PtrHash.CSharp.Port.Core
                 }
             });
             parallelStart.Stop();
-            Console.WriteLine($"[TRACE] find pilots: {parallelStart.ElapsedMilliseconds}ms (success={success})");
+            DebugLog($"find pilots: {parallelStart.ElapsedMilliseconds}ms (success={success})");
             
             if (!success)
             {
                 buildStopwatch.Stop();
-                Console.WriteLine($"[TRACE] Build FAILED after {buildStopwatch.ElapsedMilliseconds}ms");
+                DebugLog($"Build FAILED after {buildStopwatch.ElapsedMilliseconds}ms");
                 return false;
             }
             
@@ -537,14 +626,14 @@ namespace PtrHash.CSharp.Port.Core
             if (!TryRemapFreeSlots(taken))
             {
                 buildStopwatch.Stop();
-                Console.WriteLine($"[TRACE] Failed to construct remap table after {buildStopwatch.ElapsedMilliseconds}ms");
+                DebugLog($"Failed to construct remap table after {buildStopwatch.ElapsedMilliseconds}ms");
                 return false; // Rust: continue 's;
             }
             remapStart.Stop();
             
             buildStopwatch.Stop();
-            Console.WriteLine($"[TRACE] remap free: {remapStart.ElapsedMilliseconds}ms");
-            Console.WriteLine($"[TRACE] build successful in {buildStopwatch.ElapsedMilliseconds}ms");
+            DebugLog($"remap free: {remapStart.ElapsedMilliseconds}ms");
+            DebugLog($"build successful in {buildStopwatch.ElapsedMilliseconds}ms");
             return true;
         }
 
@@ -631,9 +720,9 @@ namespace PtrHash.CSharp.Port.Core
             var isDebugPart = part == 0;
             if (isDebugPart)
             {
-                Console.WriteLine($"C# Part {part}: Starting with {partHashes.Length} hashes, {partTaken.Length} slots");
+                DebugConstruction($"C# Part {part}: Starting with {partHashes.Length} hashes, {partTaken.Length} slots");
                 var first5 = partHashes.Length >= 5 ? partHashes.Slice(0, 5) : partHashes;
-                Console.WriteLine($"C# Part {part}: First 5 hash values: {string.Join(", ", first5.ToArray().Select(h => h.Full().ToString("X16")))}");
+                DebugConstruction($"C# Part {part}: First 5 hash values: {string.Join(", ", first5.ToArray().Select(h => h.Full().ToString("X16")))}");
             }
             
             // EXACT RUST BINARY HEAP IMPLEMENTATION
@@ -646,8 +735,8 @@ namespace PtrHash.CSharp.Port.Core
             // Process buckets in size order (largest first) - EXACT Rust pattern
             if (isDebugPart)
             {
-                Console.WriteLine($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
-                Console.WriteLine($"C# Part {part}: First 10 bucket IDs: {string.Join(", ", bucketOrder.Take(10))}");
+                DebugConstruction($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
+                DebugConstruction($"C# Part {part}: First 10 bucket IDs: {string.Join(", ", bucketOrder.Take(10))}");
             }
             
             var bucketProcessingStopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -692,13 +781,13 @@ namespace PtrHash.CSharp.Port.Core
                     if (evictions >= 10 * (int)_slotsPerPart)
                     {
                         evictionLoopStart.Stop();
-                        Console.WriteLine($"INFINITE LOOP DETECTED: Part {part}, evictions={evictions}, stack size={stack.Count}");
-                        Console.WriteLine($"  Bucket {bucketIdx}/{totalBuckets} (id={newBucket}), size={newBucketSize}, time={bucketStartTime.ElapsedMilliseconds}ms");
-                        Console.WriteLine($"  Recent array: [{string.Join(",", recent.Where(r => r != -1))}]");
-                        Console.WriteLine($"  Max evictions for this bucket: {maxEvictionsForBucket}");
-                        Console.WriteLine($"  Total time in eviction loop: {evictionLoopStart.ElapsedMilliseconds}ms");
+                        DebugConstruction($"INFINITE LOOP DETECTED: Part {part}, evictions={evictions}, stack size={stack.Count}");
+                        DebugConstruction($"  Bucket {bucketIdx}/{totalBuckets} (id={newBucket}), size={newBucketSize}, time={bucketStartTime.ElapsedMilliseconds}ms");
+                        DebugConstruction($"  Recent array: [{string.Join(",", recent.Where(r => r != -1))}]");
+                        DebugConstruction($"  Max evictions for this bucket: {maxEvictionsForBucket}");
+                        DebugConstruction($"  Total time in eviction loop: {evictionLoopStart.ElapsedMilliseconds}ms");
                         // Show current stack size info
-                        Console.WriteLine($"  Stack contains {stack.Count} buckets waiting to be processed");
+                        DebugConstruction($"  Stack contains {stack.Count} buckets waiting to be processed");
                         return false;
                     }
                     
@@ -709,11 +798,11 @@ namespace PtrHash.CSharp.Port.Core
                     // EXACT Rust termination condition (nested structure)
                     if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
                     {
-                        Console.WriteLine($"Part {part}: Power-of-two check at evictions={evictions}, slotsPerPart={_slotsPerPart}");
+                        DebugConstruction($"Part {part}: Power-of-two check at evictions={evictions}, slotsPerPart={_slotsPerPart}");
                         // Expensive logging/diagnostics on power-of-two intervals only
                         if (evictions >= 10 * (int)_slotsPerPart)
                         {
-                            Console.WriteLine($"Part {part}: Too many evictions, aborting at {evictions}");
+                            DebugConstruction($"Part {part}: Too many evictions, aborting at {evictions}");
                             return false; // Too many evictions, abort
                         }
                     }
@@ -732,9 +821,9 @@ namespace PtrHash.CSharp.Port.Core
                     // Debug first few buckets for Part 0
                     if (isDebugPart && processedBuckets < 3)
                     {
-                        Console.WriteLine($"C# Part {part}: Processing bucket {currentBucket} (#{processedBuckets}), size={currentBucketHashes.Length}");
+                        DebugConstruction($"C# Part {part}: Processing bucket {currentBucket} (#{processedBuckets}), size={currentBucketHashes.Length}");
                         var first3 = currentBucketHashes.Length >= 3 ? currentBucketHashes.Slice(0, 3) : currentBucketHashes;
-                        Console.WriteLine($"C# Part {part}: Bucket {currentBucket} first 3 hashes: {string.Join(", ", first3.ToArray().Select(h => h.Full().ToString("X16")))}");
+                        DebugConstruction($"C# Part {part}: Bucket {currentBucket} first 3 hashes: {string.Join(", ", first3.ToArray().Select(h => h.Full().ToString("X16")))}");
                     }
                     
                     // 1) Try collision-free pilot first (Rust hot path)
@@ -1033,7 +1122,7 @@ namespace PtrHash.CSharp.Port.Core
                     {
                         if (_collisionLogCount < 100)
                         {
-                            Console.WriteLine(
+                            DebugCollision(
                              $"[DEBUG Collision] pilot={pilot}, bucketIdx={bucketId}, " +
                              $"i={i}..{i + 3}, " +
                              $"slots=[{slot0},{slot1},{slot2},{slot3}], " +
