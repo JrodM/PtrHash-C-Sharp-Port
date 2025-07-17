@@ -13,11 +13,11 @@ namespace ComparisonTests
     [TestFixture]
     public class InteropComparisonTest
     {
-        //[Test]
+        [Test]
         public void Interop_100K_StrongerIntHash_ShouldWork()
         {
             // Test interop version with 100K sequential keys
-            var keys = Enumerable.Range(1, 1_000).Select(i => (ulong)i).ToArray();
+            var keys = Enumerable.Range(1, 100_000).Select(i => (ulong)i).ToArray();
 
             var stopwatch = Stopwatch.StartNew();
             var config = PtrHashConfig.Default with { U64HashFunction = StrongerIntHash };
@@ -34,7 +34,7 @@ namespace ComparisonTests
             Assert.Pass($"Interop SUCCESS: 100K keys in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        //[Test]
+        [Test]
         public void Port_100K_StrongerIntHasher_Performance()
         {
             Console.WriteLine("Starting Port_100K_StrongerIntHasher_Performance test");

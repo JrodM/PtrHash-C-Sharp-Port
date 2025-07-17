@@ -19,7 +19,8 @@
       "mcp__memory__create_relations",
       "Bash(cargo test:*)",
       "Bash(dotnet clean:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "mcp__memory__read_graph"
     ],
     "deny": []
   }

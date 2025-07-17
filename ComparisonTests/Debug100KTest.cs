@@ -62,7 +62,7 @@ namespace ComparisonTests
        [Test]
         public void Test_50K_Keys()
         {
-            RunPerformanceTest(90_000);
+            RunPerformanceTest(100_000);
         }
 
         //[Test]

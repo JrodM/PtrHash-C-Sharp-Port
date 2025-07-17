@@ -852,9 +852,11 @@ namespace PtrHash.CSharp.Port.Core
             for (int i = 0; i < partHashes.Length; i++)
             {
                 var hash = partHashes[i];
-                // For hashes already in this part, compute their bucket within the part
-                // This should match how Rust's sort_buckets works
-                var localBucket = (int)BucketInPart(hash);
+                // CRITICAL FIX: Use global bucket index like Rust, not local bucket index
+                // Rust: self.bucket(hashes[end]) == part * self.buckets + b
+                var globalBucket = (int)Bucket(hash);
+                // Convert to local bucket index within this part
+                var localBucket = globalBucket - part * (int)_bucketsPerPart;
                 hashBucketPairs[i] = (hash, localBucket);
             }
             
