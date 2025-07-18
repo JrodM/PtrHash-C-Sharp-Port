@@ -172,7 +172,7 @@ namespace PtrHash.CSharp.Port.Collections
                 return true;
             }
             
-            value = default(TValue)!;
+            value = _sentinel;
             return false;
         }
 
@@ -200,6 +200,7 @@ namespace PtrHash.CSharp.Port.Collections
 
         /// <summary>
         /// Performs batch lookup using streaming for better performance on large datasets
+        /// Uses cache-friendly chunking to eliminate allocations and improve performance
         /// </summary>
         /// <param name="keys">Keys to look up</param>
         /// <param name="values">Output array for values (must be same length as keys)</param>
@@ -211,21 +212,23 @@ namespace PtrHash.CSharp.Port.Collections
         {
             ThrowIfDisposed();
             
-            int n = keys.Length;
-            if (n == 0) return;
-            if (n != values.Length)
+            if (keys.Length != values.Length)
                 throw new ArgumentException("Key and value spans must have the same length");
-
-            // Use stack allocation for small arrays, heap for large ones
-            Span<nuint> indices = n <= 1024
-                ? stackalloc nuint[n]
-                : new nuint[n];
-
-            // Get all indices using streaming
-            _ptrHash.GetIndicesStream(keys, indices, minimal: true);
             
-            // Process indices and verify keys match
-            ProcessIndices(keys, indices, values);
+            const int CHUNK_SIZE = 1024; // Cache-friendly chunk size (1024 × 8 bytes = 8KB on 64-bit)
+            
+            // Process in cache-friendly chunks to eliminate allocations
+            for (int i = 0; i < keys.Length; i += CHUNK_SIZE)
+            {
+                var chunkSize = Math.Min(CHUNK_SIZE, keys.Length - i);
+                Span<nuint> indices = stackalloc nuint[chunkSize]; // Always stack allocated
+                
+                var keyChunk = keys.Slice(i, chunkSize);
+                var valueChunk = values.Slice(i, chunkSize);
+                
+                _ptrHash.GetIndicesStream(keyChunk, indices, minimal: true);
+                ProcessIndices(keyChunk, indices, valueChunk);
+            }
         }
 
         /// <summary>

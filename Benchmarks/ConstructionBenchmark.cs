@@ -8,6 +8,8 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.SentinelHashMap;
+using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.KeyHashers;
 using PtrHashImpl = PtrHash.CSharp.Interop.PtrHash;
 
 namespace PtrHash.Benchmarks
@@ -21,11 +23,11 @@ namespace PtrHash.Benchmarks
         {
             public Config()
             {
-                AddJob(Job.Default.WithToolchain(InProcessEmitToolchain.Instance));
+            
             }
         }
 
-        [Params(10_000, 100_000, 1_000_000)]
+        [Params( 1_000, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000)]
         public int KeyCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -47,35 +49,16 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public Dictionary<ulong, ulong> DictionaryConstruction()
-        {
-            var dictionary = new Dictionary<ulong, ulong>(KeyCount);
-            for (int i = 0; i < _keys.Length; i++)
-            {
-                dictionary[_keys[i]] = _keys[i];
-            }
-            return dictionary;
-        }
-
-        [Benchmark]
-        public PtrHashU64 PtrHashConstruction()
+        public PtrHashU64 NativeInteropConstruction()
         {
             return new PtrHashU64(_keys.AsSpan(), PtrHashConfig.Default);
         }
 
         [Benchmark]
-        public SentinelPtrHashU64<ulong> SentinelPtrHashConstruction()
+        public PtrHash<ulong, FxHasher> PortConstruction()
         {
-            return new SentinelPtrHashU64<ulong>(_keys.AsSpan(), _keys.AsSpan(), 0UL, PtrHashConfig.Default);
+            return new PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);
         }
-
-        [Benchmark]
-        public SentinelPtrHashU64<ulong> SentinelPtrHashSinglePartConstruction()
-        {
-            var config = PtrHashConfig.Default with { SinglePart = true };
-            return new SentinelPtrHashU64<ulong>(_keys.AsSpan(), _keys.AsSpan(), 0UL, config);
-        }
-
 
         [GlobalCleanup]
         public void Cleanup()

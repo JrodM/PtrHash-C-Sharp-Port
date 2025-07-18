@@ -21,7 +21,9 @@
       "Bash(dotnet clean:*)",
       "Bash(rm:*)",
       "mcp__memory__read_graph",
-      "Bash(dotnet new:*)"
+      "Bash(dotnet new:*)",
+      "Bash(cargo check:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

@@ -19,18 +19,13 @@ namespace PtrHash.Benchmarks
             if (args.Length == 0)
             {
                 Console.WriteLine("Available benchmarks:");
-                Console.WriteLine("  1. lookup          - PtrHash vs Dictionary lookup (interop only)");
-                Console.WriteLine("  2. lookup-mixed    - PtrHash vs Dictionary (interop + port comparison)");
-                Console.WriteLine("  3. lookup-port     - PtrHash vs Dictionary (C# port only)");
-                Console.WriteLine("  4. memory          - Memory usage comparison");
-                Console.WriteLine("  5. construct       - Construction time (interop only)");
-                Console.WriteLine("  6. construct-mixed - Construction time (interop + port comparison)");
-                Console.WriteLine("  7. construct-port  - Construction time (C# port only)");
-                Console.WriteLine("  8. prefetch        - Prefetch.PrefetchRead() vs normal array access");
-                Console.WriteLine("  9. all             - Run all benchmarks");
+                Console.WriteLine("  1. interop-vs-port     - PtrHash Interop vs C# Port comparison");
+                Console.WriteLine("  2. dictionaries        - PtrHash Dictionaries vs Standard Dictionary");
+                Console.WriteLine("  3. construct           - Construction time benchmark");
+                Console.WriteLine("  4. all                 - Run all benchmarks");
                 Console.WriteLine();
                 Console.WriteLine("Usage: dotnet run [benchmark]");
-                Console.WriteLine("Example: dotnet run lookup-port");
+                Console.WriteLine("Example: dotnet run interop-vs-port");
                 return;
             }
 
@@ -48,10 +43,15 @@ namespace PtrHash.Benchmarks
                 //     BenchmarkRunner.Run<PtrHashVsDictionaryBenchmark>(config);
                 //     break;
 
-                 case "lookup-mixed":
-                     Console.WriteLine("Running PtrHash vs Dictionary lookup benchmark (interop + port)...");
-                     BenchmarkRunner.Run<PtrHashVsDictionaryWithPortBenchmark>(config);
-                     break;
+                case "interop-vs-port":
+                    Console.WriteLine("Running PtrHash Interop vs C# Port benchmark...");
+                    BenchmarkRunner.Run<PtrHashInteropVsPortBenchmark>(config);
+                    break;
+
+                case "dictionaries":
+                    Console.WriteLine("Running PtrHash Dictionaries vs Standard Dictionary benchmark...");
+                    BenchmarkRunner.Run<PtrHashDictionariesVsDictionaryBenchmark>(config);
+                    break;
 
                 // case "lookup-port":
                 //     Console.WriteLine("Running PtrHash vs Dictionary lookup benchmark (C# port only)...");
@@ -64,7 +64,7 @@ namespace PtrHash.Benchmarks
                 //     break;
 
                 case "construct":
-                     Console.WriteLine("Running construction time benchmark (interop only)...");
+                     Console.WriteLine("Running construction time benchmark...");
                      BenchmarkRunner.Run<ConstructionBenchmark>(config);
                      break;
 
@@ -78,10 +78,6 @@ namespace PtrHash.Benchmarks
                 //     BenchmarkRunner.Run<PortConstructionBenchmark>(config);
                 //     break;
 
-                case "prefetch":
-                    Console.WriteLine("Running prefetch performance benchmark...");
-                    BenchmarkRunner.Run<PrefetchBenchmark>(config);
-                    break;
 
                 case "all":
                     Console.WriteLine("Running all benchmarks...");
@@ -90,7 +86,7 @@ namespace PtrHash.Benchmarks
 
                 default:
                     Console.WriteLine($"Unknown benchmark: {args[0]}");
-                    Console.WriteLine("Available options: prefetch, all");
+                    Console.WriteLine("Available options: interop-vs-port, dictionaries, construct, all");
                     break;
             }
 

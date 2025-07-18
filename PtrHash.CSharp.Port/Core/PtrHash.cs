@@ -365,7 +365,7 @@ namespace PtrHash.CSharp.Port.Core
         /// Simplified high-performance version without prefetch complexity
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        public unsafe void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
@@ -373,12 +373,17 @@ namespace PtrHash.CSharp.Port.Core
             var useMinimal = minimal && _minimal && _remapTable != null;
             var keysLength = keys.Length;
             
+            // Use unsafe/fixed blocks to eliminate bounds checking and enable pointer arithmetic
+            fixed (TKey* keysPtr = keys)
+            fixed (nuint* resultsPtr = results)
             {
                 var pilotsPtr = _pilots;
                 var remapPtr = _remapTable;
+                
                 for (int i = 0; i < keysLength; i++)
                 {
-                    var hash = _hasher.Hash(keys[i], _seed);
+                    // Use pointer access to avoid bounds checking and potential boxing
+                    var hash = _hasher.Hash(keysPtr[i], _seed);
                     var bucket = Bucket(hash);
                     var pilot = (ulong)pilotsPtr[bucket];
                     var slot = Slot(hash, pilot);
@@ -389,7 +394,7 @@ namespace PtrHash.CSharp.Port.Core
                         slot = (nuint)remapPtr[slot - _numKeys];
                     }
                     
-                    results[i] = slot;
+                    resultsPtr[i] = slot;
                 }
             }
         }
