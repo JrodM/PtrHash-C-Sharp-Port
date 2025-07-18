@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Buffers;
 
 namespace PtrHash.CSharp.Port.Util
 {
@@ -7,10 +8,12 @@ namespace PtrHash.CSharp.Port.Util
     /// High-performance bit vector implementation equivalent to Rust's BitVec
     /// Uses ulong array for efficient bit operations
     /// </summary>
-    public sealed class BitVec
+    public sealed class BitVec : IDisposable
     {
-        private readonly ulong[] _bits;
+        private ulong[] _bits;
         private readonly nuint _length;
+        private readonly int _numWords;
+        private readonly bool _isPooled;
         
         private const int BITS_PER_WORD = 64;
         private const int LOG2_BITS_PER_WORD = 6; // log2(64)
@@ -18,8 +21,21 @@ namespace PtrHash.CSharp.Port.Util
         public BitVec(nuint length)
         {
             _length = length;
-            var numWords = (length + BITS_PER_WORD - 1) / BITS_PER_WORD;
-            _bits = new ulong[numWords];
+            _numWords = (int)((length + BITS_PER_WORD - 1) / BITS_PER_WORD);
+            _bits = ArrayPool<ulong>.Shared.Rent(_numWords);
+            _isPooled = true;
+            
+            // Clear only the portion we're using
+            Array.Clear(_bits, 0, _numWords);
+        }
+        
+        // Constructor for external array (no pooling)
+        internal BitVec(nuint length, ulong[] bits)
+        {
+            _length = length;
+            _numWords = (int)((length + BITS_PER_WORD - 1) / BITS_PER_WORD);
+            _bits = bits;
+            _isPooled = false;
         }
         
         public nuint Length => _length;
@@ -75,7 +91,8 @@ namespace PtrHash.CSharp.Port.Util
         public nuint CountOnes()
         {
             nuint count = 0;
-            for (nuint i = 0; i < (nuint)_bits.Length; i++)
+            // Only count bits in the words we're actually using
+            for (int i = 0; i < _numWords; i++)
             {
                 count += (nuint)System.Numerics.BitOperations.PopCount(_bits[i]);
             }
@@ -84,7 +101,16 @@ namespace PtrHash.CSharp.Port.Util
         
         public void Clear()
         {
-            Array.Clear(_bits, 0, _bits.Length);
+            Array.Clear(_bits, 0, _numWords);
+        }
+        
+        public void Dispose()
+        {
+            if (_isPooled && _bits != null)
+            {
+                ArrayPool<ulong>.Shared.Return(_bits, clearArray: false);
+                _bits = null!;
+            }
         }
     }
 }

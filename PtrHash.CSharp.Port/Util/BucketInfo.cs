@@ -8,29 +8,30 @@ namespace PtrHash.CSharp.Port.Util
     /// </summary>
     public readonly struct BucketInfo : IComparable<BucketInfo>, IEquatable<BucketInfo>
     {
-        public readonly nuint BucketSize;
-        public readonly nuint BucketId;
+        public nuint Size { get; }
+        public nuint BucketId { get; }
         
-        public BucketInfo(nuint bucketSize, nuint bucketId)
+        public BucketInfo(nuint size, nuint bucketId)
         {
-            BucketSize = bucketSize;
+            Size = size;
             BucketId = bucketId;
         }
         
         public int CompareTo(BucketInfo other)
         {
-            // Compare by bucket size first (larger size has higher priority)
-            var sizeCompare = BucketSize.CompareTo(other.BucketSize);
+            // BinaryHeap in Rust is a max-heap, so we want larger sizes first
+            // Return negative for larger sizes to get max-heap behavior
+            var sizeCompare = other.Size.CompareTo(Size); // Reverse for max-heap
             if (sizeCompare != 0)
                 return sizeCompare;
                 
             // If sizes are equal, compare by bucket ID for deterministic ordering
-            return BucketId.CompareTo(other.BucketId);
+            return other.BucketId.CompareTo(BucketId); // Reverse for deterministic order
         }
         
         public bool Equals(BucketInfo other)
         {
-            return BucketSize == other.BucketSize && BucketId == other.BucketId;
+            return Size == other.Size && BucketId == other.BucketId;
         }
         
         public override bool Equals(object? obj)
@@ -40,7 +41,7 @@ namespace PtrHash.CSharp.Port.Util
         
         public override int GetHashCode()
         {
-            return HashCode.Combine(BucketSize, BucketId);
+            return HashCode.Combine(Size, BucketId);
         }
         
         public static bool operator ==(BucketInfo left, BucketInfo right)
@@ -55,7 +56,7 @@ namespace PtrHash.CSharp.Port.Util
         
         public override string ToString()
         {
-            return $"BucketInfo(size: {BucketSize}, id: {BucketId})";
+            return $"BucketInfo(size: {Size}, id: {BucketId})";
         }
     }
 }

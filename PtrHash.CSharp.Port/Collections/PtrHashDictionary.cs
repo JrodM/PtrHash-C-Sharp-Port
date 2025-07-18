@@ -17,11 +17,11 @@ namespace PtrHash.CSharp.Port.Collections
         where TKey : notnull
     {
         private readonly PtrHash<TKey, THasher> _ptrHash;
-        private readonly TKey[] _keysByIndex;
-        private readonly TValue[] _valuesByIndex;
+        private readonly KeyValuePair<TKey, TValue>[] _keyValuePairs;
         private readonly TValue _sentinel;
         private readonly TKey[] _originalKeys;
         private readonly TValue[] _originalValues;
+        private readonly IEqualityComparer<TKey> _keyComparer;
         private bool _disposed;
 
         /// <summary>
@@ -36,11 +36,13 @@ namespace PtrHash.CSharp.Port.Collections
         /// <param name="values">Array of values corresponding to keys</param>
         /// <param name="notFoundSentinel">Value to return when key is not found</param>
         /// <param name="parameters">PtrHash construction parameters</param>
+        /// <param name="keyComparer">Custom equality comparer for keys (optional, uses default if null)</param>
         public PtrHashDictionary(
             TKey[] keys,
             TValue[] values,
             TValue notFoundSentinel,
-            PtrHashParams? parameters = null)
+            PtrHashParams? parameters = null,
+            IEqualityComparer<TKey>? keyComparer = null)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (values == null) throw new ArgumentNullException(nameof(values));
@@ -50,27 +52,25 @@ namespace PtrHash.CSharp.Port.Collections
             _sentinel = notFoundSentinel;
             _originalKeys = (TKey[])keys.Clone();
             _originalValues = (TValue[])values.Clone();
+            _keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             
             _ptrHash = new PtrHash<TKey, THasher>(keys, parameters ?? PtrHashParams.DefaultFast);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;
 
-            _keysByIndex = new TKey[maxIndex];
-            _valuesByIndex = new TValue[maxIndex];
+            _keyValuePairs = new KeyValuePair<TKey, TValue>[maxIndex];
 
             // Initialize all slots with default values
             for (int i = 0; i < maxIndex; i++)
             {
-                _keysByIndex[i] = default(TKey)!;
-                _valuesByIndex[i] = _sentinel;
+                _keyValuePairs[i] = new KeyValuePair<TKey, TValue>(default(TKey)!, _sentinel);
             }
 
             // Map keys to their hash indices and store key-value pairs
             for (int i = 0; i < keys.Length; i++)
             {
                 int idx = (int)_ptrHash.GetIndex(keys[i]);
-                _keysByIndex[idx] = keys[i];
-                _valuesByIndex[idx] = values[i];
+                _keyValuePairs[idx] = new KeyValuePair<TKey, TValue>(keys[i], values[i]);
             }
         }
 
@@ -159,17 +159,21 @@ namespace PtrHash.CSharp.Port.Collections
         /// <param name="key">The key to look up</param>
         /// <param name="value">The value if found, or default if not found</param>
         /// <returns>True if the key was found, false otherwise</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(TKey key, out TValue value)
         {
-            ThrowIfDisposed();
+            var idx = (int)_ptrHash.GetIndex(key);
             
-            int idx = (int)_ptrHash.GetIndex(key);
-            
-            // Verify the key matches (handles hash collisions)
-            if (idx < _keysByIndex.Length && EqualityComparer<TKey>.Default.Equals(_keysByIndex[idx], key))
+            // Single bounds check and cache-friendly access
+            if ((uint)idx < (uint)_keyValuePairs.Length)
             {
-                value = _valuesByIndex[idx];
-                return true;
+                ref var kvp = ref _keyValuePairs[idx];
+                // Use cached comparer - faster than EqualityComparer.Default lookup
+                if (_keyComparer.Equals(kvp.Key, key))
+                {
+                    value = kvp.Value;
+                    return true;
+                }
             }
             
             value = _sentinel;
@@ -183,16 +187,21 @@ namespace PtrHash.CSharp.Port.Collections
         /// </summary>
         /// <param name="key">The key to look up</param>
         /// <returns>The value if found, or sentinel if not found</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TValue GetValueOrSentinel(TKey key)
         {
             ThrowIfDisposed();
             
-            int idx = (int)_ptrHash.GetIndex(key);
+            var idx = (int)_ptrHash.GetIndex(key);
             
-            // Verify the key matches (handles hash collisions)
-            if (idx < _keysByIndex.Length && EqualityComparer<TKey>.Default.Equals(_keysByIndex[idx], key))
+            // Single bounds check and cache-friendly access
+            if ((uint)idx < (uint)_keyValuePairs.Length)
             {
-                return _valuesByIndex[idx];
+                ref var kvp = ref _keyValuePairs[idx];
+                if (_keyComparer.Equals(kvp.Key, key))
+                {
+                    return kvp.Value;
+                }
             }
             
             return _sentinel;
@@ -242,22 +251,21 @@ namespace PtrHash.CSharp.Port.Collections
             ReadOnlySpan<nuint> indices,
             Span<TValue> values)
         {
-            var comparer = EqualityComparer<TKey>.Default;
-            
             for (int i = 0; i < keys.Length; i++)
             {
-                int idx = (int)indices[i];
-                var key = keys[i];
+                var idx = (int)indices[i];
                 
-                // Bounds check and key verification
-                if (idx >= 0 && idx < _keysByIndex.Length && comparer.Equals(key, _keysByIndex[idx]))
+                if ((uint)idx < (uint)_keyValuePairs.Length)
                 {
-                    values[i] = _valuesByIndex[idx];
+                    ref var kvp = ref _keyValuePairs[idx];
+                    if (_keyComparer.Equals(keys[i], kvp.Key))
+                    {
+                        values[i] = kvp.Value;
+                        continue;
+                    }
                 }
-                else
-                {
-                    values[i] = _sentinel;
-                }
+                
+                values[i] = _sentinel;
             }
         }
 
@@ -283,8 +291,8 @@ namespace PtrHash.CSharp.Port.Collections
     /// </summary>
     public class PtrHashDictionaryU64<TValue> : PtrHashDictionary<ulong, TValue, StrongerIntHasher>
     {
-        public PtrHashDictionaryU64(ulong[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null)
-            : base(keys, values, notFoundSentinel, parameters)
+        public PtrHashDictionaryU64(ulong[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null, IEqualityComparer<ulong>? keyComparer = null)
+            : base(keys, values, notFoundSentinel, parameters, keyComparer)
         {
         }
     }
@@ -294,8 +302,8 @@ namespace PtrHash.CSharp.Port.Collections
     /// </summary>
     public class PtrHashDictionaryString<TValue> : PtrHashDictionary<string, TValue, StringHasher>
     {
-        public PtrHashDictionaryString(string[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null)
-            : base(keys, values, notFoundSentinel, parameters)
+        public PtrHashDictionaryString(string[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null, IEqualityComparer<string>? keyComparer = null)
+            : base(keys, values, notFoundSentinel, parameters, keyComparer)
         {
         }
     }

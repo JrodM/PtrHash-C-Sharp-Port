@@ -22,7 +22,8 @@ namespace PtrHash.Benchmarks
                 Console.WriteLine("  1. interop-vs-port     - PtrHash Interop vs C# Port comparison");
                 Console.WriteLine("  2. dictionaries        - PtrHash Dictionaries vs Standard Dictionary");
                 Console.WriteLine("  3. construct           - Construction time benchmark");
-                Console.WriteLine("  4. all                 - Run all benchmarks");
+                Console.WriteLine("  4. bounds-check        - Manual vs JIT bounds checking comparison");
+                Console.WriteLine("  5. all                 - Run all benchmarks");
                 Console.WriteLine();
                 Console.WriteLine("Usage: dotnet run [benchmark]");
                 Console.WriteLine("Example: dotnet run interop-vs-port");
@@ -68,6 +69,11 @@ namespace PtrHash.Benchmarks
                      BenchmarkRunner.Run<ConstructionBenchmark>(config);
                      break;
 
+                case "bounds-check":
+                    Console.WriteLine("Running bounds check optimization benchmark...");
+                    BenchmarkRunner.Run<BoundsCheckBenchmark>(config);
+                    break;
+
                 // case "construct-mixed":
                 //     Console.WriteLine("Running construction time benchmark (interop + port)...");
                 //     BenchmarkRunner.Run<ConstructionWithPortBenchmark>(config);
@@ -86,7 +92,7 @@ namespace PtrHash.Benchmarks
 
                 default:
                     Console.WriteLine($"Unknown benchmark: {args[0]}");
-                    Console.WriteLine("Available options: interop-vs-port, dictionaries, construct, all");
+                    Console.WriteLine("Available options: interop-vs-port, dictionaries, construct, bounds-check, all");
                     break;
             }
 

@@ -5,10 +5,11 @@ namespace PtrHash.CSharp.Port.Util
     /// <summary>
     /// Helper class to mimic Rust's Vec<BitVec> functionality
     /// </summary>
-    internal class PartitionedBitVec
+    internal class PartitionedBitVec : IDisposable
     {
         private readonly BitVec[] _parts;
         private readonly nuint _slotsPerPart;
+        private bool _disposed;
         
         public PartitionedBitVec(nuint parts, nuint slotsPerPart)
         {
@@ -67,10 +68,31 @@ namespace PtrHash.CSharp.Port.Util
         
         public nuint TotalLength => (nuint)_parts.Length * _slotsPerPart;
         
+        // Clear all bits for reuse
+        public void Clear()
+        {
+            foreach (var part in _parts)
+            {
+                part.Clear();
+            }
+        }
+        
         // Access to individual parts for remap algorithm
         public BitVec[] Parts => _parts;
         
         // Get a specific part's BitVec
         public BitVec GetPart(int partIndex) => _parts[partIndex];
+        
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                foreach (var part in _parts)
+                {
+                    part?.Dispose();
+                }
+                _disposed = true;
+            }
+        }
     }
 }
