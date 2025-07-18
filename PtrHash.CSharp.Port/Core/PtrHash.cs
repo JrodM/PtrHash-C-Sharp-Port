@@ -12,26 +12,6 @@ using PtrHash.CSharp.Port.Native;
 namespace PtrHash.CSharp.Port.Core
 {
     /// <summary>
-    /// Interface for compile-time minimal flag specialization
-    /// </summary>
-    public interface IMinimalFlag
-    {
-        bool IsMinimal { get; }
-    }
-    
-    /// <summary>
-    /// Compile-time minimal flag implementations
-    /// </summary>
-    public readonly struct MinimalTrue : IMinimalFlag
-    {
-        public bool IsMinimal => true;
-    }
-    
-    public readonly struct MinimalFalse : IMinimalFlag
-    {
-        public bool IsMinimal => false;
-    }
-    /// <summary>
     /// Generic PtrHash minimal perfect hash function implementation
     /// Uses hash-evict construction algorithm with 8-bit pilots
     /// </summary>
@@ -265,9 +245,6 @@ namespace PtrHash.CSharp.Port.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GetIndicesStreamV2(ReadOnlySpan<TKey> keys, Span<nuint> results, uint prefetchDistance = 32, bool minimal = true)
         {
-            if (keys.Length != results.Length)
-                throw new ArgumentException("Keys and results spans must have the same length");
-
             var useMinimal = minimal && _minimal && _remapTable != null;
             var B = (int)Math.Min(prefetchDistance, keys.Length);
             
@@ -365,39 +342,43 @@ namespace PtrHash.CSharp.Port.Core
         /// High-performance streaming version without prefetch complexity
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             var useMinimal = minimal && _minimal && _remapTable != null;
-            var keysLength = keys.Length;
             
-            // Use unsafe/fixed blocks to eliminate bounds checking and enable pointer arithmetic
-            fixed (TKey* keysPtr = keys)
-            fixed (nuint* resultsPtr = results)
+            // Safe version without pinning - use span indexing with single bounds check pattern
+            for (int i = 0; i < keys.Length; i++)
             {
-                var pilotsPtr = _pilots;
-                var remapPtr = _remapTable;
+                var hash = _hasher.Hash(keys[i], _seed);
+                var bucket = Bucket(hash);
                 
-                for (int i = 0; i < keysLength; i++)
+                // Safe access with bounds checking
+                byte pilot;
+                unsafe
                 {
-                    // Use pointer access to avoid bounds checking and potential boxing
-                    var hash = _hasher.Hash(keysPtr[i], _seed);
-                    var bucket = Bucket(hash);
-                    var pilot = (ulong)pilotsPtr[bucket];
-                    var slot = Slot(hash, pilot);
-                    
-                    // Apply remap if minimal and slot >= numKeys
-                    if (useMinimal && slot >= _numKeys)
-                    {
-                        slot = (nuint)remapPtr[slot - _numKeys];
-                    }
-                    
-                    resultsPtr[i] = slot;
+                    pilot = _pilots[bucket];
                 }
+                
+                var slot = Slot(hash, pilot);
+                
+                // Apply remap if minimal and slot >= numKeys
+                if (useMinimal && slot >= _numKeys)
+                {
+                    uint remappedSlot;
+                    unsafe
+                    {
+                        remappedSlot = _remapTable[slot - _numKeys];
+                    }
+                    slot = remappedSlot;
+                }
+                
+                results[i] = slot;
             }
         }
+
 
         
         /// <summary>

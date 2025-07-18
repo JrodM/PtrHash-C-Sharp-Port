@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -219,24 +220,32 @@ namespace PtrHash.CSharp.Port.Collections
             Span<TValue> values,
             uint prefetchDistance = 32)
         {
-            ThrowIfDisposed();
-            
             if (keys.Length != values.Length)
                 throw new ArgumentException("Key and value spans must have the same length");
             
-            const int CHUNK_SIZE = 1024; // Cache-friendly chunk size (1024 × 8 bytes = 8KB on 64-bit)
+            const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
             
-            // Process in cache-friendly chunks to eliminate allocations
-            for (int i = 0; i < keys.Length; i += CHUNK_SIZE)
+            if (keys.Length <= MAX_STACK_SIZE)
             {
-                var chunkSize = Math.Min(CHUNK_SIZE, keys.Length - i);
-                Span<nuint> indices = stackalloc nuint[chunkSize]; // Always stack allocated
-                
-                var keyChunk = keys.Slice(i, chunkSize);
-                var valueChunk = values.Slice(i, chunkSize);
-                
-                _ptrHash.GetIndicesStream(keyChunk, indices, minimal: true);
-                ProcessIndices(keyChunk, indices, valueChunk);
+                // Small datasets: single allocation on stack
+                Span<nuint> indices = stackalloc nuint[keys.Length];
+                _ptrHash.GetIndicesStream(keys, indices, minimal: true);
+                ProcessIndices(keys, indices, values);
+            }
+            else
+            {
+                // Large datasets: rent from array pool to avoid stack overflow
+                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
+                try
+                {
+                    var indicesSpan = indices.AsSpan(0, keys.Length);
+                    _ptrHash.GetIndicesStream(keys, indicesSpan, minimal: true);
+                    ProcessIndices(keys, indicesSpan, values);
+                }
+                finally
+                {
+                    ArrayPool<nuint>.Shared.Return(indices);
+                }
             }
         }
 

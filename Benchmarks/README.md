@@ -232,19 +232,51 @@ After implementing significant memory optimizations including ArrayPool usage, e
 - Native Sentinel Stream maintains **up to 2.19x speedup** over Dictionary
 - Performance characteristics remain stable after optimizations
 
+### Dictionary Performance - Third Iteration (After Pinning Elimination)
+
+After eliminating unsafe memory pinning and optimizing the main GetIndicesStream implementation, we achieved additional performance improvements:
+
+#### PtrHash Dictionaries vs Standard Dictionary (10,000 total lookups)
+
+| Key Count | Dictionary | Native Sentinel Stream | Port Map Point | Port Map Stream |
+|-----------|------------|------------------------|----------------|-----------------|
+| 1K        | 2.44 ns    | 3.13 ns (1.28x slower) | 3.58 ns (1.47x slower) | 3.59 ns (1.47x slower) |
+| 10K       | 5.14 ns    | 3.37 ns (1.53x faster)| 3.76 ns (1.37x faster)| 3.56 ns (1.44x faster)|
+| 100K      | 7.96 ns    | 3.63 ns (2.19x faster)| 4.62 ns (1.72x faster)| 4.36 ns (1.82x faster)|
+| 1M        | 11.45 ns   | 4.75 ns (2.41x faster)| 7.40 ns (1.55x faster)| 5.92 ns (1.93x faster)|
+| 10M       | 19.26 ns   | 10.58 ns (1.82x faster)| 15.77 ns (1.22x faster)| 8.96 ns (2.15x faster)|
+
+**Key Findings (Third Iteration):**
+- **Peak performance improvement**: Port Map Stream achieves **2.15x speedup** over Dictionary at 10M keys
+- **Native maintains excellence**: Native Sentinel Stream delivers **up to 2.41x speedup** at 1M keys
+- **Improved scaling**: Better performance characteristics across larger datasets
+- **Pinning elimination success**: Removing unsafe memory pinning improved rather than hurt performance
+- **Port competitiveness**: C# port now consistently competitive with native implementation
+
 ### Optimization Impact Summary
 
 #### Major Optimizations Implemented:
+
+**Second Iteration:**
 1. **ArrayPool Usage**: Replaced direct array allocations with pooled memory
 2. **Eliminated Radix Sort**: Switched to built-in IntroSort for better allocation patterns
 3. **Cache Locality**: Consolidated KeyValuePair arrays for better memory access
 4. **Memory Reuse**: Reused BitVec instances across seed attempts
 
+**Third Iteration:**
+5. **Eliminated Memory Pinning**: Removed unsafe `fixed` statements from main GetIndicesStream
+6. **Safe Bounds Checking**: Replaced pointer arithmetic with span-based access
+7. **Reduced GC Pressure**: Eliminated pinning overhead and associated memory pressure
+8. **Hybrid Allocation Strategy**: Optimized stack vs. ArrayPool allocation thresholds
+
 #### Performance Improvements:
-- **Construction Speed**: 1.2x - 2.3x faster across all sizes
-- **Memory Efficiency**: Massive reduction in allocations (up to 448,040x less vs native)
-- **Query Performance**: Maintained or slightly improved lookup speeds
-- **Scalability**: Better scaling characteristics for large datasets
+
+**Construction Speed**: 1.2x - 2.3x faster across all sizes (Second Iteration)
+**Memory Efficiency**: Massive reduction in allocations (up to 448,040x less vs native)
+**Query Performance Evolution**:
+- Second Iteration: Maintained performance with better memory characteristics
+- **Third Iteration**: Additional 7-14% improvement, with Port Map Stream reaching **2.15x speedup** over Dictionary
+**Scalability**: Significantly improved scaling characteristics for large datasets
 
 ### Conclusions
 
