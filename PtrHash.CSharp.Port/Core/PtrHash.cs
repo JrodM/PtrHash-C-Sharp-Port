@@ -51,8 +51,10 @@ namespace PtrHash.CSharp.Port.Core
         private readonly nuint _numKeys;
         private nuint _remapTableSize;
         private readonly bool _minimal;
+        private readonly bool _isSinglePart;
         private readonly double _bitsPerKey;
         private ulong _seed;
+        
 
         /// <summary>
         /// Construct a PtrHash from a collection of keys
@@ -65,9 +67,10 @@ namespace PtrHash.CSharp.Port.Core
             _hasher = new THasher();
             _numKeys = (nuint)keys.Length;
             _minimal = parameters.Minimal;
+            _isSinglePart = parameters.SinglePart;
 
             // Calculate parts and structure sizes following Rust algorithm exactly
-            if (parameters.SinglePart)
+            if (_isSinglePart)
             {
                 // Single part mode
                 _parts = 1;
@@ -90,6 +93,7 @@ namespace PtrHash.CSharp.Port.Core
                 // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly
                 var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
                 _parts = Math.Max(1, partsPerShard) * (nuint)shards;
+                _isSinglePart = _parts == 1;
 
                 var keysPerPart = _numKeys / _parts;
                 partsPerShard = _parts / (nuint)shards; // Recalculate like Rust
@@ -137,6 +141,7 @@ namespace PtrHash.CSharp.Port.Core
             var totalBits = pilotBits + remapBits;
             _bitsPerKey = (double)totalBits / (double)_numKeys;
 
+
             if (DEBUG_CONSTRUCTION)
             {
                 DebugConstruction($"PtrHash constructed with seed: {_seed}");
@@ -151,26 +156,76 @@ namespace PtrHash.CSharp.Port.Core
 
         public PtrHashInfo GetInfo()
         {
-            // MaxIndex is always slots_total - this is the upper bound for GetIndexNoRemap()
+            // MaxIndex is always slots_total - this is the upper bound for GetIndexNoRemapMultiPart()
             // GetIndex() with minimal=true will remap values >= numKeys, but MaxIndex represents the theoretical maximum
             return new PtrHashInfo(_numKeys, _bitsPerKey, _slotsTotal);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public nuint GetIndex(TKey key)
+        public nuint GetIndexMultiPart(TKey key)
         {
-            var slot = GetIndexNoRemap(key);
+            var slot = GetIndexNoRemapMultiPart(key);
             return slot < _numKeys ? slot : (nuint)_remapTable[slot - _numKeys];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public nuint GetIndexNoRemap(TKey key)
+        public nuint GetIndexNoRemapMultiPart(TKey key)
         {
             var hx = _hasher.Hash(key, _seed);
             var bucket = Bucket(hx); // Use global bucket calculation like Rust
             var pilot = (ulong)_pilots[bucket]; // Convert byte to ulong (Pilot type)
             return Slot(hx, pilot);
         }
+
+        /// <summary>
+        /// Faster version of GetIndex for when there is only a single part.
+        /// Use only when there is indeed a single part, i.e., after constructing
+        /// with PtrHashParams.SinglePart set to true.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public nuint GetIndexSinglePart(TKey key)
+        {
+            var slot = GetIndexNoRemapSinglePart(key);
+            return slot < _numKeys ? slot : (nuint)_remapTable[slot - _numKeys];
+        }
+
+        /// <summary>
+        /// Faster version of GetIndexNoRemap for when there is only a single part, without remapping.
+        /// Use only when there is indeed a single part, i.e., after constructing
+        /// with PtrHashParams.SinglePart set to true.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public nuint GetIndexNoRemapSinglePart(TKey key)
+        {
+            var hx = _hasher.Hash(key, _seed);
+            var bucket = _remBuckets.Reduce(hx.High()); // Direct bucket calculation for single part
+            var pilot = (ulong)_pilots[bucket];
+            return SlotInPart(hx, pilot); // Direct slot calculation without part offset
+        }
+
+        /// <summary>
+        /// True if this instance was constructed with single part optimization
+        /// </summary>
+        public bool IsSinglePart => _isSinglePart;
+
+        /// <summary>
+        /// Optimized GetIndex that automatically chooses single-part or multi-part implementation
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public nuint GetIndex(TKey key)
+        {
+            return _isSinglePart ? GetIndexSinglePart(key) : GetIndexMultiPart(key);
+        }
+
+        /// <summary>
+        /// Optimized GetIndexNoRemap that automatically chooses single-part or multi-part implementation
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public nuint GetIndexNoRemap(TKey key)
+        {
+            return _isSinglePart ? GetIndexNoRemapSinglePart(key) : GetIndexNoRemapMultiPart(key);
+        }
+
         
         // Rust bucket() function - returns global bucket index
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -202,9 +257,6 @@ namespace PtrHash.CSharp.Port.Core
             return _remBuckets.Reduce(hx.High());
         }
     
-        
-        
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Slot(HashValue hx, ulong pilot)
         {
@@ -243,7 +295,7 @@ namespace PtrHash.CSharp.Port.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStreamV2(ReadOnlySpan<TKey> keys, Span<nuint> results, uint prefetchDistance = 32, bool minimal = true)
+        public void GetIndicesStreamPreFetch(ReadOnlySpan<TKey> keys, Span<nuint> results, uint prefetchDistance = 32, bool minimal = true)
         {
             var useMinimal = minimal && _minimal && _remapTable != null;
             var B = (int)Math.Min(prefetchDistance, keys.Length);
@@ -275,7 +327,12 @@ namespace PtrHash.CSharp.Port.Core
                         leftover--;
                     }
                     hashesPtr[idx] = hx;
-                    bucketsPtr[idx] = Bucket(hashesPtr[idx]);
+                    
+                    // Consolidated bucket calculation
+                    bucketsPtr[idx] = _isSinglePart 
+                        ? _remBuckets.Reduce(hx.High())  // Single-part: direct
+                        : Bucket(hx);                    // Multi-part: with part calculation
+                    
                     // Prefetch pilot for this bucket (B steps ahead)
                     Prefetch.PrefetchRead(pilotsPtr + bucketsPtr[idx]);
                 }
@@ -293,13 +350,22 @@ namespace PtrHash.CSharp.Port.Core
                     
                     // Update ring buffer with new values
                     hashesPtr[idx] = nextHash;
-                    bucketsPtr[idx] = Bucket(nextHash);
+                    
+                    // Consolidated bucket calculation
+                    bucketsPtr[idx] = _isSinglePart
+                        ? _remBuckets.Reduce(nextHash.High())  // Single-part: direct
+                        : Bucket(nextHash);                    // Multi-part: with part calculation
+                    
                     // Prefetch pilot for the new bucket (B steps ahead)
                     Prefetch.PrefetchRead(pilotsPtr + bucketsPtr[idx]);
                     
                     // Process current hash/bucket (prefetched B iterations ago)
                     var pilot = (ulong)pilotsPtr[curBucket];
-                    var slot = Slot(curHash, pilot);
+                    
+                    // Consolidated slot calculation
+                    var slot = _isSinglePart
+                        ? SlotInPart(curHash, pilot)  // Single-part: direct
+                        : Slot(curHash, pilot);       // Multi-part: with part offset
                     
                     // Apply remap if minimal and slot >= numKeys
                     if (useMinimal && slot >= _numKeys)
@@ -322,7 +388,11 @@ namespace PtrHash.CSharp.Port.Core
                     
                     // Process current hash/bucket
                     var pilot = (ulong)pilotsPtr[curBucket];
-                    var slot = Slot(curHash, pilot);
+                    
+                    // Consolidated slot calculation
+                    var slot = _isSinglePart
+                        ? SlotInPart(curHash, pilot)  // Single-part: direct
+                        : Slot(curHash, pilot);       // Multi-part: with part offset
                     
                     // Apply remap if minimal and slot >= numKeys
                     if (useMinimal && slot >= _numKeys)
@@ -337,12 +407,11 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
-        
         /// <summary>
         /// High-performance streaming version without prefetch complexity
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        public void GetIndicesStreamMultiPart(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
@@ -379,8 +448,93 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
+        /// <summary>
+        /// Single-part optimized streaming version
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void GetIndicesStreamSinglePart(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
 
-        
+            var useMinimal = minimal && _minimal && _remapTable != null;
+            
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var hx = _hasher.Hash(keys[i], _seed);
+                var bucket = _remBuckets.Reduce(hx.High()); // Direct bucket for single part
+                
+                byte pilot;
+                unsafe
+                {
+                    pilot = _pilots[bucket];
+                }
+                
+                var slot = SlotInPart(hx, pilot); // Direct slot without part offset
+                
+                // Apply remap if minimal and slot >= numKeys
+                if (useMinimal && slot >= _numKeys)
+                {
+                    uint remappedSlot;
+                    unsafe
+                    {
+                        remappedSlot = _remapTable[slot - _numKeys];
+                    }
+                    slot = remappedSlot;
+                }
+                
+                results[i] = slot;
+            }
+        }
+
+        /// <summary>
+        /// Optimized streaming version that automatically chooses single-part or multi-part implementation
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
+
+            var useMinimal = minimal && _minimal && _remapTable != null;
+            
+            // Safe version without pinning - use span indexing with single bounds check pattern
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var hash = _hasher.Hash(keys[i], _seed);
+                
+                // Consolidated bucket calculation
+                var bucket = _isSinglePart 
+                    ? _remBuckets.Reduce(hash.High())  // Single-part: direct
+                    : Bucket(hash);                    // Multi-part: with part calculation
+                
+                // Safe access with bounds checking
+                byte pilot;
+                unsafe
+                {
+                    pilot = _pilots[bucket];
+                }
+                
+                // Consolidated slot calculation
+                var slot = _isSinglePart
+                    ? SlotInPart(hash, pilot)  // Single-part: direct
+                    : Slot(hash, pilot);       // Multi-part: with part offset
+                
+                // Apply remap if minimal and slot >= numKeys
+                if (useMinimal && slot >= _numKeys)
+                {
+                    uint remappedSlot;
+                    unsafe
+                    {
+                        remappedSlot = _remapTable[slot - _numKeys];
+                    }
+                    slot = remappedSlot;
+                }
+                
+                results[i] = slot;
+            }
+        }
+
         /// <summary>
         /// Hardware-specific prefetch optimization
         /// </summary>
@@ -600,215 +754,190 @@ namespace PtrHash.CSharp.Port.Core
             
             return partStarts;
         }
-        
+
         // Build a single part (like Rust's build_part)
         private bool BuildPartRust(int part, ReadOnlySpan<HashValue> partHashes, Span<byte> partPilots, PartitionedBitVec taken, out BucketStats partStats)
         {
             // Initialize statistics collection
             partStats = new BucketStats();
-            
+
             // Sort buckets within this part (like Rust's sort_buckets)
             var (sortedHashes, bucketStarts, bucketOrder) = SortBucketsInPart(part, partHashes);
-            
+
             // Use the sorted hashes from here on - this is CRITICAL for matching Rust exactly
             var hashesSpan = sortedHashes.AsSpan();
-            
+
             const ulong kmax = 256;
             // Use ArrayPool to avoid allocation
             var slots = ArrayPool<int>.Shared.Rent((int)_slotsPerPart);
             try
             {
-            Array.Fill(slots, -1, 0, (int)_slotsPerPart); // -1 = BucketIdx::NONE
-            
-            // Get this part's BitVec - CRITICAL: Rust passes just the part's BitSlice, not global
-            var partTaken = taken.GetPart(part);
-            
-            // Debug for Part 0 only to compare with Rust
-            var isDebugPart = part == 0;
-            if (isDebugPart)
-            {
-                DebugConstruction($"C# Part {part}: Starting with {partHashes.Length} hashes, {partTaken.Length} slots");
-                var first5 = partHashes.Length >= 5 ? partHashes.Slice(0, 5) : partHashes;
-                DebugConstruction($"C# Part {part}: First 5 hash values: {string.Join(", ", first5.ToArray().Select(h => h.Full().ToString("X16")))}");
-            }
-            
-            // EXACT RUST BINARY HEAP IMPLEMENTATION
-            var stack = new BinaryHeap<BucketInfo>();
-            var recent = new int[16];
-            Array.Fill(recent, -1); // -1 = BucketIdx::NONE
-            var rng = new Random(); // Auto-seeded with entropy like Rust's fastrand::Rng::new()
+                Array.Fill(slots, -1, 0, (int)_slotsPerPart); // -1 = BucketIdx::NONE
 
-            // Process buckets in size order (largest first) - EXACT Rust pattern
-            if (isDebugPart)
-            {
+                // Get this part's BitVec - CRITICAL: Rust passes just the part's BitSlice, not global
+                var partTaken = taken.GetPart(part);
+
+                // EXACT RUST BINARY HEAP IMPLEMENTATION
+                var stack = new BinaryHeap<BucketInfo>();
+                var recent = new int[16];
+                Array.Fill(recent, -1); // -1 = BucketIdx::NONE
+                var rng = new Random(); // Auto-seeded with entropy like Rust's fastrand::Rng::new()
+
+                // Process buckets in size order (largest first) - EXACT Rust pattern
                 DebugConstruction($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
                 DebugConstruction($"C# Part {part}: First 10 bucket IDs: {string.Join(", ", bucketOrder.Take(10))}");
-            }
-            
-            var totalBuckets = bucketOrder.Length;
-            var processedBuckets = 0;
-            
-            for (int bucketIdx = 0; bucketIdx < bucketOrder.Length; bucketIdx++)
-            {
-                var newBucket = bucketOrder[bucketIdx];
-                var bucketStart = bucketStarts[newBucket];
-                var bucketEnd = bucketStarts[newBucket + 1];
-                var newBucketSize = bucketEnd - bucketStart;
-                
-                if (newBucketSize == 0)
+
+                var totalBuckets = bucketOrder.Length;
+                var processedBuckets = 0;
+
+                for (int bucketIdx = 0; bucketIdx < bucketOrder.Length; bucketIdx++)
                 {
-                    partPilots[newBucket] = 0;
-                    processedBuckets++;
-                    continue;
-                }
-                
-                var evictions = 0;
-                
-                // Push initial bucket onto stack (Rust: stack.push((new_b_len, new_b)))
-                stack.Push(new BucketInfo((nuint)newBucketSize, (nuint)newBucket));
-                Array.Fill(recent, -1); // Rust: recent.fill(BucketIdx::NONE)
-                var recentIdx = 0;
-                recent[0] = newBucket; // Rust: recent[0] = new_b
-                
-                // Process eviction chain (Rust: while let Some((_b_len, b)) = stack.pop())
-                var maxEvictionsForBucket = 0;
-                
-                while (!stack.IsEmpty)
-                {
-                    // EXACT Rust termination condition: if evictions >= 10 * self.slots
-                    if (evictions >= 10 * (int)_slotsPerPart)
+                    var newBucket = bucketOrder[bucketIdx];
+                    var bucketStart = bucketStarts[newBucket];
+                    var bucketEnd = bucketStarts[newBucket + 1];
+                    var newBucketSize = bucketEnd - bucketStart;
+
+                    if (newBucketSize == 0)
                     {
-                        DebugConstruction($"INFINITE LOOP DETECTED: Part {part}, evictions={evictions}, stack size={stack.Count}");
-                        DebugConstruction($"  Bucket {bucketIdx}/{totalBuckets} (id={newBucket}), size={newBucketSize}");
-                        DebugConstruction($"  Recent array: [{string.Join(",", recent.Where(r => r != -1))}]");
-                        DebugConstruction($"  Max evictions for this bucket: {maxEvictionsForBucket}");
-                        DebugConstruction($"  Stack contains {stack.Count} buckets waiting to be processed");
-                        return false;
+                        partPilots[newBucket] = 0;
+                        processedBuckets++;
+                        continue;
                     }
-                    
-                    // Track max evictions for this bucket
-                    if (evictions > maxEvictionsForBucket)
-                        maxEvictionsForBucket = evictions;
-                    
-                    // EXACT Rust termination condition (nested structure)
-                    if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
+
+                    var evictions = 0;
+
+                    // Push initial bucket onto stack (Rust: stack.push((new_b_len, new_b)))
+                    stack.Push(new BucketInfo((nuint)newBucketSize, (nuint)newBucket));
+                    Array.Fill(recent, -1); // Rust: recent.fill(BucketIdx::NONE)
+                    var recentIdx = 0;
+                    recent[0] = newBucket; // Rust: recent[0] = new_b
+
+                    // Process eviction chain (Rust: while let Some((_b_len, b)) = stack.pop())
+                    var maxEvictionsForBucket = 0;
+
+                    while (!stack.IsEmpty)
                     {
-                        DebugConstruction($"Part {part}: Power-of-two check at evictions={evictions}, slotsPerPart={_slotsPerPart}");
-                        // Expensive logging/diagnostics on power-of-two intervals only
+                        // EXACT Rust termination condition: if evictions >= 10 * self.slots
                         if (evictions >= 10 * (int)_slotsPerPart)
                         {
-                            DebugConstruction($"Part {part}: Too many evictions, aborting at {evictions}");
-                            return false; // Too many evictions, abort
+                            return false;
                         }
-                    }
-                    
-                    var bucketInfo = stack.Pop();
-                    var currentBucket = (int)bucketInfo.BucketId;
-                
-                    
-                    var currentStart = bucketStarts[currentBucket];
-                    var currentEnd = bucketStarts[currentBucket + 1];
-                    var currentBucketHashes = hashesSpan.Slice(currentStart, currentEnd - currentStart);
-                    
-                    if (currentBucketHashes.Length == 0)
-                        continue;
-                    
-                    // Debug first few buckets for Part 0
-                    if (isDebugPart && processedBuckets < 3)
-                    {
-                        DebugConstruction($"C# Part {part}: Processing bucket {currentBucket} (#{processedBuckets}), size={currentBucketHashes.Length}");
-                        var first3 = currentBucketHashes.Length >= 3 ? currentBucketHashes.Slice(0, 3) : currentBucketHashes;
-                        DebugConstruction($"C# Part {part}: Bucket {currentBucket} first 3 hashes: {string.Join(", ", first3.ToArray().Select(h => h.Full().ToString("X16")))}");
-                    }
-                    
-                    // 1) Try collision-free pilot first (Rust hot path)
-                    var pilotResult = FindPilot(kmax, currentBucketHashes, partTaken, out var pilotsChecked, currentBucket);
-                    
-                    if (pilotResult.HasValue)
-                    {
-                        var (pilot, hashPilot) = pilotResult.Value;
-                        partPilots[currentBucket] = (byte)pilot;
-                        
-                        // Place bucket in slots
-                        // IMPORTANT: Taken is already filled by FindPilotInPart->TryTakePilotInPart
-                        foreach (var hash in currentBucketHashes)
+
+                        // Track max evictions for this bucket
+                        if (evictions > maxEvictionsForBucket)
+                            maxEvictionsForBucket = evictions;
+
+                        // EXACT Rust termination condition (nested structure)
+                        if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
                         {
-                            var localSlot = SlotInPartHp(hash, hashPilot);
-                            slots[localSlot] = currentBucket;
-                            // DO NOT mark slots as taken here - already done in TryTakePilotInPart
-                        }
-                        continue;
-                    }
-                    
-                    // 2) Find pilot with minimal collisions and evict (EXACT Rust collision handling)
-                    var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, bucketStarts);
-                    var bestPilot = bestResult.pilot;
-                    
-                    // EXACT Rust sequence: pilots[b] = p as u8; let hp = self.hash_pilot(p);
-                    partPilots[currentBucket] = (byte)bestPilot;
-                    var hp = HashPilot(bestPilot);
-                    
-                    // Collect statistics
-                    var globalBucketId = (nuint)(part * (int)_bucketsPerPart + currentBucket);
-                    partStats.Add(globalBucketId, _bucketsTotal, currentBucketHashes.Length, bestPilot, evictions);
-                    
-                    // EXACT Rust eviction algorithm: Drop the collisions and set the new pilot
-                    var evictionsThisRound = 0;
-                    
-                    // EXACT Rust pattern: for slot in b_slots(hp)
-                    foreach (var hash in currentBucketHashes)
-                    {
-                        var localSlot = SlotInPartHp(hash, hp);
-                        
-                        // EXACT Rust pattern: let b2 = slots[slot]; if b2.is_some()
-                        var occupyingBucket = slots[localSlot];
-                        if (occupyingBucket >= 0) // b2.is_some() in Rust
-                        {
-                            if (occupyingBucket == currentBucket)
-                                throw new InvalidOperationException("Self-collision detected"); // assert!(b2 != b)
-                            
-                            // EXACT Rust pattern: stack.push((bucket_len(b2), b2)); evictions += 1;
-                            var evictedStart = bucketStarts[occupyingBucket];
-                            var evictedEnd = bucketStarts[occupyingBucket + 1];
-                            var evictedSize = evictedEnd - evictedStart;
-                            
-                            stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
-                            evictions++;
-                            evictionsThisRound++;
-                            
-                            // EXACT Rust pattern: for p2 in slots_for_bucket(b2, pilots[b2] as Pilot)
-                            var evictedPilot = (ulong)partPilots[occupyingBucket];
-                            var evictedHp = HashPilot(evictedPilot);
-                            var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
-                            
-                            // Clear slots by recomputing them from the hashes and pilot
-                            foreach (var evictedHash in evictedHashes)
+                            DebugConstruction($"Part {part}: Power-of-two check at evictions={evictions}, slotsPerPart={_slotsPerPart}");
+                            // Expensive logging/diagnostics on power-of-two intervals only
+                            if (evictions >= 10 * (int)_slotsPerPart)
                             {
-                                var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
-                                // EXACT Rust pattern: *slots.get_unchecked_mut(p2) = BucketIdx::NONE;
-                                slots[evictedLocalSlot] = -1;
-                                // EXACT Rust pattern: taken.set_unchecked(p2, false);
-                                partTaken.Set(evictedLocalSlot, false);
+                                DebugConstruction($"Part {part}: Too many evictions, aborting at {evictions}");
+                                return false; // Too many evictions, abort
                             }
                         }
-                        
-                        // EXACT Rust pattern: *slots.get_unchecked_mut(slot) = b;
-                        slots[localSlot] = currentBucket;
-                        // EXACT Rust pattern: taken.set_unchecked(slot, true);
-                        partTaken.Set(localSlot, true);
+
+                        var bucketInfo = stack.Pop();
+                        var currentBucket = (int)bucketInfo.BucketId;
+
+
+                        var currentStart = bucketStarts[currentBucket];
+                        var currentEnd = bucketStarts[currentBucket + 1];
+                        var currentBucketHashes = hashesSpan.Slice(currentStart, currentEnd - currentStart);
+
+                        if (currentBucketHashes.Length == 0)
+                            continue;
+
+                        // 1) Try collision-free pilot first (Rust hot path)
+                        var pilotResult = FindPilot(kmax, currentBucketHashes, partTaken, out var pilotsChecked, currentBucket);
+
+                        if (pilotResult.HasValue)
+                        {
+                            var (pilot, hashPilot) = pilotResult.Value;
+                            partPilots[currentBucket] = (byte)pilot;
+
+                            // Place bucket in slots
+                            // IMPORTANT: Taken is already filled by FindPilotInPart->TryTakePilotInPart
+                            foreach (var hash in currentBucketHashes)
+                            {
+                                var localSlot = SlotInPartHp(hash, hashPilot);
+                                slots[localSlot] = currentBucket;
+                                // DO NOT mark slots as taken here - already done in TryTakePilotInPart
+                            }
+                            continue;
+                        }
+
+                        // 2) Find pilot with minimal collisions and evict (EXACT Rust collision handling)
+                        var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, bucketStarts);
+                        var bestPilot = bestResult.pilot;
+
+                        // EXACT Rust sequence: pilots[b] = p as u8; let hp = self.hash_pilot(p);
+                        partPilots[currentBucket] = (byte)bestPilot;
+                        var hp = HashPilot(bestPilot);
+
+                        // Collect statistics
+                        var globalBucketId = (nuint)(part * (int)_bucketsPerPart + currentBucket);
+                        partStats.Add(globalBucketId, _bucketsTotal, currentBucketHashes.Length, bestPilot, evictions);
+
+                        // EXACT Rust eviction algorithm: Drop the collisions and set the new pilot
+                        var evictionsThisRound = 0;
+
+                        // EXACT Rust pattern: for slot in b_slots(hp)
+                        foreach (var hash in currentBucketHashes)
+                        {
+                            var localSlot = SlotInPartHp(hash, hp);
+
+                            // EXACT Rust pattern: let b2 = slots[slot]; if b2.is_some()
+                            var occupyingBucket = slots[localSlot];
+                            if (occupyingBucket >= 0) // b2.is_some() in Rust
+                            {
+                                if (occupyingBucket == currentBucket)
+                                    throw new InvalidOperationException("Self-collision detected"); // assert!(b2 != b)
+
+                                // EXACT Rust pattern: stack.push((bucket_len(b2), b2)); evictions += 1;
+                                var evictedStart = bucketStarts[occupyingBucket];
+                                var evictedEnd = bucketStarts[occupyingBucket + 1];
+                                var evictedSize = evictedEnd - evictedStart;
+
+                                stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
+                                evictions++;
+                                evictionsThisRound++;
+
+                                // EXACT Rust pattern: for p2 in slots_for_bucket(b2, pilots[b2] as Pilot)
+                                var evictedPilot = (ulong)partPilots[occupyingBucket];
+                                var evictedHp = HashPilot(evictedPilot);
+                                var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
+
+                                // Clear slots by recomputing them from the hashes and pilot
+                                foreach (var evictedHash in evictedHashes)
+                                {
+                                    var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
+                                    // EXACT Rust pattern: *slots.get_unchecked_mut(p2) = BucketIdx::NONE;
+                                    slots[evictedLocalSlot] = -1;
+                                    // EXACT Rust pattern: taken.set_unchecked(p2, false);
+                                    partTaken.Set(evictedLocalSlot, false);
+                                }
+                            }
+
+                            // EXACT Rust pattern: *slots.get_unchecked_mut(slot) = b;
+                            slots[localSlot] = currentBucket;
+                            // EXACT Rust pattern: taken.set_unchecked(slot, true);
+                            partTaken.Set(localSlot, true);
+                        }
+
+
+                        // Update recent buckets (EXACT Rust algorithm)
+                        recentIdx += 1; // recent_idx += 1
+                        recentIdx %= recent.Length; // recent_idx %= recent.len()
+                        recent[recentIdx] = currentBucket; // recent[recent_idx] = b
                     }
-                    
-                    
-                    // Update recent buckets (EXACT Rust algorithm)
-                    recentIdx += 1; // recent_idx += 1
-                    recentIdx %= recent.Length; // recent_idx %= recent.len()
-                    recent[recentIdx] = currentBucket; // recent[recent_idx] = b
+
+                    processedBuckets++;
                 }
-                
-                processedBuckets++;
-            }
-            
-            return true;
+
+                return true;
             }
             finally
             {
@@ -1187,46 +1316,6 @@ namespace PtrHash.CSharp.Port.Core
             finally
             {
                 ArrayPool<nuint>.Shared.Return(slotsTmp);
-            }
-        }
-
-        // Check for duplicate slots within a bucket (internal collisions)
-        private unsafe void ValidateHashFunction(ReadOnlySpan<TKey> keys)
-        {
-            var indices = new HashSet<nuint>();
-            for (int i = 0; i < keys.Length; i++)
-            {
-                var key = keys[i];
-                var hx = _hasher.Hash(key, _seed);
-                var bucket = Bucket(hx);
-                var pilot = (ulong)_pilots[bucket];
-                var part = GetPart(hx);
-                var localSlot = SlotInPart(hx, pilot);
-                var globalSlot = part * _slotsPerPart + localSlot;
-                var index = GetIndexNoRemap(key);
-                
-                
-                if (!indices.Add(index))
-                {
-                    // Find which other key produces the same index
-                    for (int j = 0; j < i; j++)
-                    {
-                        var otherIndex = GetIndexNoRemap(keys[j]);
-                        if (otherIndex == index)
-                        {
-                            var otherKey = keys[j];
-                            var otherHx = _hasher.Hash(otherKey, _seed);
-                            var otherBucket = Bucket(otherHx);
-                            var otherPilot = (ulong)_pilots[otherBucket];
-                            var otherPart = GetPart(otherHx);
-                            var otherLocalSlot = SlotInPart(otherHx, otherPilot);
-                            var otherGlobalSlot = otherPart * _slotsPerPart + otherLocalSlot;
-                            
-                            break;
-                        }
-                    }
-                    throw new PtrHashException($"Hash function validation failed: Key {keys[i]} (position {i}) produces duplicate index {index}");
-                }
             }
         }
 

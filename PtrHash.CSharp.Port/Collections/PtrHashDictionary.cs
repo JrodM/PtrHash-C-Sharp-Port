@@ -212,11 +212,9 @@ namespace PtrHash.CSharp.Port.Collections
         /// </summary>
         /// <param name="keys">Keys to look up</param>
         /// <param name="values">Output array for values (must be same length as keys)</param>
-        /// <param name="prefetchDistance">Prefetch distance for memory optimization</param>
         public void GetValuesStream(
             ReadOnlySpan<TKey> keys,
-            Span<TValue> values,
-            uint prefetchDistance = 32)
+            Span<TValue> values)
         {
             if (keys.Length != values.Length)
                 throw new ArgumentException("Key and value spans must have the same length");
@@ -238,6 +236,47 @@ namespace PtrHash.CSharp.Port.Collections
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
                     _ptrHash.GetIndicesStream(keys, indicesSpan, minimal: true);
+                    ProcessIndices(keys, indicesSpan, values);
+                }
+                finally
+                {
+                    ArrayPool<nuint>.Shared.Return(indices);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs batch lookup using streaming with prefetching for better performance on large datasets
+        /// Uses cache-friendly chunking to eliminate allocations and improve performance
+        /// </summary>
+        /// <param name="keys">Keys to look up</param>
+        /// <param name="values">Output array for values (must be same length as keys)</param>
+        /// <param name="prefetchDistance">Prefetch distance for memory optimization (default 32)</param>
+        public void GetValuesStreamPreFetch(
+            ReadOnlySpan<TKey> keys,
+            Span<TValue> values,
+            uint prefetchDistance = 32)
+        {
+            if (keys.Length != values.Length)
+                throw new ArgumentException("Key and value spans must have the same length");
+            
+            const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
+            
+            if (keys.Length <= MAX_STACK_SIZE)
+            {
+                // Small datasets: single allocation on stack
+                Span<nuint> indices = stackalloc nuint[keys.Length];
+                _ptrHash.GetIndicesStreamPreFetch(keys, indices, prefetchDistance, minimal: true);
+                ProcessIndices(keys, indices, values);
+            }
+            else
+            {
+                // Large datasets: rent from array pool to avoid stack overflow
+                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
+                try
+                {
+                    var indicesSpan = indices.AsSpan(0, keys.Length);
+                    _ptrHash.GetIndicesStreamPreFetch(keys, indicesSpan, prefetchDistance, minimal: true);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally

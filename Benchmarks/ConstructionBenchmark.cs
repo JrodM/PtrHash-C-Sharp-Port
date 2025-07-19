@@ -55,9 +55,29 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher> PortConstruction()
+        public PtrHash<ulong, FxHasher> PortConstructionMultiPart()
         {
             return new PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);
+        }
+
+        [Benchmark]
+        public PtrHash<ulong, FxHasher> PortConstructionSinglePart()
+        {
+            var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
+            return new PtrHash<ulong, FxHasher>(_keys, singlePartParams);
+        }
+
+        [Benchmark]
+        public PtrHash<ulong, StrongerIntHasher> PortConstructionMultiPart_StrongerHasher()
+        {
+            return new PtrHash<ulong, StrongerIntHasher>(_keys, PtrHashParams.DefaultFast);
+        }
+
+        [Benchmark]
+        public PtrHash<ulong, StrongerIntHasher> PortConstructionSinglePart_StrongerHasher()
+        {
+            var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
+            return new PtrHash<ulong, StrongerIntHasher>(_keys, singlePartParams);
         }
 
         [GlobalCleanup]

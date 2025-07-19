@@ -48,7 +48,7 @@ namespace PtrHash.CSharp.Port.Collections
             // Map elements to their hash indices
             for (int i = 0; i < elements.Length; i++)
             {
-                int idx = (int)_ptrHash.GetIndexNoRemap(elements[i]);
+                int idx = (int)_ptrHash.GetIndex(elements[i]);
                 _elementLookup[idx] = elements[i];
             }
         }
@@ -67,7 +67,7 @@ namespace PtrHash.CSharp.Port.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(TKey item)
         {
-            var idx = (int)_ptrHash.GetIndexNoRemap(item);
+            var idx = (int)_ptrHash.GetIndex(item);
             
             // Single bounds check and cache-friendly access
             if ((uint)idx < (uint)_elementLookup.Length)
@@ -83,8 +83,46 @@ namespace PtrHash.CSharp.Port.Collections
         /// </summary>
         /// <param name="items">Items to test for membership</param>
         /// <param name="results">Output array for results (must be same length as items)</param>
-        /// <param name="prefetchDistance">Prefetch distance for memory optimization</param>
         public void ContainsStream(
+            ReadOnlySpan<TKey> items,
+            Span<bool> results)
+        {
+            if (items.Length != results.Length)
+                throw new ArgumentException("Items and results spans must have the same length");
+            
+            const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
+            
+            if (items.Length <= MAX_STACK_SIZE)
+            {
+                // Small datasets: single allocation on stack
+                Span<nuint> indices = stackalloc nuint[items.Length];
+                _ptrHash.GetIndicesStream(items, indices, minimal: true);
+                ProcessIndices(items, indices, results);
+            }
+            else
+            {
+                // Large datasets: rent from array pool to avoid stack overflow
+                var indices = ArrayPool<nuint>.Shared.Rent(items.Length);
+                try
+                {
+                    var indicesSpan = indices.AsSpan(0, items.Length);
+                    _ptrHash.GetIndicesStream(items, indicesSpan, minimal: true);
+                    ProcessIndices(items, indicesSpan, results);
+                }
+                finally
+                {
+                    ArrayPool<nuint>.Shared.Return(indices);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Performs batch membership testing using streaming with prefetching for better performance on large datasets
+        /// </summary>
+        /// <param name="items">Items to test for membership</param>
+        /// <param name="results">Output array for results (must be same length as items)</param>
+        /// <param name="prefetchDistance">Prefetch distance for memory optimization (default 32)</param>
+        public void ContainsStreamPreFetch(
             ReadOnlySpan<TKey> items,
             Span<bool> results,
             uint prefetchDistance = 32)
@@ -98,7 +136,7 @@ namespace PtrHash.CSharp.Port.Collections
             {
                 // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[items.Length];
-                _ptrHash.GetIndicesStream(items, indices, minimal: false);
+                _ptrHash.GetIndicesStreamPreFetch(items, indices, prefetchDistance, minimal: true);
                 ProcessIndices(items, indices, results);
             }
             else
@@ -108,7 +146,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, items.Length);
-                    _ptrHash.GetIndicesStream(items, indicesSpan, minimal: false);
+                    _ptrHash.GetIndicesStreamPreFetch(items, indicesSpan, prefetchDistance, minimal: true);
                     ProcessIndices(items, indicesSpan, results);
                 }
                 finally
