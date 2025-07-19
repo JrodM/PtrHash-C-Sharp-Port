@@ -23,7 +23,7 @@ namespace PtrHash.Benchmarks
                 Console.WriteLine("  2. dictionaries        - PtrHash Dictionaries vs Standard Dictionary");
                 Console.WriteLine("  3. construct           - Construction time benchmark");
                 Console.WriteLine("  4. unsafe-optimization - Unsafe pointer vs safe bounds checking");
-                Console.WriteLine("  5. simple-unsafe       - Simple unsafe pointer benchmark");
+                Console.WriteLine("  5. large-scale         - Large-scale benchmark (1M-100M keys)");
                 Console.WriteLine("  6. all                 - Run all benchmarks");
                 Console.WriteLine();
                 Console.WriteLine("Usage: dotnet run [benchmark]");
@@ -75,6 +75,11 @@ namespace PtrHash.Benchmarks
                     BenchmarkRunner.Run<UnsafeOptimizationBenchmark>(config);
                     break;
 
+                case "large-scale":
+                    Console.WriteLine("Running large-scale benchmark (1M-100M keys)...");
+                    BenchmarkRunner.Run<LargeScaleBenchmark>(config);
+                    break;
+
                 // case "simple-unsafe":
                 //     Console.WriteLine("Running simple unsafe benchmark...");
                 //     SimpleUnsafeBenchmark.Run();
@@ -103,7 +108,7 @@ namespace PtrHash.Benchmarks
 
                 default:
                     Console.WriteLine($"Unknown benchmark: {args[0]}");
-                    Console.WriteLine("Available options: interop-vs-port, dictionaries, construct, unsafe-optimization, simple-unsafe, all");
+                    Console.WriteLine("Available options: interop-vs-port, dictionaries, construct, unsafe-optimization, large-scale, all");
                     break;
             }
 

@@ -23,7 +23,7 @@ namespace PtrHash.Benchmarks
             }
         }
 
-        [Params(1_000, 10_000, 100_000, 1_000_000, 10_000_000)]
+        [Params(1_000, 10_000, 100_000, 1_000_000, 10_000_000, 100_000_000)]
         public int KeyCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -54,6 +54,7 @@ namespace PtrHash.Benchmarks
                 _values[i] = (ulong)random.NextInt64(1, long.MaxValue);
 
             int lookupCount = Math.Min(KeyCount, 10_000);
+            
             _lookupKeys = new ulong[lookupCount];
             for (int i = 0; i < lookupCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];

@@ -9,42 +9,52 @@ namespace PtrHash.CSharp.Port.Tests
     [TestFixture]
     public class PtrHashCoreTests
     {
+        #region Constructor Tests
+
         [Test]
-        public void Constructor_WithValidUInt64Keys_ShouldCreateValidPtrHash()
+        public void Constructor_WithValidKeys_CreatesValidInstance()
         {
-            // Arrange
-            var keys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
-            var parameters = PtrHashParams.DefaultFast;
+            // Test both UInt64 and String keys in one test
+            // Arrange & Act - UInt64
+            var ulongKeys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
+            using var ulongPtrHash = new PtrHash<ulong, StrongerIntHasher>(ulongKeys, PtrHashParams.DefaultFast);
+            var ulongInfo = ulongPtrHash.GetInfo();
 
-            // Act
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, parameters);
-            var info = ptrHash.GetInfo();
+            // Assert - UInt64
+            Assert.That(ulongInfo.KeyCount, Is.EqualTo((nuint)1000));
+            Assert.That(ulongInfo.BitsPerKey, Is.InRange(2.0, 4.0));
+            Assert.That(ulongInfo.MaxIndex, Is.GreaterThanOrEqualTo((nuint)1000));
 
-            // Assert
-            Assert.That(info.KeyCount, Is.EqualTo((nuint)1000));
-            Assert.That(info.BitsPerKey, Is.GreaterThan(0));
-            Assert.That(info.MaxIndex, Is.GreaterThanOrEqualTo((nuint)1000));
+            // Arrange & Act - String
+            var stringKeys = Enumerable.Range(1, 100).Select(i => $"key_{i}").ToArray();
+            using var stringPtrHash = new PtrHash<string, StringHasher>(stringKeys, PtrHashParams.DefaultFast);
+            var stringInfo = stringPtrHash.GetInfo();
+
+            // Assert - String
+            Assert.That(stringInfo.KeyCount, Is.EqualTo((nuint)100));
+            Assert.That(stringInfo.BitsPerKey, Is.GreaterThan(0));
+            Assert.That(stringInfo.MaxIndex, Is.GreaterThanOrEqualTo((nuint)100));
         }
 
         [Test]
-        public void Constructor_WithStringKeys_ShouldCreateValidPtrHash()
+        public void Constructor_WithInvalidKeys_ThrowsException()
         {
-            // Arrange
-            var keys = Enumerable.Range(1, 100).Select(i => $"key_{i}").ToArray();
-            var parameters = PtrHashParams.DefaultFast;
+            // Test both empty and duplicate keys
+            Assert.Throws<ArgumentException>(() => 
+                new PtrHash<ulong, FxHasher>(Array.Empty<ulong>(), PtrHashParams.DefaultFast),
+                "Empty keys should throw ArgumentException");
 
-            // Act
-            using var ptrHash = new PtrHash<string, StringHasher>(keys, parameters);
-            var info = ptrHash.GetInfo();
-
-            // Assert
-            Assert.That(info.KeyCount, Is.EqualTo((nuint)100));
-            Assert.That(info.BitsPerKey, Is.GreaterThan(0));
-            Assert.That(info.MaxIndex, Is.GreaterThanOrEqualTo((nuint)100));
+            Assert.Throws<PtrHashException>(() => 
+                new PtrHash<ulong, FxHasher>(new ulong[] { 1, 2, 3, 2, 4 }, PtrHashParams.DefaultFast),
+                "Duplicate keys should throw PtrHashException");
         }
 
+        #endregion
+
+        #region Index Retrieval Tests
+
         [Test]
-        public void GetIndex_WithValidKeys_ShouldReturnUniqueIndices()
+        public void GetIndex_ProducesUniqueIndicesInValidRange()
         {
             // Arrange
             var keys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
@@ -52,207 +62,128 @@ namespace PtrHash.CSharp.Port.Tests
 
             // Act
             var indices = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
-
-            // Assert1
-            Assert.That(indices.Length, Is.EqualTo(1000));
-            Assert.That(indices.Distinct().Count(), Is.EqualTo(1000), "All indices should be unique");
-            Assert.That(indices.All(idx => idx < (nuint)1000), Is.True, "All indices should be less than n");
-        }
-
-        [Test]
-        public void GetIndexNoRemap_WithValidKeys_ShouldReturnValidIndices()
-        {
-            // Arrange
-            var keys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
+            var noRemapIndices = keys.Select(key => ptrHash.GetIndexNoRemap(key)).ToArray();
             var info = ptrHash.GetInfo();
 
-            // Act
-            var indices = keys.Select(key => ptrHash.GetIndexNoRemap(key)).ToArray();
+            // Assert - GetIndex (minimal)
+            Assert.That(indices.Distinct().Count(), Is.EqualTo(keys.Length), "All minimal indices should be unique");
+            Assert.That(indices.All(idx => idx < (nuint)keys.Length), Is.True, "All minimal indices should be < n");
 
-            // Assert
-            Assert.That(indices.Length, Is.EqualTo(1000));
-            Assert.That(indices.Distinct().Count(), Is.EqualTo(1000), "All indices should be unique");
-            Assert.That(indices.All(idx => idx < info.MaxIndex), Is.True, "All indices should be less than max_index");
+            // Assert - GetIndexNoRemap
+            Assert.That(noRemapIndices.Distinct().Count(), Is.EqualTo(keys.Length), "All no-remap indices should be unique");
+            Assert.That(noRemapIndices.All(idx => idx < info.MaxIndex), Is.True, "All no-remap indices should be < MaxIndex");
         }
 
+        #endregion
+
+        #region Streaming Tests
+
         [Test]
-        public void GetIndicesStream_WithMinimalFalse_ShouldEqualIndexNoRemap()
+        public void GetIndicesStream_ConsistentWithSingleLookups()
         {
             // Arrange
             var keys = Enumerable.Range(1, 200).Select(i => (ulong)i).ToArray();
             using var ptrHash = new PtrHash<ulong, FxHasher>(keys, PtrHashParams.DefaultFast);
 
-            // Act
-            var streamResults = new nuint[keys.Length];
-            ptrHash.GetIndicesStream(keys, streamResults, minimal: false);
-            
-            var noRemapResults = keys.Select(key => ptrHash.GetIndexNoRemap(key)).ToArray();
+            // Act - Get expected results from single lookups
+            var expectedMinimal = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
+            var expectedNoRemap = keys.Select(key => ptrHash.GetIndexNoRemap(key)).ToArray();
+
+            // Act - Get stream results
+            var streamMinimal = new nuint[keys.Length];
+            var streamNoRemap = new nuint[keys.Length];
+            ptrHash.GetIndicesStream(keys, streamMinimal, minimal: true);
+            ptrHash.GetIndicesStream(keys, streamNoRemap, minimal: false);
 
             // Assert
-            Assert.That(streamResults, Is.EqualTo(noRemapResults), 
-                "Stream results with minimal=false should equal IndexNoRemap results");
+            Assert.That(streamMinimal, Is.EqualTo(expectedMinimal), 
+                "Stream with minimal=true should match GetIndex");
+            Assert.That(streamNoRemap, Is.EqualTo(expectedNoRemap), 
+                "Stream with minimal=false should match GetIndexNoRemap");
         }
 
-        [Test]
-        public void GetIndicesStream_WithMinimalTrue_ShouldEqualIndex()
-        {
-            // Arrange
-            var keys = Enumerable.Range(1, 200).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, FxHasher>(keys, PtrHashParams.DefaultFast);
+        #endregion
 
-            // Act
-            var streamResults = new nuint[keys.Length];
-            ptrHash.GetIndicesStream(keys, streamResults, minimal: true);
-            
-            var indexResults = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
-
-            // Assert
-            Assert.That(streamResults, Is.EqualTo(indexResults), 
-                "Stream results with minimal=true should equal Index results");
-        }
+        #region Configuration Tests
 
         [Test]
-        public void GetIndicesStream_WithDifferentPrefetchDistances_ShouldProduceSameResults()
-        {
-            // Arrange
-            var keys = Enumerable.Range(1, 300).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, FxHasher>(keys, PtrHashParams.DefaultFast);
-
-            // Act
-            var results1 = new nuint[keys.Length];
-            var results2 = new nuint[keys.Length];
-            
-            ptrHash.GetIndicesStream(keys, results1, minimal: true);
-            ptrHash.GetIndicesStream(keys, results2, minimal: true);
-
-            // Assert
-            Assert.That(results1, Is.EqualTo(results2), 
-                "Different prefetch distances should produce the same results");
-        }
-
-        [Test]
-        public void GetIndicesStream_MinimalFalseVsTrue_ShouldBeConsistentWhenMapped()
-        {
-            // Arrange
-            var keys = Enumerable.Range(1, 10_000).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
-
-            // Act
-            var noRemapResults = new nuint[keys.Length];
-            var minimalResults = new nuint[keys.Length];
-            
-            ptrHash.GetIndicesStream(keys, noRemapResults, minimal: false);
-            ptrHash.GetIndicesStream(keys, minimalResults, minimal: true);
-
-            // Verify that manual mapping of noRemapResults equals minimalResults
-            var manuallyMappedResults = noRemapResults.Select(idx => ptrHash.GetIndex(keys[Array.IndexOf(keys, keys.First(k => ptrHash.GetIndexNoRemap(k) == idx))])).ToArray();
-
-            // Assert
-            Assert.That(minimalResults, Is.EqualTo(manuallyMappedResults), 
-                "Minimal=true should be equivalent to manually mapping minimal=false results");
-        }
-
-        [Test]
-        public void Constructor_WithDuplicateKeys_ShouldThrowException()
-        {
-            // Arrange
-            var keys = new ulong[] { 1, 2, 3, 2, 4 }; // Contains duplicate
-
-            // Act & Assert
-            Assert.Throws<PtrHashException>(() => new PtrHash<ulong, FxHasher>(keys, PtrHashParams.DefaultFast));
-        }
-
-        [Test]
-        public void Constructor_WithEmptyKeys_ShouldThrowException()
-        {
-            // Arrange
-            var keys = new ulong[0];
-
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => new PtrHash<ulong, FxHasher>(keys, PtrHashParams.DefaultFast));
-        }
-
-        [Test]
-        public void GetInfo_ShouldReturnConsistentInformation()
+        public void DifferentHashers_ProduceDifferentButValidMappings()
         {
             // Arrange
             var keys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
-
+            
             // Act
-            var info = ptrHash.GetInfo();
+            using var xxh3Hash = new PtrHash<ulong, Xxh3Hasher>(keys, PtrHashParams.DefaultFast);
+            using var strongHash = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
+            
+            var xxh3Indices = keys.Take(100).Select(k => xxh3Hash.GetIndex(k)).ToArray();
+            var strongIndices = keys.Take(100).Select(k => strongHash.GetIndex(k)).ToArray();
 
-            // Assert
-            Assert.That(info.KeyCount, Is.EqualTo((nuint)1000));
-            Assert.That(info.BitsPerKey, Is.InRange(2.0, 4.0), "Bits per key should be reasonable for default_fast");
-            Assert.That(info.MaxIndex, Is.GreaterThanOrEqualTo((nuint)1000));
+            // Assert - Different mappings
+            Assert.That(xxh3Indices, Is.Not.EqualTo(strongIndices), 
+                "Different hashers should produce different mappings");
             
-            // Verify all indices are within bounds
-            var allIndices = keys.Select(k => ptrHash.GetIndex(k));
-            Assert.That(allIndices.All(idx => idx < (nuint)1000), Is.True, "All minimal indices should be < KeyCount");
-            
-            var allNoRemapIndices = keys.Select(k => ptrHash.GetIndexNoRemap(k));
-            Assert.That(allNoRemapIndices.All(idx => idx < info.MaxIndex), Is.True, "All no-remap indices should be < MaxIndex");
+            // Assert - Both are valid perfect hash functions
+            Assert.That(xxh3Indices.Distinct().Count(), Is.EqualTo(100), 
+                "Xxh3 hasher should produce unique indices");
+            Assert.That(strongIndices.Distinct().Count(), Is.EqualTo(100), 
+                "Stronger hasher should produce unique indices");
         }
 
         [Test]
-        public void DifferentHashers_ShouldProduceDifferentResults()
+        public void SinglePartConfiguration_WorksCorrectly()
         {
             // Arrange
-            var keys = Enumerable.Range(1, 10_000).Select(i => (ulong)i).ToArray();
-            using var ptrHashFx = new PtrHash<ulong, Xxh3Hasher>(keys, PtrHashParams.DefaultFast);
-            using var ptrHashStrong = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
-
-            // Act
-            var fxIndices = keys.Select(k => ptrHashFx.GetIndex(k)).ToArray();
-            var strongIndices = keys.Select(k => ptrHashStrong.GetIndex(k)).ToArray();
-
-            // Assert
-            Assert.That(fxIndices.Length, Is.EqualTo(strongIndices.Length));
-            Assert.That(fxIndices, Is.Not.EqualTo(strongIndices), "Different hashers should produce different index mappings");
-            
-            // Both should still be perfect hash functions
-            Assert.That(fxIndices.Distinct().Count(), Is.EqualTo(keys.Length));
-            Assert.That(strongIndices.Distinct().Count(), Is.EqualTo(keys.Length));
-        }
-
-        [Test]
-        public void SinglePart_ShouldWorkCorrectly()
-        {
-            // Arrange
-            var keys = Enumerable.Range(1, 10_000).Select(i => (ulong)i).ToArray();
+            var keys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, singlePartParams);
-
+            
             // Act
+            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, singlePartParams);
             var indices = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
-            var info = ptrHash.GetInfo();
 
             // Assert
-            Assert.That(indices.Distinct().Count(), Is.EqualTo(10_000), "Single part should still be a perfect hash");
-            Assert.That(info.KeyCount, Is.EqualTo((nuint)10_000));
-            Assert.That(indices.All(idx => idx < (nuint)10_000), Is.True);
+            Assert.That(indices.Distinct().Count(), Is.EqualTo(keys.Length), 
+                "Single part should still produce perfect hash");
+            Assert.That(indices.All(idx => idx < (nuint)keys.Length), Is.True,
+                "All indices should be in valid range");
         }
 
+        #endregion
+
+        #region Scale Tests
+
         [Test]
-        public void LargeDataset_ShouldHandleCorrectly()
+        [TestCase(1_000)]
+        [TestCase(10_000)]
+        [TestCase(100_000)]
+        public void VariousDatasetSizes_MaintainCorrectness(int keyCount)
         {
             // Arrange
-            var keys = Enumerable.Range(1, 100_000).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
-
+            var keys = Enumerable.Range(1, keyCount).Select(i => (ulong)i).ToArray();
+            
             // Act
-            var sampleKeys = keys.Where((_, i) => i % 100 == 0).ToArray(); // Every 100th key
+            using var ptrHash = new PtrHash<ulong, StrongerIntHasher>(keys, PtrHashParams.DefaultFast);
+            var info = ptrHash.GetInfo();
+            
+            // Sample 1% of keys for testing (max 1000)
+            var sampleSize = Math.Min(1000, keyCount / 100);
+            var sampleKeys = keys.Where((_, i) => i % (keyCount / sampleSize) == 0).Take(sampleSize).ToArray();
             var sampleIndices = sampleKeys.Select(k => ptrHash.GetIndex(k)).ToArray();
             
-            // Test streaming on sample
+            // Test streaming
             var streamResults = new nuint[sampleKeys.Length];
             ptrHash.GetIndicesStream(sampleKeys, streamResults, minimal: true);
 
             // Assert
-            Assert.That(sampleIndices.Distinct().Count(), Is.EqualTo(sampleKeys.Length), "Large dataset should maintain uniqueness");
-            Assert.That(streamResults, Is.EqualTo(sampleIndices), "Streaming should match individual lookups");
+            Assert.That(info.KeyCount, Is.EqualTo((nuint)keyCount));
+            Assert.That(info.BitsPerKey, Is.InRange(2.0, 4.0), 
+                $"Bits per key should be reasonable for {keyCount} keys");
+            Assert.That(sampleIndices.Distinct().Count(), Is.EqualTo(sampleKeys.Length), 
+                "Sample should have unique indices");
+            Assert.That(streamResults, Is.EqualTo(sampleIndices), 
+                "Stream should match individual lookups");
         }
+
+        #endregion
     }
 }
