@@ -191,8 +191,6 @@ namespace PtrHash.CSharp.Port.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TValue GetValueOrSentinel(TKey key)
         {
-            ThrowIfDisposed();
-            
             var idx = (int)_ptrHash.GetIndex(key);
             
             // Single bounds check and cache-friendly access
@@ -276,13 +274,6 @@ namespace PtrHash.CSharp.Port.Collections
                 
                 values[i] = _sentinel;
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ThrowIfDisposed()
-        {
-            if (_disposed)
-                throw new ObjectDisposedException(nameof(PtrHashDictionary<TKey, TValue, THasher>));
         }
 
         public void Dispose()

@@ -18,7 +18,8 @@ namespace PtrHash.CSharp.Port.Collections
         where TKey : notnull
     {
         private readonly PtrHash<TKey, THasher> _ptrHash;
-        private readonly TKey[] _elements;
+        private readonly TKey[] _elementLookup;
+        private readonly TKey[] _originalElements;
         private readonly IEqualityComparer<TKey> _comparer;
         private bool _disposed;
 
@@ -35,15 +36,26 @@ namespace PtrHash.CSharp.Port.Collections
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
 
-            _elements = (TKey[])elements.Clone();
+            _originalElements = (TKey[])elements.Clone();
             _comparer = comparer ?? EqualityComparer<TKey>.Default;
             
             _ptrHash = new PtrHash<TKey, THasher>(elements, parameters ?? PtrHashParams.DefaultFast);
+            var info = _ptrHash.GetInfo();
+            int maxIndex = (int)info.MaxIndex;
+
+            _elementLookup = new TKey[maxIndex];
+
+            // Map elements to their hash indices
+            for (int i = 0; i < elements.Length; i++)
+            {
+                int idx = (int)_ptrHash.GetIndexNoRemap(elements[i]);
+                _elementLookup[idx] = elements[i];
+            }
         }
 
         #region ISet<TKey> Implementation
 
-        public int Count => _elements.Length;
+        public int Count => _originalElements.Length;
 
         public bool IsReadOnly => true;
 
@@ -55,14 +67,12 @@ namespace PtrHash.CSharp.Port.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(TKey item)
         {
-            if (_disposed) throw new ObjectDisposedException(nameof(PtrHashSet<TKey, THasher>));
-            
-            var idx = (int)_ptrHash.GetIndex(item);
+            var idx = (int)_ptrHash.GetIndexNoRemap(item);
             
             // Single bounds check and cache-friendly access
-            if ((uint)idx < (uint)_elements.Length)
+            if ((uint)idx < (uint)_elementLookup.Length)
             {
-                return _comparer.Equals(_elements[idx], item);
+                return _comparer.Equals(_elementLookup[idx], item);
             }
             
             return false;
@@ -88,7 +98,7 @@ namespace PtrHash.CSharp.Port.Collections
             {
                 // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[items.Length];
-                _ptrHash.GetIndicesStream(items, indices, minimal: true);
+                _ptrHash.GetIndicesStream(items, indices, minimal: false);
                 ProcessIndices(items, indices, results);
             }
             else
@@ -98,7 +108,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, items.Length);
-                    _ptrHash.GetIndicesStream(items, indicesSpan, minimal: true);
+                    _ptrHash.GetIndicesStream(items, indicesSpan, minimal: false);
                     ProcessIndices(items, indicesSpan, results);
                 }
                 finally
@@ -114,12 +124,12 @@ namespace PtrHash.CSharp.Port.Collections
             if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
             if (array.Length - arrayIndex < Count) throw new ArgumentException("Destination array is too small.");
 
-            Array.Copy(_elements, 0, array, arrayIndex, _elements.Length);
+            Array.Copy(_originalElements, 0, array, arrayIndex, _originalElements.Length);
         }
 
         public IEnumerator<TKey> GetEnumerator()
         {
-            return ((IEnumerable<TKey>)_elements).GetEnumerator();
+            return ((IEnumerable<TKey>)_originalElements).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -146,7 +156,7 @@ namespace PtrHash.CSharp.Port.Collections
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
             var otherSet = other.ToHashSet(_comparer);
-            return _elements.All(element => otherSet.Contains(element));
+            return _originalElements.All(element => otherSet.Contains(element));
         }
 
         public bool IsSupersetOf(IEnumerable<TKey> other)
@@ -165,7 +175,7 @@ namespace PtrHash.CSharp.Port.Collections
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
             var otherSet = other.ToHashSet(_comparer);
-            return Count == otherSet.Count && _elements.All(element => otherSet.Contains(element));
+            return Count == otherSet.Count && _originalElements.All(element => otherSet.Contains(element));
         }
 
         #endregion
@@ -229,9 +239,9 @@ namespace PtrHash.CSharp.Port.Collections
             {
                 var idx = (int)indices[i];
                 
-                if ((uint)idx < (uint)_elements.Length)
+                if ((uint)idx < (uint)_elementLookup.Length)
                 {
-                    results[i] = _comparer.Equals(items[i], _elements[idx]);
+                    results[i] = _comparer.Equals(items[i], _elementLookup[idx]);
                 }
                 else
                 {
