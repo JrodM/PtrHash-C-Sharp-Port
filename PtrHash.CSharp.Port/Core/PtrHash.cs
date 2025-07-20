@@ -6,7 +6,10 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using PtrHash.CSharp.Port.KeyHashers;
-using PtrHash.CSharp.Port.Util;
+using PtrHash.CSharp.Port.Util.Collections;
+using PtrHash.CSharp.Port.Util.RNG;
+using PtrHash.CSharp.Port.Util.Computation;
+using PtrHash.CSharp.Port.Core.Stats;
 using PtrHash.CSharp.Port.Native;
 
 namespace PtrHash.CSharp.Port.Core
@@ -566,7 +569,7 @@ namespace PtrHash.CSharp.Port.Core
             var tries = 0;
             const int MAX_TRIES = 10;
             
-            var rng = new ChaCha8Rng(31415); // ChaCha8Rng::seed_from_u64(31415)
+            var rng = new BouncyCastleChaCha8Rng(31415); // Test with BouncyCastle ChaCha8
 
             // Create PartitionedBitVec once and reuse it across seed attempts
             using var taken = new PartitionedBitVec(_parts, _slotsPerPart);
@@ -781,7 +784,7 @@ namespace PtrHash.CSharp.Port.Core
                 var stack = new BinaryHeap<BucketInfo>();
                 var recent = new int[16];
                 Array.Fill(recent, -1); // -1 = BucketIdx::NONE
-                var rng = new ChaCha8Rng((ulong)Environment.TickCount); // Auto-seeded with entropy like Rust's fastrand::Rng::new()
+                var rng = new FastRand(); // Auto-seeded like Rust's fastrand::Rng::new() (uses WyRand)
 
                 // Process buckets in size order (largest first) - EXACT Rust pattern
                 DebugConstruction($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
@@ -1213,7 +1216,7 @@ namespace PtrHash.CSharp.Port.Core
         }
         
         // Find best pilot with minimal collisions (Rust-style eviction logic)
-        private (ulong score, ulong pilot) FindBestPilotWithEvictionInPart(ReadOnlySpan<HashValue> bucketHashes, int[] slots, int[] recent, ChaCha8Rng rng, ulong kmax, int[] bucketStarts)
+        private (ulong score, ulong pilot) FindBestPilotWithEvictionInPart(ReadOnlySpan<HashValue> bucketHashes, int[] slots, int[] recent, FastRand rng, ulong kmax, int[] bucketStarts)
         {
             var bestScore = ulong.MaxValue;
             var bestPilot = ulong.MaxValue;

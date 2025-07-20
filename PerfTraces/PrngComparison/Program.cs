@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using PtrHash.CSharp.Port.Util;
+using PtrHash.CSharp.Port.Util.RNG;
 
 namespace PerfTraces.PrngComparison
 {
@@ -28,8 +29,16 @@ namespace PerfTraces.PrngComparison
 
             try
             {
-                // Create C# ChaCha8 implementation
-                var csharpRng = new ChaCha8Rng(testSeed);
+                // Let's test with a simple seed first - maybe there's an issue with our seed conversion
+                Console.WriteLine("=== Testing with seed 0 first ===");
+                var debugRng0 = new ChaCha8Debug(0);
+                Console.WriteLine("First value with seed 0:");
+                var val0 = debugRng0.NextUInt64();
+                Console.WriteLine($"C# seed 0: 0x{val0:X16}");
+                
+                Console.WriteLine("\n=== Now testing with seed 31415 ===");
+                var csharpRng = new ChaCha8Debug(testSeed);
+                Console.WriteLine("\n=== End C# Debug ===\n");
                 
                 // Create native Rust ChaCha8 implementation
                 var rustRng = create_chacha8_rng(testSeed);
@@ -46,8 +55,9 @@ namespace PerfTraces.PrngComparison
                 Console.WriteLine("------   ------------------   ------------------   -----");
 
                 int matches = 0;
-                for (int i = 0; i < numValues; i++)
+                for (int i = 0; i < Math.Min(5, numValues); i++) // Just first 5 for debugging
                 {
+                    Console.WriteLine($"\n=== Generating value {i} ===");
                     var csharpValue = csharpRng.NextUInt64();
                     var rustValue = chacha8_next_u64(rustRng);
                     var match = csharpValue == rustValue;
@@ -55,15 +65,17 @@ namespace PerfTraces.PrngComparison
                     if (match) matches++;
 
                     Console.WriteLine($"{i,6}   {csharpValue,18}   {rustValue,18}   {(match ? "✓" : "✗")}");
+                    Console.WriteLine($"       Hex: 0x{csharpValue:X16} vs 0x{rustValue:X16}");
                     
-                    if (!match && i < 10)
+                    if (!match && i == 0)
                     {
-                        Console.WriteLine($"       Hex: 0x{csharpValue:X16} vs 0x{rustValue:X16}");
+                        Console.WriteLine("MISMATCH on first value - stopping for analysis");
+                        break;
                     }
                 }
 
                 Console.WriteLine();
-                Console.WriteLine($"Results: {matches}/{numValues} values match ({(double)matches / numValues * 100:F1}%)");
+                Console.WriteLine($"Results: {matches}/5 values match ({(double)matches / 5 * 100:F1}%)");
                 
                 if (matches == numValues)
                 {

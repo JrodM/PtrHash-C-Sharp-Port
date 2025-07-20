@@ -100,3 +100,4 @@
 /home/jared/Developer/PtrHash/Benchmarks/obj/Release/net8.0/PtrHash.Benchmarks.pdb
 /home/jared/Developer/PtrHash/Benchmarks/obj/Release/net8.0/PtrHash.Benchmarks.genruntimeconfig.cache
 /home/jared/Developer/PtrHash/Benchmarks/obj/Release/net8.0/ref/PtrHash.Benchmarks.dll
+/home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/BouncyCastle.Crypto.dll

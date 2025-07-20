@@ -24,7 +24,8 @@
       "Bash(dotnet new:*)",
       "Bash(cargo check:*)",
       "Bash(mv:*)",
-      "Bash(cargo build:*)"
+      "Bash(cargo build:*)",
+      "Bash(dotnet add package:*)"
     ],
     "deny": []
   }

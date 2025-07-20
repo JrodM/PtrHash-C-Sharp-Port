@@ -181,6 +181,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Portable.BouncyCastle": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
             "System.IO.Hashing": {
               "target": "Package",
               "version": "[8.0.0, )"

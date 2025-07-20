@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "An0pFAoRAlGTqJNmBKH2lMTej/zw6zCjgBT/XZ0CliV3fmPS8kOx26sPS21lIaimD5sMA9lcOSczmKbJqJJn2w==",
+  "dgSpecHash": "dMkFqcSADvruM3Xmjoj96YiscVp9QYe9yjwP55BlWfBmh1IFFQXgln/V/td6KJc+cmMB0K5mHHB1D+W9LV1a7w==",
   "success": true,
   "projectFilePath": "/home/jared/Developer/PtrHash/Benchmarks/PtrHash.Benchmarks.csproj",
   "expectedPackageFiles": [
@@ -29,6 +29,7 @@
     "/home/jared/.nuget/packages/microsoft.netcore.platforms/5.0.0/microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/microsoft.win32.registry/5.0.0/microsoft.win32.registry.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/perfolizer/0.2.1/perfolizer.0.2.1.nupkg.sha512",
+    "/home/jared/.nuget/packages/portable.bouncycastle/1.9.0/portable.bouncycastle.1.9.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.codedom/5.0.0/system.codedom.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.collections.immutable/5.0.0/system.collections.immutable.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.io.hashing/8.0.0/system.io.hashing.8.0.0.nupkg.sha512",

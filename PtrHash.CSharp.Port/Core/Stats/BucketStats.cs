@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PtrHash.CSharp.Port.Util
+namespace PtrHash.CSharp.Port.Core.Stats
 {
     /// <summary>
     /// Statistics collected during PtrHash construction for performance analysis
