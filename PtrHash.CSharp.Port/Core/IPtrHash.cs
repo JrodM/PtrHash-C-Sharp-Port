@@ -42,7 +42,7 @@ namespace PtrHash.CSharp.Port.Core
         nuint GetIndexNoRemapSinglePart(TKey key);
 
         /// <summary>
-        /// Stream lookup with prefetching for maximum throughput - auto-chooses optimal implementation
+        /// Stream lookup for maximum throughput - auto-chooses optimal implementation
         /// </summary>
         void GetIndicesStream(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, bool minimal = true);
 

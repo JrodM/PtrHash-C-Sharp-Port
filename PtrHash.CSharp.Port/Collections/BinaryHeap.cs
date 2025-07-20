@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PtrHash.CSharp.Port.Util.Collections
+namespace PtrHash.CSharp.Port.Collections
 {
     /// <summary>
     /// Binary max-heap implementation for eviction queue

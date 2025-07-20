@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace PtrHash.CSharp.Port.Util.Computation
+namespace PtrHash.CSharp.Port.Computation
 {
     /// <summary>
     /// FastMod32, using the low 32 bits of the hash.

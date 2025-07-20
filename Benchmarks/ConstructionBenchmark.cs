@@ -27,8 +27,8 @@ namespace PtrHash.Benchmarks
             }
         }
 
- [Params(  100_000)]
-        //[Params( 1_000, 10_000, 100_000, 1_000_000, 10_000_000)]
+ //[Params(  100_000)]
+        [Params( 1_000, 10_000, 100_000, 1_000_000, 10_000_000)]
         public int KeyCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -50,6 +50,12 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
+        public HashSet<ulong> HashSetConstruction()
+        {
+            return new HashSet<ulong>(_keys);
+        }
+
+        [Benchmark]
         public PtrHashU64 NativeInteropConstruction()
         {
             return new PtrHashU64(_keys.AsSpan(), PtrHashConfig.Default);

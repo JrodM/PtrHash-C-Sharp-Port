@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Buffers;
 using System.Numerics;
 
-namespace PtrHash.CSharp.Port.Util.Collections
+namespace PtrHash.CSharp.Port.Collections
 {
     /// <summary>
     /// High-performance bit vector implementation equivalent to Rust's BitVec

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace PtrHash.CSharp.Port.Util.Computation
+namespace PtrHash.CSharp.Port.Computation
 {
     /// <summary>
     /// FastReduce instance for pre-computed modular reduction - matches Rust's FastReduce struct

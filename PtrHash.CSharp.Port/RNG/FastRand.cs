@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace PtrHash.CSharp.Port.Util.RNG
+namespace PtrHash.CSharp.Port.RNG
 {
     /// <summary>
     /// FastRand implementation matching Rust's fastrand crate

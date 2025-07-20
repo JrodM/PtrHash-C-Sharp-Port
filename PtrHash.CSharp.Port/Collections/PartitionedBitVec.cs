@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PtrHash.CSharp.Port.Util.Collections
+namespace PtrHash.CSharp.Port.Collections
 {
-    /// <summary>
-    /// Helper class to mimic Rust's Vec<BitVec> functionality
-    /// </summary>
     internal class PartitionedBitVec : IDisposable
     {
         private readonly BitVec[] _parts;
@@ -86,8 +83,7 @@ namespace PtrHash.CSharp.Port.Util.Collections
         public BitVec GetPart(int partIndex) => _parts[partIndex];
         
         /// <summary>
-        /// Efficiently iterates over zero bits across all parts, yielding global indices.
-        /// This is equivalent to Rust's flat_map approach: 
+        /// Iterates over zero bits across all parts, yielding global indices.
         /// taken.iter().enumerate().flat_map(|(p, t)| t.iter_zeros().map(move |i| offset + i))
         /// </summary>
         /// <returns>An enumerable of global indices where bits are zero</returns>

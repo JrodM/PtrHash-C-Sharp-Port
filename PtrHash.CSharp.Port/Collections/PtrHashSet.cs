@@ -116,45 +116,6 @@ namespace PtrHash.CSharp.Port.Collections
             }
         }
 
-        /// <summary>
-        /// Performs batch membership testing using streaming with prefetching for better performance on large datasets
-        /// </summary>
-        /// <param name="items">Items to test for membership</param>
-        /// <param name="results">Output array for results (must be same length as items)</param>
-        /// <param name="prefetchDistance">Prefetch distance for memory optimization (default 32)</param>
-        public void ContainsStreamPreFetch(
-            ReadOnlySpan<TKey> items,
-            Span<bool> results,
-            uint prefetchDistance = 32)
-        {
-            if (items.Length != results.Length)
-                throw new ArgumentException("Items and results spans must have the same length");
-            
-            const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
-            
-            if (items.Length <= MAX_STACK_SIZE)
-            {
-                // Small datasets: single allocation on stack
-                Span<nuint> indices = stackalloc nuint[items.Length];
-                _ptrHash.GetIndicesStreamPreFetch(items, indices, prefetchDistance, minimal: true);
-                ProcessIndices(items, indices, results);
-            }
-            else
-            {
-                // Large datasets: rent from array pool to avoid stack overflow
-                var indices = ArrayPool<nuint>.Shared.Rent(items.Length);
-                try
-                {
-                    var indicesSpan = indices.AsSpan(0, items.Length);
-                    _ptrHash.GetIndicesStreamPreFetch(items, indicesSpan, prefetchDistance, minimal: true);
-                    ProcessIndices(items, indicesSpan, results);
-                }
-                finally
-                {
-                    ArrayPool<nuint>.Shared.Return(indices);
-                }
-            }
-        }
 
         public void CopyTo(TKey[] array, int arrayIndex)
         {

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
 
-namespace PtrHash.CSharp.Port.Util.RNG
+namespace PtrHash.CSharp.Port.RNG
 {
     /// <summary>
     /// ChaCha8 RNG using BouncyCastle's ChaChaEngine

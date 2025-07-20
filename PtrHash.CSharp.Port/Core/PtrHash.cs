@@ -6,11 +6,10 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using PtrHash.CSharp.Port.KeyHashers;
-using PtrHash.CSharp.Port.Util.Collections;
-using PtrHash.CSharp.Port.Util.RNG;
-using PtrHash.CSharp.Port.Util.Computation;
+using PtrHash.CSharp.Port.Collections;
+using PtrHash.CSharp.Port.RNG;
+using PtrHash.CSharp.Port.Computation;
 using PtrHash.CSharp.Port.Core.Stats;
-using PtrHash.CSharp.Port.Native;
 
 namespace PtrHash.CSharp.Port.Core
 {
@@ -297,121 +296,9 @@ namespace PtrHash.CSharp.Port.Core
             return C * (pilot ^ _seed); // Rust: hash::C.wrapping_mul(p ^ self.seed)
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStreamPreFetch(ReadOnlySpan<TKey> keys, Span<nuint> results, uint prefetchDistance = 32, bool minimal = true)
-        {
-            var useMinimal = minimal && _minimal && _remapTable != null;
-            var B = (int)Math.Min(prefetchDistance, keys.Length);
-            
-            // Ring buffers to cache the hash and bucket of upcoming queries (like Rust)
-            // Use stackalloc for better performance (no heap allocation)
-            Span<HashValue> nextHashes = stackalloc HashValue[B];
-            Span<nuint> nextBuckets = stackalloc nuint[B];
-            
-            fixed (TKey* keysPtr = keys)
-            fixed (nuint* resultsPtr = results)
-            fixed (HashValue* hashesPtr = nextHashes)
-            fixed (nuint* bucketsPtr = nextBuckets)
-            {
-                var pilotsPtr = _pilots;
-                var remapPtr = _remapTable;
-                // Initialize and prefetch first B values (exact Rust pattern)
-                var keyEnumerator = 0;
-                var leftover = B;
-                var keysLength = keys.Length;
-                
-                for (int idx = 0; idx < B; idx++)
-                {
-                    HashValue hx = default;
-                    if (keyEnumerator < keysLength)
-                    {
-                        hx = _hasher.Hash(keysPtr[keyEnumerator], _seed);
-                        keyEnumerator++;
-                        leftover--;
-                    }
-                    hashesPtr[idx] = hx;
-                    
-                    // Consolidated bucket calculation
-                    bucketsPtr[idx] = _isSinglePart 
-                        ? _remBuckets.Reduce(hx.High())  // Single-part: direct
-                        : Bucket(hx);                    // Multi-part: with part calculation
-                    
-                    // Prefetch pilot for this bucket (B steps ahead)
-                    Prefetch.PrefetchRead(pilotsPtr + bucketsPtr[idx]);
-                }
-                
-                int resultIndex = 0;
-                int i = 0;
-                
-                // Process remaining keys with ring buffer rotation (matching Rust fold pattern)
-                while (keyEnumerator < keysLength)
-                {
-                    var nextHash = _hasher.Hash(keysPtr[keyEnumerator], _seed);
-                    var idx = i % B;
-                    var curHash = hashesPtr[idx];
-                    var curBucket = bucketsPtr[idx];
-                    
-                    // Update ring buffer with new values
-                    hashesPtr[idx] = nextHash;
-                    
-                    // Consolidated bucket calculation
-                    bucketsPtr[idx] = _isSinglePart
-                        ? _remBuckets.Reduce(nextHash.High())  // Single-part: direct
-                        : Bucket(nextHash);                    // Multi-part: with part calculation
-                    
-                    // Prefetch pilot for the new bucket (B steps ahead)
-                    Prefetch.PrefetchRead(pilotsPtr + bucketsPtr[idx]);
-                    
-                    // Process current hash/bucket (prefetched B iterations ago)
-                    var pilot = (ulong)pilotsPtr[curBucket];
-                    
-                    // Consolidated slot calculation
-                    var slot = _isSinglePart
-                        ? SlotInPart(curHash, pilot)  // Single-part: direct
-                        : Slot(curHash, pilot);       // Multi-part: with part offset
-                    
-                    // Apply remap if minimal and slot >= numKeys
-                    if (useMinimal && slot >= _numKeys)
-                    {
-                        slot = (nuint)remapPtr[slot - _numKeys];
-                    }
-                    
-                    resultsPtr[resultIndex] = slot;
-                    resultIndex++;
-                    keyEnumerator++;
-                    i++;
-                }
-                
-                // Process leftover keys from ring buffer (B - leftover remaining)
-                for (int remaining = 0; remaining < B - leftover; remaining++)
-                {
-                    var idx = i % B;
-                    var curHash = hashesPtr[idx];
-                    var curBucket = bucketsPtr[idx];
-                    
-                    // Process current hash/bucket
-                    var pilot = (ulong)pilotsPtr[curBucket];
-                    
-                    // Consolidated slot calculation
-                    var slot = _isSinglePart
-                        ? SlotInPart(curHash, pilot)  // Single-part: direct
-                        : Slot(curHash, pilot);       // Multi-part: with part offset
-                    
-                    // Apply remap if minimal and slot >= numKeys
-                    if (useMinimal && slot >= _numKeys)
-                    {
-                        slot = (nuint)remapPtr[slot - _numKeys];
-                    }
-                    
-                    resultsPtr[resultIndex] = slot;
-                    resultIndex++;
-                    i++;
-                }
-            }
-        }
 
         /// <summary>
-        /// High-performance streaming version without prefetch complexity
+        /// High-performance streaming version for multiple keys
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GetIndicesStreamMultiPart(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
@@ -538,25 +425,6 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
-        /// <summary>
-        /// Hardware-specific prefetch optimization
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void PrefetchOptimized(void* ptr)
-        {
-            // Use hardware-specific prefetch hints when available
-            #if NET8_0_OR_GREATER
-            if (System.Runtime.Intrinsics.X86.Sse.IsSupported)
-            {
-                System.Runtime.Intrinsics.X86.Sse.Prefetch0(ptr);
-            }
-            else
-            #endif
-            {
-                // Fallback to generic prefetch
-                System.Runtime.Intrinsics.X86.Sse.Prefetch0(ptr);
-            }
-        }
 
 
 
