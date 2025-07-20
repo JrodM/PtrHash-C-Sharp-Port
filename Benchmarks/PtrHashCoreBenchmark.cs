@@ -211,39 +211,5 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // Prefetch Streaming Methods
-        [Benchmark]
-        public ulong MultiPart_GetIndicesStreamPreFetch()
-        {
-            ulong sum = 0;
-            _multiPartPtrHash.GetIndicesStreamPreFetch(
-                _lookupKeys.AsSpan(),
-                _indicesBuffer1,
-                prefetchDistance: 32,
-                minimal: true);
-
-            for (int i = 0; i < _indicesBuffer1.Length; i++)
-            {
-                sum += _indicesBuffer1[i];
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong SinglePart_GetIndicesStreamPreFetch()
-        {
-            ulong sum = 0;
-            _singlePartPtrHash.GetIndicesStreamPreFetch(
-                _lookupKeys.AsSpan(),
-                _indicesBuffer2,
-                prefetchDistance: 32,
-                minimal: true);
-
-            for (int i = 0; i < _indicesBuffer2.Length; i++)
-            {
-                sum += _indicesBuffer2[i];
-            }
-            return sum;
-        }
     }
 }

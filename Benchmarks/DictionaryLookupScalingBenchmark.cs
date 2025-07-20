@@ -139,8 +139,7 @@ namespace PtrHash.Benchmarks
             ulong sum = 0;
             _nativeSentinelPtrHash.TryGetValueStream(
                 _lookupKeys.AsSpan(),
-                _valuesBuffer1.AsSpan(),
-                prefetchDistance: 32);
+                _valuesBuffer1.AsSpan());
 
             for (int i = 0; i < _valuesBuffer1.Length; i++)
             {
@@ -185,41 +184,5 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // Stream Lookups with PreFetch
-        [Benchmark]
-        public ulong MultiPartDict_StreamPreFetchLookup()
-        {
-            ulong sum = 0;
-            _multiPartPtrHashDict.GetValuesStreamPreFetch(
-                _lookupKeys.AsSpan(),
-                _valuesBuffer2,
-                prefetchDistance: 32);
-
-            for (int i = 0; i < _valuesBuffer2.Length; i++)
-            {
-                ulong v = _valuesBuffer2[i];
-                if (v != _multiPartPtrHashDict.Sentinel)
-                    sum += v;
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong SinglePartDict_StreamPreFetchLookup()
-        {
-            ulong sum = 0;
-            _singlePartPtrHashDict.GetValuesStreamPreFetch(
-                _lookupKeys.AsSpan(),
-                _valuesBuffer3,
-                prefetchDistance: 32);
-
-            for (int i = 0; i < _valuesBuffer3.Length; i++)
-            {
-                ulong v = _valuesBuffer3[i];
-                if (v != _singlePartPtrHashDict.Sentinel)
-                    sum += v;
-            }
-            return sum;
-        }
     }
 }
