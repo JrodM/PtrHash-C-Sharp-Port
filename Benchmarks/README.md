@@ -16,15 +16,15 @@ Performance on 10,000 lookups across varying dataset sizes:
 
 | Key Count | Dictionary | Native Stream | Port Point | Port Stream | Single-Part Point | Single-Part Stream |
 |-----------|------------|---------------|------------|-------------|-------------------|------------------|
-| 1K        | 2.40 μs    | 3.26 μs (0.74x) | 2.90 μs (0.83x) | 3.11 μs (0.77x) | 3.46 μs (0.69x) | 3.13 μs (0.77x) |
-| 10K       | 44.66 μs   | 31.60 μs (1.41x) | 31.34 μs (1.42x) | 31.36 μs (1.42x) | 32.37 μs (1.38x) | 30.15 μs (1.48x) |
-| 100K      | 71.92 μs   | 33.94 μs (2.12x) | 49.99 μs (1.44x) | 45.58 μs (1.58x) | 36.33 μs (1.98x) | 34.68 μs (2.07x) |
-| 1M        | 116.91 μs  | 42.46 μs (2.75x) | 78.02 μs (1.50x) | 62.39 μs (1.87x) | 61.75 μs (1.89x) | 49.16 μs (2.38x) |
-| 10M       | 189.95 μs  | 97.97 μs (1.94x) | 144.45 μs (1.31x) | 91.73 μs (2.07x) | 113.58 μs (1.67x) | 72.61 μs (2.62x) |
+| 1K        | 2.48 μs    | 3.20 μs (0.78x) | 2.84 μs (0.87x) | 3.39 μs (0.73x) | 3.07 μs (0.81x) | 3.49 μs (0.71x) |
+| 10K       | 51.35 μs   | 31.70 μs (1.62x) | 37.33 μs (1.38x) | 34.38 μs (1.49x) | 32.26 μs (1.59x) | 33.51 μs (1.53x) |
+| 100K      | 70.62 μs   | 33.77 μs (2.09x) | 47.00 μs (1.50x) | 42.55 μs (1.66x) | 39.47 μs (1.79x) | 38.93 μs (1.81x) |
+| 1M        | 123.42 μs  | 45.60 μs (2.71x) | 71.42 μs (1.73x) | 58.66 μs (2.10x) | 60.63 μs (2.04x) | 55.34 μs (2.23x) |
+| 10M       | 186.97 μs  | 96.01 μs (1.95x) | 131.96 μs (1.42x) | 89.07 μs (2.10x) | 110.95 μs (1.68x) | 76.59 μs (2.44x) |
 
 **Key Findings:**
 - Dictionary only wins at very small datasets (1K keys)
-- Single-part streaming achieves best performance: up to 2.62x speedup
+- Single-part streaming achieves best performance: up to 2.44x speedup at 10M keys
 - Port streaming consistently outperforms point lookups
 - Native streaming maintains strong performance across all sizes
 
@@ -33,15 +33,15 @@ Fixed 2M keys, varying lookup counts:
 
 | Lookups | Dictionary | Native Stream | Multi-Part Stream | Single-Part Stream |
 |---------|------------|---------------|-------------------|-----------|
-| 1K      | 4.40 μs    | 3.67 μs (1.20x) | 4.56 μs (0.97x) | 3.61 μs (1.22x) |
-| 10K     | 137.26 μs  | 56.00 μs (2.45x) | 74.32 μs (1.85x) | 47.21 μs (2.91x) |
-| 50K     | 978.28 μs  | 317.69 μs (3.08x) | 362.87 μs (2.70x) | 214.15 μs (4.57x) |
-| 100K    | 4,520.25 μs | 905.88 μs (4.99x) | 1,114.22 μs (4.06x) | 699.95 μs (6.46x) |
-| 200K    | 10,202.16 μs | 2,179.00 μs (4.68x) | 3,121.23 μs (3.27x) | 2,613.18 μs (3.90x) |
+| 1K      | 4.35 μs    | 3.79 μs (1.15x) | 4.43 μs (0.98x) | 4.08 μs (1.07x) |
+| 10K     | 162.41 μs  | 61.29 μs (2.65x) | 74.30 μs (2.19x) | 66.97 μs (2.43x) |
+| 50K     | 1,085.49 μs | 348.30 μs (3.12x) | 360.58 μs (3.01x) | 315.24 μs (3.44x) |
+| 100K    | 4,382.89 μs | 1,007.42 μs (4.35x) | 1,117.50 μs (3.92x) | 791.37 μs (5.54x) |
+| 200K    | 10,441.67 μs | 2,500.79 μs (4.18x) | 3,196.82 μs (3.27x) | 2,732.14 μs (3.82x) |
 
 **Key Findings:**
 - Performance advantage increases with lookup count
-- Single-part achieves up to 6.46x speedup at 100K lookups
+- Single-part achieves up to 5.54x speedup at 100K lookups
 - Dictionary performance degrades more severely at higher lookup counts
 
 #### 3. Core PtrHash Performance (PtrHashCoreBenchmark)
@@ -49,18 +49,19 @@ Fixed 2M keys, varying lookup counts:
 
 | Method | 1K Lookups | 100K Lookups | 1M Lookups |
 |--------|------------|--------------|------------|
-| **Native Stream** (Baseline) | 2.34 μs | 240.58 μs | 2,606.10 μs |
-| **Native Point** | 20.23 μs (8.64x) | 2,013.93 μs (8.37x) | 20,158.78 μs (7.74x) |
-| **Multi-Part Point** | 5.62 μs (2.40x) | 701.80 μs (2.92x) | 7,079.86 μs (2.72x) |
-| **Single-Part Point** | 2.59 μs (1.10x) | 354.22 μs (1.47x) | 3,634.62 μs (1.39x) |
-| **Multi-Part Stream** | 5.90 μs (2.52x) | 725.15 μs (3.01x) | 7,469.91 μs (2.87x) |
-| **Single-Part Stream** | 2.70 μs (1.15x) | 346.55 μs (1.44x) | 3,701.44 μs (1.42x) |
+| **Native Stream** (Baseline) | 2.35 μs | 245.21 μs | 2,563.34 μs |
+| **Native Point** | 18.64 μs (7.92x) | 2,090.07 μs (8.52x) | 21,120.50 μs (8.24x) |
+| **Multi-Part Point** | 2.80 μs (1.19x) | 371.50 μs (1.52x) | 3,705.97 μs (1.45x) |
+| **Single-Part Point** | 2.81 μs (1.19x) | 366.11 μs (1.49x) | 3,745.20 μs (1.46x) |
+| **Multi-Part Stream** | 2.88 μs (1.23x) | 387.13 μs (1.58x) | 4,260.35 μs (1.66x) |
+| **Single-Part Stream** | 2.89 μs (1.23x) | 395.19 μs (1.61x) | 4,127.89 μs (1.61x) |
+| **Single-Part Dedicated** | 2.15 μs (0.91x) | 305.86 μs (1.25x) | 3,047.49 μs (1.19x) |
 
 **Key Findings:**
 - Native stream is fastest, establishes performance baseline
 - Native point lookups are ~8x slower than streaming (no batching benefits)
-- Single-part port achieves near-native streaming performance (1.1-1.4x slower)
-- Multi-part has overhead but still outperforms native point lookups
+- Single-part dedicated methods achieve best port performance (0.91-1.25x vs native)
+- Port streaming is 1.2-1.6x slower than native, still significantly faster than native point lookups
 
 #### 4. Construction Performance (ConstructionBenchmark)
 HashSet as baseline across varying dataset sizes:
@@ -68,65 +69,65 @@ HashSet as baseline across varying dataset sizes:
 **1K Keys:**
 | Method | Mean | Ratio | Allocated | Memory Ratio |
 |--------|------|-------|-----------|--------------|
-| **HashSet** (Baseline) | 3.30 μs | 1.00x | 22 KB | 1.00x |
-| **Port Multi-Part** | 54.22 μs | 16.50x | 30 KB | 1.36x |
-| **Port Single-Part** | 72.79 μs | 22.17x | 30 KB | 1.36x |
-| **Native Interop** | 3,579 μs | 962.89x | 0.5 KB | 0.02x |
+| **HashSet** (Baseline) | 3.27 μs | 1.00x | 22 KB | 1.00x |
+| **Port Multi-Part** | 70.11 μs | 21.4x | 30 KB | 1.36x |
+| **Port Single-Part** | 82.62 μs | 25.3x | 30 KB | 1.36x |
+| **Native Interop** | 3,938 μs | 1,204x | 38 B | 0.002x |
 
 **10K Keys:**
 | Method | Mean | Ratio | Allocated | Memory Ratio |
 |--------|------|-------|-----------|--------------|
-| **HashSet** (Baseline) | 84.42 μs | 1.00x | 202 KB | 1.00x |
-| **Port Multi-Part** | 1,234 μs | 14.64x | 126 KB | 0.62x |
-| **Port Single-Part** | 1,235 μs | 14.65x | 126 KB | 0.62x |
-| **Native Interop** | 4,835 μs | 57.47x | 0.5 KB | 0.002x |
+| **HashSet** (Baseline) | 97.08 μs | 1.00x | 202 KB | 1.00x |
+| **Port Multi-Part** | 1,322 μs | 13.6x | 126 KB | 0.62x |
+| **Port Single-Part** | 1,258 μs | 13.0x | 126 KB | 0.62x |
+| **Native Interop** | 4,635 μs | 47.7x | 38 B | 0.0002x |
 
 **100K Keys:**
 | Method | Mean | Ratio | Allocated | Memory Ratio |
 |--------|------|-------|-----------|--------------|
-| **HashSet** (Baseline) | 1.30 ms | 1.00x | 2,174 KB | 1.00x |
-| **Port Multi-Part** | 7.98 ms | 6.13x | 1,125 KB | 0.52x |
-| **Port Single-Part** | 13.85 ms | 10.64x | 1,088 KB | 0.50x |
-| **Native Interop** | 6.31 ms | 4.86x | 0.5 KB | 0.0002x |
+| **HashSet** (Baseline) | 1.31 ms | 1.00x | 2,174 KB | 1.00x |
+| **Port Multi-Part** | 8.48 ms | 6.5x | 1,136 KB | 0.52x |
+| **Port Single-Part** | 14.24 ms | 10.9x | 1,087 KB | 0.50x |
+| **Native Interop** | 6.57 ms | 5.0x | 38 B | 0.00002x |
 
 **1M Keys:**
 | Method | Mean | Ratio | Allocated | Memory Ratio |
 |--------|------|-------|-----------|--------------|
-| **HashSet** (Baseline) | 24.54 ms | 1.00x | 23,255 KB | 1.00x |
-| **Port Multi-Part** | 91.88 ms | 3.74x | 10,715 KB | 0.46x |
-| **Port Single-Part** | 169.38 ms | 6.90x | 10,690 KB | 0.46x |
-| **Native Interop** | 25.37 ms | 1.03x | 0.5 KB | 0.00002x |
+| **HashSet** (Baseline) | 34.20 ms | 1.00x | 23,255 KB | 1.00x |
+| **Port Multi-Part** | 96.64 ms | 2.8x | 10,718 KB | 0.46x |
+| **Port Single-Part** | 178.77 ms | 5.2x | 10,690 KB | 0.46x |
+| **Native Interop** | 29.49 ms | 0.86x | 78 B | 0.000003x |
 
 **10M Keys:**
 | Method | Mean | Ratio | Allocated | Memory Ratio |
 |--------|------|-------|-----------|--------------|
-| **HashSet** (Baseline) | 668.35 ms | 1.00x | 200,001 KB | 1.00x |
-| **Native Interop** | 175.03 ms | 0.26x | 1.1 KB | 0.000005x |
-| **Port Multi-Part** | 842.30 ms | 1.26x | 106,911 KB | 0.53x |
-| **Port Single-Part** | 2,430.82 ms | 3.64x | 106,690 KB | 0.53x |
+| **HashSet** (Baseline) | 728.01 ms | 1.00x | 200,001 KB | 1.00x |
+| **Native Interop** | 190.72 ms | 0.26x | 277 B | 0.000001x |
+| **Port Multi-Part** | 874.63 ms | 1.20x | 106,911 KB | 0.53x |
+| **Port Single-Part** | 2,539.48 ms | 3.49x | 106,690 KB | 0.53x |
 
 **Key Findings:**
 - **Small datasets (1K-10K)**: HashSet dominates with much faster construction
 - **Medium datasets (100K)**: Native interop becomes competitive while using minimal memory
-- **Large datasets (1M+)**: Native interop outperforms HashSet at 10M keys (0.26x)
-- **Memory efficiency**: PtrHash uses 0.00002-0.53x memory compared to HashSet
-- **Port performance**: Multi-part consistently faster than single-part for construction
-- **Scaling**: Native interop construction scales better than HashSet for very large datasets
+- **Large datasets (1M+)**: Native interop outperforms HashSet at 1M+ keys (0.86x at 1M, 0.26x at 10M)
+- **Memory efficiency**: PtrHash uses 0.000001-0.53x memory compared to HashSet
+- **Port performance**: Multi-part consistently faster than single-part for construction  
+- **Scaling**: Native interop construction scales much better than HashSet for large datasets
 
 ### Summary
 
-1. **Native vs Port Performance**: Native streaming provides the best lookup performance. The C# port achieves excellent performance at 1.1-1.4x slower than native for single-part streaming.
+1. **Native vs Port Performance**: Native streaming provides the best lookup performance. The C# port achieves excellent performance with single-part dedicated methods at 0.91-1.25x vs native streaming.
 
 2. **Streaming vs Point Lookups**: Streaming lookups are dramatically faster (~8x) than point lookups for native code due to better memory access patterns and batching.
 
-3. **Single-Part vs Multi-Part**: Single-part provides ~2x better lookup performance and approaches native streaming speeds, while multi-part offers better construction scalability.
+3. **Single-Part vs Multi-Part**: Single-part provides similar lookup performance to multi-part but has much worse construction scaling (3.5x slower at 10M keys).
 
 4. **Construction Trade-offs**: 
-   - HashSet: Fastest construction but highest memory usage (2.1 MB for 100K keys)
-   - PtrHash: 5-10x slower construction but 50-99.98% less memory usage
-   - Choose based on your needs: frequent construction vs long-lived lookups
+   - HashSet: Fastest construction for small datasets but poor scaling
+   - Native PtrHash: Best overall - competitive construction, minimal memory, excellent lookup performance
+   - Port PtrHash: Good for C#-only environments - 3-13x slower construction but 50% memory savings vs HashSet
 
-5. **Memory Efficiency**: PtrHash excels at memory efficiency - native uses < 1KB while port uses ~1MB for 100K keys, compared to HashSet's 2.1MB.
+5. **Memory Efficiency**: PtrHash excels at memory efficiency - native uses <1KB for any dataset size, port uses ~50% of HashSet memory.
 
 ### Running Benchmarks
 

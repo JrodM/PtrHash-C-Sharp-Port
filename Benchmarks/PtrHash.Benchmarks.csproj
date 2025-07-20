@@ -20,6 +20,35 @@
     <ProjectReference Include="../PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj" />
   </ItemGroup>
 
+  <!-- Copy native library from interop project to benchmarks output -->
+  <ItemGroup>
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libptrhash.so</Link>
+    </None>
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libptrhash.dll</Link>
+    </None>
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libptrhash.dylib</Link>
+    </None>
+    <!-- Also copy as 'ptrhash' since .NET runtime looks for both names -->
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ptrhash.so</Link>
+    </None>
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ptrhash.dll</Link>
+    </None>
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ptrhash.dylib</Link>
+    </None>
+  </ItemGroup>
+
   <!-- Ensure native library is available for benchmarks -->
   <Target Name="EnsureNativeLibraryForBenchmarks" BeforeTargets="BeforeBuild">
     <PropertyGroup>

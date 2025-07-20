@@ -91,7 +91,7 @@ namespace PtrHash.Benchmarks
 
         // Native Interop Stream Baseline
         [Benchmark(Baseline = true)]
-        public ulong Native_GetIndices_Stream()
+        public ulong Native_Stream()
         {
             ulong sum = 0;
             _nativePtrHash.GetIndicesStream(
@@ -107,7 +107,7 @@ namespace PtrHash.Benchmarks
 
         // Point Lookups - GetIndex (with remapping)
         [Benchmark]
-        public ulong MultiPart_GetIndex_Point()
+        public ulong MultiPart_Point_Lookup_Specialized()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -118,18 +118,18 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong SinglePart_GetIndex_Point()
+        public ulong SinglePart_Point_Lookup_Specialized()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
             {
-                sum += _singlePartPtrHash.GetIndexMultiPart(key);
+                sum += _singlePartPtrHash.GetIndexSinglePart(key);
             }
             return sum;
         }
 
         [Benchmark]
-        public ulong MultiPart_GetIndex_Point_Optimal()
+        public ulong MultiPart_GetIndex_Point_Branching()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -140,7 +140,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong SinglePart_GetIndex_Point_Optimal()
+        public ulong SinglePart_Point_Lookup_Branching()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -152,7 +152,7 @@ namespace PtrHash.Benchmarks
 
         // Stream Lookups - GetIndicesStream
         [Benchmark]
-        public ulong MultiPart_GetIndicesStream()
+        public ulong MultiPart_Stream_Specialized()
         {
             ulong sum = 0;
             _multiPartPtrHash.GetIndicesStreamMultiPart(
@@ -168,10 +168,10 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong SinglePart_GetIndicesStream()
+        public ulong SinglePart_Stream_Specialized()
         {
             ulong sum = 0;
-            _singlePartPtrHash.GetIndicesStreamMultiPart(
+            _singlePartPtrHash.GetIndicesStreamSinglePart(
                 _lookupKeys.AsSpan(),
                 _indicesBuffer2,
                 minimal: true);
@@ -184,7 +184,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong MultiPart_GetIndicesStream_Optimal()
+        public ulong MultiPart_Stream_Branching()
         {
             ulong sum = 0;
             _multiPartPtrHash.GetIndicesStream(
@@ -200,7 +200,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong SinglePart_GetIndicesStream_Optimal()
+        public ulong SinglePart_Stream_Branching()
         {
             ulong sum = 0;
             _singlePartPtrHash.GetIndicesStream(
@@ -214,38 +214,10 @@ namespace PtrHash.Benchmarks
             }
             return sum;
         }
-
-        // Single-Part Specific Methods (should only run on single-part)
-        [Benchmark]
-        public ulong SinglePart_GetIndexSinglePart_Point()
-        {
-            ulong sum = 0;
-            foreach (var key in _lookupKeys)
-            {
-                sum += _singlePartPtrHash.GetIndexSinglePart(key);
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong SinglePart_GetIndicesStreamSinglePart()
-        {
-            ulong sum = 0;
-            _singlePartPtrHash.GetIndicesStreamSinglePart(
-                _lookupKeys.AsSpan(),
-                _indicesBuffer2,
-                minimal: true);
-
-            for (int i = 0; i < _indicesBuffer2.Length; i++)
-            {
-                sum += _indicesBuffer2[i];
-            }
-            return sum;
-        }
-
+        
         // Native Interop Point Lookup
         [Benchmark]
-        public ulong Native_GetIndex_Point()
+        public ulong Native_Point_Lookup()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)

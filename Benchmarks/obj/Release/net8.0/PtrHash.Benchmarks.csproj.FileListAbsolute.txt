@@ -1,7 +1,6 @@
 /home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/TraceReloggerLib.dll
 /home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/Dia2Lib.dll
 /home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/OSExtensions.dll
-/home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/libptrhash.so
 /home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/x86/KernelTraceControl.dll
 /home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/x86/KernelTraceControl.Win61.dll
 /home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/x86/msdia140.dll
@@ -101,3 +100,6 @@
 /home/jared/Developer/PtrHash/Benchmarks/obj/Release/net8.0/PtrHash.Benchmarks.genruntimeconfig.cache
 /home/jared/Developer/PtrHash/Benchmarks/obj/Release/net8.0/ref/PtrHash.Benchmarks.dll
 /home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/BouncyCastle.Crypto.dll
+/home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/target/release/libptrhash.so
+/home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/libptrhash.so
+/home/jared/Developer/PtrHash/Benchmarks/bin/Release/net8.0/ptrhash.so
