@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PtrHash.CSharp.Port.Util
 {
@@ -82,6 +84,37 @@ namespace PtrHash.CSharp.Port.Util
         
         // Get a specific part's BitVec
         public BitVec GetPart(int partIndex) => _parts[partIndex];
+        
+        /// <summary>
+        /// Efficiently iterates over zero bits across all parts, yielding global indices.
+        /// This is equivalent to Rust's flat_map approach: 
+        /// taken.iter().enumerate().flat_map(|(p, t)| t.iter_zeros().map(move |i| offset + i))
+        /// </summary>
+        /// <returns>An enumerable of global indices where bits are zero</returns>
+        public IEnumerable<nuint> IterZeros()
+        {
+            for (int partIndex = 0; partIndex < _parts.Length; partIndex++)
+            {
+                var offset = (nuint)partIndex * _slotsPerPart;
+                foreach (var localIndex in _parts[partIndex].IterZeros())
+                {
+                    yield return offset + localIndex;
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Iterates over zero bits in a specific part, yielding local indices within that part.
+        /// </summary>
+        /// <param name="partIndex">The part to iterate over</param>
+        /// <returns>An enumerable of local indices where bits are zero in the specified part</returns>
+        public IEnumerable<nuint> IterZerosInPart(int partIndex)
+        {
+            if (partIndex < 0 || partIndex >= _parts.Length)
+                throw new ArgumentOutOfRangeException(nameof(partIndex));
+                
+            return _parts[partIndex].IterZeros();
+        }
         
         public void Dispose()
         {

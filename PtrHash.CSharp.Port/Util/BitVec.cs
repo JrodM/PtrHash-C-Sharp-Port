@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Buffers;
+using System.Numerics;
 
 namespace PtrHash.CSharp.Port.Util
 {
@@ -97,6 +99,50 @@ namespace PtrHash.CSharp.Port.Util
                 count += (nuint)System.Numerics.BitOperations.PopCount(_bits[i]);
             }
             return count;
+        }
+        
+        /// <summary>
+        /// Efficiently iterates over only the zero bits (unset bits) in the bit vector.
+        /// This is equivalent to Rust's iter_zeros() and provides O(number_of_zeros) complexity
+        /// instead of O(total_bits) by using bit manipulation to skip over set bits.
+        /// </summary>
+        /// <returns>An enumerable of indices where bits are zero</returns>
+        public IEnumerable<nuint> IterZeros()
+        {
+            for (int wordIndex = 0; wordIndex < _numWords; wordIndex++)
+            {
+                var word = _bits[wordIndex];
+                var baseIndex = (nuint)(wordIndex * BITS_PER_WORD);
+                
+                // Skip words that are all 1s - major optimization for sparse bit vectors
+                if (word == ulong.MaxValue)
+                    continue;
+                
+                // Invert the word so we can find zero bits using trailing zero count
+                var invertedWord = ~word;
+                
+                // Process all zero bits in this word
+                while (invertedWord != 0)
+                {
+                    // Find the position of the next zero bit
+                    var trailingZeros = BitOperations.TrailingZeroCount(invertedWord);
+                    var bitIndex = baseIndex + (nuint)trailingZeros;
+                    
+                    // Only yield if within the actual bit vector length
+                    if (bitIndex < _length)
+                    {
+                        yield return bitIndex;
+                    }
+                    else
+                    {
+                        // We've gone past the end of the bit vector, stop processing this word
+                        yield break;
+                    }
+                    
+                    // Clear the bit we just found to continue searching
+                    invertedWord &= invertedWord - 1;
+                }
+            }
         }
         
         public void Clear()

@@ -1322,7 +1322,8 @@ namespace PtrHash.CSharp.Port.Core
 
         private bool TryRemapFreeSlots(PartitionedBitVec taken)
         {
-            // Exact implementation of Rust's remap_free_slots algorithm
+            // Efficient implementation of Rust's remap_free_slots algorithm using IterZeros()
+            // This eliminates the O(n²) nested loop issue by only processing actual zero bits
             // Assert: count of free slots should equal slots_total - n
             var freeSlotCount = taken.CountZeros();
             if (freeSlotCount != _slotsTotal - _numKeys)
@@ -1357,30 +1358,21 @@ namespace PtrHash.CSharp.Port.Core
                     return taken.Parts[part].Get(localSlot);
                 }
                 
-                // Process free slots directly without intermediate List
-                for (int p = 0; p < taken.Parts.Length; p++)
+                // Efficient single-pass algorithm using IterZeros() - matches Rust's approach exactly
+                // This is equivalent to:
+                // for i in taken.iter().enumerate().flat_map(|(p, t)| t.iter_zeros().map(move |i| offset + i)).take_while(|&i| i < self.n)
+                foreach (var freeSlotIndex in taken.IterZeros())
                 {
-                    var offset = (nuint)p * _slotsPerPart;
-                    var part = taken.Parts[p];
-                    
-                    // Find all zeros (free slots) in this part
-                    for (nuint localSlot = 0; localSlot < _slotsPerPart; localSlot++)
+                    if (freeSlotIndex >= _numKeys) // take_while(|&i| i < self.n) - stop when we exceed n
+                        break;
+                        
+                    // Process this free slot immediately - same logic as Rust
+                    var i = (uint)freeSlotIndex;
+                    while (!Get(_numKeys + (nuint)remapCount))
                     {
-                        if (!part.Get(localSlot))
-                        {
-                            var globalSlot = offset + localSlot;
-                            if (globalSlot < _numKeys) // take_while(|&i| i < self.n)
-                            {
-                                // Process this free slot immediately
-                                var i = (uint)globalSlot;
-                                while (!Get(_numKeys + (nuint)remapCount))
-                                {
-                                    remapArray[remapCount++] = i;
-                                }
-                                remapArray[remapCount++] = i;
-                            }
-                        }
+                        remapArray[remapCount++] = i;
                     }
+                    remapArray[remapCount++] = i;
                 }
                 
                 // Allocate exact-sized unmanaged memory for remap table

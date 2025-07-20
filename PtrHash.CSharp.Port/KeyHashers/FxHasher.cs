@@ -17,9 +17,12 @@ namespace PtrHash.CSharp.Port.KeyHashers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HashValue Hash(ulong key, ulong seed)
         {
-            ulong hash = seed == 0 ? FX_HASH_SEED : seed;
+            // Exact Rust FxHasher64 algorithm:
+            // For a fresh hasher with seed, state starts as seed
+            // Then: state = state.rotate_left(ROTATE).bitxor(key).wrapping_mul(SEED64)
+            ulong hash = seed;
             hash = RotateLeft(hash, ROTATE) ^ key;
-            hash = hash.WrappingMul(MULTIPLY);
+            hash = hash.WrappingMul(FX_HASH_SEED);
             return new HashValue(hash);
         }
 
