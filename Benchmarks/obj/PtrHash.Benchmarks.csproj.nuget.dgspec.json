@@ -26,8 +26,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj": {
-                "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj"
+              "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/PtrHashNative.csproj": {
+                "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/PtrHashNative.csproj"
               },
               "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj": {
                 "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj"
@@ -74,14 +74,14 @@
         }
       }
     },
-    "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj": {
+    "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/PtrHashNative.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj",
+        "projectUniqueName": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/PtrHashNative.csproj",
         "projectName": "PtrHashNative",
-        "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj",
+        "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/PtrHashNative.csproj",
         "packagesPath": "/home/jared/.nuget/packages/",
-        "outputPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/obj/",
+        "outputPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/jared/.nuget/NuGet/NuGet.Config"

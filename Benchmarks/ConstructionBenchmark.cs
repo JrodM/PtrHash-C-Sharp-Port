@@ -7,9 +7,11 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.PtrHash;
-using PtrHash.CSharp.Interop.SentinelHashMap;
-using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Interop.InteropDictionary;
+using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.PtrHash;
 using PtrHashImpl = PtrHash.CSharp.Interop.PtrHash;
 
 namespace PtrHash.Benchmarks
@@ -58,13 +60,13 @@ namespace PtrHash.Benchmarks
         [Benchmark]
         public PtrHashU64 NativeInteropConstruction()
         {
-            return new PtrHashU64(_keys.AsSpan(), PtrHashConfig.Default);
+            return new PtrHashU64(_keys.AsSpan(), PtrHashNative.FFIParams.Fast);
         }
 
         [Benchmark]
         public PtrHashU64 NativeInteropConstruction_StrongerHasher()
         {
-            var config = PtrHashConfig.Default with { U64HashFunction = U64HashFunction.StrongerIntHash };
+            var config = PtrHashNative.FFIParams.Fast with { U64HashFunction = 2 }; // StrongerIntHash
             return new PtrHashU64(_keys.AsSpan(), config);
         }
 

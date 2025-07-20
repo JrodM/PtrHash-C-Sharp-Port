@@ -4,11 +4,13 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port;
+using PtrHash.CSharp.Port.PtrHash;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.PtrHash;
+using PtrHash.CSharp.Interop.Native;
 
 namespace PtrHash.Benchmarks
 {
@@ -72,7 +74,7 @@ namespace PtrHash.Benchmarks
 
             
             // Native interop (multi-part only)
-            _nativePtrHash = new PtrHashU64(_keys, PtrHashConfig.Default);
+            _nativePtrHash = new PtrHashU64(_keys, PtrHashNative.FFIParams.Fast);
 
             _indicesBuffer1 = new nuint[actualLookupCount];
             _indicesBuffer2 = new nuint[actualLookupCount];

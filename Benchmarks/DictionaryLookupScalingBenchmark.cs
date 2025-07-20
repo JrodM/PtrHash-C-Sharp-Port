@@ -5,9 +5,11 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using PtrHash.CSharp.Interop.Core;
-using PtrHash.CSharp.Interop.SentinelHashMap;
+using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Port.Collections;
-using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port;
+using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Interop.Native;
 
 namespace PtrHash.Benchmarks
 {
@@ -35,7 +37,7 @@ namespace PtrHash.Benchmarks
         private Dictionary<ulong, ulong> _dictionary = null!;
         
         // Native interop dictionary
-        private SentinelPtrHashU64<ulong> _nativeSentinelPtrHash = null!;
+        private PtrHashU64InteropDictionary<ulong> _nativeSentinelPtrHash = null!;
         
         // C# port dictionaries
         private PtrHashDictionaryU64<ulong> _multiPartPtrHashDict = null!;
@@ -69,11 +71,11 @@ namespace PtrHash.Benchmarks
                 _dictionary[_keys[i]] = _values[i];
 
             // Native interop dictionary
-            _nativeSentinelPtrHash = new SentinelPtrHashU64<ulong>(
+            _nativeSentinelPtrHash = new PtrHashU64InteropDictionary<ulong>(
                 _keys,
                 _values,
                 ulong.MaxValue,
-                PtrHashConfig.Default);
+                PtrHashNative.FFIParams.Fast);
             
             // Multi-part C# port dictionary
             _multiPartPtrHashDict = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);

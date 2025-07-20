@@ -262,7 +262,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             var bucket = BucketInPart(remainder);
             return part * _bucketsPerPart + bucket;
         }
-        
+
         // Rust bucket_in_part() function - returns bucket index within a part
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint BucketInPart(ulong x)
@@ -277,7 +277,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             //         self.rem_buckets.reduce(self.params.bucket_fn.call(x))
             //     }
             // }
-            
+
             if (_bucketFunction.IsLinear)
             {
                 return _remBuckets.Reduce(x);

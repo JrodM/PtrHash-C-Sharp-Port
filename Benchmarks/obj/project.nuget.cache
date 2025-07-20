@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dMkFqcSADvruM3Xmjoj96YiscVp9QYe9yjwP55BlWfBmh1IFFQXgln/V/td6KJc+cmMB0K5mHHB1D+W9LV1a7w==",
+  "dgSpecHash": "AAzwwP9lNU9C+eXVQrAYauRs+pz+iaEb19u5g3Cxdbiym9V37fugIM+j5/d5lGkASPnKJWMdfp9NjkzVaYNLYw==",
   "success": true,
   "projectFilePath": "/home/jared/Developer/PtrHash/Benchmarks/PtrHash.Benchmarks.csproj",
   "expectedPackageFiles": [

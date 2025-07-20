@@ -1883,8 +1883,8 @@
     },
     "PtrHashNative/1.0.0": {
       "type": "project",
-      "path": "../PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj",
-      "msbuildProject": "../PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj"
+      "path": "../PtrHash.CSharp.Interop/PtrHashNative.csproj",
+      "msbuildProject": "../PtrHash.CSharp.Interop/PtrHashNative.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -1920,8 +1920,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj": {
-              "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/CSharpInterop/PtrHashNative.csproj"
+            "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/PtrHashNative.csproj": {
+              "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop/PtrHashNative.csproj"
             },
             "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj": {
               "projectPath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj"
