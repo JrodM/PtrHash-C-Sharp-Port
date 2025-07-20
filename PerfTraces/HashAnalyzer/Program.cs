@@ -6,6 +6,7 @@ using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.PtrHash;
+using PtrHash.CSharp.Interop.Native;
 
 namespace HashAnalyzer
 {
@@ -43,8 +44,12 @@ namespace HashAnalyzer
             AnalyzeHasher("StrongerIntHasher", keys, (key, seed) => strongerHasher.Hash(key, seed));
             
             // Test Native Rust FxHash (via interop)
-            Console.WriteLine("\n3. Native Rust FxHash (via interop):");
-            AnalyzeNativeHash("Rust FxHash", keys);
+            Console.WriteLine("\n3. Native Rust FxHash64 (via interop):");
+            AnalyzeHasher("Native FxHash64", keys, (key, seed) => PtrHashU64.TestNativeFxHash64(key, seed));
+            
+            // Test Native Rust StrongerIntHash (via interop)
+            Console.WriteLine("\n4. Native Rust StrongerIntHash (via interop):");
+            AnalyzeHasher("Native StrongerIntHash", keys, (key, seed) => PtrHashU64.TestNativeStrongerHash(key, seed));
 
             // Construction Performance Comparison
             Console.WriteLine("\n=== Construction Performance Analysis ===");
@@ -102,20 +107,6 @@ namespace HashAnalyzer
             Console.WriteLine($"    Average avalanche effect: {totalAvalanche / seeds.Length:F2}% (closer to 50% is better)");
         }
         
-        static void AnalyzeNativeHash(string name, ulong[] keys)
-        {
-            // Create native hash function via interop
-            try
-            {
-                using var nativeHash = new PtrHashU64(keys.AsSpan(), PtrHashConfig.Default);
-                Console.WriteLine($"  Native construction successful");
-                Console.WriteLine($"  (Hash distribution analysis requires native hasher access)");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"  Error creating native hash: {ex.Message}");
-            }
-        }
         
         static double TestAvalancheEffect(ulong[] keys, Func<ulong, ulong, ulong> hasher, ulong seed)
         {

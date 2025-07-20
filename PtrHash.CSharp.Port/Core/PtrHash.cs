@@ -566,7 +566,7 @@ namespace PtrHash.CSharp.Port.Core
             var tries = 0;
             const int MAX_TRIES = 10;
             
-            var rng = new Random(31415); // ChaCha8Rng::seed_from_u64(31415)
+            var rng = new ChaCha8Rng(31415); // ChaCha8Rng::seed_from_u64(31415)
 
             // Create PartitionedBitVec once and reuse it across seed attempts
             using var taken = new PartitionedBitVec(_parts, _slotsPerPart);
@@ -585,7 +585,7 @@ namespace PtrHash.CSharp.Port.Core
                 var oldSeed = _seed;
                 
                 // Choose a global seed s
-                _seed = (ulong)rng.NextInt64(); // self.seed = rng.random()
+                _seed = rng.NextUInt64(); // self.seed = rng.random()
                 if (tries == 1)
                 {
                     DebugConstruction($"First seed tried: {_seed}");
@@ -781,7 +781,7 @@ namespace PtrHash.CSharp.Port.Core
                 var stack = new BinaryHeap<BucketInfo>();
                 var recent = new int[16];
                 Array.Fill(recent, -1); // -1 = BucketIdx::NONE
-                var rng = new Random(); // Auto-seeded with entropy like Rust's fastrand::Rng::new()
+                var rng = new ChaCha8Rng((ulong)Environment.TickCount); // Auto-seeded with entropy like Rust's fastrand::Rng::new()
 
                 // Process buckets in size order (largest first) - EXACT Rust pattern
                 DebugConstruction($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
@@ -1213,11 +1213,11 @@ namespace PtrHash.CSharp.Port.Core
         }
         
         // Find best pilot with minimal collisions (Rust-style eviction logic)
-        private (ulong score, ulong pilot) FindBestPilotWithEvictionInPart(ReadOnlySpan<HashValue> bucketHashes, int[] slots, int[] recent, Random rng, ulong kmax, int[] bucketStarts)
+        private (ulong score, ulong pilot) FindBestPilotWithEvictionInPart(ReadOnlySpan<HashValue> bucketHashes, int[] slots, int[] recent, ChaCha8Rng rng, ulong kmax, int[] bucketStarts)
         {
             var bestScore = ulong.MaxValue;
             var bestPilot = ulong.MaxValue;
-            var startPilot = (ulong)rng.Next(256); // Random starting pilot
+            var startPilot = (ulong)rng.NextByte(); // Random starting pilot
             var newBLen = (ulong)bucketHashes.Length;
             
             // Use ArrayPool for temporary array to avoid allocation in hot path

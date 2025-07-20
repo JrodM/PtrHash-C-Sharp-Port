@@ -56,6 +56,13 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
+        public PtrHashU64 NativeInteropConstruction_StrongerHasher()
+        {
+            var config = PtrHashConfig.Default with { U64HashFunction = U64HashFunction.StrongerIntHash };
+            return new PtrHashU64(_keys.AsSpan(), config);
+        }
+
+        [Benchmark]
         public PtrHash<ulong, FxHasher> PortConstructionMultiPart()
         {
             return new PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);

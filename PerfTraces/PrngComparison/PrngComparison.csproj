@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishAot>false</PublishAot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PtrHash.CSharp.Port\PtrHash.CSharp.Port.csproj" />
+  </ItemGroup>
+
+  <!-- Build Rust native library and copy to output -->
+  <Target Name="BuildRustNative" BeforeTargets="Build">
+    <Message Text="Building Rust native library..." Importance="high" />
+    <Exec Command="cargo build --release" 
+          WorkingDirectory="..\..\PtrHash.CSharp.Interop" 
+          ContinueOnError="false" />
+  </Target>
+
+  <ItemGroup>
+    <Content Include="..\..\PtrHash.CSharp.Interop\target\release\libptrhash.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>libptrhash.so</TargetPath>
+    </Content>
+    <!-- For Windows compatibility -->
+    <Content Include="..\..\PtrHash.CSharp.Interop\target\release\ptrhash.dll" Condition="Exists('..\..\PtrHash.CSharp.Interop\target\release\ptrhash.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>ptrhash.dll</TargetPath>
+    </Content>
+  </ItemGroup>
+
+</Project>

@@ -23,7 +23,8 @@
       "mcp__memory__read_graph",
       "Bash(dotnet new:*)",
       "Bash(cargo check:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(cargo build:*)"
     ],
     "deny": []
   }
