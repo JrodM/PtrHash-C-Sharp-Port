@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using PtrHash.CSharp.Port.Collections;
-using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.PtrHash;
 using PtrHash.CSharp.Port.KeyHashers;
 using System;
 using System.Collections.Generic;

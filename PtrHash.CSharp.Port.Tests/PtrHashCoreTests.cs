@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.PtrHash;
 using PtrHash.CSharp.Port.KeyHashers;
 using System;
 using System.Linq;

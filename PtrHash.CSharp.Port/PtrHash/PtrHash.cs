@@ -10,6 +10,7 @@ using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port.RNG;
 using PtrHash.CSharp.Port.Computation;
 using PtrHash.CSharp.Port.Stats;
+using PtrHash.CSharp.Port.BucketFunctions;
 
 namespace PtrHash.CSharp.Port.PtrHash
 {
@@ -35,6 +36,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         private static readonly int MaxParallelism = Environment.ProcessorCount;
         
         private readonly THasher _hasher;
+        private readonly IBucketFunction _bucketFunction;
         private byte* _pilots;
         private uint* _remapTable;
         
@@ -48,6 +50,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         // Pre-computed reduction structures (like Rust's rem_* fields)
         private readonly FastReduceInstance _remParts; // rem_parts: Rp::new(parts)
         private readonly FastReduceInstance _remBuckets; // rem_buckets: Rb::new(buckets_per_part)
+        private readonly FastReduceInstance _remBucketsTotal; // rem_buckets_total: Rb::new(buckets_total)
         private readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
         
         private readonly nuint _numKeys;
@@ -126,7 +129,12 @@ namespace PtrHash.CSharp.Port.PtrHash
             // Initialize reduction structures like Rust does
             _remParts = new FastReduceInstance(_parts);
             _remBuckets = new FastReduceInstance(_bucketsPerPart);
+            _remBucketsTotal = new FastReduceInstance(_bucketsTotal);
             _remSlots = new FM32(Math.Max(1, _slotsPerPart));
+
+            // Initialize bucket function and set buckets per part
+            _bucketFunction = parameters.BucketFunction ?? new Linear(); // Default to Linear if not specified
+            _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
 
 
             // Construct the hash function using hash-evict algorithm
@@ -200,7 +208,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         public nuint GetIndexNoRemapSinglePart(TKey key)
         {
             var hx = _hasher.Hash(key, _seed);
-            var bucket = _remBuckets.Reduce(hx.High()); // Direct bucket calculation for single part
+            var bucket = BucketInPart(hx.High()); // Use bucket function for single part
             var pilot = (ulong)_pilots[bucket];
             return SlotInPart(hx, pilot); // Direct slot calculation without part offset
         }
@@ -233,30 +241,55 @@ namespace PtrHash.CSharp.Port.PtrHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Bucket(HashValue hx)
         {
-            // EXACT Rust optimization: Fast path for LINEAR bucket functions
-            // Rust: if BF::LINEAR { return self.rem_buckets_total.reduce(hx.high()); }
-            if (_parts == 1)
-            {
-                // Single part - use direct reduction with pre-computed instance
-                return _remBuckets.Reduce(hx.High());
-            }
+            // EXACT Rust implementation:
+            // fn bucket(&self, hx: Hx::H) -> usize {
+            //     if BF::LINEAR {
+            //         return self.rem_buckets_total.reduce(hx.high());
+            //     }
+            //     let (part, hx) = self.rem_parts.reduce_with_remainder(hx.high());
+            //     let bucket = self.bucket_in_part(hx);
+            //     part * self.buckets + bucket
+            // }
             
-            // Multi-part: Extract high bits for part selection; do normal bucket computation within the part
-            // Rust: let (part, hx) = self.rem_parts.reduce_with_remainder(hx.high());
-            //       let bucket = self.bucket_in_part(hx);
-            //       part * self.buckets + bucket
+            if (_bucketFunction.IsLinear)
+            {
+                return _remBucketsTotal.Reduce(hx.High());
+            }
+
+            // Extract the high bits for part selection; do normal bucket
+            // computation within the part using the remaining bits.
             var (part, remainder) = _remParts.ReduceWithRemainder(hx.High());
-            var localBucket = _remBuckets.Reduce(remainder);
-            return part * _bucketsPerPart + localBucket;
+            var bucket = BucketInPart(remainder);
+            return part * _bucketsPerPart + bucket;
         }
         
         // Rust bucket_in_part() function - returns bucket index within a part
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private nuint BucketInPart(HashValue hx)
+        private nuint BucketInPart(ulong x)
         {
-            // For Linear bucket function: rem_buckets.reduce(hx.high())
-            // For u64, high() returns the full value
-            return _remBuckets.Reduce(hx.High());
+            // EXACT Rust implementation:
+            // fn bucket_in_part(&self, x: u64) -> usize {
+            //     if BF::LINEAR {
+            //         self.rem_buckets.reduce(x)
+            //     } else if BF::B_OUTPUT {
+            //         self.params.bucket_fn.call(x) as usize
+            //     } else {
+            //         self.rem_buckets.reduce(self.params.bucket_fn.call(x))
+            //     }
+            // }
+            
+            if (_bucketFunction.IsLinear)
+            {
+                return _remBuckets.Reduce(x);
+            }
+            else if (_bucketFunction.BOutput)
+            {
+                return (nuint)_bucketFunction.Call(x);
+            }
+            else
+            {
+                return _remBuckets.Reduce(_bucketFunction.Call(x));
+            }
         }
     
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -352,7 +385,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             for (int i = 0; i < keys.Length; i++)
             {
                 var hx = _hasher.Hash(keys[i], _seed);
-                var bucket = _remBuckets.Reduce(hx.High()); // Direct bucket for single part
+                var bucket = BucketInPart(hx.High()); // Use bucket function for single part
                 
                 byte pilot;
                 unsafe
@@ -395,8 +428,8 @@ namespace PtrHash.CSharp.Port.PtrHash
                 
                 // Consolidated bucket calculation
                 var bucket = _isSinglePart 
-                    ? _remBuckets.Reduce(hash.High())  // Single-part: direct
-                    : Bucket(hash);                    // Multi-part: with part calculation
+                    ? BucketInPart(hash.High())  // Single-part: use bucket function
+                    : Bucket(hash);              // Multi-part: with part calculation
                 
                 // Safe access with bounds checking
                 byte pilot;
