@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
-using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.KeyHashers;
 
 namespace PtrHash.CSharp.Port.KeyHashers
 {

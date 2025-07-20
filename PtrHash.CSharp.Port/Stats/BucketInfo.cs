@@ -1,6 +1,6 @@
 using System;
 
-namespace PtrHash.CSharp.Port.Core.Stats
+namespace PtrHash.CSharp.Port.Stats
 {
     /// <summary>
     /// Bucket information for eviction queue priority

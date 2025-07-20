@@ -9,9 +9,9 @@ using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port.RNG;
 using PtrHash.CSharp.Port.Computation;
-using PtrHash.CSharp.Port.Core.Stats;
+using PtrHash.CSharp.Port.Stats;
 
-namespace PtrHash.CSharp.Port.Core
+namespace PtrHash.CSharp.Port.PtrHash
 {
     /// <summary>
     /// Generic PtrHash minimal perfect hash function implementation

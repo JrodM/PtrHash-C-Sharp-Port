@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace PtrHash.CSharp.Port.Core
+namespace PtrHash.CSharp.Port.KeyHashers
 {
     /// <summary>
     /// Represents a hash value with high and low parts, matching Rust's hash trait

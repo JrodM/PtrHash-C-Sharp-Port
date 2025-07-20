@@ -1,6 +1,6 @@
 using System;
 
-namespace PtrHash.CSharp.Port.Core
+namespace PtrHash.CSharp.Port.PtrHash
 {
     /// <summary>
     /// Parameters for PtrHash construction - simplified version supporting only default_fast and default_balanced
