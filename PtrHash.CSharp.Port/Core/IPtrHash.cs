@@ -46,14 +46,5 @@ namespace PtrHash.CSharp.Port.Core
         /// </summary>
         void GetIndicesStream(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, bool minimal = true);
 
-        /// <summary>
-        /// Stream lookup using multi-part implementation
-        /// </summary>
-        void GetIndicesStreamMultiPart(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, bool minimal = true);
-
-        /// <summary>
-        /// Stream lookup using single-part implementation
-        /// </summary>
-        void GetIndicesStreamSinglePart(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, bool minimal = true);
     }
 }

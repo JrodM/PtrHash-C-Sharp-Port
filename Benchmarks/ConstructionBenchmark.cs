@@ -10,7 +10,7 @@ using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Interop.Native;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.KeyHashers;
-using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Port.Core;
 using PtrHashImpl = PtrHash.CSharp.Interop.PtrHash;
 
 namespace PtrHash.Benchmarks

@@ -7,7 +7,7 @@ using BenchmarkDotNet.Jobs;
 using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port;
-using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Interop.Native;
 
 namespace PtrHash.Benchmarks

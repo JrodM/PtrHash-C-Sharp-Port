@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using PtrHash.CSharp.Port;
-using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 
 namespace PtrHash.Benchmarks

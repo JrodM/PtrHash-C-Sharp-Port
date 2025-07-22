@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using PtrHash.CSharp.Port;
-using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Interop.PtrHash;
@@ -36,10 +36,10 @@ namespace PtrHash.Benchmarks
         private ulong[] _lookupKeys = null!;
         
         // Multi-part PtrHash
-        private PtrHash<ulong, StrongerIntHasher> _multiPartPtrHash = null!;
+        private PtrHash<ulong, FxHasher> _multiPartPtrHash = null!;
         
         // Single-part PtrHash
-        private PtrHash<ulong, StrongerIntHasher> _singlePartPtrHash = null!;
+        private PtrHash<ulong, FxHasher> _singlePartPtrHash = null!;
         
         
         // Native interop (multi-part only)
@@ -66,11 +66,11 @@ namespace PtrHash.Benchmarks
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
 
             // Multi-part PtrHash (default)
-            _multiPartPtrHash = new PtrHash<ulong, StrongerIntHasher>(_keys, PtrHashParams.DefaultFast);
+            _multiPartPtrHash = new PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);
             
             // Single-part PtrHash
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartPtrHash = new PtrHash<ulong, StrongerIntHasher>(_keys, singlePartParams);
+            _singlePartPtrHash = new PtrHash<ulong, FxHasher>(_keys, singlePartParams);
 
             
             // Native interop (multi-part only)
@@ -98,35 +98,10 @@ namespace PtrHash.Benchmarks
                 _lookupKeys.AsSpan(),
                 _indicesBuffer3.AsSpan());
 
-            for (int i = 0; i < _indicesBuffer3.Length; i++)
-            {
-                sum += _indicesBuffer3[i];
-            }
             return sum;
         }
 
         // Point Lookups - GetIndex (with remapping)
-        [Benchmark]
-        public ulong MultiPart_Point_Lookup_Specialized()
-        {
-            ulong sum = 0;
-            foreach (var key in _lookupKeys)
-            {
-                sum += _multiPartPtrHash.GetIndexMultiPart(key);
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong SinglePart_Point_Lookup_Specialized()
-        {
-            ulong sum = 0;
-            foreach (var key in _lookupKeys)
-            {
-                sum += _singlePartPtrHash.GetIndexSinglePart(key);
-            }
-            return sum;
-        }
 
         [Benchmark]
         public ulong MultiPart_GetIndex_Point_Branching()
@@ -134,7 +109,7 @@ namespace PtrHash.Benchmarks
             ulong sum = 0;
             foreach (var key in _lookupKeys)
             {
-                sum += _multiPartPtrHash.GetIndex(key);
+                _multiPartPtrHash.GetIndex(key);
             }
             return sum;
         }
@@ -145,43 +120,12 @@ namespace PtrHash.Benchmarks
             ulong sum = 0;
             foreach (var key in _lookupKeys)
             {
-                sum += _singlePartPtrHash.GetIndex(key);
+              _singlePartPtrHash.GetIndex(key);
             }
             return sum;
         }
 
         // Stream Lookups - GetIndicesStream
-        [Benchmark]
-        public ulong MultiPart_Stream_Specialized()
-        {
-            ulong sum = 0;
-            _multiPartPtrHash.GetIndicesStreamMultiPart(
-                _lookupKeys.AsSpan(),
-                _indicesBuffer1,
-                minimal: true);
-
-            for (int i = 0; i < _indicesBuffer1.Length; i++)
-            {
-                sum += _indicesBuffer1[i];
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong SinglePart_Stream_Specialized()
-        {
-            ulong sum = 0;
-            _singlePartPtrHash.GetIndicesStreamSinglePart(
-                _lookupKeys.AsSpan(),
-                _indicesBuffer2,
-                minimal: true);
-
-            for (int i = 0; i < _indicesBuffer2.Length; i++)
-            {
-                sum += _indicesBuffer2[i];
-            }
-            return sum;
-        }
 
         [Benchmark]
         public ulong MultiPart_Stream_Branching()
@@ -192,10 +136,6 @@ namespace PtrHash.Benchmarks
                 _indicesBuffer1,
                 minimal: true);
 
-            for (int i = 0; i < _indicesBuffer1.Length; i++)
-            {
-                sum += _indicesBuffer1[i];
-            }
             return sum;
         }
 
@@ -207,24 +147,7 @@ namespace PtrHash.Benchmarks
                 _lookupKeys.AsSpan(),
                 _indicesBuffer2,
                 minimal: true);
-
-            for (int i = 0; i < _indicesBuffer2.Length; i++)
-            {
-                sum += _indicesBuffer2[i];
-            }
-            return sum;
-        }
-
-        
-        // Native Interop Point Lookup
-        [Benchmark]
-        public ulong Native_Point_Lookup()
-        {
-            ulong sum = 0;
-            foreach (var key in _lookupKeys)
-            {
-                sum += _nativePtrHash.GetIndex(key);
-            }
+                
             return sum;
         }
 
