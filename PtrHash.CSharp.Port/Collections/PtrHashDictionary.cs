@@ -20,8 +20,6 @@ namespace PtrHash.CSharp.Port.Collections
         private readonly PtrHash<TKey, THasher> _ptrHash;
         private readonly KeyValuePair<TKey, TValue>[] _keyValuePairs;
         private readonly TValue _sentinel;
-        private readonly TKey[] _originalKeys;
-        private readonly TValue[] _originalValues;
         private readonly IEqualityComparer<TKey> _keyComparer;
         private bool _disposed;
 
@@ -51,8 +49,6 @@ namespace PtrHash.CSharp.Port.Collections
                 throw new ArgumentException("Keys and values must have same length");
 
             _sentinel = notFoundSentinel;
-            _originalKeys = (TKey[])keys.Clone();
-            _originalValues = (TValue[])values.Clone();
             _keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             
             _ptrHash = new PtrHash<TKey, THasher>(keys, parameters ?? PtrHashParams.DefaultFast);
@@ -75,6 +71,7 @@ namespace PtrHash.CSharp.Port.Collections
             }
         }
 
+
         #region IDictionary<TKey, TValue> Implementation
 
         public TValue this[TKey key]
@@ -88,11 +85,11 @@ namespace PtrHash.CSharp.Port.Collections
             set => throw new NotSupportedException("PtrHashDictionary is read-only. Values cannot be modified after construction.");
         }
 
-        public ICollection<TKey> Keys => _originalKeys.ToList().AsReadOnly();
+        public ICollection<TKey> Keys => _keyValuePairs.Where(kvp => !EqualityComparer<TKey>.Default.Equals(kvp.Key, default(TKey)!)).Select(kvp => kvp.Key).ToList().AsReadOnly();
 
-        public ICollection<TValue> Values => _originalValues.ToList().AsReadOnly();
+        public ICollection<TValue> Values => _keyValuePairs.Where(kvp => !EqualityComparer<TKey>.Default.Equals(kvp.Key, default(TKey)!)).Select(kvp => kvp.Value).ToList().AsReadOnly();
 
-        public int Count => _originalKeys.Length;
+        public int Count => _keyValuePairs.Count(kvp => !EqualityComparer<TKey>.Default.Equals(kvp.Key, default(TKey)!));
 
         public bool IsReadOnly => true;
 
@@ -128,18 +125,15 @@ namespace PtrHash.CSharp.Port.Collections
             if (array.Length - arrayIndex < Count) throw new ArgumentException("Destination array is too small.");
 
             int index = arrayIndex;
-            for (int i = 0; i < _originalKeys.Length; i++)
+            foreach (var kvp in _keyValuePairs.Where(kvp => !EqualityComparer<TKey>.Default.Equals(kvp.Key, default(TKey)!)))
             {
-                array[index++] = new KeyValuePair<TKey, TValue>(_originalKeys[i], _originalValues[i]);
+                array[index++] = kvp;
             }
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            for (int i = 0; i < _originalKeys.Length; i++)
-            {
-                yield return new KeyValuePair<TKey, TValue>(_originalKeys[i], _originalValues[i]);
-            }
+            return _keyValuePairs.Where(kvp => !EqualityComparer<TKey>.Default.Equals(kvp.Key, default(TKey)!)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -294,6 +288,7 @@ namespace PtrHash.CSharp.Port.Collections
             : base(keys, values, notFoundSentinel, parameters, keyComparer)
         {
         }
+
     }
 
     /// <summary>
@@ -305,5 +300,6 @@ namespace PtrHash.CSharp.Port.Collections
             : base(keys, values, notFoundSentinel, parameters, keyComparer)
         {
         }
+
     }
 }

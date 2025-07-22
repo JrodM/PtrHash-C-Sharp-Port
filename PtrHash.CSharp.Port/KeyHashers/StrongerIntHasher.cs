@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.KeyHashers;
 
@@ -27,5 +28,6 @@ namespace PtrHash.CSharp.Port.KeyHashers
             var high = (ulong)(r >> 64);
             return new HashValue((low ^ high).WrappingMul(C)); // XOR low/high, then multiply by C
         }
+
     }
 }

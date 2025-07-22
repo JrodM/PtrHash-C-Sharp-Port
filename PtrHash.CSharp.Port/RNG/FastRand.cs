@@ -31,13 +31,12 @@ namespace PtrHash.CSharp.Port.RNG
         }
         
         /// <summary>
-        /// Generate next random u64 (matching fastrand behavior exactly)
+        /// Generate next random u64 (matching Rust's gen_u64() exactly)
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong NextUInt64()
+        public ulong gen_u64()
         {
             // Constants for WyRand taken from: https://github.com/wangyi-fudan/wyhash/blob/master/wyhash.h#L151
-            // Updated for the final v4.2 implementation with improved constants for better entropy output.
             const ulong WY_CONST_0 = 0x2d35_8dcc_aa6c_78a5;
             const ulong WY_CONST_1 = 0x8bb8_4b93_962e_acc9;
 
@@ -50,43 +49,74 @@ namespace PtrHash.CSharp.Port.RNG
         }
         
         /// <summary>
-        /// Generate random long (for compatibility)
+        /// Generate random u32 (matching Rust's gen_u32() exactly)
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public long NextInt64()
+        public uint gen_u32()
         {
-            return (long)NextUInt64();
+            return (uint)gen_u64();
         }
         
         /// <summary>
-        /// Generate random int in range [0, max)
+        /// Generate random u32 in range [0, n) (matching Rust's gen_mod_u32() exactly)
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public uint gen_mod_u32(uint n)
+        {
+            // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
+            // Matching Rust's gen_mod_u32 exactly
+            uint r = gen_u32();
+            uint hi = mul_high_u32(r, n);
+            uint lo = unchecked(r * n);
+            if (lo < n) 
+            {
+                uint t = unchecked((uint)(-(int)n) % n);
+                while (lo < t) 
+                {
+                    r = gen_u32();
+                    hi = mul_high_u32(r, n);
+                    lo = unchecked(r * n);
+                }
+            }
+            return hi;
+        }
+        
+        /// <summary>
+        /// Computes (a * b) >> 32 (matching Rust's mul_high_u32() exactly)
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static uint mul_high_u32(uint a, uint b)
+        {
+            return (uint)(((ulong)a * (ulong)b) >> 32);
+        }
+        
+        /// <summary>
+        /// Generate random u8 in unbounded range (matching Rust's u8(..) exactly)
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public byte u8()
+        {
+            // Rust's u8(..) with unbounded range: self.gen_u32() as u8
+            return (byte)gen_u32();
+        }
+
+        // Legacy C# naming for compatibility
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ulong NextUInt64() => gen_u64();
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public long NextInt64() => (long)gen_u64();
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public byte NextByte() => u8();
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Next(int max)
         {
             if (max <= 0)
                 throw new ArgumentOutOfRangeException(nameof(max));
             
-            // Use rejection sampling to avoid bias
-            var range = (ulong)max;
-            var limit = ulong.MaxValue / range * range;
-            
-            ulong value;
-            do
-            {
-                value = NextUInt64();
-            } while (value >= limit);
-            
-            return (int)(value % range);
-        }
-        
-        /// <summary>
-        /// Generate random byte
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte NextByte()
-        {
-            return (byte)Next(256);
+            return (int)gen_mod_u32((uint)max);
         }
     }
 }

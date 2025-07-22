@@ -40,14 +40,14 @@ namespace PtrHash.CSharp.Port.PtrHash
         private byte* _pilots;
         private uint* _remapTable;
         
-        // Multi-part support fields (matching Rust implementation exactly)
+        // Multi-part support fields
         private readonly nuint _parts;
         private readonly nuint _slotsPerPart;
         private readonly nuint _slotsTotal;
         private readonly nuint _bucketsPerPart;
         private readonly nuint _bucketsTotal;
         
-        // Pre-computed reduction structures (like Rust's rem_* fields)
+        // Pre-computed reduction structures (rem_* fields)
         private readonly FastReduceInstance _remParts; // rem_parts: Rp::new(parts)
         private readonly FastReduceInstance _remBuckets; // rem_buckets: Rb::new(buckets_per_part)
         private readonly FastReduceInstance _remBucketsTotal; // rem_buckets_total: Rb::new(buckets_total)
@@ -86,7 +86,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             }
             else
             {
-                // Multi-part mode - exact Rust calculation
+                // Multi-part mode
                 var shards = 1; // Sharding::None => 1
 
                 // Formula of Vigna, eps-cost-sharding: https://arxiv.org/abs/2503.18397
@@ -117,9 +117,8 @@ namespace PtrHash.CSharp.Port.PtrHash
                 _bucketsTotal = _parts * _bucketsPerPart;
             }
 
-            // Allocate unmanaged memory for pilots (cache-aligned for better performance)
+            // Allocate unmanaged memory for pilots
             _pilots = (byte*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc((nuint)_bucketsTotal, 64);
-            // Initialize to zero (like Rust's Vec::new)
             System.Runtime.InteropServices.NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
 
             // Will allocate remap table later if minimal=true
@@ -158,8 +157,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                 DebugConstruction($"Parts: {_parts}, Slots per part: {_slotsPerPart}, Buckets per part: {_bucketsPerPart}");
                 DebugConstruction($"Total slots: {_slotsTotal}, Total buckets: {_bucketsTotal}");
                 DebugConstruction($"Bits per key: {_bitsPerKey:F2}");
-
-                constructionStats?.Print();
+                DebugConstruction(constructionStats?.ToString());
             }
 
         }
@@ -183,7 +181,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         {
             var hx = _hasher.Hash(key, _seed);
             var bucket = Bucket(hx); // Use global bucket calculation like Rust
-            var pilot = (ulong)_pilots[bucket]; // Convert byte to ulong (Pilot type)
+            var pilot = (ulong)_pilots[bucket];
             return Slot(hx, pilot);
         }
 
@@ -458,9 +456,6 @@ namespace PtrHash.CSharp.Port.PtrHash
             }
         }
 
-
-
-
         private bool ComputePilots(ReadOnlySpan<TKey> keys, out ulong finalSeed, out BucketStats? stats)
         {
             // Initialize arrays - matching Rust's initialization
@@ -562,7 +557,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                     Span<byte> partPilots = new Span<byte>(_pilots + partPilotStart, (int)_bucketsPerPart);
 
                     // Build this part using exact Rust build_part algorithm
-                    if (!BuildPartRust(part, partHashes, partPilots, taken, out var partStats))
+                    if (!BuildPart(part, partHashes, partPilots, taken, out var partStats))
                     {
                         lock (lockObject)
                         {
@@ -660,7 +655,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         }
 
         // Build a single part (like Rust's build_part)
-        private bool BuildPartRust(int part, ReadOnlySpan<HashValue> partHashes, Span<byte> partPilots, PartitionedBitVec taken, out BucketStats partStats)
+        private bool BuildPart(int part, ReadOnlySpan<HashValue> partHashes, Span<byte> partPilots, PartitionedBitVec taken, out BucketStats partStats)
         {
             // Initialize statistics collection
             partStats = new BucketStats();
@@ -944,19 +939,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         // Size-specialized dispatch function matching Rust's find_pilot optimization (~10% speedup)
         private (ulong pilot, ulong hashPilot)? FindPilot(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            // Rust optimization: size-specialized dispatch for buckets with 1-8 elements
-            return bucketHashes.Length switch
-            {
-                1 => FindPilotArray1(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                2 => FindPilotArray2(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                3 => FindPilotArray3(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                4 => FindPilotArray4(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                5 => FindPilotArray5(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                6 => FindPilotArray6(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                7 => FindPilotArray7(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                8 => FindPilotArray8(kmax, bucketHashes, taken, out pilotsChecked, bucketId),
-                _ => FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId)
-            };
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         // Size-specialized versions for fixed-size buckets (1-8 elements)

@@ -58,13 +58,53 @@ namespace PtrHash.CSharp.Port.Stats
 
         public void Print()
         {
-            Console.WriteLine();
-            Console.WriteLine("Bucket Statistics by Percentile:");
-            PrintRows(byPct, false);
-            Console.WriteLine();
-            Console.WriteLine("Bucket Statistics by Size:");
-            PrintRows(byBucketLen.ToArray(), true);
-            Console.WriteLine();
+            Console.Write(ToString());
+        }
+
+        public override string ToString()
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine();
+            sb.AppendLine("Bucket Statistics by Percentile:");
+            FormatRows(sb, byPct, false);
+            sb.AppendLine();
+            sb.AppendLine("Bucket Statistics by Size:");
+            FormatRows(sb, byBucketLen.ToArray(), true);
+            sb.AppendLine();
+            return sb.ToString();
+        }
+
+        private static void FormatRows(System.Text.StringBuilder sb, Row[] rows, bool showSize)
+        {
+            var totalBuckets = rows.Sum(r => r.Buckets);
+            var totalElements = rows.Sum(r => r.Elements);
+
+            sb.AppendFormat("{0,4}  {1,11} {2,7} {3,6} {4,6} {5,6} {6,10} {7,10} {8,10} {9,10}\n",
+                showSize ? "size" : "%ile", "buckets", "%", "avg", "max", "sum%", "pilot_avg", "pilot_max", "evict_avg", "evict_max");
+
+            for (int i = 0; i < rows.Length; i++)
+            {
+                var row = rows[i];
+                if (row.Buckets == 0) continue;
+
+                var avgElements = row.Elements / (double)row.Buckets;
+                var avgPilot = row.PilotSum / (double)row.Buckets;
+                var avgEvictions = row.Evictions / (double)row.Buckets;
+                var bucketPct = row.Buckets * 100.0 / totalBuckets;
+                var elementsPct = row.Elements * 100.0 / totalElements;
+
+                sb.AppendFormat("{0,4}  {1,11:N0} {2,7:F1} {3,6:F1} {4,6} {5,6:F1} {6,10:F1} {7,10} {8,10:F1} {9,10}\n",
+                    showSize ? i : i,
+                    row.Buckets,
+                    bucketPct,
+                    avgElements,
+                    row.ElementsMax,
+                    elementsPct,
+                    avgPilot,
+                    row.PilotMax,
+                    avgEvictions,
+                    row.EvictionsMax);
+            }
         }
 
         private static void PrintRows(Row[] rows, bool showSize)

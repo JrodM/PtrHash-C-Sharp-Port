@@ -6,9 +6,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtrHash.CSharp.Port", "PtrH
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtrHash.CSharp.Port.Tests", "PtrHash.CSharp.Port.Tests\PtrHash.CSharp.Port.Tests.csproj", "{B2C3D4E5-F6G7-8901-BCDE-F23456789012}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtrHashNative", "PtrHash.CSharp.Interop\CSharpInterop\PtrHashNative.csproj", "{457D86F6-1C5B-1763-B7BE-89F7A03C1DFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtrHashNative", "PtrHash.CSharp.Interop\PtrHashNative.csproj", "{457D86F6-1C5B-1763-B7BE-89F7A03C1DFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpInterop.Tests", "PtrHash.CSharp.Interop\CSharInterop.Tests\CSharpInterop.Tests.csproj", "{2CD704D6-15ED-6A18-D3A0-D733F6073BF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpInterop.Tests", "PtrHash.CSharp.Interop.Tests/CSharpInterop.Tests.csproj", "{2CD704D6-15ED-6A18-D3A0-D733F6073BF2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PtrHash.Benchmarks", "Benchmarks\PtrHash.Benchmarks.csproj", "{C3D4E5F6-G7H8-9012-CDEF-345678901234}"
 EndProject

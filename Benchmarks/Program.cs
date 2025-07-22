@@ -23,7 +23,8 @@ namespace PtrHash.Benchmarks
                 Console.WriteLine("  2. dict-scaling        - Dictionary lookup scaling with fixed 2M keys");
                 Console.WriteLine("  3. construct           - Construction time benchmark");
                 Console.WriteLine("  4. core                - Core PtrHash single-part vs multi-part performance");
-                Console.WriteLine("  5. all                 - Run all benchmarks");
+                Console.WriteLine("  5. stream              - PtrHash streaming lookups (10^9 keys, 10k lookups)");
+                Console.WriteLine("  6. all                 - Run all benchmarks");
                 Console.WriteLine();
                 Console.WriteLine("Usage: dotnet run [benchmark]");
                 Console.WriteLine("Example: dotnet run interop-vs-port");
@@ -79,6 +80,11 @@ namespace PtrHash.Benchmarks
                     BenchmarkRunner.Run<PtrHashCoreBenchmark>(config);
                     break;
 
+                case "stream":
+                    Console.WriteLine("Running PtrHash streaming lookups benchmark...");
+                    BenchmarkRunner.Run<PtrHashStreamBenchmark>(config);
+                    break;
+
                 // case "unsafe-optimization":
                 //     Console.WriteLine("Running unsafe pointer optimization benchmark...");
                 //     BenchmarkRunner.Run<UnsafeOptimizationBenchmark>(config);
@@ -117,7 +123,7 @@ namespace PtrHash.Benchmarks
 
                 default:
                     Console.WriteLine($"Unknown benchmark: {args[0]}");
-                    Console.WriteLine("Available options: dictionaries, dict-scaling, construct, core, all");
+                    Console.WriteLine("Available options: dictionaries, dict-scaling, construct, core, stream, all");
                     break;
             }
 

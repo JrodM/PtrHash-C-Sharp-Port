@@ -1,5 +1,8 @@
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.X86;
 using PtrHash.CSharp.Port.KeyHashers;
 
 namespace PtrHash.CSharp.Port.KeyHashers
@@ -31,6 +34,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
         {
             return (value << (int)(count & 63)) | (value >> (int)(64 - (count & 63)));
         }
+
     }
 
     /// <summary>

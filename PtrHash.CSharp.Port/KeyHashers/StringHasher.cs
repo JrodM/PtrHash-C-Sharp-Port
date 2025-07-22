@@ -1,5 +1,6 @@
 using System;
 using System.IO.Hashing;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using PtrHash.CSharp.Port.KeyHashers;
@@ -31,5 +32,6 @@ namespace PtrHash.CSharp.Port.KeyHashers
                 return new HashValue(XxHash3.HashToUInt64(bytes, (long)seed));
             }
         }
+
     }
 }

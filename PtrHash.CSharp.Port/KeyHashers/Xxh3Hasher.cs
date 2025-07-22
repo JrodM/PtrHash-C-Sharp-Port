@@ -1,5 +1,6 @@
 using System;
 using System.IO.Hashing;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.KeyHashers;
 
@@ -17,5 +18,6 @@ namespace PtrHash.CSharp.Port.KeyHashers
             BitConverter.TryWriteBytes(keyBytes, key);
             return new HashValue(XxHash3.HashToUInt64(keyBytes, (long)seed));
         }
+
     }
 }

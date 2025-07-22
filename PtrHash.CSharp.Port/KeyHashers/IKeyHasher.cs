@@ -12,5 +12,6 @@ namespace PtrHash.CSharp.Port.KeyHashers
         /// Hash a key with a seed to a HashValue (with high/low parts)
         /// </summary>
         HashValue Hash(TKey key, ulong seed);
+
     }
 }

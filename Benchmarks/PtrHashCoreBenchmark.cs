@@ -8,7 +8,6 @@ using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.PtrHash;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Collections;
-using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.Native;
 
@@ -28,8 +27,9 @@ namespace PtrHash.Benchmarks
 
         [Params(5_000_000)]
         public int KeyCount { get; set; }
-        
+
         [Params(1_000, 100_000, 1_000_000)]
+       // [Params( 10_000)]
         public int LookupCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -214,6 +214,7 @@ namespace PtrHash.Benchmarks
             }
             return sum;
         }
+
         
         // Native Interop Point Lookup
         [Benchmark]
