@@ -2,7 +2,7 @@ using System;
 using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHash.CSharp.Port.Storage;
 
-namespace PtrHash.CSharp.Port.PtrHash
+namespace PtrHash.CSharp.Port.Core
 {
     /// <summary>
     /// Parameters for PtrHash construction with bucket function support

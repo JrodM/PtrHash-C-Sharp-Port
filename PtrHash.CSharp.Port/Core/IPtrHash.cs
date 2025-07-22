@@ -1,4 +1,4 @@
-namespace PtrHash.CSharp.Port.PtrHash
+namespace PtrHash.CSharp.Port.Core
 {
     /// <summary>
     /// Interface for PtrHash minimal perfect hash function

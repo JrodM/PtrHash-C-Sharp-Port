@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PtrHash.CSharp.Port.Storage
+namespace PtrHash.CSharp.Port.Construction
 {
     internal class PartitionedBitVec : IDisposable
     {

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 
 namespace PtrHash.CSharp.Port.Collections

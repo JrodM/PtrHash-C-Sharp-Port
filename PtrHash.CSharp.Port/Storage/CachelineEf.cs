@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using PtrHash.CSharp.Port.Internal;
+using PtrHash.CSharp.Port.Construction;
 
 namespace PtrHash.CSharp.Port.Storage
 {

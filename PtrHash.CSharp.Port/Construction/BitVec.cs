@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Buffers;
 using System.Numerics;
 
-namespace PtrHash.CSharp.Port.Storage
+namespace PtrHash.CSharp.Port.Construction
 {
     /// <summary>
     /// High-performance bit vector implementation

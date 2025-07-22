@@ -6,14 +6,13 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using PtrHash.CSharp.Port.KeyHashers;
-using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port.Storage;
 using PtrHash.CSharp.Port.RNG;
 using PtrHash.CSharp.Port.Computation;
-using PtrHash.CSharp.Port.Stats;
+using PtrHash.CSharp.Port.Construction;
 using PtrHash.CSharp.Port.BucketFunctions;
 
-namespace PtrHash.CSharp.Port.PtrHash
+namespace PtrHash.CSharp.Port.Core
 {
     /// <summary>
     /// PtrHash: Minimal Perfect Hashing at RAM Throughput

@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 
-namespace PtrHash.CSharp.Port.Internal
+namespace PtrHash.CSharp.Port.Construction
 {
     /// <summary>
     /// Fast bit manipulation operations for select queries

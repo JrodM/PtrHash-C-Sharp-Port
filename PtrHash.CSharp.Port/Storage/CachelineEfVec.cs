@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
-using PtrHash.CSharp.Port.Storage;
 
-namespace PtrHash.CSharp.Port.Collections
+namespace PtrHash.CSharp.Port.Storage
 {
     /// <summary>
     /// A vector of CachelineEf that implements IList for 64-bit values.
