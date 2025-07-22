@@ -249,7 +249,7 @@ namespace PtrHash.CSharp.Port.Tests
             
             Assert.That(results, Is.EqualTo(new[] { true, false, true, false }));
             
-            // Note: Case-insensitive comparison is not supported in PtrHash
+            // Case-insensitive comparison is not supported in PtrHash
             // because the hash function must match the stored keys exactly
         }
 

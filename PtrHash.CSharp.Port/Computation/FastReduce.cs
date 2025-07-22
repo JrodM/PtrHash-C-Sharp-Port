@@ -4,13 +4,13 @@ using System.Runtime.CompilerServices;
 namespace PtrHash.CSharp.Port.Computation
 {
     /// <summary>
-    /// FastReduce instance for pre-computed modular reduction - matches Rust's FastReduce struct
+    /// FastReduce instance for pre-computed modular reduction
     /// </summary>
-    internal readonly struct FastReduceInstance
+    internal readonly struct FastReduce
     {
         private readonly nuint d;
         
-        public FastReduceInstance(nuint modulus)
+        public FastReduce(nuint modulus)
         {
             d = modulus;
         }
@@ -18,7 +18,7 @@ namespace PtrHash.CSharp.Port.Computation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public nuint Reduce(ulong hash)
         {
-            // Rust: mul_high(self.d, h) = (d as u128 * h as u128) >> 64
+            // mul_high(self.d, h) = (d as u128 * h as u128) >> 64
             return (nuint)((UInt128)d * (UInt128)hash >> 64);
         }
         
