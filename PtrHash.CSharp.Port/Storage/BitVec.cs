@@ -4,10 +4,10 @@ using System.Runtime.CompilerServices;
 using System.Buffers;
 using System.Numerics;
 
-namespace PtrHash.CSharp.Port.Collections
+namespace PtrHash.CSharp.Port.Storage
 {
     /// <summary>
-    /// High-performance bit vector implementation equivalent to Rust's BitVec
+    /// High-performance bit vector implementation
     /// Uses ulong array for efficient bit operations
     /// </summary>
     public sealed class BitVec : IDisposable
@@ -103,7 +103,7 @@ namespace PtrHash.CSharp.Port.Collections
         
         /// <summary>
         /// Efficiently iterates over only the zero bits (unset bits) in the bit vector.
-        /// This is equivalent to Rust's iter_zeros() and provides O(number_of_zeros) complexity
+        /// Iterates over zero bit positions with O(number_of_zeros) complexity
         /// instead of O(total_bits) by using bit manipulation to skip over set bits.
         /// </summary>
         /// <returns>An enumerable of indices where bits are zero</returns>

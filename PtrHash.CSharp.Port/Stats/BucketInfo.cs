@@ -19,7 +19,7 @@ namespace PtrHash.CSharp.Port.Stats
         
         public int CompareTo(BucketInfo other)
         {
-            // BinaryHeap in Rust is a max-heap, so we want larger sizes first
+            // Use max-heap to process larger sizes first
             // Return negative for larger sizes to get max-heap behavior
             var sizeCompare = other.Size.CompareTo(Size); // Reverse for max-heap
             if (sizeCompare != 0)

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.Native;
 using PtrHash.CSharp.Interop.Tests;

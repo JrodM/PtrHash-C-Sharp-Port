@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Interop.PtrHash;
 
 namespace PtrHash.CSharp.Interop.Tests
 {
@@ -65,7 +66,7 @@ namespace PtrHash.CSharp.Interop.Tests
             };
         }
 
-        public static void AssertValidPtrHashInfo(Core.PtrHashInfo info, int expectedKeyCount)
+        public static void AssertValidPtrHashInfo(PtrHashInfo info, int expectedKeyCount)
         {
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual((nuint)expectedKeyCount, info.KeyCount);
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(info.BitsPerKey > 0);

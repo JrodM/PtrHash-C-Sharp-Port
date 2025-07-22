@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace PtrHash.CSharp.Port.KeyHashers
 {
     /// <summary>
-    /// Represents a hash value with high and low parts, matching Rust's hash trait
+    /// Represents a hash value with high and low parts
     /// </summary>
     public readonly struct HashValue : IComparable<HashValue>
     {
@@ -17,13 +17,13 @@ namespace PtrHash.CSharp.Port.KeyHashers
         }
         
         /// <summary>
-        /// Get the high value - for u64 in Rust, this returns the full value
+        /// Get the high value - for u64, this returns the full value
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong High() => _value;
         
         /// <summary>
-        /// Get the low value - for u64 in Rust, this returns the full value
+        /// Get the low value - for u64, this returns the full value
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong Low() => _value;

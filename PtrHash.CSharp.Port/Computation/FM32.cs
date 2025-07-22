@@ -6,7 +6,7 @@ namespace PtrHash.CSharp.Port.Computation
     /// <summary>
     /// FastMod32, using the low 32 bits of the hash.
     /// Taken from https://github.com/lemire/fastmod/blob/master/include/fastmod.h
-    /// Matches Rust's FM32 implementation for slot reduction
+    /// Fast modular reduction for slot computation (PtrHash paper Equation 4)
     /// </summary>
     public readonly struct FM32
     {

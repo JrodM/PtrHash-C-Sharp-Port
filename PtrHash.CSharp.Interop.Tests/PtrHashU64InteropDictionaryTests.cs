@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using System.Numerics;
-using PtrHash.CSharp.Interop.Core;
+using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Interop.Native;
 using PtrHash.CSharp.Interop.Tests;

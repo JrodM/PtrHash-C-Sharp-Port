@@ -16,7 +16,7 @@ namespace PtrHash.CSharp.Port.RNG
         /// </summary>
         public FastRand()
         {
-            // Auto-seed like Rust's fastrand using system entropy
+            // Auto-seed using system entropy
             _state = (ulong)Environment.TickCount64 ^ (ulong)DateTime.UtcNow.Ticks;
             if (_state == 0) _state = 1; // Ensure non-zero state
         }
@@ -31,7 +31,7 @@ namespace PtrHash.CSharp.Port.RNG
         }
         
         /// <summary>
-        /// Generate next random u64 (matching Rust's gen_u64() exactly)
+        /// Generate next random u64
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong gen_u64()
@@ -49,7 +49,7 @@ namespace PtrHash.CSharp.Port.RNG
         }
         
         /// <summary>
-        /// Generate random u32 (matching Rust's gen_u32() exactly)
+        /// Generate random u32
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint gen_u32()
@@ -58,13 +58,13 @@ namespace PtrHash.CSharp.Port.RNG
         }
         
         /// <summary>
-        /// Generate random u32 in range [0, n) (matching Rust's gen_mod_u32() exactly)
+        /// Generate random u32 in range [0, n)
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public uint gen_mod_u32(uint n)
         {
             // Adapted from: https://lemire.me/blog/2016/06/30/fast-random-shuffling/
-            // Matching Rust's gen_mod_u32 exactly
+            // Lemire's fast modular reduction algorithm
             uint r = gen_u32();
             uint hi = mul_high_u32(r, n);
             uint lo = unchecked(r * n);
@@ -82,7 +82,7 @@ namespace PtrHash.CSharp.Port.RNG
         }
         
         /// <summary>
-        /// Computes (a * b) >> 32 (matching Rust's mul_high_u32() exactly)
+        /// Computes (a * b) >> 32
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint mul_high_u32(uint a, uint b)
@@ -91,12 +91,12 @@ namespace PtrHash.CSharp.Port.RNG
         }
         
         /// <summary>
-        /// Generate random u8 in unbounded range (matching Rust's u8(..) exactly)
+        /// Generate random u8
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte u8()
         {
-            // Rust's u8(..) with unbounded range: self.gen_u32() as u8
+            // u8 from u32 truncation
             return (byte)gen_u32();
         }
 

@@ -15,8 +15,17 @@ using PtrHash.CSharp.Port.BucketFunctions;
 namespace PtrHash.CSharp.Port.PtrHash
 {
     /// <summary>
-    /// Generic PtrHash minimal perfect hash function implementation
-    /// Uses hash-evict construction algorithm with 8-bit pilots
+    /// PtrHash: Minimal Perfect Hashing at RAM Throughput
+    /// 
+    /// Implements the PtrHash algorithm from Ragnar Groot Koerkamp (ETH Zurich).
+    /// Maps n distinct keys bijectively to {0,...,n-1} using hash-evict construction
+    /// with fixed-width 8-bit pilots and cuckoo-style eviction for collision resolution.
+    /// 
+    /// Provides O(1) query time with streaming support for high throughput.
+    /// 
+    /// Current limitations compared to full paper implementation:
+    /// - No external-memory construction (sharding for >10^10 keys)
+    /// - No CacheLineEF remapping compression
     /// </summary>
     /// <typeparam name="TKey">Type of keys</typeparam>
     /// <typeparam name="THasher">Hash function implementation</typeparam>
@@ -32,7 +41,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                 Console.WriteLine(message);
         }
 
-        // Cap parallelism to prevent thread explosion (Rust's rayon uses all cores by default)
+        // Cap parallelism to prevent thread explosion
         private static readonly int MaxParallelism = Environment.ProcessorCount;
         
         private readonly THasher _hasher;
@@ -59,7 +68,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         private readonly bool _isSinglePart;
         private readonly double _bitsPerKey;
         private ulong _seed;
-        
+
 
         /// <summary>
         /// Construct a PtrHash from a collection of keys
@@ -74,10 +83,10 @@ namespace PtrHash.CSharp.Port.PtrHash
             _minimal = parameters.Minimal;
             _isSinglePart = parameters.SinglePart;
 
-            // Calculate parts and structure sizes following Rust algorithm exactly
+            // Calculate parts and structure sizes (PtrHash paper Section 3.1)
             if (_isSinglePart)
             {
-                // Single part mode
+                // Single part mode: all keys in one partition for faster queries (Section 3.1)
                 _parts = 1;
                 _slotsPerPart = CalculateNumSlots(_numKeys, parameters.Alpha);
                 _slotsTotal = _slotsPerPart;
@@ -86,7 +95,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             }
             else
             {
-                // Multi-part mode
+                // Multi-part mode: partition keys for better cache locality and parallelism (Section 3.1)
                 var shards = 1; // Sharding::None => 1
 
                 // Formula of Vigna, eps-cost-sharding: https://arxiv.org/abs/2503.18397
@@ -95,13 +104,13 @@ namespace PtrHash.CSharp.Port.PtrHash
                 var x = (double)_numKeys * eps * eps / 2.0;
                 var targetParts = x / Math.Log(x);
 
-                // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly
+                // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly (Section 3.1 formula)
                 var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
                 _parts = Math.Max(1, partsPerShard) * (nuint)shards;
                 _isSinglePart = _parts == 1;
 
                 var keysPerPart = _numKeys / _parts;
-                partsPerShard = _parts / (nuint)shards; // Recalculate like Rust
+                partsPerShard = _parts / (nuint)shards; // Recalculate after adjustment
                 var slotsPerPart = (nuint)((double)keysPerPart / parameters.Alpha);
 
                 // Avoid powers of two, since then %S does not depend on all bits
@@ -125,7 +134,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             _remapTable = null;
             _remapTableSize = 0;
 
-            // Initialize reduction structures like Rust does
+            // Initialize reduction structures
             _remParts = new FastReduce(_parts);
             _remBuckets = new FastReduce(_bucketsPerPart);
             _remBucketsTotal = new FastReduce(_bucketsTotal);
@@ -150,15 +159,11 @@ namespace PtrHash.CSharp.Port.PtrHash
             var totalBits = pilotBits + remapBits;
             _bitsPerKey = (double)totalBits / (double)_numKeys;
 
-
-            if (DEBUG_CONSTRUCTION)
-            {
-                DebugConstruction($"PtrHash constructed with seed: {_seed}");
-                DebugConstruction($"Parts: {_parts}, Slots per part: {_slotsPerPart}, Buckets per part: {_bucketsPerPart}");
-                DebugConstruction($"Total slots: {_slotsTotal}, Total buckets: {_bucketsTotal}");
-                DebugConstruction($"Bits per key: {_bitsPerKey:F2}");
-                DebugConstruction(constructionStats?.ToString() ?? "");
-            }
+            DebugConstruction($"PtrHash constructed with seed: {_seed}");
+            DebugConstruction($"Parts: {_parts}, Slots per part: {_slotsPerPart}, Buckets per part: {_bucketsPerPart}");
+            DebugConstruction($"Total slots: {_slotsTotal}, Total buckets: {_bucketsTotal}");
+            DebugConstruction($"Bits per key: {_bitsPerKey:F2}");
+            DebugConstruction(constructionStats?.ToString() ?? "");
 
         }
 
@@ -180,7 +185,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         public nuint GetIndexNoRemapMultiPart(TKey key)
         {
             var hx = _hasher.Hash(key, _seed);
-            var bucket = Bucket(hx); // Use global bucket calculation like Rust
+            var bucket = Bucket(hx); // Use global bucket calculation
             var pilot = (ulong)_pilots[bucket];
             return Slot(hx, pilot);
         }
@@ -235,19 +240,12 @@ namespace PtrHash.CSharp.Port.PtrHash
         }
 
         
-        // Rust bucket() function - returns global bucket index
+        // Global bucket calculation - returns global bucket index (PtrHash paper Equation 1)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Bucket(HashValue hx)
         {
-            // EXACT Rust implementation:
-            // fn bucket(&self, hx: Hx::H) -> usize {
-            //     if BF::LINEAR {
-            //         return self.rem_buckets_total.reduce(hx.high());
-            //     }
-            //     let (part, hx) = self.rem_parts.reduce_with_remainder(hx.high());
-            //     let bucket = self.bucket_in_part(hx);
-            //     part * self.buckets + bucket
-            // }
+            // If using linear bucket function, use total buckets reduction
+            // Otherwise, extract high bits for part selection and compute bucket within part
             
             if (_bucketFunction.IsLinear)
             {
@@ -261,20 +259,12 @@ namespace PtrHash.CSharp.Port.PtrHash
             return part * _bucketsPerPart + bucket;
         }
 
-        // Rust bucket_in_part() function - returns bucket index within a part
+        // Bucket calculation within a part - returns bucket index within a part (PtrHash paper Equation 1)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint BucketInPart(ulong x)
         {
-            // EXACT Rust implementation:
-            // fn bucket_in_part(&self, x: u64) -> usize {
-            //     if BF::LINEAR {
-            //         self.rem_buckets.reduce(x)
-            //     } else if BF::B_OUTPUT {
-            //         self.params.bucket_fn.call(x) as usize
-            //     } else {
-            //         self.rem_buckets.reduce(self.params.bucket_fn.call(x))
-            //     }
-            // }
+            // Linear: reduce directly; B_OUTPUT: use bucket function result;
+            // Otherwise: reduce the bucket function result
 
             if (_bucketFunction.IsLinear)
             {
@@ -293,7 +283,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Slot(HashValue hx, ulong pilot)
         {
-            // Exact Rust algorithm: (self.part(hx) * self.slots) + self.slot_in_part(hx, pilot)
+            // Algorithm: (part * slots_per_part) + slot_in_part (PtrHash paper Equation 2)
             return (GetPart(hx) * _slotsPerPart)  + SlotInPart(hx, pilot);
         }
         
@@ -307,7 +297,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint SlotInPartHp(HashValue hx, ulong hp)
         {
-            // self.rem_slots.reduce(hx.low() ^ hp)
+            // Use low 64 bits XORed with hash pilot, reduced to [0, S)
             
             return _remSlots.Reduce(hx.Low() ^ hp);
         }
@@ -315,16 +305,15 @@ namespace PtrHash.CSharp.Port.PtrHash
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint GetPart(HashValue hx)
         {
-            // rem_parts.reduce(hx.high())
-            // For u64, high() returns the full value, not just high 32 bits
+            // Use high 64 bits to determine part index [0, P)
             return _remParts.Reduce(hx.High());
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ulong HashPilot(ulong pilot)
         {
-            const ulong C = 0x51_7c_c1_b7_27_22_0a_95UL; // FxHash constant from Rust
-            return C * (pilot ^ _seed); // hash::C.wrapping_mul(p ^ self.seed)
+            const ulong C = 0x51_7c_c1_b7_27_22_0a_95UL; // FxHash mixing constant from Firefox
+            return C * (pilot ^ _seed); // Hash pilot with seed using FxHash multiplication
         }
 
 
@@ -458,7 +447,7 @@ namespace PtrHash.CSharp.Port.PtrHash
 
         private bool ComputePilots(ReadOnlySpan<TKey> keys, out ulong finalSeed, out BucketStats? stats)
         {
-            // Initialize arrays - matching Rust's initialization
+            // Initialize arrays for construction
             // _pilots already allocated in constructor, but clear/resize in loop
             stats = null;
             
@@ -470,15 +459,15 @@ namespace PtrHash.CSharp.Port.PtrHash
             // Create PartitionedBitVec once and reuse it across seed attempts
             using var taken = new PartitionedBitVec(_parts, _slotsPerPart);
             
-            // Loop over global seeds `s` - matching Rust's labeled loop
-            while (true) // let stats = 's: loop
+            // Loop over global seeds attempting construction
+            while (true) // Try multiple seeds until construction succeeds (PtrHash paper Section 3.3)
             {
                 tries++;
                 if (tries > MAX_TRIES)
                 {
                     DebugConstruction($"ERROR: PtrHash failed to find a global seed after {MAX_TRIES} tries.");
                     finalSeed = 0;
-                    return false; // return None;
+                    return false; // Construction failed after max attempts
                 }
                 
                 var oldSeed = _seed;
@@ -502,14 +491,14 @@ namespace PtrHash.CSharp.Port.PtrHash
                 {
                     finalSeed = _seed;
                     
-                    // Pack the data - Rust: self.pilots = pilots (already done)
+                    // Pilots data already stored during construction
                     
                     // Return true with stats collected during construction
                     return true;
                 }
                 
                 // If build failed, continue to next seed
-                // continue 's;
+                // Try next seed
             }
         }
 
@@ -519,7 +508,6 @@ namespace PtrHash.CSharp.Port.PtrHash
             stats = null;
 
             // Seed already assigned in ComputePilots before calling this method
-            // Matching Rust where self.seed is set before calling build_shard
 
             // Reset pilots
             System.Runtime.InteropServices.NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
@@ -530,10 +518,10 @@ namespace PtrHash.CSharp.Port.PtrHash
             {
                 var hashBuffer = hashArray.AsSpan(0, keys.Length);
                 
-                // First, hash all keys and partition them by parts (like Rust's sort_parts)
+                // First, hash all keys and partition them by parts
                 var partStarts = SortPartsByHashes(keys, seed, hashBuffer);
 
-                // Process parts in parallel like Rust's par_chunks_exact_mut
+                // Process parts in parallel
                 var parallelOptions = new ParallelOptions
                 {
                     MaxDegreeOfParallelism = MaxParallelism
@@ -556,7 +544,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                     var partPilotStart = part * (int)_bucketsPerPart;
                     Span<byte> partPilots = new Span<byte>(_pilots + partPilotStart, (int)_bucketsPerPart);
 
-                    // Build this part using exact Rust build_part algorithm
+                    // Build this part using hash-evict algorithm
                     if (!BuildPart(part, partHashes, partPilots, taken, out var partStats))
                     {
                         lock (lockObject)
@@ -590,7 +578,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                 if (!TryRemapFreeSlots(taken))
                 {
                     stats = null;
-                    return false; // continue 's;
+                    return false; // Construction failed - try next seed
                 }
 
                 return true;
@@ -607,12 +595,11 @@ namespace PtrHash.CSharp.Port.PtrHash
             return value > 0 && (value & (value - 1)) == 0;
         }
         
-        // Hash all keys and partition by parts (like Rust's sort_parts)
+        // Hash all keys and partition by parts
         // Caller provides the array to make ownership clear
         private uint[] SortPartsByHashes(ReadOnlySpan<TKey> keys, ulong seed, Span<HashValue> hashBuffer)
         {
-            // Hash all keys first (like Rust: keys.map(|key| self.hash_key(key)))
-            // No duplicate checking here - we'll do it after sorting like Rust
+            // Hash all keys using seed, then sort for duplicate detection
             for (int i = 0; i < keys.Length; i++)
             {
                 hashBuffer[i] = _hasher.Hash(keys[i], seed);
@@ -621,8 +608,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             // Sort by hash - use built-in IntroSort (zero allocations, optimal performance)
             hashBuffer.Sort();
             
-            // Check for duplicate hashes AFTER sorting (like Rust: hashes.par_windows(2).all(|w| w[0] != w[1]))
-            // This is O(n) and doesn't require HashSet allocation
+            // O(n) duplicate detection on sorted hashes - indicates duplicate keys
             for (int i = 1; i < hashBuffer.Length; i++)
             {
                 if (hashBuffer[i - 1].Full() == hashBuffer[i].Full())
@@ -632,7 +618,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                 }
             }
             
-            // Find part starts using binary search (like Rust)
+            // Locate part boundaries in sorted hash array using binary search
             var partStarts = new uint[_parts + 1];
             partStarts[0] = 0;
             
@@ -654,16 +640,16 @@ namespace PtrHash.CSharp.Port.PtrHash
             return partStarts;
         }
 
-        // Build a single part (like Rust's build_part)
+        // Build a single part using hash-evict algorithm
         private bool BuildPart(int part, ReadOnlySpan<HashValue> partHashes, Span<byte> partPilots, PartitionedBitVec taken, out BucketStats partStats)
         {
             // Initialize statistics collection
             partStats = new BucketStats();
 
-            // Sort buckets within this part (like Rust's sort_buckets)
+            // Sort buckets within this part
             var (sortedHashes, bucketStarts, bucketOrder) = SortBucketsInPart(part, partHashes);
 
-            // Use the sorted hashes from here on - this is CRITICAL for matching Rust exactly
+            // Use the sorted hashes from here on - this is critical for deterministic ordering
             var hashesSpan = sortedHashes.AsSpan();
 
             const ulong kmax = 256;
@@ -673,16 +659,16 @@ namespace PtrHash.CSharp.Port.PtrHash
             {
                 Array.Fill(slots, -1, 0, (int)_slotsPerPart); // -1 = BucketIdx::NONE
 
-                // Get this part's BitVec - CRITICAL: Rust passes just the part's BitSlice, not global
+                // Get this part's BitVec - critical: use only this part's bit slice
                 var partTaken = taken.GetPart(part);
 
-                // EXACT RUST BINARY HEAP IMPLEMENTATION
+                // Binary heap for bucket eviction processing
                 var stack = new BinaryHeap<BucketInfo>();
                 var recent = new int[16];
                 Array.Fill(recent, -1); // -1 = BucketIdx::NONE
-                var rng = new FastRand(); // Auto-seeded like Rust's fastrand::Rng::new() (uses WyRand)
+                var rng = new FastRand(); // Auto-seeded random number generator (uses WyRand algorithm)
 
-                // Process buckets in size order (largest first) - EXACT Rust pattern
+                // Process buckets in size order (largest first)
                 DebugConstruction($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
                 DebugConstruction($"C# Part {part}: First 10 bucket IDs: {string.Join(", ", bucketOrder.Take(10))}");
 
@@ -705,18 +691,18 @@ namespace PtrHash.CSharp.Port.PtrHash
 
                     var evictions = 0;
 
-                    // Push initial bucket onto stack (Rust: stack.push((new_b_len, new_b)))
+                    // Push initial bucket onto eviction stack with size-based priority
                     stack.Push(new BucketInfo((nuint)newBucketSize, (nuint)newBucket));
-                    Array.Fill(recent, -1); // recent.fill(BucketIdx::NONE)
+                    Array.Fill(recent, -1); // Initialize recent buckets to prevent cycles (Section 3.3)
                     var recentIdx = 0;
-                    recent[0] = newBucket; // recent[0] = new_b
+                    recent[0] = newBucket; // Mark bucket as recently processed
 
                     // Process eviction chain (Rust: while let Some((_b_len, b)) = stack.pop())
                     var maxEvictionsForBucket = 0;
 
                     while (!stack.IsEmpty)
                     {
-                        // EXACT Rust termination condition: if evictions >= 10 * self.slots
+                        // Termination: prevent infinite eviction cycles (PtrHash paper Section 3.3)
                         if (evictions >= 10 * (int)_slotsPerPart)
                         {
                             return false;
@@ -726,7 +712,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                         if (evictions > maxEvictionsForBucket)
                             maxEvictionsForBucket = evictions;
 
-                        // EXACT Rust termination condition (nested structure)
+                        // Additional termination check for excessive evictions
                         if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
                         {
                             DebugConstruction($"Part {part}: Power-of-two check at evictions={evictions}, slotsPerPart={_slotsPerPart}");
@@ -749,7 +735,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                         if (currentBucketHashes.Length == 0)
                             continue;
 
-                        // 1) Try collision-free pilot first (Rust hot path)
+                        // 1) Try collision-free pilot first (hot path optimization)
                         var pilotResult = FindPilot(kmax, currentBucketHashes, partTaken, out var pilotsChecked, currentBucket);
 
                         if (pilotResult.HasValue)
@@ -768,11 +754,11 @@ namespace PtrHash.CSharp.Port.PtrHash
                             continue;
                         }
 
-                        // 2) Find pilot with minimal collisions and evict (EXACT Rust collision handling)
+                        // 2) Find pilot with minimal collisions and evict
                         var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, bucketStarts);
                         var bestPilot = bestResult.pilot;
 
-                        // EXACT Rust sequence: pilots[b] = p as u8; let hp = self.hash_pilot(p);
+                        // Set pilot and compute hash of pilot
                         partPilots[currentBucket] = (byte)bestPilot;
                         var hp = HashPilot(bestPilot);
 
@@ -780,22 +766,22 @@ namespace PtrHash.CSharp.Port.PtrHash
                         var globalBucketId = (nuint)(part * (int)_bucketsPerPart + currentBucket);
                         partStats.Add(globalBucketId, _bucketsTotal, currentBucketHashes.Length, bestPilot, evictions);
 
-                        // EXACT Rust eviction algorithm: Drop the collisions and set the new pilot
+                        // Eviction algorithm: Drop the collisions and set the new pilot
                         var evictionsThisRound = 0;
 
-                        // EXACT Rust pattern: for slot in b_slots(hp)
+                        // For each slot in this bucket
                         foreach (var hash in currentBucketHashes)
                         {
                             var localSlot = SlotInPartHp(hash, hp);
 
-                            // EXACT Rust pattern: let b2 = slots[slot]; if b2.is_some()
+                            // Check if slot is occupied
                             var occupyingBucket = slots[localSlot];
-                            if (occupyingBucket >= 0) // b2.is_some() in Rust
+                            if (occupyingBucket >= 0) // Slot is occupied
                             {
                                 if (occupyingBucket == currentBucket)
                                     throw new InvalidOperationException("Self-collision detected"); // assert!(b2 != b)
 
-                                // EXACT Rust pattern: stack.push((bucket_len(b2), b2)); evictions += 1;
+                                // Push evicted bucket onto stack for reprocessing
                                 var evictedStart = bucketStarts[occupyingBucket];
                                 var evictedEnd = bucketStarts[occupyingBucket + 1];
                                 var evictedSize = evictedEnd - evictedStart;
@@ -804,7 +790,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                                 evictions++;
                                 evictionsThisRound++;
 
-                                // EXACT Rust pattern: for p2 in slots_for_bucket(b2, pilots[b2] as Pilot)
+                                // Clear all slots for the evicted bucket
                                 var evictedPilot = (ulong)partPilots[occupyingBucket];
                                 var evictedHp = HashPilot(evictedPilot);
                                 var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
@@ -813,21 +799,21 @@ namespace PtrHash.CSharp.Port.PtrHash
                                 foreach (var evictedHash in evictedHashes)
                                 {
                                     var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
-                                    // EXACT Rust pattern: *slots.get_unchecked_mut(p2) = BucketIdx::NONE;
+                                    // Clear slot assignment
                                     slots[evictedLocalSlot] = -1;
-                                    // EXACT Rust pattern: taken.set_unchecked(p2, false);
+                                    // Mark slot as available
                                     partTaken.Set(evictedLocalSlot, false);
                                 }
                             }
 
-                            // EXACT Rust pattern: *slots.get_unchecked_mut(slot) = b;
+                            // Assign slot to current bucket
                             slots[localSlot] = currentBucket;
-                            // EXACT Rust pattern: taken.set_unchecked(slot, true);
+                            // Mark slot as taken
                             partTaken.Set(localSlot, true);
                         }
 
 
-                        // Update recent buckets (EXACT Rust algorithm)
+                        // Update recent buckets for collision avoidance
                         recentIdx += 1; // recent_idx += 1
                         recentIdx %= recent.Length; // recent_idx %= recent.len()
                         recent[recentIdx] = currentBucket; // recent[recent_idx] = b
@@ -844,7 +830,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             }
         }
 
-        // Sort buckets within a single part (like Rust's sort_buckets)
+        // Sort buckets within a single part by size (PtrHash paper Section 3.3)
         // Returns the sorted hash array AND bucket starts/order that match it
         private (HashValue[] sortedHashes, int[] bucketStarts, int[] bucketOrder) SortBucketsInPart(int part, ReadOnlySpan<HashValue> partHashes)
         {
@@ -935,14 +921,14 @@ namespace PtrHash.CSharp.Port.PtrHash
             }
         }
         
-        // Size-specialized dispatch function matching Rust's find_pilot optimization (~10% speedup)
+        // Size-specialized dispatch function for find_pilot optimization (~10% speedup)
         private (ulong pilot, ulong hashPilot)? FindPilot(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
             return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
         // Size-specialized versions for fixed-size buckets (1-8 elements)
-        // In Rust, all find_pilot_array methods just call find_pilot_slice
+        // All find_pilot_array methods delegate to find_pilot_slice
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private (ulong pilot, ulong hashPilot)? FindPilotArray1(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
@@ -994,7 +980,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         // Variable-size bucket processing for larger buckets (renamed from FindPilotInPart)
         private (ulong pilot, ulong hashPilot)? FindPilotSlice(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
         {
-            // EXACT Rust algorithm: Sequential search from 0 to kmax-1 with 4x chunking
+            // Sequential pilot search from 0 to kmax-1 with 4x loop unrolling (Section 3.3)
             int r = bucketHashes.Length / 4 * 4; // let r = bucket.len() / 4 * 4;
 
             pilotsChecked = 0;
@@ -1053,7 +1039,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             return null; // None
         }
         
-        // EXACT Rust try_take_pilot implementation - marks slots as taken with backtracking
+        // try_take_pilot implementation - marks slots as taken with backtracking (Section 3.3)
         private bool TryTakePilotInPart(ReadOnlySpan<HashValue> bucketHashes, ulong pilot, BitVec taken)
         {
             var hp = HashPilot(pilot);
@@ -1066,7 +1052,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                 
                 if (taken.Get(localSlot))
                 {
-                    // Collision within the bucket. Clean already set entries (EXACT Rust backtrack)
+                    // Collision within the bucket. Clean already set entries (Section 3.3 backtracking)
                     // for &hx in unsafe { bucket.get_unchecked(..i) }
                     for (int j = 0; j < i; j++)
                     {
@@ -1077,8 +1063,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                     return false;
                 }
                 
-                // Mark slot as taken immediately (EXACT Rust behavior)
-                // unsafe { taken.set_unchecked(slot, true) };
+                // Mark slot as taken immediately (Section 3.3)
                 taken.Set(localSlot, true);
             }
             
@@ -1098,7 +1083,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             return false;
         }
         
-        // Find best pilot with minimal collisions (Rust-style eviction logic)
+        // Find best pilot with minimal collisions (PtrHash paper Section 3.3)
         private (ulong score, ulong pilot) FindBestPilotWithEvictionInPart(ReadOnlySpan<HashValue> bucketHashes, int[] slots, int[] recent, FastRand rng, ulong kmax, int[] bucketStarts)
         {
             var bestScore = ulong.MaxValue;
@@ -1165,12 +1150,12 @@ namespace PtrHash.CSharp.Port.PtrHash
                         break; // Exit inner loop to continue outer loop
                     }
                     
-                    // EXACT Rust pattern: bucket_len(s).pow(2)
+                    // Collision scoring: s² penalizes evicting large buckets more (Section 3.3)
                     var bucketSize = bucketStarts[occupyingBucket + 1] - bucketStarts[occupyingBucket];
                     var newScore = (ulong)(bucketSize * bucketSize);
                     collisionScore += newScore;
                     
-                    // EXACT Rust pattern: if collision_score >= best.0 { continue 'p; }
+                    // Early termination: skip pilots with worse collision scores (Section 3.3)
                     if (collisionScore >= bestScore)
                     {
                         shouldSkip = true;
@@ -1208,7 +1193,7 @@ namespace PtrHash.CSharp.Port.PtrHash
 
         private bool TryRemapFreeSlots(PartitionedBitVec taken)
         {
-            // Efficient implementation of Rust's remap_free_slots algorithm using IterZeros()
+            // Efficient implementation of remap_free_slots algorithm using IterZeros() (Section 3.2)
             // This eliminates the O(n²) nested loop issue by only processing actual zero bits
             // Assert: count of free slots should equal slots_total - n
             var freeSlotCount = taken.CountZeros();
@@ -1227,7 +1212,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                 return true;
             }
             
-            // Compute the free spots - exact Rust algorithm
+            // Compute the free spots (PtrHash paper Section 3.2)
             // Use ArrayPool for temporary storage
             var maxRemapSize = (int)(_slotsTotal - _numKeys);
             var remapArray = ArrayPool<uint>.Shared.Rent(maxRemapSize);
@@ -1235,7 +1220,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             
             try
             {
-                // Helper function equivalent to Rust's get closure
+                // Helper function for slot access (Section 3.2)
                 // get = |t: &Vec<BitVec>, idx: usize| t[idx / self.slots][idx % self.slots];
                 bool Get(nuint idx)
                 {
@@ -1244,7 +1229,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                     return taken.Parts[part].Get(localSlot);
                 }
                 
-                // Efficient single-pass algorithm using IterZeros() - matches Rust's approach exactly
+                // Efficient single-pass algorithm using IterZeros() (Section 3.2)
                 // This is equivalent to:
                 // for i in taken.iter().enumerate().flat_map(|(p, t)| t.iter_zeros().map(move |i| offset + i)).take_while(|&i| i < self.n)
                 foreach (var freeSlotIndex in taken.IterZeros())
@@ -1252,7 +1237,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                     if (freeSlotIndex >= _numKeys) // take_while(|&i| i < self.n) - stop when we exceed n
                         break;
                         
-                    // Process this free slot immediately - same logic as Rust
+                    // Process this free slot immediately (Section 3.2)
                     var i = (uint)freeSlotIndex;
                     while (!Get(_numKeys + (nuint)remapCount))
                     {

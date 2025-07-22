@@ -9,7 +9,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
 {
     /// <summary>
     /// FxHash implementation for fast hashing of ulong keys
-    /// Based on Rust's FxHash which is designed for speed over cryptographic security
+    /// FxHash implementation designed for speed over cryptographic security
     /// </summary>
     public readonly struct FxHasher : IKeyHasher<ulong>
     {
@@ -20,7 +20,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HashValue Hash(ulong key, ulong seed)
         {
-            // Exact Rust FxHasher64 algorithm:
+            // FxHasher64 algorithm:
             // For a fresh hasher with seed, state starts as seed
             // Then: state = state.rotate_left(ROTATE).bitxor(key).wrapping_mul(SEED64)
             ulong hash = seed;

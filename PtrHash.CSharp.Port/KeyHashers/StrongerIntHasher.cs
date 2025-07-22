@@ -6,17 +6,17 @@ using PtrHash.CSharp.Port.KeyHashers;
 namespace PtrHash.CSharp.Port.KeyHashers
 {
     /// <summary>
-    /// Stronger hash function for ulong keys - exact port of Rust StrongerIntHash
-    /// Uses double multiplication with 128-bit intermediate like Rust version
+    /// Stronger hash function for ulong keys
+    /// Uses double multiplication with 128-bit intermediate
     /// </summary>
     public readonly struct StrongerIntHasher : IKeyHasher<ulong>
     {
-        private const ulong C = 0x517cc1b727220a95UL; // FxHash constant from Rust
+        private const ulong C = 0x517cc1b727220a95UL; // FxHash constant
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public HashValue Hash(ulong key, ulong seed)
         {
-            // EXACT Rust algorithm from hash.rs:
+            // Double multiplication algorithm:
             // let r = (*x as u64 ^ seed) as u128 * C as u128;
             // let low = r as u64;
             // let high = (r >> 64) as u64;

@@ -5,7 +5,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Interop.Native;

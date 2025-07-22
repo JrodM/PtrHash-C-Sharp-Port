@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace PtrHash.CSharp.Port.Computation
 {
     /// <summary>
-    /// FastReduce instance for pre-computed modular reduction
+    /// FastReduce instance for pre-computed modular reduction (PtrHash paper Section 3.2)
     /// </summary>
     internal readonly struct FastReduce
     {
@@ -18,7 +18,7 @@ namespace PtrHash.CSharp.Port.Computation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public nuint Reduce(ulong hash)
         {
-            // mul_high(self.d, h) = (d as u128 * h as u128) >> 64
+            // mul_high(self.d, h) = (d as u128 * h as u128) >> 64 (PtrHash paper reduce function)
             return (nuint)((UInt128)d * (UInt128)hash >> 64);
         }
         

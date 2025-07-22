@@ -16,25 +16,25 @@ namespace PtrHash.CSharp.Port.PtrHash
 
         /// <summary>
         /// Default fast parameters: 3.0 bits/key, optimized for query speed
-        /// Uses Linear bucket function like Rust default_fast()
+        /// Uses Linear bucket function for fast construction
         /// </summary>
         public static PtrHashParams DefaultFast => new()
         {
             Alpha = 0.99,
             Lambda = 3.0,
             Minimal = true,
-            SinglePart = false,  // Multi-part like Rust default
+            SinglePart = false,  // Multi-part mode
             BucketFunction = new Linear()
         };
 
         /// <summary>
         /// Default balanced parameters: 2.4 bits/key, balanced trade-off
-        /// Uses CubicEps bucket function like Rust default_balanced()
+        /// Uses CubicEps bucket function for balanced performance
         /// </summary>
         public static PtrHashParams DefaultBalanced => new()
         {
-            Alpha = 0.99,  // Match Rust default_balanced
-            Lambda = 3.5,  // Match Rust default_balanced
+            Alpha = 0.99,  // Space efficiency parameter
+            Lambda = 3.5,  // Expected bucket size parameter
             Minimal = true,
             SinglePart = false,
             BucketFunction = new CubicEps()

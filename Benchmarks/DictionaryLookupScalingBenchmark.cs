@@ -4,7 +4,6 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using PtrHash.CSharp.Interop.Core;
 using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port;

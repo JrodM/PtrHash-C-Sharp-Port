@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PtrHash.CSharp.Port.PtrHash;
 using PtrHash.CSharp.Port.KeyHashers;
 using System;
@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace PtrHash.CSharp.Port.Tests
 {
-    [TestFixture]
+    [TestClass]
     public class PtrHashCoreTests
     {
         #region Constructor Tests
 
-        [Test]
+        [TestMethod]
         public void Constructor_WithValidKeys_CreatesValidInstance()
         {
             // Test both UInt64 and String keys in one test
@@ -21,7 +21,7 @@ namespace PtrHash.CSharp.Port.Tests
             var ulongInfo = ulongPtrHash.GetInfo();
 
             // Assert - UInt64
-            Assert.That(ulongInfo.KeyCount, Is.EqualTo((nuint)1000));
+            Assert.AreEqual((nuint)1000, ulongInfo.KeyCount);
             Assert.That(ulongInfo.BitsPerKey, Is.InRange(2.0, 4.0));
             Assert.That(ulongInfo.MaxIndex, Is.GreaterThanOrEqualTo((nuint)1000));
 
@@ -36,7 +36,7 @@ namespace PtrHash.CSharp.Port.Tests
             Assert.That(stringInfo.MaxIndex, Is.GreaterThanOrEqualTo((nuint)100));
         }
 
-        [Test]
+        [TestMethod]
         public void Constructor_WithInvalidKeys_ThrowsException()
         {
             // Test both empty and duplicate keys
@@ -53,7 +53,7 @@ namespace PtrHash.CSharp.Port.Tests
 
         #region Index Retrieval Tests
 
-        [Test]
+        [TestMethod]
         public void GetIndex_ProducesUniqueIndicesInValidRange()
         {
             // Arrange
@@ -78,7 +78,7 @@ namespace PtrHash.CSharp.Port.Tests
 
         #region Streaming Tests
 
-        [Test]
+        [TestMethod]
         public void GetIndicesStream_ConsistentWithSingleLookups()
         {
             // Arrange
@@ -106,7 +106,7 @@ namespace PtrHash.CSharp.Port.Tests
 
         #region Configuration Tests
 
-        [Test]
+        [TestMethod]
         public void DifferentHashers_ProduceDifferentButValidMappings()
         {
             // Arrange
@@ -130,7 +130,7 @@ namespace PtrHash.CSharp.Port.Tests
                 "Stronger hasher should produce unique indices");
         }
 
-        [Test]
+        [TestMethod]
         public void SinglePartConfiguration_WorksCorrectly()
         {
             // Arrange
@@ -152,7 +152,7 @@ namespace PtrHash.CSharp.Port.Tests
 
         #region Scale Tests
 
-        [Test]
+        [TestMethod]
         [TestCase(1_000)]
         [TestCase(10_000)]
         [TestCase(100_000)]
