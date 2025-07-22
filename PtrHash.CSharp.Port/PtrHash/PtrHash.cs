@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Collections;
+using PtrHash.CSharp.Port.Storage;
 using PtrHash.CSharp.Port.RNG;
 using PtrHash.CSharp.Port.Computation;
 using PtrHash.CSharp.Port.Stats;
@@ -47,7 +48,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         private readonly THasher _hasher;
         private readonly IBucketFunction _bucketFunction;
         private byte* _pilots;
-        private uint* _remapTable;
+        private IMutableRemappingStorage? _remapStorage;
         
         // Multi-part support fields
         private readonly nuint _parts;
@@ -63,8 +64,8 @@ namespace PtrHash.CSharp.Port.PtrHash
         private readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
         
         private readonly nuint _numKeys;
-        private nuint _remapTableSize;
         private readonly bool _minimal;
+        private readonly RemappingStorageType _storageType;
         private readonly bool _isSinglePart;
         private readonly double _bitsPerKey;
         private ulong _seed;
@@ -82,6 +83,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             _numKeys = (nuint)keys.Length;
             _minimal = parameters.Minimal;
             _isSinglePart = parameters.SinglePart;
+            _storageType = parameters.StorageType;
 
             // Calculate parts and structure sizes (PtrHash paper Section 3.1)
             if (_isSinglePart)
@@ -130,9 +132,8 @@ namespace PtrHash.CSharp.Port.PtrHash
             _pilots = (byte*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc((nuint)_bucketsTotal, 64);
             System.Runtime.InteropServices.NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
 
-            // Will allocate remap table later if minimal=true
-            _remapTable = null;
-            _remapTableSize = 0;
+            // Will allocate remap storage later if minimal=true
+            _remapStorage = null;
 
             // Initialize reduction structures
             _remParts = new FastReduce(_parts);
@@ -154,8 +155,8 @@ namespace PtrHash.CSharp.Port.PtrHash
             // Remap table will be created during construction if needed
 
             // Calculate bits per key
-            var pilotBits = _bucketsTotal * 8;
-            var remapBits = _remapTable != null ? _remapTableSize * 32 : 0;
+            var pilotBits = (ulong)(_bucketsTotal * 8);
+            var remapBits = (ulong)(_remapStorage?.SizeInBytes * 8 ?? 0);
             var totalBits = pilotBits + remapBits;
             _bitsPerKey = (double)totalBits / (double)_numKeys;
 
@@ -178,7 +179,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         public nuint GetIndexMultiPart(TKey key)
         {
             var slot = GetIndexNoRemapMultiPart(key);
-            return slot < _numKeys ? slot : (nuint)_remapTable[slot - _numKeys];
+            return slot < _numKeys ? slot : (nuint)_remapStorage!.Index((int)(slot - _numKeys));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -199,7 +200,7 @@ namespace PtrHash.CSharp.Port.PtrHash
         public nuint GetIndexSinglePart(TKey key)
         {
             var slot = GetIndexNoRemapSinglePart(key);
-            return slot < _numKeys ? slot : (nuint)_remapTable[slot - _numKeys];
+            return slot < _numKeys ? slot : (nuint)_remapStorage!.Index((int)(slot - _numKeys));
         }
 
         /// <summary>
@@ -326,7 +327,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            var useMinimal = minimal && _minimal && _remapTable != null;
+            var useMinimal = minimal && _minimal && _remapStorage != null;
             
             // Safe version without pinning - use span indexing with single bounds check pattern
             for (int i = 0; i < keys.Length; i++)
@@ -346,12 +347,8 @@ namespace PtrHash.CSharp.Port.PtrHash
                 // Apply remap if minimal and slot >= numKeys
                 if (useMinimal && slot >= _numKeys)
                 {
-                    uint remappedSlot;
-                    unsafe
-                    {
-                        remappedSlot = _remapTable[slot - _numKeys];
-                    }
-                    slot = remappedSlot;
+                    var remappedSlot = _remapStorage!.Index((int)(slot - _numKeys));
+                    slot = (nuint)remappedSlot;
                 }
                 
                 results[i] = slot;
@@ -367,7 +364,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            var useMinimal = minimal && _minimal && _remapTable != null;
+            var useMinimal = minimal && _minimal && _remapStorage != null;
             
             for (int i = 0; i < keys.Length; i++)
             {
@@ -385,12 +382,8 @@ namespace PtrHash.CSharp.Port.PtrHash
                 // Apply remap if minimal and slot >= numKeys
                 if (useMinimal && slot >= _numKeys)
                 {
-                    uint remappedSlot;
-                    unsafe
-                    {
-                        remappedSlot = _remapTable[slot - _numKeys];
-                    }
-                    slot = remappedSlot;
+                    var remappedSlot = _remapStorage!.Index((int)(slot - _numKeys));
+                    slot = (nuint)remappedSlot;
                 }
                 
                 results[i] = slot;
@@ -406,7 +399,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            var useMinimal = minimal && _minimal && _remapTable != null;
+            var useMinimal = minimal && _minimal && _remapStorage != null;
             
             // Safe version without pinning - use span indexing with single bounds check pattern
             for (int i = 0; i < keys.Length; i++)
@@ -433,12 +426,8 @@ namespace PtrHash.CSharp.Port.PtrHash
                 // Apply remap if minimal and slot >= numKeys
                 if (useMinimal && slot >= _numKeys)
                 {
-                    uint remappedSlot;
-                    unsafe
-                    {
-                        remappedSlot = _remapTable[slot - _numKeys];
-                    }
-                    slot = remappedSlot;
+                    var remappedSlot = _remapStorage!.Index((int)(slot - _numKeys));
+                    slot = (nuint)remappedSlot;
                 }
                 
                 results[i] = slot;
@@ -1121,7 +1110,7 @@ namespace PtrHash.CSharp.Port.PtrHash
                 return false; // No duplicates
             }
             
-            // EXACT Rust pattern: 'p: for delta in 0u64..kmax
+            // 'p: for delta in 0u64..kmax
             for (ulong delta = 0; delta < kmax; delta++)
             {
                 var pilot = (startPilot + delta) % kmax;
@@ -1130,19 +1119,19 @@ namespace PtrHash.CSharp.Port.PtrHash
                 var collisionScore = 0UL;
                 var shouldSkip = false;
                 
-                // EXACT Rust pattern: for p in b_slots(hp)
+                // for p in b_slots(hp)
                 foreach (var hash in bucketHashes)
                 {
                     var localSlot = SlotInPartHp(hash, hp);
                     var occupyingBucket = slots[localSlot];
                     
-                    // EXACT Rust pattern: let s = unsafe { *slots.get_unchecked(p) };
-                    // EXACT Rust pattern: if s.is_none() { continue; }
+                    // let s = unsafe { *slots.get_unchecked(p) };
+                    // if s.is_none() { continue; }
                     if (occupyingBucket == -1)
                     {
                         continue;
                     }
-                    // EXACT Rust pattern: else if recent.contains(&s) { continue 'p; }
+                    // else if recent.contains(&s) { continue 'p; }
                     // Optimized: recent array is small (16 elements), so linear search is fine but we can optimize it
                     else if (IsInRecentArray(recent, occupyingBucket))
                     {
@@ -1167,14 +1156,14 @@ namespace PtrHash.CSharp.Port.PtrHash
                 if (shouldSkip)
                     continue;
                 
-                // EXACT Rust pattern: if !duplicate_slots(b, p)
+                // if !duplicate_slots(b, p)
                 if (!DuplicateSlots(bucketHashes, pilot))
                 {
-                    // EXACT Rust pattern: best = (collision_score, p);
+                    //  best = (collision_score, p);
                     bestScore = collisionScore;
                     bestPilot = pilot;
                     
-                    // EXACT Rust pattern: if collision_score == new_b_len * new_b_len { break; }
+                    // if collision_score == new_b_len * new_b_len { break; }
                     if (collisionScore == newBLen * newBLen)
                     {
                         break;
@@ -1204,11 +1193,7 @@ namespace PtrHash.CSharp.Port.PtrHash
             
             if (!_minimal || _slotsTotal == _numKeys)
             {
-                unsafe
-                {
-                    this._remapTable = null;
-                    _remapTableSize = 0;
-                }
+                _remapStorage = null;
                 return true;
             }
             
@@ -1246,24 +1231,33 @@ namespace PtrHash.CSharp.Port.PtrHash
                     remapArray[remapCount++] = i;
                 }
                 
-                // Allocate exact-sized unmanaged memory for remap table
-                unsafe
-                {
-                    _remapTableSize = (nuint)remapCount;
-                    _remapTable = (uint*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc(_remapTableSize * 4, 64);
-                    
-                    // Copy only the used portion to unmanaged memory
-                    fixed (uint* sourcePtr = remapArray)
-                    {
-                        System.Runtime.InteropServices.NativeMemory.Copy(sourcePtr, _remapTable, _remapTableSize * 4);
-                    }
-                }
+                // Create remapping storage using selected type
+                var remapValues = remapArray.AsSpan(0, remapCount).ToArray().Select(x => (ulong)x).ToArray();
+                _remapStorage = CreateRemappingStorage(remapValues);
             }
             finally
             {
                 ArrayPool<uint>.Shared.Return(remapArray);
             }
             return true;
+        }
+
+        /// <summary>
+        /// Create remapping storage based on selected storage type - matches Rust F generic parameter
+        /// </summary>
+        private IMutableRemappingStorage CreateRemappingStorage(ReadOnlySpan<ulong> values)
+        {
+            return _storageType switch
+            {
+                RemappingStorageType.VecU8 => new ByteVectorRemappingStorage(values),
+                RemappingStorageType.VecU16 => CompactVectorRemappingStorage.TryNew(values) ?? VectorRemappingStorage.TryNew(values) ?? new LargeVectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.VecU32 => VectorRemappingStorage.TryNew(values) ?? new LargeVectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.VecU64 => new LargeVectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.CacheLineEF => CachelineEfVec.TryNew(values) ?? VectorRemappingStorage.TryNew(values) ?? new LargeVectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.EliasFano => throw new NotImplementedException("EliasFano storage not yet implemented"),
+                RemappingStorageType.Auto => RemappingStorageFactory.CreateOptimal(values),
+                _ => throw new ArgumentOutOfRangeException(nameof(_storageType), _storageType, "Unknown storage type")
+            };
         }
 
         private static nuint CalculateNumBuckets(nuint numKeys, double lambda)
@@ -1306,13 +1300,9 @@ namespace PtrHash.CSharp.Port.PtrHash
                         System.Runtime.InteropServices.NativeMemory.Free(_pilots);
                         _pilots = null;
                     }
-
-                    if (_remapTable != null)
-                    {
-                        System.Runtime.InteropServices.NativeMemory.Free(_remapTable);
-                        _remapTable = null;
-                    }
                 }
+
+                _remapStorage?.Dispose();
 
                 _disposed = true;
             }

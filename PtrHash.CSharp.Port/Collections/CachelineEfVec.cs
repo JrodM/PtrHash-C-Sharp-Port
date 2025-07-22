@@ -12,7 +12,7 @@ namespace PtrHash.CSharp.Port.Collections
     /// Provides efficient storage and lookup for sorted 40-bit values using
     /// Elias-Fano encoding with cacheline alignment.
     /// </summary>
-    public unsafe class CachelineEfVec : IList<ulong>, IReadOnlyList<ulong>, IDisposable
+    public unsafe class CachelineEfVec : IList<ulong>, IReadOnlyList<ulong>, IDisposable, IMutableRemappingStorage
     {
         private readonly CachelineEf[] _ef;
         private readonly int _length;
@@ -66,13 +66,7 @@ namespace PtrHash.CSharp.Port.Collections
         /// </summary>
         public ulong this[int index]
         {
-            get
-            {
-                if ((uint)index >= (uint)_length)
-                    throw new ArgumentOutOfRangeException(nameof(index));
-                
-                return IndexUnchecked(index);
-            }
+            get => Index(index);
             set => throw new NotSupportedException("CachelineEfVec is read-only");
         }
 
@@ -82,9 +76,23 @@ namespace PtrHash.CSharp.Port.Collections
         public int Count => _length;
 
         /// <summary>
+        /// The number of values stored (matches Rust len() method).
+        /// </summary>
+        public int Length => _length;
+
+        /// <summary>
         /// Always true - CachelineEfVec is read-only.
         /// </summary>
         public bool IsReadOnly => true;
+
+        /// <summary>
+        /// Get the value at the given index in the vector (matches Rust index() method).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ulong Index(int index)
+        {
+            return _ef[index / CachelineEf.L].Index(index % CachelineEf.L);
+        }
 
         /// <summary>
         /// Get the value at the specified index without bounds checking.
@@ -92,7 +100,6 @@ namespace PtrHash.CSharp.Port.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong IndexUnchecked(int index)
         {
-            ObjectDisposedException.ThrowIf(_disposed, this);
             return _ef[index / CachelineEf.L].IndexUnchecked(index % CachelineEf.L);
         }
 
@@ -102,7 +109,6 @@ namespace PtrHash.CSharp.Port.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Prefetch(int index)
         {
-            ObjectDisposedException.ThrowIf(_disposed, this);
             var cachelineIndex = index / CachelineEf.L;
             if ((uint)cachelineIndex < (uint)_ef.Length)
             {
@@ -168,8 +174,6 @@ namespace PtrHash.CSharp.Port.Collections
 
         public IEnumerator<ulong> GetEnumerator()
         {
-            ObjectDisposedException.ThrowIf(_disposed, this);
-            
             for (int i = 0; i < _length; i++)
             {
                 yield return this[i];
@@ -182,5 +186,13 @@ namespace PtrHash.CSharp.Port.Collections
         {
             _disposed = true;
         }
+
+        // IMutableRemappingStorage implementation
+        static IMutableRemappingStorage? IMutableRemappingStorage.TryNew(ReadOnlySpan<ulong> values)
+        {
+            return TryNew(values);
+        }
+
+        static string IMutableRemappingStorage.Name => "CacheLineEF";
     }
 }

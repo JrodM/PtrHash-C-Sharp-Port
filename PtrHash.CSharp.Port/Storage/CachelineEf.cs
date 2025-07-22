@@ -9,7 +9,7 @@ namespace PtrHash.CSharp.Port.Storage
     /// A single cacheline that holds 44 Elias-Fano encoded 40-bit values in a range of size 256*84=21504.
     /// Aligned to 64 bytes to ensure it fits in a single cache line.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 64)]
     public unsafe struct CachelineEf
     {
         /// <summary>
@@ -111,9 +111,6 @@ namespace PtrHash.CSharp.Port.Storage
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly ulong Index(int idx)
         {
-            if (idx >= L)
-                throw new ArgumentOutOfRangeException(nameof(idx), $"Index {idx} is out of bounds. Max is {L - 1}");
-
             var p = System.Numerics.BitOperations.PopCount(_highBoundaries0);
             int onePos;
             
