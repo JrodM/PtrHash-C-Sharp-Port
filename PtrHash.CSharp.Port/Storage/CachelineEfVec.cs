@@ -11,7 +11,7 @@ namespace PtrHash.CSharp.Port.Storage
     /// Provides efficient storage and lookup for sorted 40-bit values using
     /// Elias-Fano encoding with cacheline alignment.
     /// </summary>
-    public unsafe class CachelineEfVec : IList<ulong>, IReadOnlyList<ulong>, IDisposable, IMutableRemappingStorage
+    public unsafe class CachelineEfVec : IList<ulong>, IReadOnlyList<ulong>, IDisposable, IStaticRemappingStorage<CachelineEfVec>
     {
         private readonly CachelineEf[] _ef;
         private readonly int _length;
@@ -193,5 +193,8 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         static string IMutableRemappingStorage.Name => "CacheLineEF";
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong IndexStatic(CachelineEfVec self, int index) => self._ef[index / CachelineEf.L].Index(index % CachelineEf.L);
     }
 }

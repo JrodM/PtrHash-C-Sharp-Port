@@ -56,14 +56,10 @@ namespace PtrHash.CSharp.Interop.Tests
 
         public static PtrHashNative.FFIParams GetTestParams(bool useFast = true, uint hashFunction = 1)
         {
-            return new PtrHashNative.FFIParams 
-            { 
-                ParamSet = useFast ? (uint)1 : 0,
-                SinglePart = false,
-                Lambda = 0.0,
-                U64HashFunction = hashFunction,
-                StringHashFunction = 0 
-            };
+            // Use default fast configuration but with StrongerIntHash (1) instead of FxHash (0) to avoid construction timeouts
+            return useFast 
+                ? PtrHashNative.FFIParams.FastWithOverrides(hashFunction: hashFunction)
+                : PtrHashNative.FFIParams.Custom(hashFunction: hashFunction);
         }
 
         public static void AssertValidPtrHashInfo(PtrHashInfo info, int expectedKeyCount)

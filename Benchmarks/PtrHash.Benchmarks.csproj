@@ -9,6 +9,20 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
     <Optimize>true</Optimize>
+    
+    <!-- Server GC for better throughput -->
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    
+    <!-- Suppress preview features warnings for performance optimizations -->
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <NoWarn>$(NoWarn);CA2252</NoWarn>
+    
+    <!-- AOT settings for BenchmarkDotNet -->
+    <NativeAotInstructionSet Condition="'$(PublishAot)'=='true'">-avx512f,-avx512cd,-avx512bw,-avx512dq,-avx512vl,-avx512vbmi</NativeAotInstructionSet>
+    <IlcInstructionSet Condition="'$(PublishAot)'=='true'">-avx512f,-avx512cd,-avx512bw,-avx512dq,-avx512vl,-avx512vbmi</IlcInstructionSet>
+    <EnableAVX512>false</EnableAVX512>
+    <EnableAVX512F>false</EnableAVX512F>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,30 +34,60 @@
     <ProjectReference Include="../PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj" />
   </ItemGroup>
 
-  <!-- Copy native library from interop project to benchmarks output -->
+  <!-- Copy native library from Rust target directory to output -->
   <ItemGroup>
-    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so')">
+    <!-- Try both bin/$(Configuration)/net8.0 and target/release paths -->
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.so')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>libptrhash.so</Link>
     </None>
-    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll')">
+    <None Include="../PtrHash.CSharp.Interop/target/release/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And !Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.so') And Exists('../PtrHash.CSharp.Interop/target/release/libptrhash.so')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libptrhash.so</Link>
+    </None>
+    
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dll')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>libptrhash.dll</Link>
     </None>
-    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib')">
+    <None Include="../PtrHash.CSharp.Interop/target/release/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And !Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dll') And Exists('../PtrHash.CSharp.Interop/target/release/libptrhash.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libptrhash.dll</Link>
+    </None>
+    
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dylib')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>libptrhash.dylib</Link>
     </None>
+    <None Include="../PtrHash.CSharp.Interop/target/release/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And !Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dylib') And Exists('../PtrHash.CSharp.Interop/target/release/libptrhash.dylib')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>libptrhash.dylib</Link>
+    </None>
+    
     <!-- Also copy as 'ptrhash' since .NET runtime looks for both names -->
-    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.so')">
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.so')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>ptrhash.so</Link>
     </None>
-    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dll')">
+    <None Include="../PtrHash.CSharp.Interop/target/release/libptrhash.so" Condition="$([MSBuild]::IsOSPlatform('Linux')) And !Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.so') And Exists('../PtrHash.CSharp.Interop/target/release/libptrhash.so')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ptrhash.so</Link>
+    </None>
+    
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dll')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>ptrhash.dll</Link>
     </None>
-    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net6.0/libptrhash.dylib')">
+    <None Include="../PtrHash.CSharp.Interop/target/release/libptrhash.dll" Condition="$([MSBuild]::IsOSPlatform('Windows')) And !Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dll') And Exists('../PtrHash.CSharp.Interop/target/release/libptrhash.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ptrhash.dll</Link>
+    </None>
+    
+    <None Include="../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dylib')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ptrhash.dylib</Link>
+    </None>
+    <None Include="../PtrHash.CSharp.Interop/target/release/libptrhash.dylib" Condition="$([MSBuild]::IsOSPlatform('OSX')) And !Exists('../PtrHash.CSharp.Interop/bin/$(Configuration)/net8.0/libptrhash.dylib') And Exists('../PtrHash.CSharp.Interop/target/release/libptrhash.dylib')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>ptrhash.dylib</Link>
     </None>

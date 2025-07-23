@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace PtrHash.CSharp.Port.Storage
 {
@@ -11,6 +12,7 @@ namespace PtrHash.CSharp.Port.Storage
         /// <summary>
         /// Get the value at the given index (uses unchecked access internally).
         /// </summary>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         ulong Index(int index);
 
         /// <summary>
@@ -40,5 +42,19 @@ namespace PtrHash.CSharp.Port.Storage
         /// Human-readable name of this storage type.
         /// </summary>
         static abstract string Name { get; }
+    }
+
+    /// <summary>
+    /// Static interface for zero-overhead remapping storage access.
+    /// Enables compile-time dispatch and perfect inlining.
+    /// </summary>
+    public interface IStaticRemappingStorage<TSelf> : IMutableRemappingStorage 
+        where TSelf : IStaticRemappingStorage<TSelf>
+    {
+        /// <summary>
+        /// Get the value at the specified index with zero-overhead static dispatch.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static abstract ulong IndexStatic(TSelf self, int index);
     }
 }

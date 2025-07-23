@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.Collections;
 
 namespace PtrHash.CSharp.Port.Storage
@@ -13,8 +14,8 @@ namespace PtrHash.CSharp.Port.Storage
         /// Create the most space-efficient remapping storage for the given values.
         /// Tries storage types in order of space efficiency:
         /// 1. CachelineEfVec - Most compact for sparse sorted values
-        /// 2. CompactVectorRemappingStorage - For values that fit in ushort
-        /// 3. VectorRemappingStorage - For values that fit in uint
+        /// 2. CompactUInt32VectorRemappingStorage - For values that fit in ushort
+        /// 3. UInt32VectorRemappingStorage - For values that fit in uint
         /// 4. Falls back to large vector if needed
         /// </summary>
         public static IMutableRemappingStorage CreateOptimal(ReadOnlySpan<ulong> values)
@@ -25,12 +26,12 @@ namespace PtrHash.CSharp.Port.Storage
                 return cachelineEf;
 
             // Try compact vector storage (16-bit values)
-            var compactVector = CompactVectorRemappingStorage.TryNew(values);
+            var compactVector = UShort16VectorRemappingStorage.TryNew(values);
             if (compactVector != null)
                 return compactVector;
 
             // Try standard vector storage (32-bit values)  
-            var standardVector = VectorRemappingStorage.TryNew(values);
+            var standardVector = UInt32VectorRemappingStorage.TryNew(values);
             if (standardVector != null)
                 return standardVector;
 
@@ -58,9 +59,9 @@ namespace PtrHash.CSharp.Port.Storage
         /// <summary>
         /// Create standard uint vector storage.
         /// </summary>
-        public static VectorRemappingStorage? CreateVector(ReadOnlySpan<ulong> values)
+        public static UInt32VectorRemappingStorage? CreateVector(ReadOnlySpan<ulong> values)
         {
-            return VectorRemappingStorage.TryNew(values) as VectorRemappingStorage;
+            return UInt32VectorRemappingStorage.TryNew(values) as UInt32VectorRemappingStorage;
         }
 
         /// <summary>
@@ -70,18 +71,18 @@ namespace PtrHash.CSharp.Port.Storage
         {
             var array = new ulong[values.Length];
             values.CopyTo(array);
-            return new LargeVectorRemappingStorage(array);
+            return new ULong64VectorRemappingStorage(array);
         }
     }
 
     /// <summary>
     /// 64-bit vector storage - always works but uses more memory.
     /// </summary>
-    internal class LargeVectorRemappingStorage : IMutableRemappingStorage
+    internal class ULong64VectorRemappingStorage : IStaticRemappingStorage<ULong64VectorRemappingStorage>
     {
         private readonly ulong[] _values;
 
-        internal LargeVectorRemappingStorage(ulong[] values)
+        internal ULong64VectorRemappingStorage(ulong[] values)
         {
             _values = values;
         }
@@ -90,13 +91,17 @@ namespace PtrHash.CSharp.Port.Storage
         {
             var array = new ulong[values.Length];
             values.CopyTo(array);
-            return new LargeVectorRemappingStorage(array);
+            return new ULong64VectorRemappingStorage(array);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong Index(int index) => _values[index];
         public void Prefetch(int index) { }
         public int SizeInBytes => _values.Length * sizeof(ulong);
         public static string Name => "Vec<u64>";
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong IndexStatic(ULong64VectorRemappingStorage self, int index) => self._values[index];
 
         public void Dispose()
         {

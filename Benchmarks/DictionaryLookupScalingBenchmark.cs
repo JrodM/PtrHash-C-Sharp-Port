@@ -36,7 +36,7 @@ namespace PtrHash.Benchmarks
         private Dictionary<ulong, ulong> _dictionary = null!;
         
         // Native interop dictionary
-        private PtrHashU64InteropDictionary<ulong> _nativeSentinelPtrHash = null!;
+        private PtrHashInteropDictionary<ulong, ulong> _nativeSentinelPtrHash = null!;
         
         // C# port dictionaries
         private PtrHashDictionaryU64<ulong> _multiPartPtrHashDict = null!;
@@ -70,7 +70,7 @@ namespace PtrHash.Benchmarks
                 _dictionary[_keys[i]] = _values[i];
 
             // Native interop dictionary
-            _nativeSentinelPtrHash = new PtrHashU64InteropDictionary<ulong>(
+            _nativeSentinelPtrHash = new PtrHashInteropDictionary<ulong, ulong>(
                 _keys,
                 _values,
                 ulong.MaxValue,

@@ -3,6 +3,8 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 using PtrHash.CSharp.Port.KeyHashers;
@@ -32,6 +34,7 @@ namespace PtrHash.CSharp.Port.Core
     public sealed unsafe class PtrHash<TKey, THasher> : IPtrHash<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
     {
+
         // Debug feature flags - set to false for production
         public static bool DEBUG_CONSTRUCTION = false;
     
@@ -68,7 +71,6 @@ namespace PtrHash.CSharp.Port.Core
         private readonly bool _isSinglePart;
         private readonly double _bitsPerKey;
         private ulong _seed;
-
 
         /// <summary>
         /// Construct a PtrHash from a collection of keys
@@ -133,6 +135,7 @@ namespace PtrHash.CSharp.Port.Core
 
             // Will allocate remap storage later if minimal=true
             _remapStorage = null;
+            
 
             // Initialize reduction structures
             _remParts = new FastReduce(_parts);
@@ -165,6 +168,7 @@ namespace PtrHash.CSharp.Port.Core
             DebugConstruction($"Bits per key: {_bitsPerKey:F2}");
             DebugConstruction(constructionStats?.ToString() ?? "");
 
+
         }
 
         public PtrHashInfo GetInfo()
@@ -173,6 +177,8 @@ namespace PtrHash.CSharp.Port.Core
             // GetIndex() with minimal=true will remap values >= numKeys, but MaxIndex represents the theoretical maximum
             return new PtrHashInfo(_numKeys, _bitsPerKey, _slotsTotal);
         }
+
+        #region Multi-Part Index Methods
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public nuint GetIndexMultiPart(TKey key)
@@ -189,6 +195,10 @@ namespace PtrHash.CSharp.Port.Core
             var pilot = (ulong)_pilots[bucket];
             return Slot(hx, pilot);
         }
+
+        #endregion
+
+        #region Single-Part Index Methods
 
         /// <summary>
         /// Faster version of GetIndex for when there is only a single part.
@@ -216,6 +226,10 @@ namespace PtrHash.CSharp.Port.Core
             return SlotInPart(hx, pilot); // Direct slot calculation without part offset
         }
 
+        #endregion
+
+        #region Unified Index Methods
+
         /// <summary>
         /// True if this instance was constructed with single part optimization
         /// </summary>
@@ -239,7 +253,10 @@ namespace PtrHash.CSharp.Port.Core
             return _isSinglePart ? GetIndexNoRemapSinglePart(key) : GetIndexNoRemapMultiPart(key);
         }
 
-        
+        #endregion
+
+        #region Core Hash Functions
+
         // Global bucket calculation - returns global bucket index (PtrHash paper Equation 1)
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Bucket(HashValue hx)
@@ -316,51 +333,333 @@ namespace PtrHash.CSharp.Port.Core
             return C * (pilot ^ _seed); // Hash pilot with seed using FxHash multiplication
         }
 
+        #endregion
 
+        #region Streaming Methods
 
-        /// <summary>
-        /// Optimized streaming version that automatically chooses single-part or multi-part implementation
-        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (_isSinglePart)
+                GetIndicesStreamSinglePart(keys, results, minimal);
+            else
+                GetIndicesStreamMultiPart(keys, results, minimal);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void GetIndicesStreamSinglePart(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             var useMinimal = minimal && _minimal && _remapStorage != null;
+            var numKeys = _numKeys; // Cache field access
             
-            // Safe version without pinning - use span indexing with single bounds check pattern
-            for (int i = 0; i < keys.Length; i++)
+            unsafe
             {
-                var hash = _hasher.Hash(keys[i], _seed);
-                
-                // Consolidated bucket calculation
-                var bucket = _isSinglePart 
-                    ? BucketInPart(hash.High())  // Single-part: use bucket function
-                    : Bucket(hash);              // Multi-part: with part calculation
-                
-                // Safe access with bounds checking
-                byte pilot;
-                unsafe
+                fixed (TKey* keysPtr = keys)
+                fixed (nuint* resultsPtr = results)
                 {
-                    pilot = _pilots[bucket];
+                    if (useMinimal)
+                    {
+                        // Direct implementation - no generic dispatch overhead
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            var slot = GetIndexNoRemapSinglePart(keysPtr[i]);
+                            if (slot >= numKeys)
+                            {
+                                var remapIndex = (int)(slot - numKeys);
+                                slot = (nuint)_remapStorage!.Index(remapIndex);
+                            }
+                            resultsPtr[i] = slot;
+                        }
+                    }
+                    else
+                    {
+                        // No remapping needed - direct copy
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            resultsPtr[i] = GetIndexNoRemapSinglePart(keysPtr[i]);
+                        }
+                    }
                 }
-                
-                // Consolidated slot calculation
-                var slot = _isSinglePart
-                    ? SlotInPart(hash, pilot)  // Single-part: direct
-                    : Slot(hash, pilot);       // Multi-part: with part offset
-                
-                // Apply remap if minimal and slot >= numKeys
-                if (useMinimal && slot >= _numKeys)
-                {
-                    var remappedSlot = _remapStorage!.Index((int)(slot - _numKeys));
-                    slot = (nuint)remappedSlot;
-                }
-                
-                results[i] = slot;
             }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void GetIndicesStreamMultiPart(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
+
+            var useMinimal = minimal && _minimal && _remapStorage != null;
+            var numKeys = _numKeys; // Cache field access
+            
+            unsafe
+            {
+                fixed (TKey* keysPtr = keys)
+                fixed (nuint* resultsPtr = results)
+                {
+                    if (useMinimal)
+                    {
+                        // Direct implementation - no generic dispatch overhead
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            var slot = GetIndexNoRemapMultiPart(keysPtr[i]);
+                            if (slot >= numKeys)
+                            {
+                                var remapIndex = (int)(slot - numKeys);
+                                slot = (nuint)_remapStorage!.Index(remapIndex);
+                            }
+                            resultsPtr[i] = slot;
+                        }
+                    }
+                    else
+                    {
+                        // No remapping needed - direct copy
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            resultsPtr[i] = GetIndexNoRemapMultiPart(keysPtr[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Prefetch-enabled streaming - matches Rust's index_stream implementation
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void GetIndicesStreamPrefetch(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            // Fall back to regular streaming if SSE2 prefetch not supported
+            if (!Sse2.IsSupported)
+            {
+                GetIndicesStream(keys, results, minimal);
+                return;
+            }
+
+            if (_isSinglePart)
+                GetIndicesStreamPrefetchSinglePart(keys, results, minimal);
+            else
+                GetIndicesStreamPrefetchMultiPart(keys, results, minimal);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void GetIndicesStreamPrefetchSinglePart(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
+
+            const int PREFETCH_DISTANCE = 32; // Match Rust's B parameter
+            var useMinimal = minimal && _minimal && _remapStorage != null;
+            var numKeys = _numKeys;
+            
+            // Ring buffers for prefetching - match Rust exactly
+            Span<HashValue> nextHashes = stackalloc HashValue[PREFETCH_DISTANCE];
+            Span<ulong> nextBuckets = stackalloc ulong[PREFETCH_DISTANCE];
+            
+            ref var keysRef = ref MemoryMarshal.GetReference(keys);
+            ref var resultsRef = ref MemoryMarshal.GetReference(results);
+            
+            unsafe
+            {
+                // Get raw pointers to ring buffers to avoid bounds checks
+                fixed (HashValue* hashBufPtr = &MemoryMarshal.GetReference(nextHashes))
+                fixed (ulong* bucketBufPtr = &MemoryMarshal.GetReference(nextBuckets))
+                {
+                    // Initialize and prefetch first batch
+                    int remaining = Math.Min(PREFETCH_DISTANCE, keys.Length);
+                    for (int i = 0; i < remaining; i++)
+                    {
+                        var key = Unsafe.Add(ref keysRef, i);
+                        hashBufPtr[i] = _hasher.Hash(key, _seed);
+                        bucketBufPtr[i] = BucketInPart(hashBufPtr[i].High());
+                        
+                        // Prefetch pilot data
+                        Sse.Prefetch0(_pilots + bucketBufPtr[i]);
+                    }
+                    
+                    // Fill remainder with defaults
+                    for (int i = remaining; i < PREFETCH_DISTANCE; i++)
+                    {
+                        hashBufPtr[i] = default;
+                        bucketBufPtr[i] = 0;
+                    }
+                    
+                    // Process main loop with prefetch pipeline
+                    int processed = 0;
+                    
+                    // Main loop - process keys and prefetch ahead
+                    int mainLoopEnd = Math.Max(0, keys.Length - PREFETCH_DISTANCE);
+                    while (processed < mainLoopEnd)
+                    {
+                        int idx = processed % PREFETCH_DISTANCE;
+                        var currentHash = hashBufPtr[idx];
+                        var currentBucket = bucketBufPtr[idx];
+                        
+                        // Prefetch next key while processing current
+                        var nextKey = Unsafe.Add(ref keysRef, processed + PREFETCH_DISTANCE);
+                        hashBufPtr[idx] = _hasher.Hash(nextKey, _seed);
+                        bucketBufPtr[idx] = BucketInPart(hashBufPtr[idx].High());
+                        
+                        // Prefetch pilot data for next iteration
+                        Sse.Prefetch0(_pilots + bucketBufPtr[idx]);
+                        
+                        // Process current key with prefetched data
+                        var pilot = _pilots[currentBucket];
+                        var hp = HashPilot(pilot);
+                        var slot = SlotInPartHp(currentHash, hp);
+                        
+                        if (useMinimal && slot >= numKeys)
+                        {
+                            slot = (nuint)_remapStorage!.Index((int)(slot - numKeys));
+                        }
+                        
+                        Unsafe.Add(ref resultsRef, processed) = slot;
+                        processed++;
+                    }
+                    
+                    // Process remaining prefetched items (matches Rust's leftover loop)
+                    while (processed < keys.Length)
+                    {
+                        int idx = processed % PREFETCH_DISTANCE;
+                        var currentHash = hashBufPtr[idx];
+                        var currentBucket = bucketBufPtr[idx];
+                        
+                        var pilot = _pilots[currentBucket];
+                        var hp = HashPilot(pilot);
+                        var slot = SlotInPartHp(currentHash, hp);
+                        
+                        if (useMinimal && slot >= numKeys)
+                        {
+                            slot = (nuint)_remapStorage!.Index((int)(slot - numKeys));
+                        }
+                        
+                        Unsafe.Add(ref resultsRef, processed) = slot;
+                        processed++;
+                    }
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void GetIndicesStreamPrefetchMultiPart(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        {
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
+
+            const int PREFETCH_DISTANCE = 32;
+            var useMinimal = minimal && _minimal && _remapStorage != null;
+            var numKeys = _numKeys;
+            
+            Span<HashValue> nextHashes = stackalloc HashValue[PREFETCH_DISTANCE];
+            Span<ulong> nextBuckets = stackalloc ulong[PREFETCH_DISTANCE];
+            Span<ulong> nextParts = stackalloc ulong[PREFETCH_DISTANCE];
+            
+            ref var keysRef = ref MemoryMarshal.GetReference(keys);
+            ref var resultsRef = ref MemoryMarshal.GetReference(results);
+            
+            unsafe
+            {
+                // Get raw pointers to ring buffers to avoid bounds checks
+                fixed (HashValue* hashBufPtr = &MemoryMarshal.GetReference(nextHashes))
+                fixed (ulong* bucketBufPtr = &MemoryMarshal.GetReference(nextBuckets))
+                fixed (ulong* partBufPtr = &MemoryMarshal.GetReference(nextParts))
+                {
+                    // Initialize and prefetch first batch
+                    int remaining = Math.Min(PREFETCH_DISTANCE, keys.Length);
+                    for (int i = 0; i < remaining; i++)
+                    {
+                        var key = Unsafe.Add(ref keysRef, i);
+                        hashBufPtr[i] = _hasher.Hash(key, _seed);
+                        var high = hashBufPtr[i].High();
+                        
+                        // Calculate part and remainder
+                        var (part, remainder) = _remParts.ReduceWithRemainder(high);
+                        partBufPtr[i] = part;
+                        
+                        // Calculate bucket in total using remainder
+                        var bucketInPart = BucketInPart(remainder);
+                        bucketBufPtr[i] = part * (ulong)_bucketsPerPart + bucketInPart;
+                        
+                        // Prefetch pilot data
+                        Sse.Prefetch0(_pilots + bucketBufPtr[i]);
+                    }
+                    
+                    // Fill remainder
+                    for (int i = remaining; i < PREFETCH_DISTANCE; i++)
+                    {
+                        hashBufPtr[i] = default;
+                        bucketBufPtr[i] = 0;
+                        partBufPtr[i] = 0;
+                    }
+                    
+                    // Process main loop
+                    int processed = 0;
+                    
+                    // Main loop - process keys and prefetch ahead
+                    int mainLoopEnd = Math.Max(0, keys.Length - PREFETCH_DISTANCE);
+                    while (processed < mainLoopEnd)
+                    {
+                        int idx = processed % PREFETCH_DISTANCE;
+                        var currentHash = hashBufPtr[idx];
+                        var currentBucket = bucketBufPtr[idx];
+                        var currentPart = partBufPtr[idx];
+                        
+                        // Prefetch next key
+                        var nextKey = Unsafe.Add(ref keysRef, processed + PREFETCH_DISTANCE);
+                        hashBufPtr[idx] = _hasher.Hash(nextKey, _seed);
+                        var high = hashBufPtr[idx].High();
+                        
+                        var (part, remainder) = _remParts.ReduceWithRemainder(high);
+                        partBufPtr[idx] = part;
+                        var bucketInPart = BucketInPart(remainder);
+                        bucketBufPtr[idx] = part * (ulong)_bucketsPerPart + bucketInPart;
+                        
+                        Sse.Prefetch0(_pilots + bucketBufPtr[idx]);
+                        
+                        // Process current with prefetched data
+                        var pilot = _pilots[currentBucket];
+                        var hp = HashPilot(pilot);
+                        var slotInPart = SlotInPartHp(currentHash, hp);
+                        var slot = (nuint)(currentPart * (ulong)_slotsPerPart) + slotInPart;
+                        
+                        if (useMinimal && slot >= numKeys)
+                        {
+                            slot = (nuint)_remapStorage!.Index((int)(slot - numKeys));
+                        }
+                        
+                        Unsafe.Add(ref resultsRef, processed) = slot;
+                        processed++;
+                    }
+                    
+                    // Process remaining prefetched items (matches Rust's leftover loop)
+                    while (processed < keys.Length)
+                    {
+                        int idx = processed % PREFETCH_DISTANCE;
+                        var currentHash = hashBufPtr[idx];
+                        var currentBucket = bucketBufPtr[idx];
+                        var currentPart = partBufPtr[idx];
+                        
+                        var pilot = _pilots[currentBucket];
+                        var hp = HashPilot(pilot);
+                        var slotInPart = SlotInPartHp(currentHash, hp);
+                        var slot = (nuint)(currentPart * (ulong)_slotsPerPart) + slotInPart;
+                        
+                        if (useMinimal && slot >= numKeys)
+                        {
+                            slot = (nuint)_remapStorage!.Index((int)(slot - numKeys));
+                        }
+                        
+                        Unsafe.Add(ref resultsRef, processed) = slot;
+                        processed++;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Construction Methods
 
         private bool ComputePilots(ReadOnlySpan<TKey> keys, out ulong finalSeed, out BucketStats? stats)
         {
@@ -391,15 +690,6 @@ namespace PtrHash.CSharp.Port.Core
                 
                 // Choose a global seed s
                 _seed = rng.NextUInt64(); // self.seed = rng.random()
-                if (tries == 1)
-                {
-                    DebugConstruction($"First seed tried: {_seed}");
-                }
-                else
-                {
-                    DebugConstruction($"Previous seed {oldSeed} failed.");
-                    DebugConstruction($"Trying seed number {tries}: {_seed}.");
-                }
                 
                 // Clear the taken bits for new attempt
                 taken.Clear();
@@ -586,8 +876,6 @@ namespace PtrHash.CSharp.Port.Core
                 var rng = new FastRand(); // Auto-seeded random number generator (uses WyRand algorithm)
 
                 // Process buckets in size order (largest first)
-                DebugConstruction($"C# Part {part}: First 10 bucket sizes: {string.Join(", ", bucketOrder.Take(10).Select(b => bucketStarts[b + 1] - bucketStarts[b]))}");
-                DebugConstruction($"C# Part {part}: First 10 bucket IDs: {string.Join(", ", bucketOrder.Take(10))}");
 
                 var totalBuckets = bucketOrder.Length;
                 var processedBuckets = 0;
@@ -632,11 +920,9 @@ namespace PtrHash.CSharp.Port.Core
                         // Additional termination check for excessive evictions
                         if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
                         {
-                            DebugConstruction($"Part {part}: Power-of-two check at evictions={evictions}, slotsPerPart={_slotsPerPart}");
                             // Expensive logging/diagnostics on power-of-two intervals only
                             if (evictions >= 10 * (int)_slotsPerPart)
                             {
-                                DebugConstruction($"Part {part}: Too many evictions, aborting at {evictions}");
                                 return false; // Too many evictions, abort
                             }
                         }
@@ -844,55 +1130,6 @@ namespace PtrHash.CSharp.Port.Core
             return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
         }
         
-        // Size-specialized versions for fixed-size buckets (1-8 elements)
-        // All find_pilot_array methods delegate to find_pilot_slice
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray1(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray2(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray3(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray4(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray5(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray6(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray7(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private (ulong pilot, ulong hashPilot)? FindPilotArray8(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
-        {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
-        }
 
         // Variable-size bucket processing for larger buckets (renamed from FindPilotInPart)
         private (ulong pilot, ulong hashPilot)? FindPilotSlice(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
@@ -1177,16 +1414,20 @@ namespace PtrHash.CSharp.Port.Core
         {
             return _storageType switch
             {
-                RemappingStorageType.VecU8 => new ByteVectorRemappingStorage(values),
-                RemappingStorageType.VecU16 => CompactVectorRemappingStorage.TryNew(values) ?? VectorRemappingStorage.TryNew(values) ?? new LargeVectorRemappingStorage(values.ToArray()),
-                RemappingStorageType.VecU32 => VectorRemappingStorage.TryNew(values) ?? new LargeVectorRemappingStorage(values.ToArray()),
-                RemappingStorageType.VecU64 => new LargeVectorRemappingStorage(values.ToArray()),
-                RemappingStorageType.CacheLineEF => CachelineEfVec.TryNew(values) ?? VectorRemappingStorage.TryNew(values) ?? new LargeVectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.VecU8 => new Byte8VectorRemappingStorage(values),
+                RemappingStorageType.VecU16 => UShort16VectorRemappingStorage.TryNew(values) ?? UInt32VectorRemappingStorage.TryNew(values) ?? new ULong64VectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.VecU32 => UInt32VectorRemappingStorage.TryNew(values) ?? new ULong64VectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.VecU64 => new ULong64VectorRemappingStorage(values.ToArray()),
+                RemappingStorageType.CacheLineEF => CachelineEfVec.TryNew(values) ?? UInt32VectorRemappingStorage.TryNew(values) ?? new ULong64VectorRemappingStorage(values.ToArray()),
                 RemappingStorageType.EliasFano => throw new NotImplementedException("EliasFano storage not yet implemented"),
                 RemappingStorageType.Auto => RemappingStorageFactory.CreateOptimal(values),
                 _ => throw new ArgumentOutOfRangeException(nameof(_storageType), _storageType, "Unknown storage type")
             };
         }
+
+        #endregion
+
+        #region Utility Methods
 
         private static nuint CalculateNumBuckets(nuint numKeys, double lambda)
         {
@@ -1202,6 +1443,8 @@ namespace PtrHash.CSharp.Port.Core
         {
             return (nuint)Math.Max(1, Math.Ceiling(lambda));
         }
+
+        #endregion
 
         #region IDisposable Support
         private bool _disposed = false;

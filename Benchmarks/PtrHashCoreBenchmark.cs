@@ -15,13 +15,16 @@ namespace PtrHash.Benchmarks
 {
     [Config(typeof(Config))]
     [MemoryDiagnoser]
-    [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
+    [SimpleJob(RuntimeMoniker.NativeAot80)]
     public class PtrHashCoreBenchmark
     {
         private class Config : ManualConfig
         {
             public Config()
             {
+                // Add configuration for better benchmarking
+                WithOption(ConfigOptions.JoinSummary, true);
             }
         }
 
@@ -42,12 +45,17 @@ namespace PtrHash.Benchmarks
         private PtrHash<ulong, FxHasher> _singlePartPtrHash = null!;
         
         
-        // Native interop (multi-part only)
-        private PtrHashU64 _nativePtrHash = null!;
+        // Native interop - multi-part
+        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong> _nativeMultiPartPtrHash = null!;
+        
+        // Native interop - single-part
+        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong> _nativeSinglePartPtrHash = null!;
         
         private nuint[] _indicesBuffer1 = null!;
         private nuint[] _indicesBuffer2 = null!;
         private nuint[] _indicesBuffer3 = null!;
+        private nuint[] _indicesBuffer4 = null!;
+        private nuint[] _indicesBuffer5 = null!;
 
         [GlobalSetup]
         public void Setup()
@@ -73,12 +81,18 @@ namespace PtrHash.Benchmarks
             _singlePartPtrHash = new PtrHash<ulong, FxHasher>(_keys, singlePartParams);
 
             
-            // Native interop (multi-part only)
-            _nativePtrHash = new PtrHashU64(_keys, PtrHashNative.FFIParams.Fast);
+            // Native interop - multi-part
+            _nativeMultiPartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong>(_keys, PtrHashNative.FFIParams.Fast);
+            
+            // Native interop - single-part
+            var singlePartNativeParams = PtrHashNative.FFIParams.Fast with { OverrideSinglePart = true };
+            _nativeSinglePartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong>(_keys, singlePartNativeParams);
 
             _indicesBuffer1 = new nuint[actualLookupCount];
             _indicesBuffer2 = new nuint[actualLookupCount];
             _indicesBuffer3 = new nuint[actualLookupCount];
+            _indicesBuffer4 = new nuint[actualLookupCount];
+            _indicesBuffer5 = new nuint[actualLookupCount];
         }
 
         [GlobalCleanup]
@@ -86,49 +100,55 @@ namespace PtrHash.Benchmarks
         {
             _multiPartPtrHash?.Dispose();
             _singlePartPtrHash?.Dispose();
-            _nativePtrHash?.Dispose();
+            _nativeMultiPartPtrHash?.Dispose();
+            _nativeSinglePartPtrHash?.Dispose();
         }
 
-        // Native Interop Stream Baseline
+        // === MULTI-PART COMPARISONS ===
+        
+        // Multi-Part: Native vs Port Point Lookups
         [Benchmark(Baseline = true)]
-        public ulong Native_Stream()
+        public ulong MultiPart_Native_Point()
         {
             ulong sum = 0;
-            _nativePtrHash.GetIndicesStream(
+            foreach (var key in _lookupKeys)
+            {
+                sum += _nativeMultiPartPtrHash.GetIndex(key);
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong MultiPart_Port_Point()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _multiPartPtrHash.GetIndexNoRemap(key);
+            }
+            return sum;
+        }
+
+        // Multi-Part: Native vs Port Stream Lookups
+        [Benchmark]
+        public ulong MultiPart_Native_Stream()
+        {
+            ulong sum = 0;
+            _nativeMultiPartPtrHash.GetIndicesStream(
                 _lookupKeys.AsSpan(),
-                _indicesBuffer3.AsSpan());
+                _indicesBuffer3.AsSpan(),
+                prefetchDistance: 32,
+                minimal: true);
 
-            return sum;
-        }
-
-        // Point Lookups - GetIndex (with remapping)
-
-        [Benchmark]
-        public ulong MultiPart_GetIndex_Point_Branching()
-        {
-            ulong sum = 0;
-            foreach (var key in _lookupKeys)
+            for (int i = 0; i < _indicesBuffer3.Length; i++)
             {
-                _multiPartPtrHash.GetIndex(key);
+                sum += _indicesBuffer3[i];
             }
             return sum;
         }
 
         [Benchmark]
-        public ulong SinglePart_Point_Lookup_Branching()
-        {
-            ulong sum = 0;
-            foreach (var key in _lookupKeys)
-            {
-              _singlePartPtrHash.GetIndex(key);
-            }
-            return sum;
-        }
-
-        // Stream Lookups - GetIndicesStream
-
-        [Benchmark]
-        public ulong MultiPart_Stream_Branching()
+        public ulong MultiPart_Port_Stream()
         {
             ulong sum = 0;
             _multiPartPtrHash.GetIndicesStream(
@@ -136,18 +156,101 @@ namespace PtrHash.Benchmarks
                 _indicesBuffer1,
                 minimal: true);
 
+            for (int i = 0; i < _indicesBuffer1.Length; i++)
+            {
+                sum += _indicesBuffer1[i];
+            }
             return sum;
         }
 
         [Benchmark]
-        public ulong SinglePart_Stream_Branching()
+        public ulong MultiPart_Port_StreamPrefetch()
+        {
+            ulong sum = 0;
+            _multiPartPtrHash.GetIndicesStreamPrefetch(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer1,
+                minimal: true);
+
+            for (int i = 0; i < _indicesBuffer1.Length; i++)
+            {
+                sum += _indicesBuffer1[i];
+            }
+            return sum;
+        }
+
+        // === SINGLE-PART COMPARISONS ===
+        
+        // Single-Part: Native vs Port Point Lookups
+        [Benchmark]
+        public ulong SinglePart_Native_Point()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _nativeSinglePartPtrHash.GetIndex(key);
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong SinglePart_Port_Point()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _singlePartPtrHash.GetIndexNoRemap(key);
+            }
+            return sum;
+        }
+
+        // Single-Part: Native vs Port Stream Lookups
+        [Benchmark]
+        public ulong SinglePart_Native_Stream()
+        {
+            ulong sum = 0;
+            _nativeSinglePartPtrHash.GetIndicesStream(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer4.AsSpan(),
+                prefetchDistance: 32,
+                minimal: true);
+
+            for (int i = 0; i < _indicesBuffer4.Length; i++)
+            {
+                sum += _indicesBuffer4[i];
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong SinglePart_Port_Stream()
         {
             ulong sum = 0;
             _singlePartPtrHash.GetIndicesStream(
                 _lookupKeys.AsSpan(),
                 _indicesBuffer2,
                 minimal: true);
-                
+
+            for (int i = 0; i < _indicesBuffer2.Length; i++)
+            {
+                sum += _indicesBuffer2[i];
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong SinglePart_Port_StreamPrefetch()
+        {
+            ulong sum = 0;
+            _singlePartPtrHash.GetIndicesStreamPrefetch(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer2,
+                minimal: true);
+
+            for (int i = 0; i < _indicesBuffer2.Length; i++)
+            {
+                sum += _indicesBuffer2[i];
+            }
             return sum;
         }
 

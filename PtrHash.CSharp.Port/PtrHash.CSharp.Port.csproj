@@ -1,15 +1,53 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- General compiler optimizations -->
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+
+    <!-- Tiered JIT (only applies when PublishAot is false) -->
+    <TieredCompilation Condition="'$(PublishAot)'!='true'">true</TieredCompilation>
+    <TieredPGO        Condition="'$(PublishAot)'!='true'">true</TieredPGO>
+
+    <!-- ReadyToRun images for faster startup (non‑AOT) -->
+    <ReadyToRun                    Condition="'$(PublishAot)'!='true'">true</ReadyToRun>
+    <PublishReadyToRunUseCrossgen2 Condition="'$(PublishAot)'!='true'">true</PublishReadyToRunUseCrossgen2>
+    <DOTNET_TC_QuickJitForLoops Condition="'$(PublishAot)'!='true'">true</DOTNET_TC_QuickJitForLoops>
+
+
+    <!-- IL trimming to remove unused code -->
+    <TrimMode>link</TrimMode>
+
+    <!-- GC settings -->
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+
+    <!-- Native AOT switch (default false; set to true at publish time) -->
+    <PublishAot>false</PublishAot>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+
+    <!-- SIMD sets for the AOT image - disable AVX-512 -->
+    <NativeAotInstructionSet Condition="'$(PublishAot)'=='true'">-avx512f,-avx512cd,-avx512bw,-avx512dq,-avx512vl,-avx512vbmi</NativeAotInstructionSet>
+
+    <!-- Enable hardware-intrinsics -->
+    <EnableHWIntrinsic>true</EnableHWIntrinsic>
+    <EnableSSE>true</EnableSSE>
+    <EnableSSE2>true</EnableSSE2>
+    <EnableAVX>true</EnableAVX>
+    <EnableAVX2>true</EnableAVX2>
+
+    <!-- Explicitly disable AVX‑512 variants for AOT -->
+    <EnableAVX512>false</EnableAVX512>
+    <EnableAVX512F>false</EnableAVX512F>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
   </ItemGroup>
-
 </Project>

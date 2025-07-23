@@ -12,8 +12,13 @@ namespace PtrHash.Benchmarks
     {
         static void Main(string[] args)
         {
+            // Note: Environment variables set here don't affect BenchmarkDotNet child processes
+            // For AOT benchmarks, run with: DOTNET_EnableAVX512F=0 dotnet run -c Release -- core
+            
             Console.WriteLine("PtrHash Performance Benchmarks");
             Console.WriteLine("==============================");
+            Console.WriteLine("Runtime: " + (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription));
+            Console.WriteLine("GC Mode: " + (System.Runtime.GCSettings.IsServerGC ? "Server" : "Workstation"));
             Console.WriteLine();
 
             if (args.Length == 0)

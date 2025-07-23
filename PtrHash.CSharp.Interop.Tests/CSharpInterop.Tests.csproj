@@ -7,6 +7,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
+    <!-- Suppress preview features warnings for P/Invoke optimizations -->
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <NoWarn>$(NoWarn);CA2252</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

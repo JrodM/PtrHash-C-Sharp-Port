@@ -57,16 +57,16 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHashU64 NativeInteropConstruction()
+        public PtrHashImpl.PtrHashInterop<ulong> NativeInteropConstruction()
         {
-            return new PtrHashU64(_keys.AsSpan(), PtrHashNative.FFIParams.Fast);
+            return new PtrHashImpl.PtrHashInterop<ulong>(_keys.AsSpan(), PtrHashNative.FFIParams.Fast);
         }
 
         [Benchmark]
-        public PtrHashU64 NativeInteropConstruction_StrongerHasher()
+        public PtrHashImpl.PtrHashInterop<ulong> NativeInteropConstruction_StrongerHasher()
         {
-            var config = PtrHashNative.FFIParams.Fast with { U64HashFunction = 2 }; // StrongerIntHash
-            return new PtrHashU64(_keys.AsSpan(), config);
+            var config = PtrHashNative.FFIParams.Fast with { OverrideHashFunction = 2 }; // StrongerIntHash
+            return new PtrHashImpl.PtrHashInterop<ulong>(_keys.AsSpan(), config);
         }
 
         [Benchmark]

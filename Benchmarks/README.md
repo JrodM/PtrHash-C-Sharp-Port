@@ -160,3 +160,29 @@ dotnet run -c Release -- all
 - Ratios show speedup relative to baseline (Dictionary or Multi-Part)
 - Results include memory diagnostics where available
 - Multiple iterations ensure statistical significance
+
+
+
+
+
+
+
+
+
+
+
++--------------------------------------+-------------------------------------------------------------+
+| Feature                              | Removes                                                     |
++--------------------------------------+-------------------------------------------------------------+
+| DisableRuntimeMarshalling            | • Argument/runtime data marshalling code                    |
+|                                      | • Pinning & buffer copying (strings, structs)               |
+|                                      | • Security stack‑walk & runtime stub setup (~100 ns+)       |
++--------------------------------------+-------------------------------------------------------------+
+| LibraryImport (source‑gen P/Invoke)  | • JIT‑emitted IL stub                                        |
+|                                      | • Reflection‑based lookup of entrypoint                     |
+|                                      | • Per‑call metadata checks                                  |
++--------------------------------------+-------------------------------------------------------------+
+| SuppressGCTransition                 | • Thread GC mode switch (cooperative ⇄ preemptive) (~20 ns) |
++--------------------------------------+-------------------------------------------------------------+
+| **Combined**                         | All of the above → ~10–20 ns raw call                        |
++--------------------------------------+-------------------------------------------------------------+

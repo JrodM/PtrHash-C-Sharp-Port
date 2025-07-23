@@ -9,25 +9,25 @@ namespace PtrHash.CSharp.Port.Storage
     /// Simple vector-based remapping storage using aligned native memory for uint values.
     /// Corresponds to Rust's Vec&lt;u32&gt; backing storage.
     /// </summary>
-    public unsafe class VectorRemappingStorage : IMutableRemappingStorage
+    public unsafe class UInt32VectorRemappingStorage : IStaticRemappingStorage<UInt32VectorRemappingStorage>
     {
         private readonly uint* _values;
         private readonly int _length;
         private bool _disposed;
 
-        private VectorRemappingStorage(uint* values, int length)
+        private UInt32VectorRemappingStorage(uint* values, int length)
         {
             _values = values;
             _length = length;
         }
 
-        ~VectorRemappingStorage()
+        ~UInt32VectorRemappingStorage()
         {
             Dispose(false);
         }
 
         /// <summary>
-        /// Create a new VectorRemappingStorage from the given values.
+        /// Create a new UInt32VectorRemappingStorage from the given values.
         /// Always succeeds as it can represent any uint values.
         /// </summary>
         public static IMutableRemappingStorage? TryNew(ReadOnlySpan<ulong> values)
@@ -48,7 +48,7 @@ namespace PtrHash.CSharp.Port.Storage
                 ptr[i] = (uint)values[i];
             }
             
-            return new VectorRemappingStorage(ptr, length);
+            return new UInt32VectorRemappingStorage(ptr, length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -70,6 +70,9 @@ namespace PtrHash.CSharp.Port.Storage
 
         public static string Name => "Vec<u32>";
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong IndexStatic(UInt32VectorRemappingStorage self, int index) => self._values[index];
+
         public void Dispose()
         {
             Dispose(true);
@@ -90,25 +93,25 @@ namespace PtrHash.CSharp.Port.Storage
     /// Compact vector-based remapping storage using aligned native memory for ushort values.
     /// More memory efficient for smaller values.
     /// </summary>
-    public unsafe class CompactVectorRemappingStorage : IMutableRemappingStorage
+    public unsafe class UShort16VectorRemappingStorage : IStaticRemappingStorage<UShort16VectorRemappingStorage>
     {
         private readonly ushort* _values;
         private readonly int _length;
         private bool _disposed;
 
-        private CompactVectorRemappingStorage(ushort* values, int length)
+        private UShort16VectorRemappingStorage(ushort* values, int length)
         {
             _values = values;
             _length = length;
         }
 
-        ~CompactVectorRemappingStorage()
+        ~UShort16VectorRemappingStorage()
         {
             Dispose(false);
         }
 
         /// <summary>
-        /// Create a new CompactVectorRemappingStorage from the given values.
+        /// Create a new UShort16VectorRemappingStorage from the given values.
         /// Returns null if any value exceeds ushort.MaxValue.
         /// </summary>
         public static IMutableRemappingStorage? TryNew(ReadOnlySpan<ulong> values)
@@ -129,7 +132,7 @@ namespace PtrHash.CSharp.Port.Storage
                 ptr[i] = (ushort)values[i];
             }
             
-            return new CompactVectorRemappingStorage(ptr, length);
+            return new UShort16VectorRemappingStorage(ptr, length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -150,6 +153,9 @@ namespace PtrHash.CSharp.Port.Storage
         public int SizeInBytes => _length * sizeof(ushort);
 
         public static string Name => "Vec<u16>";
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong IndexStatic(UShort16VectorRemappingStorage self, int index) => self._values[index];
 
         public void Dispose()
         {
@@ -171,13 +177,13 @@ namespace PtrHash.CSharp.Port.Storage
     /// Ultra-compact vector-based remapping storage using aligned native memory for byte values.
     /// Most memory efficient for very small values.
     /// </summary>
-    public unsafe class ByteVectorRemappingStorage : IMutableRemappingStorage
+    public unsafe class Byte8VectorRemappingStorage : IStaticRemappingStorage<Byte8VectorRemappingStorage>
     {
         private readonly byte* _values;
         private readonly int _length;
         private bool _disposed;
 
-        public ByteVectorRemappingStorage(ReadOnlySpan<ulong> values)
+        public Byte8VectorRemappingStorage(ReadOnlySpan<ulong> values)
         {
             var length = values.Length;
             var byteSize = length * sizeof(byte);
@@ -195,7 +201,7 @@ namespace PtrHash.CSharp.Port.Storage
             _length = length;
         }
 
-        ~ByteVectorRemappingStorage()
+        ~Byte8VectorRemappingStorage()
         {
             Dispose(false);
         }
@@ -207,7 +213,7 @@ namespace PtrHash.CSharp.Port.Storage
                 if (values[i] > byte.MaxValue)
                     return null;
             }
-            return new ByteVectorRemappingStorage(values);
+            return new Byte8VectorRemappingStorage(values);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -228,6 +234,9 @@ namespace PtrHash.CSharp.Port.Storage
         public int SizeInBytes => _length * sizeof(byte);
 
         public static string Name => "Vec<u8>";
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong IndexStatic(Byte8VectorRemappingStorage self, int index) => self._values[index];
 
         public void Dispose()
         {
