@@ -54,12 +54,16 @@ namespace PtrHash.CSharp.Interop.Tests
             return new string(result);
         }
 
-        public static PtrHashNative.FFIParams GetTestParams(bool useFast = true, uint hashFunction = 1)
+        public static PtrHashNative.FFIParams GetTestParams(uint hashFunction = 1)
         {
             // Use default fast configuration but with StrongerIntHash (1) instead of FxHash (0) to avoid construction timeouts
-            return useFast 
-                ? PtrHashNative.FFIParams.FastWithOverrides(hashFunction: hashFunction)
-                : PtrHashNative.FFIParams.Custom(hashFunction: hashFunction);
+            return PtrHashNative.FFIParams.FastWithOverrides(hashFunction: hashFunction);
+        }
+        
+        public static PtrHashNative.FFIParams GetStringTestParams()
+        {
+            // For strings, use Fast preset but ensure proper string hash handling
+            return PtrHashNative.FFIParams.Fast;  // Strings always use StringHash regardless of override
         }
 
         public static void AssertValidPtrHashInfo(PtrHashInfo info, int expectedKeyCount)

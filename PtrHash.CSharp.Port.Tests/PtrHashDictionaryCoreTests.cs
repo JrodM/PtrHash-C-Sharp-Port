@@ -1,6 +1,6 @@
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PtrHash.CSharp.Port.Collections;
-using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 using System;
 using System.Collections.Generic;
@@ -8,12 +8,12 @@ using System.Linq;
 
 namespace PtrHash.CSharp.Port.Tests
 {
-    [TestFixture]
+    [TestClass]
     public class PtrHashDictionaryCoreTests
     {
         #region Constructor Tests
 
-        [Test]
+        [TestMethod]
         public void Constructor_WithValidAndInvalidInputs_BehavesCorrectly()
         {
             // Valid construction
@@ -22,11 +22,11 @@ namespace PtrHash.CSharp.Port.Tests
             var sentinel = "NOT_FOUND";
             
             using var dictionary = new PtrHashDictionaryU64<string>(keys, values, sentinel);
-            Assert.That(dictionary.Sentinel, Is.EqualTo(sentinel));
-            Assert.That(dictionary.Count, Is.EqualTo(1000));
+            Assert.AreEqual(sentinel, dictionary.Sentinel);
+            Assert.AreEqual(1000, dictionary.Count);
             
             // Invalid construction - mismatched arrays
-            Assert.Throws<ArgumentException>(() => 
+            Assert.ThrowsException<ArgumentException>(() => 
                 new PtrHashDictionaryU64<string>(new ulong[] { 1, 2, 3 }, new string[] { "a", "b" }, "ERROR"));
         }
 
@@ -34,7 +34,7 @@ namespace PtrHash.CSharp.Port.Tests
 
         #region Lookup Tests
 
-        [Test]
+        [TestMethod]
         public void Lookups_ReturnCorrectValuesForValidAndInvalidKeys()
         {
             // Arrange
@@ -44,23 +44,23 @@ namespace PtrHash.CSharp.Port.Tests
             using var dictionary = new PtrHashDictionaryU64<int>(keys, values, sentinel);
 
             // Test valid keys
-            Assert.That(dictionary.TryGetValue(20, out int value), Is.True);
-            Assert.That(value, Is.EqualTo(200));
-            Assert.That(dictionary.GetValueOrSentinel(40), Is.EqualTo(400));
-            Assert.That(dictionary[30], Is.EqualTo(300));
+            Assert.IsTrue(dictionary.TryGetValue(20, out int value));
+            Assert.AreEqual(200, value);
+            Assert.AreEqual(400, dictionary.GetValueOrSentinel(40));
+            Assert.AreEqual(300, dictionary[30]);
 
             // Test invalid keys
-            Assert.That(dictionary.TryGetValue(15, out int missingValue), Is.False);
-            Assert.That(missingValue, Is.EqualTo(sentinel));
-            Assert.That(dictionary.GetValueOrSentinel(99), Is.EqualTo(sentinel));
-            Assert.Throws<KeyNotFoundException>(() => { var x = dictionary[99]; });
+            Assert.IsFalse(dictionary.TryGetValue(15, out int missingValue));
+            Assert.AreEqual(sentinel, missingValue);
+            Assert.AreEqual(sentinel, dictionary.GetValueOrSentinel(99));
+            Assert.ThrowsException<KeyNotFoundException>(() => { var x = dictionary[99]; });
         }
 
         #endregion
 
         #region Streaming Tests
 
-        [Test]
+        [TestMethod]
         public void GetValuesStream_ConsistentWithSingleLookups()
         {
             // Arrange
@@ -78,11 +78,10 @@ namespace PtrHash.CSharp.Port.Tests
             dictionary.GetValuesStream(queryKeys, streamResults);
 
             // Assert
-            Assert.That(streamResults, Is.EqualTo(expectedPoint), 
-                "Stream results should match point lookups");
+            CollectionAssert.AreEqual(expectedPoint, streamResults);
         }
 
-        [Test]
+        [TestMethod]
         public void GetValuesStream_EdgeCases()
         {
             // Arrange
@@ -91,10 +90,10 @@ namespace PtrHash.CSharp.Port.Tests
             using var dictionary = new PtrHashDictionaryU64<string>(keys, values, "EMPTY");
 
             // Empty input
-            Assert.DoesNotThrow(() => dictionary.GetValuesStream(Array.Empty<ulong>(), Array.Empty<string>()));
+            dictionary.GetValuesStream(Array.Empty<ulong>(), Array.Empty<string>());
 
             // Mismatched spans
-            Assert.Throws<ArgumentException>(() => 
+            Assert.ThrowsException<ArgumentException>(() => 
                 dictionary.GetValuesStream(new ulong[] { 1, 2 }, new string[3]));
         }
 
@@ -102,7 +101,7 @@ namespace PtrHash.CSharp.Port.Tests
 
         #region String Key Tests
 
-        [Test]
+        [TestMethod]
         public void StringDictionary_WorksCorrectly()
         {
             // Arrange
@@ -112,22 +111,22 @@ namespace PtrHash.CSharp.Port.Tests
             using var dictionary = new PtrHashDictionaryString<string>(keys, values, sentinel);
 
             // Test point lookups
-            Assert.That(dictionary["red"], Is.EqualTo("#FF0000"));
-            Assert.That(dictionary.GetValueOrSentinel("missing"), Is.EqualTo(sentinel));
+            Assert.AreEqual("#FF0000", dictionary["red"]);
+            Assert.AreEqual(sentinel, dictionary.GetValueOrSentinel("missing"));
 
             // Test streaming
             var queryKeys = new[] { "blue", "invalid", "yellow" };
             var results = new string[queryKeys.Length];
             dictionary.GetValuesStream(queryKeys, results);
             
-            Assert.That(results, Is.EqualTo(new[] { "#0000FF", "#UNKNOWN", "#FFFF00" }));
+            CollectionAssert.AreEqual(new[] { "#0000FF", "#UNKNOWN", "#FFFF00" }, results);
         }
 
         #endregion
 
         #region IDictionary Interface Tests
 
-        [Test]
+        [TestMethod]
         public void IDictionaryInterface_ImplementedCorrectly()
         {
             // Arrange
@@ -136,35 +135,35 @@ namespace PtrHash.CSharp.Port.Tests
             using var dictionary = new PtrHashDictionaryU64<string>(keys, values, "NONE");
 
             // Test properties
-            Assert.That(dictionary.Count, Is.EqualTo(5));
-            Assert.That(dictionary.IsReadOnly, Is.True);
-            Assert.That(dictionary.Keys, Is.EquivalentTo(keys));
-            Assert.That(dictionary.Values, Is.EquivalentTo(values));
+            Assert.AreEqual(5, dictionary.Count);
+            Assert.IsTrue(dictionary.IsReadOnly);
+            CollectionAssert.AreEquivalent(keys.ToArray(), dictionary.Keys.ToArray());
+            CollectionAssert.AreEquivalent(values.ToArray(), dictionary.Values.ToArray());
 
             // Test read operations
-            Assert.That(dictionary.ContainsKey(3), Is.True);
-            Assert.That(dictionary.ContainsKey(10), Is.False);
-            Assert.That(dictionary.Contains(new System.Collections.Generic.KeyValuePair<ulong, string>(2, "two")), Is.True);
+            Assert.IsTrue(dictionary.ContainsKey(3));
+            Assert.IsFalse(dictionary.ContainsKey(10));
+            Assert.IsTrue(dictionary.Contains(new System.Collections.Generic.KeyValuePair<ulong, string>(2, "two")));
 
             // Test enumeration
             var items = dictionary.ToList();
-            Assert.That(items.Count, Is.EqualTo(5));
+            Assert.AreEqual(5, items.Count);
 
             // Test read-only exceptions
-            Assert.Throws<NotSupportedException>(() => dictionary[1] = "new");
-            Assert.Throws<NotSupportedException>(() => dictionary.Add(6, "six"));
-            Assert.Throws<NotSupportedException>(() => dictionary.Remove(1));
-            Assert.Throws<NotSupportedException>(() => dictionary.Clear());
+            Assert.ThrowsException<NotSupportedException>(() => dictionary[1] = "new");
+            Assert.ThrowsException<NotSupportedException>(() => dictionary.Add(6, "six"));
+            Assert.ThrowsException<NotSupportedException>(() => dictionary.Remove(1));
+            Assert.ThrowsException<NotSupportedException>(() => dictionary.Clear());
         }
 
         #endregion
 
         #region Performance and Scale Tests
 
-        [Test]
-        [TestCase(1_000)]
-        [TestCase(10_000)]
-        [TestCase(100_000)]
+        [TestMethod]
+        [DataRow(1_000)]
+        [DataRow(10_000)]
+        [DataRow(100_000)]
         public void LargeScale_MaintainsCorrectness(int size)
         {
             // Arrange
@@ -184,16 +183,15 @@ namespace PtrHash.CSharp.Port.Tests
             var streamResults = new int[testKeys.Length];
             dictionary.GetValuesStream(testKeys, streamResults);
 
-            Assert.That(streamResults, Is.EqualTo(pointResults));
-            Assert.That(pointResults.All(v => v != sentinel), Is.True, 
-                "All sampled keys should be found");
+            CollectionAssert.AreEqual(pointResults, streamResults);
+            Assert.IsTrue(pointResults.All(v => v != sentinel));
         }
 
         #endregion
 
         #region Lifecycle Tests
 
-        [Test]
+        [TestMethod]
         public void Dispose_ReleasesResources()
         {
             // Arrange
@@ -203,10 +201,10 @@ namespace PtrHash.CSharp.Port.Tests
                 "DISPOSED");
             
             // Act & Assert - no exceptions on dispose
-            Assert.DoesNotThrow(() => dictionary.Dispose());
+            dictionary.Dispose();
             
             // Multiple disposes should not throw
-            Assert.DoesNotThrow(() => dictionary.Dispose());
+            dictionary.Dispose();
         }
 
         #endregion

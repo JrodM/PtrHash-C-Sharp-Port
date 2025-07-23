@@ -15,7 +15,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void Constructor_WithValidKeys_CreatesInstance()
         {
             var keys = TestUtilities.GenerateTestU64Keys();
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             TestUtilities.AssertValidPtrHashInfo(hash.GetInfo(), keys.Length);
         }
 
@@ -30,8 +30,8 @@ namespace PtrHash.CSharp.Interop.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void Constructor_WithNullKeys_ThrowsArgumentNullException()
+        [ExpectedException(typeof(ArgumentException))]
+        public void Constructor_WithNullKeys_ThrowsArgumentException()
         {
             new PtrHashInterop<ulong>((ulong[])null);
         }
@@ -47,7 +47,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndex_WithValidKeys_ReturnsUniqueIndices()
         {
             var keys = TestUtilities.GenerateTestU64Keys(10_000);
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             
             var indices = new nuint[keys.Length];
             for (int i = 0; i < keys.Length; i++)
@@ -62,7 +62,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndexNoRemap_WithValidKeys_ReturnsIndices()
         {
             var keys = TestUtilities.GenerateTestU64Keys();
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             var info = hash.GetInfo();
             
             var indices = new nuint[keys.Length];
@@ -78,7 +78,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndicesBatch_WithValidKeys_ReturnsCorrectIndices()
         {
             var keys = TestUtilities.GenerateTestU64Keys(10_000);
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             
             var expectedIndices = new nuint[keys.Length];
             for (int i = 0; i < keys.Length; i++)
@@ -96,7 +96,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndicesBatch_WithNoRemapFlag_ReturnsCorrectIndices()
         {
             var keys = TestUtilities.GenerateTestU64Keys();
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             
             var expectedIndices = new nuint[keys.Length];
             for (int i = 0; i < keys.Length; i++)
@@ -114,7 +114,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndicesStream_WithValidKeys_ReturnsCorrectIndices()
         {
             var keys = TestUtilities.GenerateTestU64Keys(10);
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             
             var expectedIndices = new nuint[keys.Length];
             for (int i = 0; i < keys.Length; i++)
@@ -132,7 +132,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndicesStream_WithDifferentPrefetchDistances_ReturnsCorrectIndices()
         {
             var keys = TestUtilities.GenerateTestU64Keys(10);
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             
             var expectedIndices = new nuint[keys.Length];
             for (int i = 0; i < keys.Length; i++)
@@ -152,7 +152,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void Performance_BasicFunctionality_Works()
         {
             var keys = TestUtilities.GenerateUniqueRandomKeys(25_000);
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             
             var results = new nuint[keys.Length];
             hash.GetIndicesBatch(keys, results);
@@ -166,7 +166,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndicesBatch_WithMismatchedArrays_ThrowsArgumentException()
         {
             var keys = TestUtilities.GenerateTestU64Keys(3);
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             var results = new nuint[2];
             hash.GetIndicesBatch(keys, results);
         }
@@ -175,7 +175,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetInfo_ReturnsValidInformation()
         {
             var keys = TestUtilities.GenerateTestU64Keys();
-            using var hash = new PtrHashInterop<ulong>(keys);
+            using var hash = new PtrHashInterop<ulong>(keys, TestUtilities.GetTestParams());
             TestUtilities.AssertValidPtrHashInfo(hash.GetInfo(), keys.Length);
         }
 

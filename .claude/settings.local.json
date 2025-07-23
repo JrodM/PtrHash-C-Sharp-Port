@@ -29,7 +29,8 @@
       "Bash(sed:*)",
       "Bash(cp:*)",
       "Bash(DOTNET_EnableAVX512F=0 dotnet build -c Release)",
-      "Bash(RUST_LOG=debug dotnet test /home/jared/Developer/PtrHash/PtrHash.CSharp.Interop.Tests --configuration Release --filter \"GetIndex_WithValidKeys_ReturnsUniqueIndices\" --verbosity detailed)"
+      "Bash(RUST_LOG=debug dotnet test /home/jared/Developer/PtrHash/PtrHash.CSharp.Interop.Tests --configuration Release --filter \"GetIndex_WithValidKeys_ReturnsUniqueIndices\" --verbosity detailed)",
+      "Bash(cd \"/home/jared/Developer/PtrHash/PtrHash.CSharp.Interop.Tests\")"
     ],
     "deny": []
   }

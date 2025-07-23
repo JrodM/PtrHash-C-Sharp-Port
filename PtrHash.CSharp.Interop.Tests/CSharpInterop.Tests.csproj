@@ -29,8 +29,8 @@
       <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Windows'))">dll</NativeLibExt>
       <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('Linux'))">so</NativeLibExt>
       <NativeLibExt Condition="$([MSBuild]::IsOSPlatform('OSX'))">dylib</NativeLibExt>
-      <NativeLibPath>..\PtrHash.CSharp.Interop\target\release\ptrhash.$(NativeLibExt)</NativeLibPath>
-      <NativeLibPathDebug>..\PtrHash.CSharp.Interop\target\debug\ptrhash.$(NativeLibExt)</NativeLibPathDebug>
+      <NativeLibPath>../PtrHash.CSharp.Interop/target/release/libptrhash.$(NativeLibExt)</NativeLibPath>
+      <NativeLibPathDebug>../PtrHash.CSharp.Interop/target/debug/libptrhash.$(NativeLibExt)</NativeLibPathDebug>
     </PropertyGroup>
     
     <Message Text="Checking for native library for tests..." Importance="high" />

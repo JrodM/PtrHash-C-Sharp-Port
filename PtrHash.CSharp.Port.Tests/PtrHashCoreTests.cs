@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PtrHash.CSharp.Port.PtrHash;
+using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 using System;
 using System.Linq;
@@ -22,8 +22,8 @@ namespace PtrHash.CSharp.Port.Tests
 
             // Assert - UInt64
             Assert.AreEqual((nuint)1000, ulongInfo.KeyCount);
-            Assert.That(ulongInfo.BitsPerKey, Is.InRange(2.0, 4.0));
-            Assert.That(ulongInfo.MaxIndex, Is.GreaterThanOrEqualTo((nuint)1000));
+            Assert.IsTrue(ulongInfo.BitsPerKey >= 2.0 && ulongInfo.BitsPerKey <= 4.0);
+            Assert.IsTrue(ulongInfo.MaxIndex >= (nuint)1000);
 
             // Arrange & Act - String
             var stringKeys = Enumerable.Range(1, 100).Select(i => $"key_{i}").ToArray();
@@ -31,22 +31,20 @@ namespace PtrHash.CSharp.Port.Tests
             var stringInfo = stringPtrHash.GetInfo();
 
             // Assert - String
-            Assert.That(stringInfo.KeyCount, Is.EqualTo((nuint)100));
-            Assert.That(stringInfo.BitsPerKey, Is.GreaterThan(0));
-            Assert.That(stringInfo.MaxIndex, Is.GreaterThanOrEqualTo((nuint)100));
+            Assert.AreEqual((nuint)100, stringInfo.KeyCount);
+            Assert.IsTrue(stringInfo.BitsPerKey > 0);
+            Assert.IsTrue(stringInfo.MaxIndex >= (nuint)100);
         }
 
         [TestMethod]
         public void Constructor_WithInvalidKeys_ThrowsException()
         {
             // Test both empty and duplicate keys
-            Assert.Throws<ArgumentException>(() => 
-                new PtrHash<ulong, FxHasher>(Array.Empty<ulong>(), PtrHashParams.DefaultFast),
-                "Empty keys should throw ArgumentException");
+            Assert.ThrowsException<ArgumentException>(() => 
+                new PtrHash<ulong, FxHasher>(Array.Empty<ulong>(), PtrHashParams.DefaultFast));
 
-            Assert.Throws<PtrHashException>(() => 
-                new PtrHash<ulong, FxHasher>(new ulong[] { 1, 2, 3, 2, 4 }, PtrHashParams.DefaultFast),
-                "Duplicate keys should throw PtrHashException");
+            Assert.ThrowsException<PtrHashException>(() => 
+                new PtrHash<ulong, FxHasher>(new ulong[] { 1, 2, 3, 2, 4 }, PtrHashParams.DefaultFast));
         }
 
         #endregion
@@ -66,12 +64,12 @@ namespace PtrHash.CSharp.Port.Tests
             var info = ptrHash.GetInfo();
 
             // Assert - GetIndex (minimal)
-            Assert.That(indices.Distinct().Count(), Is.EqualTo(keys.Length), "All minimal indices should be unique");
-            Assert.That(indices.All(idx => idx < (nuint)keys.Length), Is.True, "All minimal indices should be < n");
+            Assert.AreEqual(keys.Length, indices.Distinct().Count());
+            Assert.IsTrue(indices.All(idx => idx < (nuint)keys.Length));
 
             // Assert - GetIndexNoRemap
-            Assert.That(noRemapIndices.Distinct().Count(), Is.EqualTo(keys.Length), "All no-remap indices should be unique");
-            Assert.That(noRemapIndices.All(idx => idx < info.MaxIndex), Is.True, "All no-remap indices should be < MaxIndex");
+            Assert.AreEqual(keys.Length, noRemapIndices.Distinct().Count());
+            Assert.IsTrue(noRemapIndices.All(idx => idx < info.MaxIndex));
         }
 
         #endregion
@@ -96,10 +94,8 @@ namespace PtrHash.CSharp.Port.Tests
             ptrHash.GetIndicesStream(keys, streamNoRemap, minimal: false);
 
             // Assert
-            Assert.That(streamMinimal, Is.EqualTo(expectedMinimal), 
-                "Stream with minimal=true should match GetIndex");
-            Assert.That(streamNoRemap, Is.EqualTo(expectedNoRemap), 
-                "Stream with minimal=false should match GetIndexNoRemap");
+            CollectionAssert.AreEqual(expectedMinimal, streamMinimal);
+            CollectionAssert.AreEqual(expectedNoRemap, streamNoRemap);
         }
 
         #endregion
@@ -120,14 +116,11 @@ namespace PtrHash.CSharp.Port.Tests
             var strongIndices = keys.Take(100).Select(k => strongHash.GetIndex(k)).ToArray();
 
             // Assert - Different mappings
-            Assert.That(xxh3Indices, Is.Not.EqualTo(strongIndices), 
-                "Different hashers should produce different mappings");
+            CollectionAssert.AreNotEqual(strongIndices, xxh3Indices);
             
             // Assert - Both are valid perfect hash functions
-            Assert.That(xxh3Indices.Distinct().Count(), Is.EqualTo(100), 
-                "Xxh3 hasher should produce unique indices");
-            Assert.That(strongIndices.Distinct().Count(), Is.EqualTo(100), 
-                "Stronger hasher should produce unique indices");
+            Assert.AreEqual(100, xxh3Indices.Distinct().Count());
+            Assert.AreEqual(100, strongIndices.Distinct().Count());
         }
 
         [TestMethod]
@@ -142,10 +135,8 @@ namespace PtrHash.CSharp.Port.Tests
             var indices = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
 
             // Assert
-            Assert.That(indices.Distinct().Count(), Is.EqualTo(keys.Length), 
-                "Single part should still produce perfect hash");
-            Assert.That(indices.All(idx => idx < (nuint)keys.Length), Is.True,
-                "All indices should be in valid range");
+            Assert.AreEqual(keys.Length, indices.Distinct().Count());
+            Assert.IsTrue(indices.All(idx => idx < (nuint)keys.Length));
         }
 
         #endregion
@@ -153,9 +144,9 @@ namespace PtrHash.CSharp.Port.Tests
         #region Scale Tests
 
         [TestMethod]
-        [TestCase(1_000)]
-        [TestCase(10_000)]
-        [TestCase(100_000)]
+        [DataRow(1_000)]
+        [DataRow(10_000)]
+        [DataRow(100_000)]
         public void VariousDatasetSizes_MaintainCorrectness(int keyCount)
         {
             // Arrange
@@ -175,13 +166,10 @@ namespace PtrHash.CSharp.Port.Tests
             ptrHash.GetIndicesStream(sampleKeys, streamResults, minimal: true);
 
             // Assert
-            Assert.That(info.KeyCount, Is.EqualTo((nuint)keyCount));
-            Assert.That(info.BitsPerKey, Is.InRange(2.0, 4.0), 
-                $"Bits per key should be reasonable for {keyCount} keys");
-            Assert.That(sampleIndices.Distinct().Count(), Is.EqualTo(sampleKeys.Length), 
-                "Sample should have unique indices");
-            Assert.That(streamResults, Is.EqualTo(sampleIndices), 
-                "Stream should match individual lookups");
+            Assert.AreEqual((nuint)keyCount, info.KeyCount);
+            Assert.IsTrue(info.BitsPerKey >= 2.0 && info.BitsPerKey <= 4.0);
+            Assert.AreEqual(sampleKeys.Length, sampleIndices.Distinct().Count());
+            CollectionAssert.AreEqual(sampleIndices, streamResults);
         }
 
         #endregion
