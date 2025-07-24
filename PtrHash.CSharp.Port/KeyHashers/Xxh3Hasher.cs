@@ -12,7 +12,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
     public readonly struct Xxh3Hasher : IKeyHasher<ulong>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public HashValue Hash(ulong key, ulong seed)
+        public static HashValue Hash(ulong key, ulong seed)
         {
             Span<byte> keyBytes = stackalloc byte[8];
             BitConverter.TryWriteBytes(keyBytes, key);

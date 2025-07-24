@@ -25,7 +25,7 @@ namespace PtrHash.Benchmarks
             }
         }
 
-        [Params(1_000, 10_000, 100_000, 1_000_000, 10_000_000)]
+        [Params(10_000, 100_000, 1_000_000, 10_000_000)]
         public int KeyCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -62,8 +62,31 @@ namespace PtrHash.Benchmarks
             int lookupCount = Math.Min(KeyCount, 10_000);
             
             _lookupKeys = new ulong[lookupCount];
-            for (int i = 0; i < lookupCount; i++)
+            // 50% keys in set, 50% keys not in set for realistic lookup testing
+            var halfCount = lookupCount / 2;
+            
+            // First half: keys that ARE in the set
+            for (int i = 0; i < halfCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
+            
+            // Second half: keys that are NOT in the set
+            var missKeySet = new HashSet<ulong>(_keys);
+            for (int i = halfCount; i < lookupCount; i++)
+            {
+                ulong missKey;
+                do
+                {
+                    missKey = (ulong)random.NextInt64(1, long.MaxValue);
+                } while (missKeySet.Contains(missKey));
+                _lookupKeys[i] = missKey;
+            }
+            
+            // Shuffle the lookup keys to mix hits and misses
+            for (int i = lookupCount - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                (_lookupKeys[i], _lookupKeys[j]) = (_lookupKeys[j], _lookupKeys[i]);
+            }
 
             // Dictionary
             _dictionary = new Dictionary<ulong, ulong>(KeyCount);

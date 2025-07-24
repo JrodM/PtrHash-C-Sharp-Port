@@ -13,7 +13,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
     public readonly struct StringHasher : IKeyHasher<string>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public HashValue Hash(string key, ulong seed)
+        public static HashValue Hash(string key, ulong seed)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));

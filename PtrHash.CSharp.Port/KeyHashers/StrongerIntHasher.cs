@@ -14,7 +14,7 @@ namespace PtrHash.CSharp.Port.KeyHashers
         private const ulong C = 0x517cc1b727220a95UL; // FxHash constant
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public HashValue Hash(ulong key, ulong seed)
+        public static HashValue Hash(ulong key, ulong seed)
         {
             // Double multiplication algorithm:
             // let r = (*x as u64 ^ seed) as u128 * C as u128;

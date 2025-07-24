@@ -47,7 +47,6 @@ namespace PtrHash.CSharp.Port.Core
         // Cap parallelism to prevent thread explosion
         private static readonly int MaxParallelism = Environment.ProcessorCount;
         
-        private readonly THasher _hasher;
         private readonly IBucketFunction _bucketFunction;
         private byte* _pilots;
         private IMutableRemappingStorage? _remapStorage;
@@ -82,7 +81,6 @@ namespace PtrHash.CSharp.Port.Core
 
             try
             {
-                _hasher = new THasher();
                 _numKeys = (nuint)keys.Length;
                 _minimal = parameters.Minimal;
                 _isSinglePart = parameters.SinglePart;
@@ -202,7 +200,7 @@ namespace PtrHash.CSharp.Port.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public nuint GetIndexNoRemapMultiPart(TKey key)
         {
-            var hx = _hasher.Hash(key, _seed);
+            var hx = THasher.Hash(key, _seed);
             var bucket = Bucket(hx); // Use global bucket calculation
             var pilot = (ulong)_pilots[bucket];
             return Slot(hx, pilot);
@@ -232,7 +230,7 @@ namespace PtrHash.CSharp.Port.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public nuint GetIndexNoRemapSinglePart(TKey key)
         {
-            var hx = _hasher.Hash(key, _seed);
+            var hx = THasher.Hash(key, _seed);
             var bucket = BucketInPart(hx.High()); // Use bucket function for single part
             var pilot = (ulong)_pilots[bucket];
             return SlotInPart(hx, pilot); // Direct slot calculation without part offset
@@ -483,7 +481,7 @@ namespace PtrHash.CSharp.Port.Core
                     for (int i = 0; i < remaining; i++)
                     {
                         var key = Unsafe.Add(ref keysRef, i);
-                        hashBufPtr[i] = _hasher.Hash(key, _seed);
+                        hashBufPtr[i] = THasher.Hash(key, _seed);
                         bucketBufPtr[i] = BucketInPart(hashBufPtr[i].High());
                         
                         // Prefetch pilot data
@@ -510,7 +508,7 @@ namespace PtrHash.CSharp.Port.Core
                         
                         // Prefetch next key while processing current
                         var nextKey = Unsafe.Add(ref keysRef, processed + PREFETCH_DISTANCE);
-                        hashBufPtr[idx] = _hasher.Hash(nextKey, _seed);
+                        hashBufPtr[idx] = THasher.Hash(nextKey, _seed);
                         bucketBufPtr[idx] = BucketInPart(hashBufPtr[idx].High());
                         
                         // Prefetch pilot data for next iteration
@@ -582,7 +580,7 @@ namespace PtrHash.CSharp.Port.Core
                     for (int i = 0; i < remaining; i++)
                     {
                         var key = Unsafe.Add(ref keysRef, i);
-                        hashBufPtr[i] = _hasher.Hash(key, _seed);
+                        hashBufPtr[i] = THasher.Hash(key, _seed);
                         var high = hashBufPtr[i].High();
                         
                         // Calculate part and remainder
@@ -619,7 +617,7 @@ namespace PtrHash.CSharp.Port.Core
                         
                         // Prefetch next key
                         var nextKey = Unsafe.Add(ref keysRef, processed + PREFETCH_DISTANCE);
-                        hashBufPtr[idx] = _hasher.Hash(nextKey, _seed);
+                        hashBufPtr[idx] = THasher.Hash(nextKey, _seed);
                         var high = hashBufPtr[idx].High();
                         
                         var (part, remainder) = _remParts.ReduceWithRemainder(high);
@@ -821,7 +819,7 @@ namespace PtrHash.CSharp.Port.Core
             // Hash all keys using seed, then sort for duplicate detection
             for (int i = 0; i < keys.Length; i++)
             {
-                hashBuffer[i] = _hasher.Hash(keys[i], seed);
+                hashBuffer[i] = THasher.Hash(keys[i], seed);
             }
             
             // Sort by hash - use built-in IntroSort (zero allocations, optimal performance)

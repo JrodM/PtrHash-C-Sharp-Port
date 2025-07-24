@@ -17,7 +17,7 @@ namespace PtrHash.Benchmarks
     [Config(typeof(Config))]
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
-    [SimpleJob(RuntimeMoniker.NativeAot80)]
+    //[SimpleJob(RuntimeMoniker.NativeAot80)]
     public class PtrHashCoreBenchmark
     {
         private class Config : ManualConfig
@@ -72,7 +72,12 @@ namespace PtrHash.Benchmarks
             
             _lookupKeys = new ulong[actualLookupCount];
             for (int i = 0; i < actualLookupCount; i++)
-                _lookupKeys[i] = _keys[random.Next(KeyCount)];
+            {
+                if (i < actualLookupCount / 2)
+                    _lookupKeys[i] = _keys[random.Next(KeyCount)]; // 50% hits
+                else
+                    _lookupKeys[i] = (ulong)random.NextInt64(long.MaxValue / 2, long.MaxValue); // 50% misses
+            }
 
             // Multi-part PtrHash (default)
             _multiPartPtrHash = new PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);
