@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Jbo+Huh4o2QekRPIaF+ATl1qJvf+n3MdEih8IoonSWidGY5PZV3w/AHdqPiVWs77jvu0/fsY/z3WnP45fgcU/Q==",
+  "dgSpecHash": "lvOEnkJH7xHxgkO98c8nzlNbAwQrFhUyQt2GaN7LxxKLURjisKmC21RPK+IO1LuuDwlkmpTM6wnNsNbcuK41qQ==",
   "success": true,
   "projectFilePath": "/home/jared/Developer/PtrHash/Benchmarks/PtrHash.Benchmarks.csproj",
   "expectedPackageFiles": [
@@ -40,7 +40,10 @@
     "/home/jared/.nuget/packages/system.security.accesscontrol/5.0.0/system.security.accesscontrol.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.security.principal.windows/5.0.0/system.security.principal.windows.5.0.0.nupkg.sha512",
     "/home/jared/.nuget/packages/system.text.encoding.codepages/4.5.1/system.text.encoding.codepages.4.5.1.nupkg.sha512",
-    "/home/jared/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512"
+    "/home/jared/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512",
+    "/home/jared/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/8.0.17/microsoft.netcore.app.runtime.linux-x64.8.0.17.nupkg.sha512",
+    "/home/jared/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/8.0.17/microsoft.aspnetcore.app.runtime.linux-x64.8.0.17.nupkg.sha512",
+    "/home/jared/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.17/microsoft.netcore.app.host.linux-x64.8.0.17.nupkg.sha512"
   ],
   "logs": []
 }

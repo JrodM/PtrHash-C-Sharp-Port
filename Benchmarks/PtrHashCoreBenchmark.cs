@@ -17,7 +17,7 @@ namespace PtrHash.Benchmarks
     [Config(typeof(Config))]
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
-    //[SimpleJob(RuntimeMoniker.NativeAot80)]
+    [SimpleJob(RuntimeMoniker.NativeAot80)]
     public class PtrHashCoreBenchmark
     {
         private class Config : ManualConfig
