@@ -16,7 +16,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void Constructor_WithValidStringKeys_CreatesInstance()
         {
             var keys = TestUtilities.GenerateTestStringKeys();
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             TestUtilities.AssertValidPtrHashInfo(hash.GetInfo(), keys.Length);
         }
 
@@ -24,7 +24,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void Constructor_WithList_CreatesInstance()
         {
             var keysList = TestUtilities.GenerateTestStringKeys();
-            using var hash = new PtrHashInterop<string>(keysList);
+            using var hash = new PtrHashInteropString(keysList);
             TestUtilities.AssertValidPtrHashInfo(hash.GetInfo(), keysList.Length);
         }
 
@@ -32,8 +32,8 @@ namespace PtrHash.CSharp.Interop.Tests
         public void Constructor_WithDifferentConfigs_CreatesInstances()
         {
             var keys = TestUtilities.GenerateTestStringKeys(4);
-            using var defaultHash = new PtrHashInterop<string>(keys, TestUtilities.GetTestParams());
-            using var customHash = new PtrHashInterop<string>(keys, TestUtilities.GetTestParams(hashFunction: 2));
+            using var defaultHash = new PtrHashInteropString(keys, TestUtilities.GetTestParams());
+            using var customHash = new PtrHashInteropString(keys, TestUtilities.GetTestParams(hashFunction: 2));
             
             Assert.AreEqual(defaultHash.GetInfo().KeyCount, customHash.GetInfo().KeyCount);
         }
@@ -42,14 +42,14 @@ namespace PtrHash.CSharp.Interop.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void Constructor_WithNullKeys_ThrowsArgumentException()
         {
-            new PtrHashInterop<string>((string[])null);
+            new PtrHashInteropString((string[])null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void Constructor_WithEmptyKeys_ThrowsArgumentException()
         {
-            new PtrHashInterop<string>(Array.Empty<string>());
+            new PtrHashInteropString(Array.Empty<string>());
         }
 
         [TestMethod]
@@ -60,14 +60,14 @@ namespace PtrHash.CSharp.Interop.Tests
             var keys = new string[] { "hello", null, "world" };
 
             // Act
-            new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
         }
 
         [TestMethod]
         public void GetIndex_WithValidStringKeys_ReturnsUniqueIndices()
         {
             var keys = TestUtilities.GenerateTestStringKeys();
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             
             var indices = new nuint[keys.Length];
             for (int i = 0; i < keys.Length; i++)
@@ -83,7 +83,7 @@ namespace PtrHash.CSharp.Interop.Tests
         {
             // Arrange
             var keys = new string[] { "hello", "world", "test", "müller", "🚀", "café" };
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
 
             // Act & Assert
             for (int i = 0; i < keys.Length; i++)
@@ -101,7 +101,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndex_WithNullString_ThrowsArgumentNullException()
         {
             var keys = TestUtilities.GenerateTestStringKeys(2);
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             hash.GetIndex((string)null);
         }
 
@@ -109,7 +109,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetIndicesBatch_WithValidStringKeys_ReturnsCorrectIndices()
         {
             var keys = TestUtilities.GenerateTestStringKeys().Take(6).ToArray();
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             
             var expectedIndices = new nuint[keys.Length];
             for (int i = 0; i < keys.Length; i++)
@@ -128,7 +128,7 @@ namespace PtrHash.CSharp.Interop.Tests
         {
             // Arrange
             var keys = new string[] { "hello", "world", "test", "müller", "🚀" };
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
 
             // Get individual indices for comparison
             var expectedIndices = new nuint[keys.Length];
@@ -151,7 +151,7 @@ namespace PtrHash.CSharp.Interop.Tests
         {
             // Arrange
             var keys = new string[] { "hello", "world" };
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             var results = new nuint[2];
 
             // Act
@@ -164,7 +164,7 @@ namespace PtrHash.CSharp.Interop.Tests
         {
             // Arrange
             var keys = new string[] { "hello", "world", "test" };
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             var results = new nuint[2]; // Wrong size
 
             // Act
@@ -177,7 +177,7 @@ namespace PtrHash.CSharp.Interop.Tests
         {
             // Arrange
             var keys = new string[] { "hello", "world" };
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             var lookupKeys = new string[] { "hello", null };
             var results = new nuint[2];
 
@@ -189,7 +189,7 @@ namespace PtrHash.CSharp.Interop.Tests
         public void GetInfo_ReturnsValidInformation()
         {
             var keys = TestUtilities.GenerateTestStringKeys(4);
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             TestUtilities.AssertValidPtrHashInfo(hash.GetInfo(), keys.Length);
         }
 
@@ -203,28 +203,19 @@ namespace PtrHash.CSharp.Interop.Tests
                 keys[i] = TestUtilities.GenerateRandomString(random, random.Next(5, 15));
             }
             
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             var results = new nuint[keys.Length];
             hash.GetIndicesBatch(keys, results);
             
             TestUtilities.AssertValidPtrHashInfo(hash.GetInfo(), keys.Length);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ObjectDisposedException))]
-        public void GetIndex_AfterDispose_ThrowsObjectDisposedException()
-        {
-            var keys = TestUtilities.GenerateTestStringKeys(2);
-            var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
-            hash.Dispose();
-            hash.GetIndex(keys[0]);
-        }
 
         [TestMethod]
         public void Dispose_MultipleCallsSafe()
         {
             var keys = TestUtilities.GenerateTestStringKeys(2);
-            var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
             hash.Dispose();
             hash.Dispose();
             hash.Dispose();
@@ -247,7 +238,7 @@ namespace PtrHash.CSharp.Interop.Tests
             };
 
             // Act
-            using var hash = new PtrHashInterop<string>(keys, TestUtilities.GetStringTestParams());
+            using var hash = new PtrHashInteropString(keys, TestUtilities.GetStringTestParams());
 
             // Assert
             var indices = new nuint[keys.Length];

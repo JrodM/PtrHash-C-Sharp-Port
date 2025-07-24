@@ -178,6 +178,7 @@ namespace PtrHash.CSharp.Port.Core
                 {
                     System.Runtime.InteropServices.NativeMemory.AlignedFree(_pilots);
                 }
+                _remapStorage?.Dispose();
                 throw;
             }
         }
@@ -1479,7 +1480,7 @@ namespace PtrHash.CSharp.Port.Core
                 {
                     if (_pilots != null)
                     {
-                        System.Runtime.InteropServices.NativeMemory.Free(_pilots);
+                        System.Runtime.InteropServices.NativeMemory.AlignedFree(_pilots);
                         _pilots = null;
                     }
                 }

@@ -93,10 +93,13 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
-            if (ptr != null)
+            if (!_disposed)
             {
-                NativeMemory.AlignedFree(ptr);
+                if (_values != null)
+                {
+                    NativeMemory.AlignedFree(_values);
+                    _values = null;
+                }
                 _disposed = true;
             }
         }
@@ -187,10 +190,13 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
-            if (ptr != null)
+            if (!_disposed)
             {
-                NativeMemory.AlignedFree(ptr);
+                if (_values != null)
+                {
+                    NativeMemory.AlignedFree(_values);
+                    _values = null;
+                }
                 _disposed = true;
             }
         }
@@ -278,10 +284,13 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
-            if (ptr != null)
+            if (!_disposed)
             {
-                NativeMemory.AlignedFree(ptr);
+                if (_values != null)
+                {
+                    NativeMemory.AlignedFree(_values);
+                    _values = null;
+                }
                 _disposed = true;
             }
         }
