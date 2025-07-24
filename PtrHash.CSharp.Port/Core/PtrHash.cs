@@ -80,95 +80,106 @@ namespace PtrHash.CSharp.Port.Core
             if (keys.Length == 0)
                 throw new ArgumentException("Keys collection cannot be empty", nameof(keys));
 
-            _hasher = new THasher();
-            _numKeys = (nuint)keys.Length;
-            _minimal = parameters.Minimal;
-            _isSinglePart = parameters.SinglePart;
-            _storageType = parameters.StorageType;
-
-            // Calculate parts and structure sizes (PtrHash paper Section 3.1)
-            if (_isSinglePart)
+            try
             {
-                // Single part mode: all keys in one partition for faster queries (Section 3.1)
-                _parts = 1;
-                _slotsPerPart = CalculateNumSlots(_numKeys, parameters.Alpha);
-                _slotsTotal = _slotsPerPart;
-                _bucketsPerPart = CalculateNumBuckets(_numKeys, parameters.Lambda);
-                _bucketsTotal = _bucketsPerPart;
-            }
-            else
-            {
-                // Multi-part mode: partition keys for better cache locality and parallelism (Section 3.1)
-                var shards = 1; // Sharding::None => 1
+                _hasher = new THasher();
+                _numKeys = (nuint)keys.Length;
+                _minimal = parameters.Minimal;
+                _isSinglePart = parameters.SinglePart;
+                _storageType = parameters.StorageType;
 
-                // Formula of Vigna, eps-cost-sharding: https://arxiv.org/abs/2503.18397
-                // (1-alpha)/2, so that on average we still have some room to play with.
-                var eps = (1.0 - parameters.Alpha) / 2.0;
-                var x = (double)_numKeys * eps * eps / 2.0;
-                var targetParts = x / Math.Log(x);
-
-                // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly (Section 3.1 formula)
-                var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
-                _parts = Math.Max(1, partsPerShard) * (nuint)shards;
-                _isSinglePart = _parts == 1;
-
-                var keysPerPart = _numKeys / _parts;
-                partsPerShard = _parts / (nuint)shards; // Recalculate after adjustment
-                var slotsPerPart = (nuint)((double)keysPerPart / parameters.Alpha);
-
-                // Avoid powers of two, since then %S does not depend on all bits
-                if (IsPowerOfTwo((int)slotsPerPart))
+                // Calculate parts and structure sizes (PtrHash paper Section 3.1)
+                if (_isSinglePart)
                 {
-                    slotsPerPart += 1;
+                    // Single part mode: all keys in one partition for faster queries (Section 3.1)
+                    _parts = 1;
+                    _slotsPerPart = CalculateNumSlots(_numKeys, parameters.Alpha);
+                    _slotsTotal = _slotsPerPart;
+                    _bucketsPerPart = CalculateNumBuckets(_numKeys, parameters.Lambda);
+                    _bucketsTotal = _bucketsPerPart;
+                }
+                else
+                {
+                    // Multi-part mode: partition keys for better cache locality and parallelism (Section 3.1)
+                    var shards = 1; // Sharding::None => 1
+
+                    // Formula of Vigna, eps-cost-sharding: https://arxiv.org/abs/2503.18397
+                    // (1-alpha)/2, so that on average we still have some room to play with.
+                    var eps = (1.0 - parameters.Alpha) / 2.0;
+                    var x = (double)_numKeys * eps * eps / 2.0;
+                    var targetParts = x / Math.Log(x);
+
+                    // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly (Section 3.1 formula)
+                    var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
+                    _parts = Math.Max(1, partsPerShard) * (nuint)shards;
+                    _isSinglePart = _parts == 1;
+
+                    var keysPerPart = _numKeys / _parts;
+                    partsPerShard = _parts / (nuint)shards; // Recalculate after adjustment
+                    var slotsPerPart = (nuint)((double)keysPerPart / parameters.Alpha);
+
+                    // Avoid powers of two, since then %S does not depend on all bits
+                    if (IsPowerOfTwo((int)slotsPerPart))
+                    {
+                        slotsPerPart += 1;
+                    }
+
+                    _slotsPerPart = slotsPerPart;
+                    _slotsTotal = _parts * _slotsPerPart;
+                    // Add a few extra buckets to avoid collisions for small n.
+                    _bucketsPerPart = (nuint)Math.Ceiling((double)keysPerPart / parameters.Lambda) + 3;
+                    _bucketsTotal = _parts * _bucketsPerPart;
                 }
 
-                _slotsPerPart = slotsPerPart;
-                _slotsTotal = _parts * _slotsPerPart;
-                // Add a few extra buckets to avoid collisions for small n.
-                _bucketsPerPart = (nuint)Math.Ceiling((double)keysPerPart / parameters.Lambda) + 3;
-                _bucketsTotal = _parts * _bucketsPerPart;
+                // Allocate unmanaged memory for pilots
+                var pilotsPtr = (byte*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc((nuint)_bucketsTotal, 64);
+                System.Runtime.InteropServices.NativeMemory.Clear(pilotsPtr, (nuint)_bucketsTotal);
+                _pilots = pilotsPtr;
+
+                // Will allocate remap storage later if minimal=true
+                _remapStorage = null;
+
+
+                // Initialize reduction structures
+                _remParts = new FastReduce(_parts);
+                _remBuckets = new FastReduce(_bucketsPerPart);
+                _remBucketsTotal = new FastReduce(_bucketsTotal);
+                _remSlots = new FM32(Math.Max(1, _slotsPerPart));
+
+                // Initialize bucket function and set buckets per part
+                _bucketFunction = parameters.BucketFunction ?? new Linear(); // Default to Linear if not specified
+                _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
+
+
+                // Construct the hash function using hash-evict algorithm
+                if (!ComputePilots(keys, out _seed, out var constructionStats))
+                {
+                    throw new PtrHashException("Failed to construct minimal perfect hash function. Try different parameters or check for duplicate keys.");
+                }
+
+                // Remap table will be created during construction if needed
+
+                // Calculate bits per key
+                var pilotBits = (ulong)(_bucketsTotal * 8);
+                var remapBits = (ulong)(_remapStorage?.SizeInBytes * 8 ?? 0);
+                var totalBits = pilotBits + remapBits;
+                _bitsPerKey = (double)totalBits / (double)_numKeys;
+
+                DebugConstruction($"PtrHash constructed with seed: {_seed}");
+                DebugConstruction($"Parts: {_parts}, Slots per part: {_slotsPerPart}, Buckets per part: {_bucketsPerPart}");
+                DebugConstruction($"Total slots: {_slotsTotal}, Total buckets: {_bucketsTotal}");
+                DebugConstruction($"Bits per key: {_bitsPerKey:F2}");
+                DebugConstruction(constructionStats?.ToString() ?? "");
             }
-
-            // Allocate unmanaged memory for pilots
-            _pilots = (byte*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc((nuint)_bucketsTotal, 64);
-            System.Runtime.InteropServices.NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
-
-            // Will allocate remap storage later if minimal=true
-            _remapStorage = null;
-            
-
-            // Initialize reduction structures
-            _remParts = new FastReduce(_parts);
-            _remBuckets = new FastReduce(_bucketsPerPart);
-            _remBucketsTotal = new FastReduce(_bucketsTotal);
-            _remSlots = new FM32(Math.Max(1, _slotsPerPart));
-
-            // Initialize bucket function and set buckets per part
-            _bucketFunction = parameters.BucketFunction ?? new Linear(); // Default to Linear if not specified
-            _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
-
-
-            // Construct the hash function using hash-evict algorithm
-            if (!ComputePilots(keys, out _seed, out var constructionStats))
+            catch
             {
-                throw new PtrHashException("Failed to construct minimal perfect hash function. Try different parameters or check for duplicate keys.");
+                // Clean up if construction failed
+                if (_pilots != null)
+                {
+                    System.Runtime.InteropServices.NativeMemory.AlignedFree(_pilots);
+                }
+                throw;
             }
-
-            // Remap table will be created during construction if needed
-
-            // Calculate bits per key
-            var pilotBits = (ulong)(_bucketsTotal * 8);
-            var remapBits = (ulong)(_remapStorage?.SizeInBytes * 8 ?? 0);
-            var totalBits = pilotBits + remapBits;
-            _bitsPerKey = (double)totalBits / (double)_numKeys;
-
-            DebugConstruction($"PtrHash constructed with seed: {_seed}");
-            DebugConstruction($"Parts: {_parts}, Slots per part: {_slotsPerPart}, Buckets per part: {_bucketsPerPart}");
-            DebugConstruction($"Total slots: {_slotsTotal}, Total buckets: {_bucketsTotal}");
-            DebugConstruction($"Bits per key: {_bitsPerKey:F2}");
-            DebugConstruction(constructionStats?.ToString() ?? "");
-
-
         }
 
         public PtrHashInfo GetInfo()

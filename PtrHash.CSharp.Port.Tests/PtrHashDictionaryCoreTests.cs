@@ -164,6 +164,7 @@ namespace PtrHash.CSharp.Port.Tests
         [DataRow(1_000)]
         [DataRow(10_000)]
         [DataRow(100_000)]
+        //[DataRow(1_000_000)]
         public void LargeScale_MaintainsCorrectness(int size)
         {
             // Arrange

@@ -9,6 +9,7 @@ using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 
 namespace PtrHash.Benchmarks
 {
@@ -33,7 +34,7 @@ namespace PtrHash.Benchmarks
         private Dictionary<ulong, ulong> _dictionary = null!;
         
         // Native interop dictionary
-        private PtrHashInteropDictionary<ulong, ulong> _nativeSentinelPtrHash = null!;
+        private PtrHashInteropDictionary<ulong, ulong, ULongDispatcher> _nativeSentinelPtrHash = null!;
         
         // C# port dictionary
         private PtrHashDictionaryU64<ulong> _portPtrHashMap = null!;
@@ -70,7 +71,7 @@ namespace PtrHash.Benchmarks
                 _dictionary[_keys[i]] = _values[i];
 
             // Native interop dictionary
-            _nativeSentinelPtrHash = new PtrHashInteropDictionary<ulong, ulong>(
+            _nativeSentinelPtrHash = new PtrHashInteropDictionary<ulong, ulong, ULongDispatcher>(
                 _keys,
                 _values,
                 ulong.MaxValue,

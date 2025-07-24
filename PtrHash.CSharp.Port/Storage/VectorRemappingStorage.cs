@@ -2,6 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
+using Microsoft.Win32.SafeHandles;
+using PtrHash.CSharp.Port.Core;
 
 namespace PtrHash.CSharp.Port.Storage
 {
@@ -11,7 +13,7 @@ namespace PtrHash.CSharp.Port.Storage
     /// </summary>
     public unsafe class UInt32VectorRemappingStorage : IStaticRemappingStorage<UInt32VectorRemappingStorage>
     {
-        private readonly uint* _values;
+        private uint* _values;
         private readonly int _length;
         private bool _disposed;
 
@@ -40,15 +42,25 @@ namespace PtrHash.CSharp.Port.Storage
 
             var length = values.Length;
             var byteSize = length * sizeof(uint);
-            var memory = NativeMemory.AlignedAlloc((nuint)byteSize, 64); // 64-byte aligned
+            
+            var memory = NativeMemory.AlignedAlloc((nuint)byteSize, 64);
             var ptr = (uint*)memory;
             
-            for (int i = 0; i < length; i++)
+            try
             {
-                ptr[i] = (uint)values[i];
+                for (int i = 0; i < length; i++)
+                {
+                    ptr[i] = (uint)values[i];
+                }
+                
+                return new UInt32VectorRemappingStorage(ptr, length);
             }
-            
-            return new UInt32VectorRemappingStorage(ptr, length);
+            catch
+            {
+                if (memory != null)
+                    NativeMemory.AlignedFree(memory);
+                throw;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -81,9 +93,10 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed && _values != null)
+            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
+            if (ptr != null)
             {
-                NativeMemory.AlignedFree(_values);
+                NativeMemory.AlignedFree(ptr);
                 _disposed = true;
             }
         }
@@ -95,7 +108,7 @@ namespace PtrHash.CSharp.Port.Storage
     /// </summary>
     public unsafe class UShort16VectorRemappingStorage : IStaticRemappingStorage<UShort16VectorRemappingStorage>
     {
-        private readonly ushort* _values;
+        private ushort* _values;
         private readonly int _length;
         private bool _disposed;
 
@@ -127,12 +140,21 @@ namespace PtrHash.CSharp.Port.Storage
             var memory = NativeMemory.AlignedAlloc((nuint)byteSize, 32); // 32-byte aligned
             var ptr = (ushort*)memory;
             
-            for (int i = 0; i < length; i++)
+            try
             {
-                ptr[i] = (ushort)values[i];
+                for (int i = 0; i < length; i++)
+                {
+                    ptr[i] = (ushort)values[i];
+                }
+                
+                return new UShort16VectorRemappingStorage(ptr, length);
             }
-            
-            return new UShort16VectorRemappingStorage(ptr, length);
+            catch
+            {
+                if (memory != null)
+                    NativeMemory.AlignedFree(memory);
+                throw;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -165,9 +187,10 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed && _values != null)
+            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
+            if (ptr != null)
             {
-                NativeMemory.AlignedFree(_values);
+                NativeMemory.AlignedFree(ptr);
                 _disposed = true;
             }
         }
@@ -179,7 +202,7 @@ namespace PtrHash.CSharp.Port.Storage
     /// </summary>
     public unsafe class Byte8VectorRemappingStorage : IStaticRemappingStorage<Byte8VectorRemappingStorage>
     {
-        private readonly byte* _values;
+        private byte* _values;
         private readonly int _length;
         private bool _disposed;
 
@@ -190,15 +213,24 @@ namespace PtrHash.CSharp.Port.Storage
             var memory = NativeMemory.AlignedAlloc((nuint)byteSize, 16); // 16-byte aligned
             var ptr = (byte*)memory;
             
-            for (int i = 0; i < length; i++)
+            try
             {
-                if (values[i] > byte.MaxValue)
-                    throw new ArgumentException($"Value {values[i]} exceeds byte.MaxValue");
-                ptr[i] = (byte)values[i];
+                for (int i = 0; i < length; i++)
+                {
+                    if (values[i] > byte.MaxValue)
+                        throw new ArgumentException($"Value {values[i]} exceeds byte.MaxValue");
+                    ptr[i] = (byte)values[i];
+                }
+                
+                _values = ptr;
+                _length = length;
             }
-            
-            _values = ptr;
-            _length = length;
+            catch
+            {
+                if (memory != null)
+                    NativeMemory.AlignedFree(memory);
+                throw;
+            }
         }
 
         ~Byte8VectorRemappingStorage()
@@ -246,9 +278,10 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed && _values != null)
+            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
+            if (ptr != null)
             {
-                NativeMemory.AlignedFree(_values);
+                NativeMemory.AlignedFree(ptr);
                 _disposed = true;
             }
         }

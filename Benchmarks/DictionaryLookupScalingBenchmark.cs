@@ -9,6 +9,7 @@ using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 
 namespace PtrHash.Benchmarks
 {
@@ -36,8 +37,8 @@ namespace PtrHash.Benchmarks
         private Dictionary<ulong, ulong> _dictionary = null!;
         
         // Native interop dictionaries
-        private PtrHashInteropDictionary<ulong, ulong> _nativeMultiPartInterop = null!;
-        private PtrHashInteropDictionary<ulong, ulong> _nativeSinglePartInterop = null!;
+        private PtrHashInteropDictionary<ulong, ulong, ULongDispatcher> _nativeMultiPartInterop = null!;
+        private PtrHashInteropDictionary<ulong, ulong, ULongDispatcher> _nativeSinglePartInterop = null!;
         
         // C# port dictionaries
         private PtrHashDictionaryU64<ulong> _multiPartPtrHashDict = null!;
@@ -63,10 +64,25 @@ namespace PtrHash.Benchmarks
             for (int i = 0; i < KeyCount; i++)
                 _values[i] = (ulong)random.NextInt64(1, long.MaxValue);
 
-            // Create lookup keys (can exceed key count for larger lookup tests)
+            // Create lookup keys - half found, half not found
             _lookupKeys = new ulong[LookupCount];
-            for (int i = 0; i < LookupCount; i++)
+            var halfCount = LookupCount / 2;
+            
+            // First half: keys that exist in the set
+            for (int i = 0; i < halfCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
+            
+            // Second half: keys that don't exist in the set
+            var usedKeys = new HashSet<ulong>(_keys);
+            for (int i = halfCount; i < LookupCount; i++)
+            {
+                ulong notFoundKey;
+                do
+                {
+                    notFoundKey = (ulong)random.NextInt64(1, long.MaxValue);
+                } while (usedKeys.Contains(notFoundKey));
+                _lookupKeys[i] = notFoundKey;
+            }
 
             // Standard Dictionary
             _dictionary = new Dictionary<ulong, ulong>(KeyCount);
@@ -74,7 +90,7 @@ namespace PtrHash.Benchmarks
                 _dictionary[_keys[i]] = _values[i];
 
             // Native interop dictionaries - multi-part (default fast)
-            _nativeMultiPartInterop = new PtrHashInteropDictionary<ulong, ulong>(
+            _nativeMultiPartInterop = new PtrHashInteropDictionary<ulong, ulong, ULongDispatcher>(
                 _keys,
                 _values,
                 ulong.MaxValue,
@@ -82,7 +98,7 @@ namespace PtrHash.Benchmarks
             
             // Native interop dictionaries - single-part
             var singlePartNativeParams = PtrHashNative.FFIParams.FastWithOverrides(singlePart: true);
-            _nativeSinglePartInterop = new PtrHashInteropDictionary<ulong, ulong>(
+            _nativeSinglePartInterop = new PtrHashInteropDictionary<ulong, ulong, ULongDispatcher>(
                 _keys,
                 _values,
                 ulong.MaxValue,

@@ -8,6 +8,7 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Core;
@@ -57,16 +58,16 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHashImpl.PtrHashInterop<ulong> NativeInteropConstruction()
+        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> NativeInteropConstruction()
         {
-            return new PtrHashImpl.PtrHashInterop<ulong>(_keys.AsSpan(), PtrHashNative.FFIParams.Fast);
+            return new PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher>(_keys.AsSpan(), PtrHashNative.FFIParams.Fast);
         }
 
         [Benchmark]
-        public PtrHashImpl.PtrHashInterop<ulong> NativeInteropConstruction_StrongerHasher()
+        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> NativeInteropConstruction_StrongerHasher()
         {
             var config = PtrHashNative.FFIParams.Fast with { OverrideHashFunction = 2 }; // StrongerIntHash
-            return new PtrHashImpl.PtrHashInterop<ulong>(_keys.AsSpan(), config);
+            return new PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher>(_keys.AsSpan(), config);
         }
 
         [Benchmark]

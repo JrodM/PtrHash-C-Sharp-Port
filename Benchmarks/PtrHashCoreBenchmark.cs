@@ -10,6 +10,7 @@ using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 
 namespace PtrHash.Benchmarks
 {
@@ -46,10 +47,10 @@ namespace PtrHash.Benchmarks
         
         
         // Native interop - multi-part
-        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong> _nativeMultiPartPtrHash = null!;
+        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher> _nativeMultiPartPtrHash = null!;
         
         // Native interop - single-part
-        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong> _nativeSinglePartPtrHash = null!;
+        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher> _nativeSinglePartPtrHash = null!;
         
         private nuint[] _indicesBuffer1 = null!;
         private nuint[] _indicesBuffer2 = null!;
@@ -82,11 +83,11 @@ namespace PtrHash.Benchmarks
 
             
             // Native interop - multi-part
-            _nativeMultiPartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong>(_keys, PtrHashNative.FFIParams.Fast);
+            _nativeMultiPartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher>(_keys, PtrHashNative.FFIParams.Fast);
             
             // Native interop - single-part
             var singlePartNativeParams = PtrHashNative.FFIParams.Fast with { OverrideSinglePart = true };
-            _nativeSinglePartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong>(_keys, singlePartNativeParams);
+            _nativeSinglePartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher>(_keys, singlePartNativeParams);
 
             _indicesBuffer1 = new nuint[actualLookupCount];
             _indicesBuffer2 = new nuint[actualLookupCount];

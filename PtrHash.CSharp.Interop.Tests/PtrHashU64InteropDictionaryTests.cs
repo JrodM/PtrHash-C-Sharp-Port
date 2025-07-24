@@ -5,6 +5,7 @@ using System.Numerics;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 using PtrHash.CSharp.Interop.Tests;
 
 namespace PtrHash.CSharp.Interop.Tests
@@ -20,7 +21,7 @@ namespace PtrHash.CSharp.Interop.Tests
             var sentinel = -1L;
 
             var parameters = TestUtilities.GetTestParams();
-            using var ptrHash = new PtrHashInteropDictionary<ulong, long>(keys, values, sentinel, parameters);
+            using var ptrHash = new PtrHashInteropDictionary<ulong, long, ULongDispatcher>(keys, values, sentinel, parameters);
 
             for (int i = 0; i < keys.Length; i++)
             {
@@ -44,7 +45,7 @@ namespace PtrHash.CSharp.Interop.Tests
             var sentinel = -1L;
 
             var parameters = TestUtilities.GetTestParams();
-            using var ptrHash = new PtrHashInteropDictionary<ulong, long>(keys, values, sentinel, parameters);
+            using var ptrHash = new PtrHashInteropDictionary<ulong, long, ULongDispatcher>(keys, values, sentinel, parameters);
 
             var queryKeys = new ulong[keys.Length * 2];
             var expectedValues = new long[keys.Length * 2];
@@ -79,7 +80,7 @@ namespace PtrHash.CSharp.Interop.Tests
             var sentinel = -1L;
 
             var parameters = TestUtilities.GetTestParams();
-            using var ptrHash = new PtrHashInteropDictionary<ulong, long>(keys, values, sentinel, parameters);
+            using var ptrHash = new PtrHashInteropDictionary<ulong, long, ULongDispatcher>(keys, values, sentinel, parameters);
 
             var queryKeys = Enumerable.Range(0, 1000).Select(i => (ulong)i * 10 + 1).ToArray();
             var resultValues = new long[queryKeys.Length];
@@ -105,7 +106,7 @@ namespace PtrHash.CSharp.Interop.Tests
             
             Assert.ThrowsException<ArgumentException>(() => 
             {
-                using var emptyHash = new PtrHashInteropDictionary<ulong, int>(emptyKeys, emptyValues, sentinel, parameters);
+                using var emptyHash = new PtrHashInteropDictionary<ulong, int, ULongDispatcher>(emptyKeys, emptyValues, sentinel, parameters);
             });
 
             // Test with different value types
@@ -113,7 +114,7 @@ namespace PtrHash.CSharp.Interop.Tests
             var doubleValues = new double[] { 1.1, 2.2, 3.3 };
             var doubleSentinel = double.NaN;
 
-            using var doubleHash = new PtrHashInteropDictionary<ulong, double>(keys, doubleValues, doubleSentinel, parameters);
+            using var doubleHash = new PtrHashInteropDictionary<ulong, double, ULongDispatcher>(keys, doubleValues, doubleSentinel, parameters);
             
             Assert.IsTrue(doubleHash.TryGetValue(1, out var val1));
             Assert.AreEqual(1.1, val1);
@@ -130,7 +131,7 @@ namespace PtrHash.CSharp.Interop.Tests
             var sentinel = -1;
 
             var parameters = TestUtilities.GetTestParams();
-            using var ptrHash = new PtrHashInteropDictionary<ulong, int>(keys, values, sentinel, parameters);
+            using var ptrHash = new PtrHashInteropDictionary<ulong, int, ULongDispatcher>(keys, values, sentinel, parameters);
 
             var queryKeys = keys.Take(10_000).Concat(keys.Select(k => k + 1).Take(10_000)).ToArray();
             var results = new int[queryKeys.Length];
