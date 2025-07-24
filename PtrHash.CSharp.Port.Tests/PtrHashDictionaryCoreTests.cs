@@ -61,7 +61,7 @@ namespace PtrHash.CSharp.Port.Tests
         #region Streaming Tests
 
         [TestMethod]
-        public void GetValuesStream_ConsistentWithSingleLookups()
+        public void TryGetValueStream_ConsistentWithSingleLookups()
         {
             // Arrange
             var keys = Enumerable.Range(1, 200).Select(i => (ulong)i).ToArray();
@@ -75,14 +75,14 @@ namespace PtrHash.CSharp.Port.Tests
             
             // Test streaming
             var streamResults = new string[queryKeys.Length];
-            dictionary.GetValuesStream(queryKeys, streamResults);
+            dictionary.TryGetValueStream(queryKeys, streamResults);
 
             // Assert
             CollectionAssert.AreEqual(expectedPoint, streamResults);
         }
 
         [TestMethod]
-        public void GetValuesStream_EdgeCases()
+        public void TryGetValueStream_EdgeCases()
         {
             // Arrange
             var keys = new ulong[] { 1, 2, 3 };
@@ -90,11 +90,11 @@ namespace PtrHash.CSharp.Port.Tests
             using var dictionary = new PtrHashDictionaryU64<string>(keys, values, "EMPTY");
 
             // Empty input
-            dictionary.GetValuesStream(Array.Empty<ulong>(), Array.Empty<string>());
+            dictionary.TryGetValueStream(Array.Empty<ulong>(), Array.Empty<string>());
 
             // Mismatched spans
             Assert.ThrowsException<ArgumentException>(() => 
-                dictionary.GetValuesStream(new ulong[] { 1, 2 }, new string[3]));
+                dictionary.TryGetValueStream(new ulong[] { 1, 2 }, new string[3]));
         }
 
         #endregion
@@ -117,7 +117,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Test streaming
             var queryKeys = new[] { "blue", "invalid", "yellow" };
             var results = new string[queryKeys.Length];
-            dictionary.GetValuesStream(queryKeys, results);
+            dictionary.TryGetValueStream(queryKeys, results);
             
             CollectionAssert.AreEqual(new[] { "#0000FF", "#UNKNOWN", "#FFFF00" }, results);
         }
@@ -181,7 +181,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Test point vs stream consistency
             var pointResults = testKeys.Select(k => dictionary.GetValueOrSentinel(k)).ToArray();
             var streamResults = new int[testKeys.Length];
-            dictionary.GetValuesStream(testKeys, streamResults);
+            dictionary.TryGetValueStream(testKeys, streamResults);
 
             CollectionAssert.AreEqual(pointResults, streamResults);
             Assert.IsTrue(pointResults.All(v => v != sentinel));

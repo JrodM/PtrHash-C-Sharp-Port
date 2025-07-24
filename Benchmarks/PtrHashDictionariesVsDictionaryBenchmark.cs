@@ -140,7 +140,7 @@ namespace PtrHash.Benchmarks
         public ulong PortPtrHashMapStreamLookup()
         {
             ulong sum = 0;
-            _portPtrHashMap.GetValuesStream(
+            _portPtrHashMap.TryGetValueStream(
                 _lookupKeys.AsSpan(),
                 _valuesBuffer2);
 
@@ -170,7 +170,7 @@ namespace PtrHash.Benchmarks
         public ulong SinglePartPtrHashMapStreamLookup()
         {
             ulong sum = 0;
-            _singlePartPtrHashMap.GetValuesStream(
+            _singlePartPtrHashMap.TryGetValueStream(
                 _lookupKeys.AsSpan(),
                 _valuesBuffer3);
 

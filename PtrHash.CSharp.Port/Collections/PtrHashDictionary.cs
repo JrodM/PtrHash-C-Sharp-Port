@@ -201,12 +201,12 @@ namespace PtrHash.CSharp.Port.Collections
         }
 
         /// <summary>
-        /// Performs batch lookup using streaming for better performance on large datasets
+        /// Performs batch lookup using streaming with SSE prefetch for better performance on large datasets
         /// Uses cache-friendly chunking to eliminate allocations and improve performance
         /// </summary>
         /// <param name="keys">Keys to look up</param>
         /// <param name="values">Output array for values (must be same length as keys)</param>
-        public void GetValuesStream(
+        public void TryGetValueStream(
             ReadOnlySpan<TKey> keys,
             Span<TValue> values)
         {
@@ -219,7 +219,7 @@ namespace PtrHash.CSharp.Port.Collections
             {
                 // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStream(keys, indices, minimal: true);
+                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: true);
                 ProcessIndices(keys, indices, values);
             }
             else
@@ -229,7 +229,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStream(keys, indicesSpan, minimal: true);
+                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: true);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally
