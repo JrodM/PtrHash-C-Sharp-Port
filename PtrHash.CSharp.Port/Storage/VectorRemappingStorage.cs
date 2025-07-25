@@ -8,14 +8,91 @@ using PtrHash.CSharp.Port.Core;
 namespace PtrHash.CSharp.Port.Storage
 {
     /// <summary>
+    /// Vector-based remapping storage using aligned native memory for ulong values.
+    /// Corresponds to Rust's Vec&lt;u64&gt; backing storage.
+    /// WARNING: This struct manages unmanaged memory and must be explicitly disposed!
+    /// </summary>
+    public unsafe struct UInt64VectorRemappingStorage : IRemappingStorage<UInt64VectorRemappingStorage>
+    {
+        private readonly ulong* _values;
+        private readonly int _length;
+
+        private UInt64VectorRemappingStorage(ulong* values, int length)
+        {
+            _values = values;
+            _length = length;
+        }
+
+        /// <summary>
+        /// Create a new UInt64VectorRemappingStorage from the given values.
+        /// Throws if allocation fails.
+        /// </summary>
+        public static UInt64VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
+        {
+            var length = values.Length;
+            var byteSize = length * sizeof(ulong);
+            
+            var memory = NativeMemory.AlignedAlloc((nuint)byteSize, 64);
+            var ptr = (ulong*)memory;
+            
+            try
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    ptr[i] = values[i];
+                }
+                
+                return new UInt64VectorRemappingStorage(ptr, length);
+            }
+            catch
+            {
+                if (memory != null)
+                    NativeMemory.AlignedFree(memory);
+                throw;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong Index(UInt64VectorRemappingStorage self, int index)
+        {
+            return self._values[index];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Prefetch(UInt64VectorRemappingStorage self, int index)
+        {
+            // Native memory prefetch using software prefetch hint
+            if (Sse.IsSupported && index < self._length)
+            {
+                Sse.Prefetch0(&self._values[index]);
+            }
+        }
+
+        public static int GetSizeInBytes(UInt64VectorRemappingStorage self) => self._length * sizeof(ulong);
+
+        public static string Name => "Vec<u64>";
+
+        /// <summary>
+        /// Dispose of the native memory. Must be called explicitly since structs cannot have finalizers.
+        /// </summary>
+        public readonly void Dispose()
+        {
+            if (_values != null)
+            {
+                NativeMemory.AlignedFree(_values);
+            }
+        }
+    }
+
+    /// <summary>
     /// Simple vector-based remapping storage using aligned native memory for uint values.
     /// Corresponds to Rust's Vec&lt;u32&gt; backing storage.
+    /// WARNING: This struct manages unmanaged memory and must be explicitly disposed!
     /// </summary>
-    public unsafe class UInt32VectorRemappingStorage : IRemappingStorage<UInt32VectorRemappingStorage>
+    public unsafe struct UInt32VectorRemappingStorage : IRemappingStorage<UInt32VectorRemappingStorage>
     {
-        private uint* _values;
+        private readonly uint* _values;
         private readonly int _length;
-        private bool _disposed;
 
         private UInt32VectorRemappingStorage(uint* values, int length)
         {
@@ -23,21 +100,16 @@ namespace PtrHash.CSharp.Port.Storage
             _length = length;
         }
 
-        ~UInt32VectorRemappingStorage()
-        {
-            Dispose(false);
-        }
-
         /// <summary>
         /// Create a new UInt32VectorRemappingStorage from the given values.
-        /// Always succeeds as it can represent any uint values.
+        /// Throws if any value exceeds uint.MaxValue.
         /// </summary>
-        public static IMutableRemappingStorage? TryNew(ReadOnlySpan<ulong> values)
+        public static UInt32VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
         {
             for (int i = 0; i < values.Length; i++)
             {
                 if (values[i] > uint.MaxValue)
-                    return null; // Value too large for uint backing
+                    throw new ArgumentException($"Value {values[i]} exceeds uint.MaxValue");
             }
 
             var length = values.Length;
@@ -64,44 +136,33 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Index(int index)
+        public static ulong Index(UInt32VectorRemappingStorage self, int index)
         {
-            return _values[index];
+            return self._values[index];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Prefetch(int index)
+        public static void Prefetch(UInt32VectorRemappingStorage self, int index)
         {
             // Native memory prefetch using software prefetch hint
-            if (Sse.IsSupported && index < _length)
+            if (Sse.IsSupported && index < self._length)
             {
-                Sse.Prefetch0(&_values[index]);
+                Sse.Prefetch0(&self._values[index]);
             }
         }
 
-        public int SizeInBytes => _length * sizeof(uint);
+        public static int GetSizeInBytes(UInt32VectorRemappingStorage self) => self._length * sizeof(uint);
 
         public static string Name => "Vec<u32>";
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong IndexStatic(UInt32VectorRemappingStorage self, int index) => self._values[index];
-
-        public void Dispose()
+        /// <summary>
+        /// Dispose of the native memory. Must be called explicitly since structs cannot have finalizers.
+        /// </summary>
+        public readonly void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposed)
+            if (_values != null)
             {
-                if (_values != null)
-                {
-                    NativeMemory.AlignedFree(_values);
-                    _values = null;
-                }
-                _disposed = true;
+                NativeMemory.AlignedFree(_values);
             }
         }
     }
@@ -109,12 +170,12 @@ namespace PtrHash.CSharp.Port.Storage
     /// <summary>
     /// Compact vector-based remapping storage using aligned native memory for ushort values.
     /// More memory efficient for smaller values.
+    /// WARNING: This struct manages unmanaged memory and must be explicitly disposed!
     /// </summary>
-    public unsafe class UShort16VectorRemappingStorage : IStaticRemappingStorage<UShort16VectorRemappingStorage>
+    public unsafe struct UShort16VectorRemappingStorage : IRemappingStorage<UShort16VectorRemappingStorage>
     {
-        private ushort* _values;
+        private readonly ushort* _values;
         private readonly int _length;
-        private bool _disposed;
 
         private UShort16VectorRemappingStorage(ushort* values, int length)
         {
@@ -122,21 +183,16 @@ namespace PtrHash.CSharp.Port.Storage
             _length = length;
         }
 
-        ~UShort16VectorRemappingStorage()
-        {
-            Dispose(false);
-        }
-
         /// <summary>
         /// Create a new UShort16VectorRemappingStorage from the given values.
-        /// Returns null if any value exceeds ushort.MaxValue.
+        /// Throws if any value exceeds ushort.MaxValue.
         /// </summary>
-        public static IMutableRemappingStorage? TryNew(ReadOnlySpan<ulong> values)
+        public static UShort16VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
         {
             for (int i = 0; i < values.Length; i++)
             {
                 if (values[i] > ushort.MaxValue)
-                    return null; // Value too large for ushort backing
+                    throw new ArgumentException($"Value {values[i]} exceeds ushort.MaxValue");
             }
 
             var length = values.Length;
@@ -162,40 +218,33 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Index(int index)
+        public static ulong Index(UShort16VectorRemappingStorage self, int index)
         {
-            return _values[index];
+            return self._values[index];
         }
 
-        public void Prefetch(int index)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Prefetch(UShort16VectorRemappingStorage self, int index)
         {
             // Native memory prefetch using software prefetch hint
-            if (Sse.IsSupported && index < _length)
+            if (Sse.IsSupported && index < self._length)
             {
-                Sse.Prefetch0(&_values[index]);
+                Sse.Prefetch0(&self._values[index]);
             }
         }
 
-        public int SizeInBytes => _length * sizeof(ushort);
+        public static int GetSizeInBytes(UShort16VectorRemappingStorage self) => self._length * sizeof(ushort);
 
         public static string Name => "Vec<u16>";
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong IndexStatic(UShort16VectorRemappingStorage self, int index) => self._values[index];
 
-        public void Dispose()
+        /// <summary>
+        /// Dispose of the native memory. Must be called explicitly since structs cannot have finalizers.
+        /// </summary>
+        public readonly void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
-            if (ptr != null)
+            if (_values != null)
             {
-                NativeMemory.AlignedFree(ptr);
-                _disposed = true;
+                NativeMemory.AlignedFree(_values);
             }
         }
     }
@@ -203,14 +252,20 @@ namespace PtrHash.CSharp.Port.Storage
     /// <summary>
     /// Ultra-compact vector-based remapping storage using aligned native memory for byte values.
     /// Most memory efficient for very small values.
+    /// WARNING: This struct manages unmanaged memory and must be explicitly disposed!
     /// </summary>
-    public unsafe class Byte8VectorRemappingStorage : IStaticRemappingStorage<Byte8VectorRemappingStorage>
+    public unsafe struct Byte8VectorRemappingStorage : IRemappingStorage<Byte8VectorRemappingStorage>
     {
-        private byte* _values;
+        private readonly byte* _values;
         private readonly int _length;
-        private bool _disposed;
 
-        public Byte8VectorRemappingStorage(ReadOnlySpan<ulong> values)
+        private Byte8VectorRemappingStorage(byte* values, int length)
+        {
+            _values = values;
+            _length = length;
+        }
+
+        public static Byte8VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
         {
             var length = values.Length;
             var byteSize = length * sizeof(byte);
@@ -226,8 +281,7 @@ namespace PtrHash.CSharp.Port.Storage
                     ptr[i] = (byte)values[i];
                 }
                 
-                _values = ptr;
-                _length = length;
+                return new Byte8VectorRemappingStorage(ptr, length);
             }
             catch
             {
@@ -237,56 +291,34 @@ namespace PtrHash.CSharp.Port.Storage
             }
         }
 
-        ~Byte8VectorRemappingStorage()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong Index(Byte8VectorRemappingStorage self, int index)
         {
-            Dispose(false);
-        }
-
-        public static IMutableRemappingStorage? TryNew(ReadOnlySpan<ulong> values)
-        {
-            for (int i = 0; i < values.Length; i++)
-            {
-                if (values[i] > byte.MaxValue)
-                    return null;
-            }
-            return new Byte8VectorRemappingStorage(values);
+            return self._values[index];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Index(int index)
-        {
-            return _values[index];
-        }
-
-        public void Prefetch(int index)
+        public static void Prefetch(Byte8VectorRemappingStorage self, int index)
         {
             // Native memory prefetch using software prefetch hint
-            if (Sse.IsSupported && index < _length)
+            if (Sse.IsSupported && index < self._length)
             {
-                Sse.Prefetch0(&_values[index]);
+                Sse.Prefetch0(&self._values[index]);
             }
         }
 
-        public int SizeInBytes => _length * sizeof(byte);
+        public static int GetSizeInBytes(Byte8VectorRemappingStorage self) => self._length * sizeof(byte);
 
         public static string Name => "Vec<u8>";
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong IndexStatic(Byte8VectorRemappingStorage self, int index) => self._values[index];
 
-        public void Dispose()
+        /// <summary>
+        /// Dispose of the native memory. Must be called explicitly since structs cannot have finalizers.
+        /// </summary>
+        public readonly void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
-            if (ptr != null)
+            if (_values != null)
             {
-                NativeMemory.AlignedFree(ptr);
-                _disposed = true;
+                NativeMemory.AlignedFree(_values);
             }
         }
     }

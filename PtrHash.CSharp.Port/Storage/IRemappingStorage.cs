@@ -9,7 +9,7 @@ namespace PtrHash.CSharp.Port.Storage
     /// Corresponds to Rust's Packed trait with compile-time dispatch.
     /// </summary>
     public interface IRemappingStorage<TSelf> : IDisposable
-        where TSelf : class, IRemappingStorage<TSelf>
+        where TSelf : struct, IRemappingStorage<TSelf>
     {
         /// <summary>
         /// Get the value at the specified index with zero-overhead static dispatch.
@@ -31,9 +31,9 @@ namespace PtrHash.CSharp.Port.Storage
 
         /// <summary>
         /// Try to create a new instance from the given values.
-        /// Returns null if the values cannot be efficiently represented.
+        /// Throws if the values cannot be efficiently represented.
         /// </summary>
-        static abstract TSelf? TryNew(ReadOnlySpan<ulong> values);
+        static abstract TSelf TryNew(ReadOnlySpan<ulong> values);
 
         /// <summary>
         /// Human-readable name of this storage type.

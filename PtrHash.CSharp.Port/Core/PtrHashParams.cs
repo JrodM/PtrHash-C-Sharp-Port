@@ -35,7 +35,7 @@ namespace PtrHash.CSharp.Port.Core
 
         /// <summary>
         /// Default balanced parameters: 2.4 bits/key, balanced trade-off
-        /// Uses CacheLineEF storage (matches Rust balanced config)
+        /// Uses VecU32 storage for balanced performance
         /// </summary>
         public static PtrHashParams DefaultBalanced => new()
         {
@@ -43,7 +43,7 @@ namespace PtrHash.CSharp.Port.Core
             Lambda = 3.5,  // Expected bucket size parameter
             Minimal = true,
             SinglePart = false,
-            StorageType = RemappingStorageType.CacheLineEF
+            StorageType = RemappingStorageType.VecU32
         };
         
         /// <summary>
@@ -86,11 +86,6 @@ namespace PtrHash.CSharp.Port.Core
         /// </summary>
         VecU64,
         
-        /// <summary>
-        /// CacheLineEF - Cache-line optimized Elias-Fano encoding, most compact for sparse sorted data
-        /// Matches Rust CachelineEfVec type
-        /// </summary>
-        CacheLineEF,
         
         /// <summary>
         /// EliasFano - Standard Elias-Fano compressed encoding, maximum compression

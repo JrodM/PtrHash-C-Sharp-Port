@@ -36,7 +36,7 @@ namespace PtrHash.CSharp.Port.Core
     public sealed unsafe class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> : IPtrHash<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
-        where TRemappingStorage : class, IRemappingStorage<TRemappingStorage>
+        where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
     {
 
         // Debug feature flags - set to false for production
@@ -52,8 +52,10 @@ namespace PtrHash.CSharp.Port.Core
         private static readonly int MaxParallelism = Environment.ProcessorCount;
 
         private TBucketFunction _bucketFunction;
+
+        private TRemappingStorage _remapStorage;
+
         private byte* _pilots;
-        private TRemappingStorage? _remapStorage;
 
         // Multi-part support fields
         private readonly nuint _parts;
@@ -72,6 +74,7 @@ namespace PtrHash.CSharp.Port.Core
         private readonly bool _minimal;
         private readonly bool _isSinglePart;
         private readonly double _bitsPerKey;
+        private readonly RemappingStorageType _storageType;
         private ulong _seed;
 
         /// <summary>
@@ -87,6 +90,7 @@ namespace PtrHash.CSharp.Port.Core
                 _numKeys = (nuint)keys.Length;
                 _minimal = parameters.Minimal;
                 _isSinglePart = parameters.SinglePart;
+                _storageType = parameters.StorageType;
 
                 // Calculate parts and structure sizes (PtrHash paper Section 3.1)
                 if (_isSinglePart)
@@ -137,7 +141,7 @@ namespace PtrHash.CSharp.Port.Core
                 _pilots = pilotsPtr;
 
                 // Will allocate remap storage later if minimal=true
-                _remapStorage = null;
+                _remapStorage = default;
 
 
                 // Initialize reduction structures
@@ -161,7 +165,7 @@ namespace PtrHash.CSharp.Port.Core
 
                 // Calculate bits per key
                 var pilotBits = (ulong)(_bucketsTotal * 8);
-                var remapBits = (ulong)(_remapStorage != null ? TRemappingStorage.GetSizeInBytes(_remapStorage) * 8 : 0);
+                var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
                 var totalBits = pilotBits + remapBits;
                 _bitsPerKey = (double)totalBits / (double)_numKeys;
 
@@ -178,7 +182,7 @@ namespace PtrHash.CSharp.Port.Core
                 {
                     System.Runtime.InteropServices.NativeMemory.AlignedFree(_pilots);
                 }
-                _remapStorage?.Dispose();
+                _remapStorage.Dispose();
                 throw;
             }
         }
@@ -196,7 +200,7 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexMultiPart(TKey key)
         {
             var slot = GetIndexNoRemapMultiPart(key);
-            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage!, (int)(slot - _numKeys));
+            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - _numKeys));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -221,7 +225,7 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexSinglePart(TKey key)
         {
             var slot = GetIndexNoRemapSinglePart(key);
-            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage!, (int)(slot - _numKeys));
+            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - _numKeys));
         }
 
         /// <summary>
@@ -364,7 +368,7 @@ namespace PtrHash.CSharp.Port.Core
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            var useMinimal = minimal && _minimal && _remapStorage != null;
+            var useMinimal = minimal && _minimal;
             var numKeys = _numKeys; // Cache field access
 
             unsafe
@@ -381,7 +385,7 @@ namespace PtrHash.CSharp.Port.Core
                             if (slot >= numKeys)
                             {
                                 var remapIndex = (int)(slot - numKeys);
-                                slot = (nuint)TRemappingStorage.Index(_remapStorage!, remapIndex);
+                                slot = (nuint)TRemappingStorage.Index(_remapStorage, remapIndex);
                             }
                             resultsPtr[i] = slot;
                         }
@@ -404,7 +408,7 @@ namespace PtrHash.CSharp.Port.Core
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            var useMinimal = minimal && _minimal && _remapStorage != null;
+            var useMinimal = minimal && _minimal;
             var numKeys = _numKeys; // Cache field access
 
             unsafe
@@ -421,7 +425,7 @@ namespace PtrHash.CSharp.Port.Core
                             if (slot >= numKeys)
                             {
                                 var remapIndex = (int)(slot - numKeys);
-                                slot = (nuint)TRemappingStorage.Index(_remapStorage!, remapIndex);
+                                slot = (nuint)TRemappingStorage.Index(_remapStorage, remapIndex);
                             }
                             resultsPtr[i] = slot;
                         }
@@ -462,7 +466,7 @@ namespace PtrHash.CSharp.Port.Core
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             const int PREFETCH_DISTANCE = 32; // Match Rust's B parameter
-            var useMinimal = minimal && _minimal && _remapStorage != null;
+            var useMinimal = minimal && _minimal;
             var numKeys = _numKeys;
 
             // Ring buffers for prefetching - match Rust exactly
@@ -523,7 +527,7 @@ namespace PtrHash.CSharp.Port.Core
 
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage!, (int)(slot - numKeys));
+                            slot = (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - numKeys));
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -543,7 +547,7 @@ namespace PtrHash.CSharp.Port.Core
 
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage!, (int)(slot - numKeys));
+                            slot = (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - numKeys));
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -560,7 +564,7 @@ namespace PtrHash.CSharp.Port.Core
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             const int PREFETCH_DISTANCE = 32;
-            var useMinimal = minimal && _minimal && _remapStorage != null;
+            var useMinimal = minimal && _minimal;
             var numKeys = _numKeys;
 
             Span<HashValue> nextHashes = stackalloc HashValue[PREFETCH_DISTANCE];
@@ -637,7 +641,7 @@ namespace PtrHash.CSharp.Port.Core
 
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage!, (int)(slot - numKeys));
+                            slot = (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - numKeys));
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -659,7 +663,7 @@ namespace PtrHash.CSharp.Port.Core
 
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage!, (int)(slot - numKeys));
+                            slot = (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - numKeys));
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -1372,12 +1376,12 @@ namespace PtrHash.CSharp.Port.Core
 
             if (!_minimal || _slotsTotal == _numKeys)
             {
-                _remapStorage = null;
+                _remapStorage = default;
                 return true;
             }
 
             // Compute the free spots (PtrHash paper Section 3.2)
-            // Use ArrayPool for temporary storage - use ulong to match Rust u64
+            // Use ArrayPool for temporary storage
             var maxRemapSize = (int)(_slotsTotal - _numKeys);
             var remapArray = ArrayPool<ulong>.Shared.Rent(maxRemapSize);
             var remapCount = 0;
@@ -1402,7 +1406,7 @@ namespace PtrHash.CSharp.Port.Core
                         break;
 
                     // Process this free slot immediately (Section 3.2)
-                    var i = (ulong)freeSlotIndex;
+                    var i = (uint)freeSlotIndex;
                     while (!Get(_numKeys + (nuint)remapCount))
                     {
                         remapArray[remapCount++] = i;
@@ -1410,9 +1414,9 @@ namespace PtrHash.CSharp.Port.Core
                     remapArray[remapCount++] = i;
                 }
 
-                // Create remapping storage using static generic type
+                // Create remapping storage using selected type
                 var remapValues = remapArray.AsSpan(0, remapCount);
-                _remapStorage = TRemappingStorage.TryNew(remapValues) ?? throw new PtrHashException("Failed to create remapping storage");
+                _remapStorage = TRemappingStorage.TryNew(remapValues);
             }
             finally
             {
@@ -1464,15 +1468,12 @@ namespace PtrHash.CSharp.Port.Core
                 {
                     if (_pilots != null)
                     {
-                        System.Runtime.InteropServices.NativeMemory.AlignedFree(_pilots);
+                        NativeMemory.AlignedFree(_pilots);
                         _pilots = null;
                     }
                 }
 
-                if (disposing)
-                {
-                    _remapStorage?.Dispose();
-                }
+                _remapStorage.Dispose();
 
                 _disposed = true;
             }
