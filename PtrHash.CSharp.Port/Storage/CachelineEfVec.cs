@@ -11,39 +11,11 @@ namespace PtrHash.CSharp.Port.Storage
     /// Provides efficient storage and lookup for sorted 40-bit values using
     /// Elias-Fano encoding with cacheline alignment.
     /// </summary>
-    public unsafe class CachelineEfVec : IList<ulong>, IReadOnlyList<ulong>, IDisposable, IStaticRemappingStorage<CachelineEfVec>
+    public readonly unsafe struct CachelineEfVec : IList<ulong>, IReadOnlyList<ulong>, IDisposable, IRemappingStorage<CachelineEfVec>
     {
         private readonly CachelineEf[] _ef;
         private readonly int _length;
-        private bool _disposed;
 
-        /// <summary>
-        /// Try to construct a new CachelineEfVec for the given sorted values.
-        /// Returns null if any cacheline would span too large a range.
-        /// </summary>
-        public static CachelineEfVec? TryNew(ReadOnlySpan<ulong> values)
-        {
-            if (values.Length == 0)
-                throw new ArgumentException("Values cannot be empty");
-
-            var numCachelines = (values.Length + CachelineEf.L - 1) / CachelineEf.L;
-            var ef = new CachelineEf[numCachelines];
-
-            for (int i = 0; i < numCachelines; i++)
-            {
-                var start = i * CachelineEf.L;
-                var end = Math.Min(start + CachelineEf.L, values.Length);
-                var chunk = values.Slice(start, end - start);
-                
-                var cacheline = CachelineEf.TryNew(chunk);
-                if (cacheline == null)
-                    return null;
-                    
-                ef[i] = cacheline.Value;
-            }
-
-            return new CachelineEfVec(ef, values.Length);
-        }
 
         /// <summary>
         /// Construct a new CachelineEfVec for the given sorted values.
@@ -51,7 +23,7 @@ namespace PtrHash.CSharp.Port.Storage
         /// </summary>
         public static CachelineEfVec New(ReadOnlySpan<ulong> values)
         {
-            return TryNew(values) ?? throw new ArgumentException("Values are too sparse!");
+            return TryNew(values);
         }
 
         private CachelineEfVec(CachelineEf[] ef, int length)
@@ -181,20 +153,66 @@ namespace PtrHash.CSharp.Port.Storage
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public void Dispose()
+        public readonly void Dispose()
         {
-            _disposed = true;
+            // Nothing to dispose for struct - CachelineEf structs handle their own cleanup
         }
 
-        // IMutableRemappingStorage implementation
-        static IMutableRemappingStorage? IMutableRemappingStorage.TryNew(ReadOnlySpan<ulong> values)
+        // IRemappingStorage implementation
+        public static CachelineEfVec TryNew(ReadOnlySpan<ulong> values)
         {
-            return TryNew(values);
+            if (values.Length == 0)
+                throw new ArgumentException("Values cannot be empty");
+
+            var numCachelines = (values.Length + CachelineEf.L - 1) / CachelineEf.L;
+            var ef = new CachelineEf[numCachelines];
+
+            for (int i = 0; i < numCachelines; i++)
+            {
+                var start = i * CachelineEf.L;
+                var end = Math.Min(start + CachelineEf.L, values.Length);
+                var chunk = values.Slice(start, end - start);
+                
+                var cacheline = CachelineEf.TryNew(chunk);
+                if (cacheline == null)
+                    throw new ArgumentException($"Cacheline {i} spans too large a range");
+                    
+                ef[i] = cacheline.Value;
+            }
+
+            return new CachelineEfVec(ef, values.Length);
         }
 
-        static string IMutableRemappingStorage.Name => "CacheLineEF";
+        public static string Name => "CacheLineEF";
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong IndexStatic(CachelineEfVec self, int index) => self._ef[index / CachelineEf.L].Index(index % CachelineEf.L);
+        public static ulong Index(CachelineEfVec self, int index) => self._ef[index / CachelineEf.L].Index(index % CachelineEf.L);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Prefetch(CachelineEfVec self, int index)
+        {
+            // Prefetch the relevant cacheline - CachelineEf is already cache-aligned
+            if (Sse.IsSupported && index < self._length)
+            {
+                var cachelineIndex = index / CachelineEf.L;
+                if (cachelineIndex < self._ef.Length)
+                {
+                    // Prefetch the cacheline data structure itself
+                    unsafe
+                    {
+                        fixed (CachelineEf* ptr = &self._ef[cachelineIndex])
+                        {
+                            Sse.Prefetch0(ptr);
+                        }
+                    }
+                }
+            }
+        }
+        
+        public static int GetSizeInBytes(CachelineEfVec self)
+        {
+            // Each CachelineEf is exactly 64 bytes (cache line size)
+            return self._ef.Length * 64;
+        }
     }
 }

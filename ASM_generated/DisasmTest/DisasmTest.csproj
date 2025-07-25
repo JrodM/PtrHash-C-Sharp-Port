@@ -5,8 +5,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
     <PlatformTarget>x64</PlatformTarget>
-    <PublishAot>true</PublishAot>
-    <StripSymbols>false</StripSymbols>
+    <PublishAot>false</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>

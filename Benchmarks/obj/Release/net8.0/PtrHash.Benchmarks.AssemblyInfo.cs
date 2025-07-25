@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PtrHash.Benchmarks")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+01271131ea0a24c24b574de263fa4614ddf8a22e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d5ca1a92647b014e8455cfa7a13df980dcc8c1d9")]
 [assembly: System.Reflection.AssemblyProductAttribute("PtrHash.Benchmarks")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PtrHash.Benchmarks")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

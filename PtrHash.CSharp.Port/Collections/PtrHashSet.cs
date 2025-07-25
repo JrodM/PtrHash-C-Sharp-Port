@@ -6,20 +6,23 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
-using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 
 namespace PtrHash.CSharp.Port.Collections
 {
     /// <summary>
-    /// A high-performance read-only set implementation using PtrHash as the underlying structure.
+    /// A high-performance set implementation using PtrHash as the underlying mapping structure.
     /// Provides O(1) lookups with perfect hashing for a fixed set of elements.
+    /// Consolidates the functionality of both PtrHashSet and PtrHashHashSet.
     /// </summary>
-    public class PtrHashSet<TKey, THasher, TBucketFunction> : ISet<TKey>, IDisposable
+    public class PtrHashSet<TKey, THasher, TBucketFunction, TRemappingStorage> : ISet<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
+        where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
         where TKey : notnull
     {
-        private readonly PtrHash<TKey, THasher, TBucketFunction> _ptrHash;
+        private readonly PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> _ptrHash;
         private readonly TKey[] _elementLookup;
         private readonly TKey[] _originalElements;
         private readonly IEqualityComparer<TKey> _comparer;
@@ -37,79 +40,89 @@ namespace PtrHash.CSharp.Port.Collections
             IEqualityComparer<TKey>? comparer = null)
         {
             if (elements == null) throw new ArgumentNullException(nameof(elements));
+            if (elements.Length == 0) throw new ArgumentException("Elements cannot be empty", nameof(elements));
 
-            _originalElements = (TKey[])elements.Clone();
             _comparer = comparer ?? EqualityComparer<TKey>.Default;
-            
-            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction>(elements, parameters ?? PtrHashParams.DefaultFast);
-            var info = _ptrHash.GetInfo();
-            int maxIndex = (int)info.MaxIndex;
+            _originalElements = new TKey[elements.Length];
+            Array.Copy(elements, _originalElements, elements.Length);
 
-            _elementLookup = new TKey[maxIndex];
-
-            // Map elements to their hash indices
-            for (int i = 0; i < elements.Length; i++)
+            // Validate uniqueness
+            var uniqueElements = new HashSet<TKey>(_comparer);
+            foreach (var element in elements)
             {
-                int idx = (int)_ptrHash.GetIndex(elements[i]);
-                _elementLookup[idx] = elements[i];
+                if (!uniqueElements.Add(element))
+                    throw new ArgumentException($"Duplicate element found: {element}", nameof(elements));
+            }
+
+            // Build PtrHash with the unique elements
+            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(elements, parameters ?? PtrHashParams.DefaultFast);
+
+            // Create lookup array indexed by hash result
+            _elementLookup = new TKey[_ptrHash.GetInfo().MaxIndex];
+
+            // Populate lookup array using streaming for better performance
+            var indices = ArrayPool<nuint>.Shared.Rent(elements.Length);
+            try
+            {
+                var indicesSpan = indices.AsSpan(0, elements.Length);
+                _ptrHash.GetIndicesStream(elements, indicesSpan, minimal: true);
+
+                for (int i = 0; i < elements.Length; i++)
+                {
+                    _elementLookup[indicesSpan[i]] = elements[i];
+                }
+            }
+            finally
+            {
+                ArrayPool<nuint>.Shared.Return(indices);
             }
         }
 
-        #region ISet<TKey> Implementation
+        /// <summary>
+        /// Creates a new PtrHashSet from the given collection
+        /// </summary>
+        public PtrHashSet(IEnumerable<TKey> collection, PtrHashParams? parameters = null, IEqualityComparer<TKey>? comparer = null)
+            : this(collection.ToArray(), parameters, comparer)
+        {
+        }
 
         public int Count => _originalElements.Length;
-
         public bool IsReadOnly => true;
 
-        /// <summary>
-        /// Determines whether the set contains the specified element
-        /// </summary>
-        /// <param name="item">The element to search for</param>
-        /// <returns>True if the element is found, false otherwise</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(TKey item)
         {
-            var idx = (int)_ptrHash.GetIndex(item);
-            
-            // Single bounds check and cache-friendly access
-            if ((uint)idx < (uint)_elementLookup.Length)
-            {
-                return _comparer.Equals(_elementLookup[idx], item);
-            }
-            
-            return false;
+            if (item == null) return false;
+
+            var index = _ptrHash.GetIndex(item);
+            return index < (nuint)_elementLookup.Length && 
+                   _comparer.Equals(_elementLookup[index], item);
         }
 
         /// <summary>
-        /// Performs batch membership testing using streaming for better performance on large datasets
+        /// Efficiently checks membership for multiple keys using streaming operations.
+        /// Uses stack allocation for small datasets and ArrayPool for larger ones.
         /// </summary>
-        /// <param name="items">Items to test for membership</param>
-        /// <param name="results">Output array for results (must be same length as items)</param>
-        public void ContainsStream(
-            ReadOnlySpan<TKey> items,
-            Span<bool> results)
+        public void ContainsStream(ReadOnlySpan<TKey> keys, Span<bool> results)
         {
-            if (items.Length != results.Length)
-                throw new ArgumentException("Items and results spans must have the same length");
-            
-            const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
-            
-            if (items.Length <= MAX_STACK_SIZE)
+            if (keys.Length != results.Length)
+                throw new ArgumentException("Keys and results spans must have the same length");
+
+            const int MAX_STACK_SIZE = 4096; // 32KB on stack
+            if (keys.Length <= MAX_STACK_SIZE)
             {
-                // Small datasets: single allocation on stack
-                Span<nuint> indices = stackalloc nuint[items.Length];
-                _ptrHash.GetIndicesStream(items, indices, minimal: true);
-                ProcessIndices(items, indices, results);
+                Span<nuint> indices = stackalloc nuint[keys.Length];
+                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: true);
+                ProcessIndicesForContains(keys, indices, results);
             }
             else
             {
-                // Large datasets: rent from array pool to avoid stack overflow
-                var indices = ArrayPool<nuint>.Shared.Rent(items.Length);
+                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
                 try
                 {
-                    var indicesSpan = indices.AsSpan(0, items.Length);
-                    _ptrHash.GetIndicesStream(items, indicesSpan, minimal: true);
-                    ProcessIndices(items, indicesSpan, results);
+                    var indicesSpan = indices.AsSpan(0, keys.Length);
+                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: true);
+                    ProcessIndicesForContains(keys, indicesSpan, results);
                 }
                 finally
                 {
@@ -118,46 +131,66 @@ namespace PtrHash.CSharp.Port.Collections
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ProcessIndicesForContains(ReadOnlySpan<TKey> keys, ReadOnlySpan<nuint> indices, Span<bool> results)
+        {
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var index = indices[i];
+                results[i] = index < (nuint)_elementLookup.Length && 
+                           _comparer.Equals(_elementLookup[index], keys[i]);
+            }
+        }
 
         public void CopyTo(TKey[] array, int arrayIndex)
         {
             if (array == null) throw new ArgumentNullException(nameof(array));
             if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-            if (array.Length - arrayIndex < Count) throw new ArgumentException("Destination array is too small.");
+            if (array.Length - arrayIndex < Count) throw new ArgumentException("Destination array is too small");
 
-            Array.Copy(_originalElements, 0, array, arrayIndex, _originalElements.Length);
+            Array.Copy(_originalElements, 0, array, arrayIndex, Count);
         }
 
         public IEnumerator<TKey> GetEnumerator()
         {
-            return ((IEnumerable<TKey>)_originalElements).GetEnumerator();
+            for (int i = 0; i < _originalElements.Length; i++)
+            {
+                yield return _originalElements[i];
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        #endregion
+        // ISet<TKey> mutation methods - all throw NotSupportedException since this is a read-only set
+        public bool Add(TKey item) => throw new NotSupportedException("PtrHashSet is read-only");
+        void ICollection<TKey>.Add(TKey item) => throw new NotSupportedException("PtrHashSet is read-only");
+        public bool Remove(TKey item) => throw new NotSupportedException("PtrHashSet is read-only");
+        public void Clear() => throw new NotSupportedException("PtrHashSet is read-only");
+        public void ExceptWith(IEnumerable<TKey> other) => throw new NotSupportedException("PtrHashSet is read-only");
+        public void IntersectWith(IEnumerable<TKey> other) => throw new NotSupportedException("PtrHashSet is read-only");
+        public void SymmetricExceptWith(IEnumerable<TKey> other) => throw new NotSupportedException("PtrHashSet is read-only");
+        public void UnionWith(IEnumerable<TKey> other) => throw new NotSupportedException("PtrHashSet is read-only");
 
-        #region Set Operations (Read-Only)
-
+        // Set operation methods that return new results
         public bool IsProperSubsetOf(IEnumerable<TKey> other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
-            var otherSet = other.ToHashSet(_comparer);
+            var otherSet = other as ISet<TKey> ?? new HashSet<TKey>(other, _comparer);
             return Count < otherSet.Count && IsSubsetOf(otherSet);
         }
 
         public bool IsProperSupersetOf(IEnumerable<TKey> other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
-            var otherSet = other.ToHashSet(_comparer);
+            var otherSet = other as ISet<TKey> ?? new HashSet<TKey>(other, _comparer);
             return Count > otherSet.Count && IsSupersetOf(otherSet);
         }
 
         public bool IsSubsetOf(IEnumerable<TKey> other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
-            var otherSet = other.ToHashSet(_comparer);
-            return _originalElements.All(element => otherSet.Contains(element));
+            var otherSet = other as ISet<TKey> ?? new HashSet<TKey>(other, _comparer);
+            return _originalElements.All(otherSet.Contains);
         }
 
         public bool IsSupersetOf(IEnumerable<TKey> other)
@@ -175,80 +208,17 @@ namespace PtrHash.CSharp.Port.Collections
         public bool SetEquals(IEnumerable<TKey> other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
-            var otherSet = other.ToHashSet(_comparer);
-            return Count == otherSet.Count && _originalElements.All(element => otherSet.Contains(element));
+            var otherSet = other as ISet<TKey> ?? new HashSet<TKey>(other, _comparer);
+            return Count == otherSet.Count && IsSupersetOf(otherSet);
         }
 
-        #endregion
-
-        #region Unsupported Operations (Read-Only)
-
-        public bool Add(TKey item)
+        // Static factory methods for common configurations
+        public static PtrHashSet<TKey, THasher, TBucketFunction, TRemappingStorage> Create(
+            IEnumerable<TKey> elements,
+            PtrHashParams? parameters = null,
+            IEqualityComparer<TKey>? comparer = null)
         {
-            throw new NotSupportedException("PtrHashSet is read-only. Items cannot be added after construction.");
-        }
-
-        void ICollection<TKey>.Add(TKey item)
-        {
-            throw new NotSupportedException("PtrHashSet is read-only. Items cannot be added after construction.");
-        }
-
-        public void Clear()
-        {
-            throw new NotSupportedException("PtrHashSet is read-only. Items cannot be removed after construction.");
-        }
-
-        public bool Remove(TKey item)
-        {
-            throw new NotSupportedException("PtrHashSet is read-only. Items cannot be removed after construction.");
-        }
-
-        public void ExceptWith(IEnumerable<TKey> other)
-        {
-            throw new NotSupportedException("PtrHashSet is read-only. Set operations that modify the set are not supported.");
-        }
-
-        public void IntersectWith(IEnumerable<TKey> other)
-        {
-            throw new NotSupportedException("PtrHashSet is read-only. Set operations that modify the set are not supported.");
-        }
-
-        public void SymmetricExceptWith(IEnumerable<TKey> other)
-        {
-            throw new NotSupportedException("PtrHashSet is read-only. Set operations that modify the set are not supported.");
-        }
-
-        public void UnionWith(IEnumerable<TKey> other)
-        {
-            throw new NotSupportedException("PtrHashSet is read-only. Set operations that modify the set are not supported.");
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Gets information about the underlying PtrHash structure
-        /// </summary>
-        public PtrHashInfo GetInfo() => _ptrHash.GetInfo();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ProcessIndices(
-            ReadOnlySpan<TKey> items,
-            ReadOnlySpan<nuint> indices,
-            Span<bool> results)
-        {
-            for (int i = 0; i < items.Length; i++)
-            {
-                var idx = (int)indices[i];
-                
-                if ((uint)idx < (uint)_elementLookup.Length)
-                {
-                    results[i] = _comparer.Equals(items[i], _elementLookup[idx]);
-                }
-                else
-                {
-                    results[i] = false;
-                }
-            }
+            return new PtrHashSet<TKey, THasher, TBucketFunction, TRemappingStorage>(elements, parameters, comparer);
         }
 
         public void Dispose()
@@ -259,27 +229,39 @@ namespace PtrHash.CSharp.Port.Collections
                 _disposed = true;
             }
         }
-    }
 
-    /// <summary>
-    /// Convenience class for UInt64 elements using StrongerIntHasher
-    /// </summary>
-    public class PtrHashSetU64 : PtrHashSet<ulong, StrongerIntHasher, Linear>
-    {
-        public PtrHashSetU64(ulong[] elements, PtrHashParams? parameters = null, IEqualityComparer<ulong>? comparer = null)
-            : base(elements, parameters, comparer)
+        ~PtrHashSet()
         {
+            Dispose();
         }
     }
 
     /// <summary>
-    /// Convenience class for string elements using StringHasher
+    /// Convenience aliases for common PtrHashSet configurations
     /// </summary>
-    public class PtrHashSetString : PtrHashSet<string, StringHasher, Linear>
+    public static class PtrHashSet
     {
-        public PtrHashSetString(string[] elements, PtrHashParams? parameters = null, IEqualityComparer<string>? comparer = null)
-            : base(elements, parameters, comparer)
+        /// <summary>
+        /// Create a PtrHashSet for string elements using optimized defaults
+        /// </summary>
+        public static PtrHashSet<string, StringHasher, Linear, UInt32VectorRemappingStorage> CreateForStrings(
+            IEnumerable<string> elements,
+            PtrHashParams? parameters = null)
         {
+            return new PtrHashSet<string, StringHasher, Linear, UInt32VectorRemappingStorage>(
+                elements, parameters);
         }
+
+        /// <summary>
+        /// Create a PtrHashSet for ulong elements using optimized defaults
+        /// </summary>
+        public static PtrHashSet<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage> CreateForUInt64(
+            IEnumerable<ulong> elements,
+            PtrHashParams? parameters = null)
+        {
+            return new PtrHashSet<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
+                elements, parameters);
+        }
+
     }
 }

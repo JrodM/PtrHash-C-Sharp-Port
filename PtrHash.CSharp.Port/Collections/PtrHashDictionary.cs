@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 
 namespace PtrHash.CSharp.Port.Collections
 {
@@ -14,12 +15,13 @@ namespace PtrHash.CSharp.Port.Collections
     /// A dictionary implementation using PtrHash as the underlying mapping structure.
     /// Provides O(1) lookups with perfect hashing for a fixed set of keys.
     /// </summary>
-    public class PtrHashDictionary<TKey, TValue, THasher, TBucketFunction> : IDictionary<TKey, TValue>, IDisposable
+    public class PtrHashDictionary<TKey, TValue, THasher, TBucketFunction, TRemappingStorage> : IDictionary<TKey, TValue>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
+        where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
         where TKey : notnull
     {
-        private readonly PtrHash<TKey, THasher, TBucketFunction> _ptrHash;
+        private readonly PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> _ptrHash;
         private readonly KeyValuePair<TKey, TValue>[] _keyValuePairs;
         private readonly TValue _sentinel;
         private readonly IEqualityComparer<TKey> _keyComparer;
@@ -53,7 +55,7 @@ namespace PtrHash.CSharp.Port.Collections
             _sentinel = notFoundSentinel;
             _keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             
-            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction>(keys, parameters ?? PtrHashParams.DefaultFast);
+            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(keys, parameters ?? PtrHashParams.DefaultFast);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;
 
@@ -284,7 +286,7 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for UInt64 keys using StrongerIntHasher
     /// </summary>
-    public class PtrHashDictionaryU64<TValue> : PtrHashDictionary<ulong, TValue, StrongerIntHasher, Linear>
+    public class PtrHashDictionaryU64<TValue> : PtrHashDictionary<ulong, TValue, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>
     {
         public PtrHashDictionaryU64(ulong[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null, IEqualityComparer<ulong>? keyComparer = null)
             : base(keys, values, notFoundSentinel, parameters, keyComparer)
@@ -296,7 +298,7 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for string keys using StringHasher
     /// </summary>
-    public class PtrHashDictionaryString<TValue> : PtrHashDictionary<string, TValue, StringHasher, Linear>
+    public class PtrHashDictionaryString<TValue> : PtrHashDictionary<string, TValue, StringHasher, Linear, UInt32VectorRemappingStorage>
     {
         public PtrHashDictionaryString(string[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null, IEqualityComparer<string>? keyComparer = null)
             : base(keys, values, notFoundSentinel, parameters, keyComparer)

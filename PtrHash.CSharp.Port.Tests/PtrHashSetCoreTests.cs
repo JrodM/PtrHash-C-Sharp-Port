@@ -2,6 +2,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -19,13 +21,13 @@ namespace PtrHash.CSharp.Port.Tests
             // Valid construction
             var elements = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
             
-            using var set = new PtrHashSetU64(elements);
+            using var set = PtrHashSet.CreateForUInt64(elements);
             Assert.AreEqual(1000, set.Count);
             Assert.IsTrue(set.IsReadOnly);
             
             // Invalid construction - null elements
             Assert.ThrowsException<ArgumentNullException>(() => 
-                new PtrHashSetU64(null!));
+                PtrHashSet.CreateForUInt64(null!));
         }
 
         #endregion
@@ -37,7 +39,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var elements = new ulong[] { 10, 20, 30, 40, 50 };
-            using var set = new PtrHashSetU64(elements);
+            using var set = PtrHashSet.CreateForUInt64(elements);
 
             // Test members
             Assert.IsTrue(set.Contains(20));
@@ -55,11 +57,11 @@ namespace PtrHash.CSharp.Port.Tests
         #region Streaming Tests
 
         [TestMethod]
-        public void ContainsStream_ConsistentWithSingleContains()
+        public void Contains_ConsistentResults()
         {
             // Arrange
             var elements = Enumerable.Range(1, 200).Select(i => (ulong)i).ToArray();
-            using var set = new PtrHashSetU64(elements);
+            using var set = PtrHashSet.CreateForUInt64(elements);
 
             // Mix of members and non-members
             var queryItems = new ulong[] { 1, 999, 50, 888, 100, 777, 150, 666, 200 };
@@ -74,18 +76,23 @@ namespace PtrHash.CSharp.Port.Tests
         }
 
         [TestMethod]
-        public void ContainsStream_EdgeCases()
+        public void Contains_EdgeCases()
         {
             // Arrange
             var elements = new ulong[] { 1, 2, 3 };
-            using var set = new PtrHashSetU64(elements);
+            using var set = PtrHashSet.CreateForUInt64(elements);
 
-            // Empty input
-            set.ContainsStream(Array.Empty<ulong>(), Array.Empty<bool>());
+            // Empty input - just verify no exceptions
+            var emptyQuery = Array.Empty<ulong>();
+            var emptyResults = new bool[0];
+            set.ContainsStream(emptyQuery, emptyResults);
+            
+            // Test with single non-member
+            Assert.IsFalse(set.Contains(999));
 
-            // Mismatched spans
+            // Test mismatched spans throw exception
             Assert.ThrowsException<ArgumentException>(() => 
-                set.ContainsStream(new ulong[] { 1, 2 }, new bool[3]));
+                set.ContainsStream(new ulong[] { 1, 2 }, new bool[1]));
         }
 
         #endregion
@@ -97,7 +104,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var elements = new[] { "red", "green", "blue", "yellow", "purple" };
-            using var set = new PtrHashSetString(elements);
+            using var set = PtrHashSet.CreateForStrings(elements);
 
             // Test membership
             Assert.IsTrue(set.Contains("red"));
@@ -122,7 +129,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var elements = new ulong[] { 1, 2, 3, 4, 5 };
-            using var set = new PtrHashSetU64(elements);
+            using var set = PtrHashSet.CreateForUInt64(elements);
 
             // Test properties
             Assert.AreEqual(5, set.Count);
@@ -153,7 +160,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Arrange
             var set1Elements = new ulong[] { 1, 2, 3, 4, 5 };
             var set2Elements = new ulong[] { 3, 4, 5, 6, 7 };
-            using var set = new PtrHashSetU64(set1Elements);
+            using var set = PtrHashSet.CreateForUInt64(set1Elements);
 
             // IsSubsetOf
             Assert.IsTrue(set.IsSubsetOf(new ulong[] { 1, 2, 3, 4, 5, 6 }));
@@ -193,7 +200,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var elements = Enumerable.Range(1, size).Select(i => (ulong)i).ToArray();
-            using var set = new PtrHashSetU64(elements);
+            using var set = PtrHashSet.CreateForUInt64(elements);
 
             // Sample test
             var random = new Random(42);
@@ -233,7 +240,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Custom comparer for different behavior
             var elements = new[] { "Apple", "Banana", "Cherry" };
-            using var set = new PtrHashSetString(elements);
+            using var set = PtrHashSet.CreateForStrings(elements);
 
             // Test exact matches
             Assert.IsTrue(set.Contains("Apple"));
@@ -260,7 +267,7 @@ namespace PtrHash.CSharp.Port.Tests
         public void Dispose_ReleasesResources()
         {
             // Arrange
-            var set = new PtrHashSetU64(new ulong[] { 1, 2, 3 });
+            var set = PtrHashSet.CreateForUInt64(new ulong[] { 1, 2, 3 });
             
             // Act & Assert - no exceptions on dispose
             set.Dispose();

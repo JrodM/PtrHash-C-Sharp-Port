@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 using System;
 using System.Linq;
 
@@ -18,7 +19,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Test both UInt64 and String keys in one test
             // Arrange & Act - UInt64
             var ulongKeys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
-            using var ulongPtrHash = new PtrHash<ulong, StrongerIntHasher, Linear>(ulongKeys, PtrHashParams.DefaultFast);
+            using var ulongPtrHash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(ulongKeys, PtrHashParams.DefaultFast);
             var ulongInfo = ulongPtrHash.GetInfo();
 
             // Assert - UInt64
@@ -28,7 +29,7 @@ namespace PtrHash.CSharp.Port.Tests
 
             // Arrange & Act - String
             var stringKeys = Enumerable.Range(1, 100).Select(i => $"key_{i}").ToArray();
-            using var stringPtrHash = new PtrHash<string, StringHasher, Linear>(stringKeys, PtrHashParams.DefaultFast);
+            using var stringPtrHash = new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>(stringKeys, PtrHashParams.DefaultFast);
             var stringInfo = stringPtrHash.GetInfo();
 
             // Assert - String
@@ -42,10 +43,10 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Test both empty and duplicate keys
             Assert.ThrowsException<ArgumentException>(() => 
-                new PtrHash<ulong, FxHasher, Linear>(Array.Empty<ulong>(), PtrHashParams.DefaultFast));
+                new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(Array.Empty<ulong>(), PtrHashParams.DefaultFast));
 
             Assert.ThrowsException<PtrHashException>(() => 
-                new PtrHash<ulong, FxHasher, Linear>(new ulong[] { 1, 2, 3, 2, 4 }, PtrHashParams.DefaultFast));
+                new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(new ulong[] { 1, 2, 3, 2, 4 }, PtrHashParams.DefaultFast));
         }
 
         #endregion
@@ -57,7 +58,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var keys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher, Linear>(keys, PtrHashParams.DefaultFast);
+            using var ptrHash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, PtrHashParams.DefaultFast);
 
             // Act
             var indices = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
@@ -82,7 +83,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var keys = Enumerable.Range(1, 200).Select(i => (ulong)i).ToArray();
-            using var ptrHash = new PtrHash<ulong, FxHasher, Linear>(keys, PtrHashParams.DefaultFast);
+            using var ptrHash = new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(keys, PtrHashParams.DefaultFast);
 
             // Act - Get expected results from single lookups
             var expectedMinimal = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
@@ -110,8 +111,8 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = Enumerable.Range(1, 1000).Select(i => (ulong)i).ToArray();
             
             // Act
-            using var xxh3Hash = new PtrHash<ulong, Xxh3Hasher, Linear>(keys, PtrHashParams.DefaultFast);
-            using var strongHash = new PtrHash<ulong, StrongerIntHasher, Linear>(keys, PtrHashParams.DefaultFast);
+            using var xxh3Hash = new PtrHash<ulong, Xxh3Hasher, Linear, UInt32VectorRemappingStorage>(keys, PtrHashParams.DefaultFast);
+            using var strongHash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, PtrHashParams.DefaultFast);
             
             var xxh3Indices = keys.Take(100).Select(k => xxh3Hash.GetIndex(k)).ToArray();
             var strongIndices = keys.Take(100).Select(k => strongHash.GetIndex(k)).ToArray();
@@ -132,7 +133,7 @@ namespace PtrHash.CSharp.Port.Tests
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
             
             // Act
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher, Linear>(keys, singlePartParams);
+            using var ptrHash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, singlePartParams);
             var indices = keys.Select(key => ptrHash.GetIndex(key)).ToArray();
 
             // Assert
@@ -154,7 +155,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = Enumerable.Range(1, keyCount).Select(i => (ulong)i).ToArray();
             
             // Act
-            using var ptrHash = new PtrHash<ulong, StrongerIntHasher, Linear>(keys, PtrHashParams.DefaultFast);
+            using var ptrHash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, PtrHashParams.DefaultFast);
             var info = ptrHash.GetInfo();
             
             // Sample 1% of keys for testing (max 1000)
