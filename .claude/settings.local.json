@@ -55,7 +55,9 @@
       "Bash(DOTNET_EnableAVX512F=0 dotnet test --logger console --verbosity detailed PtrHash.CSharp.Port.Tests/)",
       "Bash(./scripts/generate_unified_asm.sh:*)",
       "Bash(bash:*)",
-      "Bash(DOTNET_EnableAVX512F=0 dotnet build PtrHash.CSharp.Port/)"
+      "Bash(DOTNET_EnableAVX512F=0 dotnet build PtrHash.CSharp.Port/)",
+      "Bash(./scripts/simple_comparison.sh:*)",
+      "Bash(awk:*)"
     ],
     "deny": []
   }

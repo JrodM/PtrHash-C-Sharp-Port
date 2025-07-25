@@ -13,6 +13,7 @@ using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 using PtrHashImpl = PtrHash.CSharp.Interop.PtrHash;
 
 namespace PtrHash.Benchmarks
@@ -72,29 +73,29 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher, Linear> PortConstructionMultiPart()
+        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PortConstructionMultiPart()
         {
-            return new PtrHash<ulong, FxHasher, Linear>(_keys, PtrHashParams.DefaultFast);
+            return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, PtrHashParams.DefaultFast);
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher, Linear> PortConstructionSinglePart()
+        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PortConstructionSinglePart()
         {
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            return new PtrHash<ulong, FxHasher, Linear>(_keys, singlePartParams);
+            return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, singlePartParams);
         }
 
         [Benchmark]
-        public PtrHash<ulong, StrongerIntHasher, Linear> PortConstructionMultiPart_StrongerHasher()
+        public PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage> PortConstructionMultiPart_StrongerHasher()
         {
-            return new PtrHash<ulong, StrongerIntHasher, Linear>(_keys, PtrHashParams.DefaultFast);
+            return new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(_keys, PtrHashParams.DefaultFast);
         }
 
         [Benchmark]
-        public PtrHash<ulong, StrongerIntHasher, Linear> PortConstructionSinglePart_StrongerHasher()
+        public PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage> PortConstructionSinglePart_StrongerHasher()
         {
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            return new PtrHash<ulong, StrongerIntHasher, Linear>(_keys, singlePartParams);
+            return new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(_keys, singlePartParams);
         }
 
         [GlobalCleanup]

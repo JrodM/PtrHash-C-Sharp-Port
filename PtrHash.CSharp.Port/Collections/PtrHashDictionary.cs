@@ -275,11 +275,26 @@ namespace PtrHash.CSharp.Port.Collections
 
         public void Dispose()
         {
-            if (!_disposed)
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~PtrHashDictionary()
+        {
+            Dispose(disposing: false);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
             {
+                // Only safe to access managed objects here
                 _ptrHash?.Dispose();
-                _disposed = true;
             }
+
+            _disposed = true;
         }
     }
 
