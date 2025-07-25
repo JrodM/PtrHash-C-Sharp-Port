@@ -11,7 +11,7 @@ namespace PtrHash.CSharp.Port.Storage
     /// Simple vector-based remapping storage using aligned native memory for uint values.
     /// Corresponds to Rust's Vec&lt;u32&gt; backing storage.
     /// </summary>
-    public unsafe class UInt32VectorRemappingStorage : IStaticRemappingStorage<UInt32VectorRemappingStorage>
+    public unsafe class UInt32VectorRemappingStorage : IRemappingStorage<UInt32VectorRemappingStorage>
     {
         private uint* _values;
         private readonly int _length;
@@ -69,6 +69,7 @@ namespace PtrHash.CSharp.Port.Storage
             return _values[index];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Prefetch(int index)
         {
             // Native memory prefetch using software prefetch hint
@@ -190,13 +191,10 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed)
+            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
+            if (ptr != null)
             {
-                if (_values != null)
-                {
-                    NativeMemory.AlignedFree(_values);
-                    _values = null;
-                }
+                NativeMemory.AlignedFree(ptr);
                 _disposed = true;
             }
         }
@@ -284,13 +282,10 @@ namespace PtrHash.CSharp.Port.Storage
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed)
+            var ptr = System.Threading.Interlocked.Exchange(ref _values, null);
+            if (ptr != null)
             {
-                if (_values != null)
-                {
-                    NativeMemory.AlignedFree(_values);
-                    _values = null;
-                }
+                NativeMemory.AlignedFree(ptr);
                 _disposed = true;
             }
         }

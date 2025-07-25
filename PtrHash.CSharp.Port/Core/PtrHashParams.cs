@@ -1,5 +1,4 @@
 using System;
-using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHash.CSharp.Port.Storage;
 
 namespace PtrHash.CSharp.Port.Core
@@ -14,7 +13,6 @@ namespace PtrHash.CSharp.Port.Core
         public double Lambda { get; init; }
         public bool Minimal { get; init; }
         public bool SinglePart { get; init; }
-        public IBucketFunction? BucketFunction { get; init; }
         
         /// <summary>
         /// Remapping storage type selector - matches Rust's F generic parameter
@@ -24,7 +22,7 @@ namespace PtrHash.CSharp.Port.Core
 
         /// <summary>
         /// Default fast parameters: 3.0 bits/key, optimized for query speed
-        /// Uses Linear bucket function and Vec&lt;u32&gt; storage (matches Rust default)
+        /// Uses Vec&lt;u32&gt; storage (matches Rust default)
         /// </summary>
         public static PtrHashParams DefaultFast => new()
         {
@@ -32,13 +30,12 @@ namespace PtrHash.CSharp.Port.Core
             Lambda = 3.0,
             Minimal = true,
             SinglePart = false,  // Multi-part mode
-            BucketFunction = new Linear(),
             StorageType = RemappingStorageType.VecU32
         };
 
         /// <summary>
         /// Default balanced parameters: 2.4 bits/key, balanced trade-off
-        /// Uses CubicEps bucket function and CacheLineEF storage (matches Rust balanced config)
+        /// Uses CacheLineEF storage (matches Rust balanced config)
         /// </summary>
         public static PtrHashParams DefaultBalanced => new()
         {
@@ -46,13 +43,12 @@ namespace PtrHash.CSharp.Port.Core
             Lambda = 3.5,  // Expected bucket size parameter
             Minimal = true,
             SinglePart = false,
-            BucketFunction = new CubicEps(),
             StorageType = RemappingStorageType.CacheLineEF
         };
         
         /// <summary>
         /// Most compact parameters: 2.1 bits/key, maximum compression
-        /// Uses CubicEps bucket function and EliasFano storage (matches Rust compact config)
+        /// Uses EliasFano storage (matches Rust compact config)
         /// </summary>
         public static PtrHashParams DefaultCompact => new()
         {
@@ -60,7 +56,6 @@ namespace PtrHash.CSharp.Port.Core
             Lambda = 3.5,
             Minimal = true,
             SinglePart = false,
-            BucketFunction = new CubicEps(),
             StorageType = RemappingStorageType.EliasFano
         };
     }

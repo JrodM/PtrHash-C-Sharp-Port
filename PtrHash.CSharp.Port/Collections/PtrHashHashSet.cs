@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.Core;
-using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
 
 namespace PtrHash.CSharp.Port.Collections
 {
@@ -12,11 +13,12 @@ namespace PtrHash.CSharp.Port.Collections
     /// A hash set implementation using PtrHash as the underlying mapping structure.
     /// Provides O(1) lookups with perfect hashing for a fixed set of items.
     /// </summary>
-    public class PtrHashHashSet<T, THasher> : ISet<T>, IDisposable
+    public class PtrHashHashSet<T, THasher, TBucketFunction> : ISet<T>, IDisposable
         where THasher : struct, IKeyHasher<T>
+        where TBucketFunction : struct, IBucketFunction
         where T : notnull
     {
-        private readonly PtrHash<T, THasher> _ptrHash;
+        private readonly PtrHash<T, THasher, TBucketFunction> _ptrHash;
         private readonly T[] _itemsByIndex;
         private readonly T[] _originalItems;
         private readonly bool[] _occupied;
@@ -32,7 +34,7 @@ namespace PtrHash.CSharp.Port.Collections
             if (items == null) throw new ArgumentNullException(nameof(items));
 
             _originalItems = (T[])items.Clone();
-            _ptrHash = new PtrHash<T, THasher>(items, parameters ?? PtrHashParams.DefaultFast);
+            _ptrHash = new PtrHash<T, THasher, TBucketFunction>(items, parameters ?? PtrHashParams.DefaultFast);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;
 
@@ -230,7 +232,7 @@ namespace PtrHash.CSharp.Port.Collections
         private void ThrowIfDisposed()
         {
             if (_disposed)
-                throw new ObjectDisposedException(nameof(PtrHashHashSet<T, THasher>));
+                throw new ObjectDisposedException(nameof(PtrHashHashSet<T, THasher, TBucketFunction>));
         }
 
         public void Dispose()
@@ -246,7 +248,7 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for UInt64 items using StrongerIntHasher
     /// </summary>
-    public class PtrHashHashSetU64 : PtrHashHashSet<ulong, StrongerIntHasher>
+    public class PtrHashHashSetU64 : PtrHashHashSet<ulong, StrongerIntHasher, Linear>
     {
         public PtrHashHashSetU64(ulong[] items, PtrHashParams? parameters = null)
             : base(items, parameters)
@@ -257,7 +259,7 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for string items using StringHasher
     /// </summary>
-    public class PtrHashHashSetString : PtrHashHashSet<string, StringHasher>
+    public class PtrHashHashSetString : PtrHashHashSet<string, StringHasher, Linear>
     {
         public PtrHashHashSetString(string[] items, PtrHashParams? parameters = null)
             : base(items, parameters)

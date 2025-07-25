@@ -29,6 +29,11 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
   </ItemGroup>
+  
+  <!-- Exclude DisasmTest from compilation -->
+  <ItemGroup>
+    <Compile Remove="DisasmTest/**/*.cs" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../PtrHash.CSharp.Interop/PtrHashNative.csproj" />
     <ProjectReference Include="../PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj" />

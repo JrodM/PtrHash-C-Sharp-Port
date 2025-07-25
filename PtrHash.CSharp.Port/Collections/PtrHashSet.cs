@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using PtrHash.CSharp.Port.Core;
-using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
 
 namespace PtrHash.CSharp.Port.Collections
 {
@@ -13,11 +14,12 @@ namespace PtrHash.CSharp.Port.Collections
     /// A high-performance read-only set implementation using PtrHash as the underlying structure.
     /// Provides O(1) lookups with perfect hashing for a fixed set of elements.
     /// </summary>
-    public class PtrHashSet<TKey, THasher> : ISet<TKey>, IDisposable
+    public class PtrHashSet<TKey, THasher, TBucketFunction> : ISet<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
+        where TBucketFunction : struct, IBucketFunction
         where TKey : notnull
     {
-        private readonly PtrHash<TKey, THasher> _ptrHash;
+        private readonly PtrHash<TKey, THasher, TBucketFunction> _ptrHash;
         private readonly TKey[] _elementLookup;
         private readonly TKey[] _originalElements;
         private readonly IEqualityComparer<TKey> _comparer;
@@ -39,7 +41,7 @@ namespace PtrHash.CSharp.Port.Collections
             _originalElements = (TKey[])elements.Clone();
             _comparer = comparer ?? EqualityComparer<TKey>.Default;
             
-            _ptrHash = new PtrHash<TKey, THasher>(elements, parameters ?? PtrHashParams.DefaultFast);
+            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction>(elements, parameters ?? PtrHashParams.DefaultFast);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;
 
@@ -262,7 +264,7 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for UInt64 elements using StrongerIntHasher
     /// </summary>
-    public class PtrHashSetU64 : PtrHashSet<ulong, StrongerIntHasher>
+    public class PtrHashSetU64 : PtrHashSet<ulong, StrongerIntHasher, Linear>
     {
         public PtrHashSetU64(ulong[] elements, PtrHashParams? parameters = null, IEqualityComparer<ulong>? comparer = null)
             : base(elements, parameters, comparer)
@@ -273,7 +275,7 @@ namespace PtrHash.CSharp.Port.Collections
     /// <summary>
     /// Convenience class for string elements using StringHasher
     /// </summary>
-    public class PtrHashSetString : PtrHashSet<string, StringHasher>
+    public class PtrHashSetString : PtrHashSet<string, StringHasher, Linear>
     {
         public PtrHashSetString(string[] elements, PtrHashParams? parameters = null, IEqualityComparer<string>? comparer = null)
             : base(elements, parameters, comparer)

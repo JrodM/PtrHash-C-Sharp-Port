@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Interop.PtrHash;
 using PtrHash.CSharp.Interop.Native;
@@ -40,10 +41,10 @@ namespace PtrHash.Benchmarks
         private ulong[] _lookupKeys = null!;
         
         // Multi-part PtrHash
-        private PtrHash<ulong, FxHasher> _multiPartPtrHash = null!;
+        private PtrHash<ulong, FxHasher, Linear> _multiPartPtrHash = null!;
         
         // Single-part PtrHash
-        private PtrHash<ulong, FxHasher> _singlePartPtrHash = null!;
+        private PtrHash<ulong, FxHasher, Linear> _singlePartPtrHash = null!;
         
         
         // Native interop - multi-part
@@ -80,11 +81,11 @@ namespace PtrHash.Benchmarks
             }
 
             // Multi-part PtrHash (default)
-            _multiPartPtrHash = new PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);
+            _multiPartPtrHash = new PtrHash<ulong, FxHasher, Linear>(_keys, PtrHashParams.DefaultFast);
             
             // Single-part PtrHash
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartPtrHash = new PtrHash<ulong, FxHasher>(_keys, singlePartParams);
+            _singlePartPtrHash = new PtrHash<ulong, FxHasher, Linear>(_keys, singlePartParams);
 
             
             // Native interop - multi-part

@@ -12,6 +12,7 @@ using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHashImpl = PtrHash.CSharp.Interop.PtrHash;
 
 namespace PtrHash.Benchmarks
@@ -71,29 +72,29 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher> PortConstructionMultiPart()
+        public PtrHash<ulong, FxHasher, Linear> PortConstructionMultiPart()
         {
-            return new PtrHash<ulong, FxHasher>(_keys, PtrHashParams.DefaultFast);
+            return new PtrHash<ulong, FxHasher, Linear>(_keys, PtrHashParams.DefaultFast);
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher> PortConstructionSinglePart()
+        public PtrHash<ulong, FxHasher, Linear> PortConstructionSinglePart()
         {
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            return new PtrHash<ulong, FxHasher>(_keys, singlePartParams);
+            return new PtrHash<ulong, FxHasher, Linear>(_keys, singlePartParams);
         }
 
         [Benchmark]
-        public PtrHash<ulong, StrongerIntHasher> PortConstructionMultiPart_StrongerHasher()
+        public PtrHash<ulong, StrongerIntHasher, Linear> PortConstructionMultiPart_StrongerHasher()
         {
-            return new PtrHash<ulong, StrongerIntHasher>(_keys, PtrHashParams.DefaultFast);
+            return new PtrHash<ulong, StrongerIntHasher, Linear>(_keys, PtrHashParams.DefaultFast);
         }
 
         [Benchmark]
-        public PtrHash<ulong, StrongerIntHasher> PortConstructionSinglePart_StrongerHasher()
+        public PtrHash<ulong, StrongerIntHasher, Linear> PortConstructionSinglePart_StrongerHasher()
         {
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            return new PtrHash<ulong, StrongerIntHasher>(_keys, singlePartParams);
+            return new PtrHash<ulong, StrongerIntHasher, Linear>(_keys, singlePartParams);
         }
 
         [GlobalCleanup]

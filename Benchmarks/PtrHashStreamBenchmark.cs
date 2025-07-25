@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
 
 namespace PtrHash.Benchmarks
 {
@@ -31,7 +32,7 @@ namespace PtrHash.Benchmarks
         private ulong[] _keys = null!;
         private ulong[] _lookupKeys = null!;
         
-        private PtrHash<ulong, StrongerIntHasher> _multiPartPtrHash = null!;
+        private PtrHash<ulong, StrongerIntHasher, Linear> _multiPartPtrHash = null!;
         
         private nuint[] _indicesBuffer = null!;
 
@@ -49,7 +50,7 @@ namespace PtrHash.Benchmarks
             for (int i = 0; i < actualLookupCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
 
-            _multiPartPtrHash = new PtrHash<ulong, StrongerIntHasher>(_keys, PtrHashParams.DefaultFast);
+            _multiPartPtrHash = new PtrHash<ulong, StrongerIntHasher, Linear>(_keys, PtrHashParams.DefaultFast);
 
             _indicesBuffer = new nuint[actualLookupCount];
         }

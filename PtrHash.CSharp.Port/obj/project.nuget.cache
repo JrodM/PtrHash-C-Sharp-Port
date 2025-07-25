@@ -1,14 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "jebjyEw479KTf7ZekU+v8uQpDkRBJuXv56KjzYP9WJRnECEm3IKyJhPVIeMW48DSZc/rOcWkOOuc4lCfzetjGA==",
+  "dgSpecHash": "c69mBShBOHlWAfjhFS5/yhPf9lTRY+2JwS9nd19HkOrsKe88MITE++tJ9+3/tVWgwKre/g4qcYscLejUVsTIcQ==",
   "success": true,
   "projectFilePath": "/home/jared/Developer/PtrHash/PtrHash.CSharp.Port/PtrHash.CSharp.Port.csproj",
   "expectedPackageFiles": [
     "/home/jared/.nuget/packages/portable.bouncycastle/1.9.0/portable.bouncycastle.1.9.0.nupkg.sha512",
-    "/home/jared/.nuget/packages/system.io.hashing/8.0.0/system.io.hashing.8.0.0.nupkg.sha512",
-    "/home/jared/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/8.0.17/microsoft.netcore.app.runtime.linux-x64.8.0.17.nupkg.sha512",
-    "/home/jared/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/8.0.17/microsoft.aspnetcore.app.runtime.linux-x64.8.0.17.nupkg.sha512",
-    "/home/jared/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.17/microsoft.netcore.app.host.linux-x64.8.0.17.nupkg.sha512"
+    "/home/jared/.nuget/packages/system.io.hashing/8.0.0/system.io.hashing.8.0.0.nupkg.sha512"
   ],
   "logs": []
 }
