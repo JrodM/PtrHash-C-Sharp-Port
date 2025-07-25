@@ -95,7 +95,7 @@ namespace PtrHash.CSharp.Port.Collections
             if (item == null) return false;
 
             var index = _ptrHash.GetIndex(item);
-            return index < (nuint)_elementLookup.Length && 
+            return index < (nuint)_elementLookup.Length &&
                    _comparer.Equals(_elementLookup[index], item);
         }
 
@@ -137,7 +137,7 @@ namespace PtrHash.CSharp.Port.Collections
             for (int i = 0; i < keys.Length; i++)
             {
                 var index = indices[i];
-                results[i] = index < (nuint)_elementLookup.Length && 
+                results[i] = index < (nuint)_elementLookup.Length &&
                            _comparer.Equals(_elementLookup[index], keys[i]);
             }
         }
@@ -223,17 +223,28 @@ namespace PtrHash.CSharp.Port.Collections
 
         public void Dispose()
         {
-            if (!_disposed)
-            {
-                _ptrHash?.Dispose();
-                _disposed = true;
-            }
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         ~PtrHashSet()
         {
-            Dispose();
+            Dispose(disposing: false);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                // Only safe to access managed objects here
+                _ptrHash?.Dispose();
+            }
+
+            _disposed = true;
+        }
+
     }
 
     /// <summary>
