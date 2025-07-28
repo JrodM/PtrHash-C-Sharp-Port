@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.X86;
 using Microsoft.Win32.SafeHandles;
 using PtrHash.CSharp.Port.Core;
 
@@ -53,20 +52,11 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(UInt64VectorRemappingStorage self, int index)
+        public static ulong Index(UInt64VectorRemappingStorage self, nuint index)
         {
             return self._values[index];
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Prefetch(UInt64VectorRemappingStorage self, int index)
-        {
-            // Native memory prefetch using software prefetch hint
-            if (Sse.IsSupported && index < self._length)
-            {
-                Sse.Prefetch0(&self._values[index]);
-            }
-        }
 
         public static int GetSizeInBytes(UInt64VectorRemappingStorage self) => self._length * sizeof(ulong);
 
@@ -136,20 +126,11 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(UInt32VectorRemappingStorage self, int index)
+        public static ulong Index(UInt32VectorRemappingStorage self, nuint index)
         {
             return self._values[index];
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Prefetch(UInt32VectorRemappingStorage self, int index)
-        {
-            // Native memory prefetch using software prefetch hint
-            if (Sse.IsSupported && index < self._length)
-            {
-                Sse.Prefetch0(&self._values[index]);
-            }
-        }
 
         public static int GetSizeInBytes(UInt32VectorRemappingStorage self) => self._length * sizeof(uint);
 
@@ -218,20 +199,11 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(UShort16VectorRemappingStorage self, int index)
+        public static ulong Index(UShort16VectorRemappingStorage self, nuint index)
         {
             return self._values[index];
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Prefetch(UShort16VectorRemappingStorage self, int index)
-        {
-            // Native memory prefetch using software prefetch hint
-            if (Sse.IsSupported && index < self._length)
-            {
-                Sse.Prefetch0(&self._values[index]);
-            }
-        }
 
         public static int GetSizeInBytes(UShort16VectorRemappingStorage self) => self._length * sizeof(ushort);
 
@@ -292,20 +264,11 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(Byte8VectorRemappingStorage self, int index)
+        public static ulong Index(Byte8VectorRemappingStorage self, nuint index)
         {
             return self._values[index];
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Prefetch(Byte8VectorRemappingStorage self, int index)
-        {
-            // Native memory prefetch using software prefetch hint
-            if (Sse.IsSupported && index < self._length)
-            {
-                Sse.Prefetch0(&self._values[index]);
-            }
-        }
 
         public static int GetSizeInBytes(Byte8VectorRemappingStorage self) => self._length * sizeof(byte);
 

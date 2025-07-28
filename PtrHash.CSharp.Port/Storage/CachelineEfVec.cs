@@ -186,28 +186,8 @@ namespace PtrHash.CSharp.Port.Storage
         public static string Name => "CacheLineEF";
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(CachelineEfVec self, int index) => self._ef[index / CachelineEf.L].Index(index % CachelineEf.L);
+        public static ulong Index(CachelineEfVec self, nuint index) => self._ef[index / CachelineEf.L].Index((int)(index % CachelineEf.L));
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Prefetch(CachelineEfVec self, int index)
-        {
-            // Prefetch the relevant cacheline - CachelineEf is already cache-aligned
-            if (Sse.IsSupported && index < self._length)
-            {
-                var cachelineIndex = index / CachelineEf.L;
-                if (cachelineIndex < self._ef.Length)
-                {
-                    // Prefetch the cacheline data structure itself
-                    unsafe
-                    {
-                        fixed (CachelineEf* ptr = &self._ef[cachelineIndex])
-                        {
-                            Sse.Prefetch0(ptr);
-                        }
-                    }
-                }
-            }
-        }
         
         public static int GetSizeInBytes(CachelineEfVec self)
         {

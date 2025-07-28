@@ -16,13 +16,8 @@ namespace PtrHash.CSharp.Port.Storage
         /// This replaces both the instance Index() and static IndexStatic() methods.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static abstract ulong Index(TSelf self, int index);
+        static abstract ulong Index(TSelf self, nuint index);
 
-        /// <summary>
-        /// Prefetch the element at the given index for performance.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static abstract void Prefetch(TSelf self, int index);
 
         /// <summary>
         /// Size of the storage in bytes.

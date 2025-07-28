@@ -24,6 +24,7 @@ namespace PtrHash.CSharp.Port.Core
     public readonly struct NoMinimal : IBoolConstant { public bool Value => false; }
     public readonly struct SinglePart : IPartConstant { public bool IsSinglePart => true; }
     public readonly struct MultiPart : IPartConstant { public bool IsSinglePart => false; }
+    
     /// <summary>
     /// PtrHash: Minimal Perfect Hashing at RAM Throughput
     /// 
@@ -208,7 +209,7 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexMultiPart(TKey key)
         {
             var slot = GetIndexNoRemapMultiPart(key);
-            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - _numKeys));
+            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, slot - _numKeys);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -233,7 +234,7 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexSinglePart(TKey key)
         {
             var slot = GetIndexNoRemapSinglePart(key);
-            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - _numKeys));
+            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, slot - _numKeys);
         }
 
         /// <summary>
@@ -360,7 +361,7 @@ namespace PtrHash.CSharp.Port.Core
         public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
         {
             var useMinimal = minimal && _minimal;
-            
+
             if (_isSinglePart)
             {
                 if (useMinimal)
@@ -386,22 +387,22 @@ namespace PtrHash.CSharp.Port.Core
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             var numKeys = _numKeys;
-            
+
             ref TKey keysRef = ref MemoryMarshal.GetReference(keys);
             ref nuint resultsRef = ref MemoryMarshal.GetReference(results);
-            
+
             for (int i = 0; i < keys.Length; i++)
             {
                 ref TKey key = ref Unsafe.Add(ref keysRef, i);
-                
+
                 // Type checks resolved at compile-time per specialization
-                var slot = typeof(TPart) == typeof(SinglePart) 
+                var slot = typeof(TPart) == typeof(SinglePart)
                     ? GetIndexNoRemapSinglePart(key)
                     : GetIndexNoRemapMultiPart(key);
 
                 if (typeof(TMinimal) == typeof(UseMinimal) && slot >= numKeys)
                 {
-                    var remapIndex = (int)(slot - numKeys);
+                    var remapIndex = slot - numKeys;
                     slot = (nuint)TRemappingStorage.Index(_remapStorage, remapIndex);
                 }
 
@@ -447,7 +448,7 @@ namespace PtrHash.CSharp.Port.Core
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            
+
             // These will be compile-time constants due to generic specialization
             var isSinglePart = default(TPart).IsSinglePart;
             var useMinimal = default(TMinimal).Value;
@@ -481,7 +482,7 @@ namespace PtrHash.CSharp.Port.Core
                         {
                             hash = default; // unwrap_or_default() like Rust
                         }
-                        
+
                         hashBufPtr[i] = hash;
 
                         // Calculate bucket - this matches Rust's bucket() method
@@ -518,7 +519,7 @@ namespace PtrHash.CSharp.Port.Core
                         // JIT will optimize this branch away if useMinimal is false
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - numKeys));
+                            slot = (nuint)TRemappingStorage.Index(_remapStorage, slot - numKeys);
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -539,7 +540,7 @@ namespace PtrHash.CSharp.Port.Core
                         // JIT will optimize this branch away if useMinimal is false
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage, (int)(slot - numKeys));
+                            slot = (nuint)TRemappingStorage.Index(_remapStorage, slot - numKeys);
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -609,7 +610,7 @@ namespace PtrHash.CSharp.Port.Core
             // Seed already assigned in ComputePilots before calling this method
 
             // Reset pilots
-            NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
+            NativeMemory.Clear(_pilots, _bucketsTotal);
 
             // Rent array for hashing
             var hashArray = ArrayPool<HashValue>.Shared.Rent(keys.Length);
@@ -870,7 +871,7 @@ namespace PtrHash.CSharp.Port.Core
                         {
                             var localSlot = SlotInPartHp(hash, hp);
                             var occupyingBucket = slots[localSlot];
-                            
+
                             if (occupyingBucket >= 0) // Slot is occupied
                             {
                                 // With atomic placement, self-collision should never happen
@@ -882,7 +883,7 @@ namespace PtrHash.CSharp.Port.Core
                                 var evictedStart = bucketStarts[occupyingBucket];
                                 var evictedEnd = bucketStarts[occupyingBucket + 1];
                                 var evictedSize = evictedEnd - evictedStart;
-                                
+
                                 stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
                                 evictions++;
                                 evictionsThisRound++;
