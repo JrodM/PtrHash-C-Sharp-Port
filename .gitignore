@@ -5,6 +5,8 @@ Cargo.lock
 # C# build artifacts
 [Bb]in/
 [Oo]bj/
+**/[Bb]in/**
+**/[Oo]bj/**
 *.user
 *.suo
 *.userprefs
@@ -50,6 +52,12 @@ nunit_random_seed.tmp
 *.deps.json
 *.runtimeconfig.json
 *.runtimeconfig.dev.json
+*.assets.cache
+*.csproj.AssemblyReference.cache
+*.AssemblyInfoInputs.cache
+*.GeneratedMSBuildEditorConfig.editorconfig
+*.genruntimeconfig.cache
+*.sourcelink.json
 
 # Assembly info generated files
 **/AssemblyInfo.cs
