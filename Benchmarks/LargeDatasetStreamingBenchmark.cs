@@ -15,7 +15,7 @@ namespace PtrHash.Benchmarks
     [Config(typeof(Config))]
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net80)]
-    public class PtrHashStreamBenchmark
+    public class LargeDatasetStreamingBenchmark
     {
         private class Config : ManualConfig
         {
@@ -24,7 +24,7 @@ namespace PtrHash.Benchmarks
             }
         }
 
-        [Params(500_000_000)]
+        [Params(200_000_000)]
         public int KeyCount { get; set; }
 
         [Params(10_000)]
@@ -63,7 +63,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong MultiPart_GetIndicesStream()
+        public ulong PtrHashPort_MultiPart_StrongerIntHasher_Linear_U32Vec_Stream_GetIndicesStream()
         {
             ulong sum = 0;
             _multiPartPtrHash.GetIndicesStream(

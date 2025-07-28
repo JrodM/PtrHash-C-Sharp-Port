@@ -17,23 +17,22 @@ namespace PtrHash.Benchmarks
             
             Console.WriteLine("PtrHash Performance Benchmarks");
             Console.WriteLine("==============================");
-            Console.WriteLine("Runtime: " + (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription));
+            Console.WriteLine("Runtime: " + System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);
             Console.WriteLine("GC Mode: " + (System.Runtime.GCSettings.IsServerGC ? "Server" : "Workstation"));
             Console.WriteLine();
 
             if (args.Length == 0)
             {
                 Console.WriteLine("Available benchmarks:");
-                Console.WriteLine("  1. dictionaries        - PtrHash Dictionaries vs Standard Dictionary");
-                Console.WriteLine("  2. dict-scaling        - Dictionary lookup scaling with fixed 2M keys");
-                Console.WriteLine("  3. dict-interface      - Dictionary interface dispatch overhead");
-                Console.WriteLine("  4. construct           - Construction time benchmark");
-                Console.WriteLine("  5. core                - Core PtrHash single-part vs multi-part performance");
-                Console.WriteLine("  6. stream              - PtrHash streaming lookups (10^9 keys, 10k lookups)");
-                Console.WriteLine("  7. all                 - Run all benchmarks");
+                Console.WriteLine("  dictionaries           - Dictionary implementation comparison (PtrHash vs Standard Dictionary)");
+                Console.WriteLine("  dict-scaling           - Lookup performance scaling benchmark");
+                Console.WriteLine("  construct              - Data structure construction time benchmark");
+                Console.WriteLine("  core                   - Native vs Port performance comparison");
+                Console.WriteLine("  stream                 - Large dataset streaming benchmark");
+                Console.WriteLine("  all                    - Run all benchmarks");
                 Console.WriteLine();
                 Console.WriteLine("Usage: dotnet run [benchmark]");
-                Console.WriteLine("Example: dotnet run interop-vs-port");
+                Console.WriteLine("Example: dotnet run dictionaries");
                 return;
             }
 
@@ -46,86 +45,30 @@ namespace PtrHash.Benchmarks
 
             switch (args[0].ToLowerInvariant())
             {
-                // case "lookup":
-                //     Console.WriteLine("Running PtrHash vs Dictionary lookup benchmark (original)...");
-                //     BenchmarkRunner.Run<PtrHashVsDictionaryBenchmark>(config);
-                //     break;
-
-                // case "interop-vs-port":
-                //     Console.WriteLine("Running PtrHash Interop vs C# Port benchmark...");
-                //     BenchmarkRunner.Run<PtrHashInteropVsPortBenchmark>(config);
-                //     break;
-
                 case "dictionaries":
-                    Console.WriteLine("Running PtrHash Dictionaries vs Standard Dictionary benchmark...");
-                    BenchmarkRunner.Run<PtrHashDictionariesVsDictionaryBenchmark>(config);
+                    Console.WriteLine("Running Dictionary Implementation Comparison benchmark...");
+                    BenchmarkRunner.Run<DictionaryImplementationComparisonBenchmark>(config);
                     break;
 
                 case "dict-scaling":
-                    Console.WriteLine("Running Dictionary lookup scaling benchmark...");
-                    BenchmarkRunner.Run<DictionaryLookupScalingBenchmark>(config);
+                    Console.WriteLine("Running Lookup Performance Scaling benchmark...");
+                    BenchmarkRunner.Run<LookupPerformanceScalingBenchmark>(config);
                     break;
-
-                case "dict-interface":
-                    Console.WriteLine("Running Dictionary interface dispatch overhead benchmark...");
-                    BenchmarkRunner.Run<DictionaryInterfaceOverheadBenchmark>(config);
-                    break;
-
-                // case "lookup-port":
-                //     Console.WriteLine("Running PtrHash vs Dictionary lookup benchmark (C# port only)...");
-                //     BenchmarkRunner.Run<PortOnlyBenchmark>(config);
-                //     break;
-
-                // case "memory":
-                //     Console.WriteLine("Running memory usage benchmark...");
-                //     BenchmarkRunner.Run<MemoryUsageBenchmark>(config);
-                //     break;
 
                 case "construct":
-                     Console.WriteLine("Running construction time benchmark...");
-                     BenchmarkRunner.Run<ConstructionBenchmark>(config);
-                     break;
+                    Console.WriteLine("Running Data Structure Construction benchmark...");
+                    BenchmarkRunner.Run<DataStructureConstructionBenchmark>(config);
+                    break;
 
                 case "core":
-                    Console.WriteLine("Running Core PtrHash benchmark...");
-                    BenchmarkRunner.Run<PtrHashCoreBenchmark>(config);
+                    Console.WriteLine("Running Native vs Port Performance benchmark...");
+                    BenchmarkRunner.Run<NativeVsPortPerformanceBenchmark>(config);
                     break;
 
                 case "stream":
-                    Console.WriteLine("Running PtrHash streaming lookups benchmark...");
-                    BenchmarkRunner.Run<PtrHashStreamBenchmark>(config);
+                    Console.WriteLine("Running Large Dataset Streaming benchmark...");
+                    BenchmarkRunner.Run<LargeDatasetStreamingBenchmark>(config);
                     break;
-
-                // case "unsafe-optimization":
-                //     Console.WriteLine("Running unsafe pointer optimization benchmark...");
-                //     BenchmarkRunner.Run<UnsafeOptimizationBenchmark>(config);
-                //     break;
-
-                // case "large-scale":
-                //     Console.WriteLine("Running large-scale benchmark (1M-100M keys)...");
-                //     BenchmarkRunner.Run<LargeScaleBenchmark>(config);
-                //     break;
-
-                // case "simple-unsafe":
-                //     Console.WriteLine("Running simple unsafe benchmark...");
-                //     SimpleUnsafeBenchmark.Run();
-                //     break;
-
-                // case "allocation":
-                //     Console.WriteLine("Running allocation benchmark...");
-                //     BenchmarkRunner.Run<AllocationBenchmark>(config);
-                //     break;
-
-                // case "construct-mixed":
-                //     Console.WriteLine("Running construction time benchmark (interop + port)...");
-                //     BenchmarkRunner.Run<ConstructionWithPortBenchmark>(config);
-                //     break;
-
-                // case "construct-port":
-                //     Console.WriteLine("Running construction time benchmark (C# port only)...");
-                //     BenchmarkRunner.Run<PortConstructionBenchmark>(config);
-                //     break;
-
 
                 case "all":
                     Console.WriteLine("Running all benchmarks...");
@@ -134,7 +77,7 @@ namespace PtrHash.Benchmarks
 
                 default:
                     Console.WriteLine($"Unknown benchmark: {args[0]}");
-                    Console.WriteLine("Available options: dictionaries, dict-scaling, dict-interface, construct, core, stream, all");
+                    Console.WriteLine("Available options: dictionaries, dict-scaling, construct, core, stream, all");
                     break;
             }
 

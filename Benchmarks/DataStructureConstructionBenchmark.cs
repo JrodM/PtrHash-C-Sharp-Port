@@ -21,7 +21,7 @@ namespace PtrHash.Benchmarks
     [Config(typeof(Config))]
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net80)]
-    public class ConstructionBenchmark
+    public class DataStructureConstructionBenchmark
     {
         private class Config : ManualConfig
         {
@@ -54,48 +54,35 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public HashSet<ulong> HashSetConstruction()
+        public HashSet<ulong> HashSet_Construction()
         {
             return new HashSet<ulong>(_keys);
         }
 
         [Benchmark]
-        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> NativeInteropConstruction()
+        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> PtrHashNative_MultiPart_FxHasher_Construction()
         {
             return new PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher>(_keys.AsSpan(), PtrHashNative.FFIParams.Fast);
         }
 
         [Benchmark]
-        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> NativeInteropConstruction_StrongerHasher()
+        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> PtrHashNative_MultiPart_StrongerIntHasher_Construction()
         {
             var config = PtrHashNative.FFIParams.Fast with { OverrideHashFunction = 2 }; // StrongerIntHash
             return new PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher>(_keys.AsSpan(), config);
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PortConstructionMultiPart()
+        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Construction()
         {
             return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, PtrHashParams.DefaultFast);
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PortConstructionSinglePart()
+        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Construction()
         {
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
             return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, singlePartParams);
-        }
-
-        [Benchmark]
-        public PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage> PortConstructionMultiPart_StrongerHasher()
-        {
-            return new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(_keys, PtrHashParams.DefaultFast);
-        }
-
-        [Benchmark]
-        public PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage> PortConstructionSinglePart_StrongerHasher()
-        {
-            var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            return new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(_keys, singlePartParams);
         }
 
         [GlobalCleanup]

@@ -40,10 +40,6 @@
     <EnableSSE2>true</EnableSSE2>
     <EnableAVX>true</EnableAVX>
     <EnableAVX2>true</EnableAVX2>
-
-    <!-- Explicitly disable AVX‑512 variants for AOT -->
-    <EnableAVX512>false</EnableAVX512>
-    <EnableAVX512F>false</EnableAVX512F>
   </PropertyGroup>
 
   <ItemGroup>

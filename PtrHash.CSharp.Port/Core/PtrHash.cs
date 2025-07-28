@@ -906,49 +906,51 @@ namespace PtrHash.CSharp.Port.Core
                         var globalBucketId = (nuint)(part * (int)_bucketsPerPart + currentBucket);
                         partStats.Add(globalBucketId, _bucketsTotal, currentBucketHashes.Length, bestPilot, evictions);
 
-                        // Eviction algorithm: Drop the collisions and set the new pilot
+                        // ATOMIC PLACEMENT: Exact Rust parity - two-phase processing
+                        // Phase 1: Process collisions and evict immediately (like Rust)
                         var evictionsThisRound = 0;
 
-                        // For each slot in this bucket
+                        // First pass: identify collisions and evict immediately (matches Rust exactly)
                         foreach (var hash in currentBucketHashes)
                         {
                             var localSlot = SlotInPartHp(hash, hp);
-
-                            // Check if slot is occupied
                             var occupyingBucket = slots[localSlot];
+                            
                             if (occupyingBucket >= 0) // Slot is occupied
                             {
+                                // With atomic placement, self-collision should never happen
+                                // This assertion matches Rust: assert!(b2 != b)
                                 if (occupyingBucket == currentBucket)
-                                    throw new InvalidOperationException("Self-collision detected"); // assert!(b2 != b)
+                                    throw new InvalidOperationException("Self-collision detected - algorithm invariant violated");
 
-                                // Push evicted bucket onto stack for reprocessing
+                                // Push evicted bucket onto stack for reprocessing (exact Rust match)
                                 var evictedStart = bucketStarts[occupyingBucket];
                                 var evictedEnd = bucketStarts[occupyingBucket + 1];
                                 var evictedSize = evictedEnd - evictedStart;
-
+                                
                                 stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
                                 evictions++;
                                 evictionsThisRound++;
 
-                                // Clear all slots for the evicted bucket
+                                // Clear all slots for the evicted bucket immediately (exact Rust match)
                                 var evictedPilot = (ulong)partPilots[occupyingBucket];
                                 var evictedHp = HashPilot(evictedPilot);
                                 var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
 
-                                // Clear slots by recomputing them from the hashes and pilot
                                 foreach (var evictedHash in evictedHashes)
                                 {
                                     var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
-                                    // Clear slot assignment
                                     slots[evictedLocalSlot] = -1;
-                                    // Mark slot as available
                                     partTaken.Set(evictedLocalSlot, false);
                                 }
                             }
+                        }
 
-                            // Assign slot to current bucket
+                        // Phase 2: Atomically assign all slots for current bucket (exact Rust match)
+                        foreach (var hash in currentBucketHashes)
+                        {
+                            var localSlot = SlotInPartHp(hash, hp);
                             slots[localSlot] = currentBucket;
-                            // Mark slot as taken
                             partTaken.Set(localSlot, true);
                         }
 

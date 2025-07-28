@@ -19,8 +19,8 @@ namespace PtrHash.Benchmarks
     [Config(typeof(Config))]
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
- //   [SimpleJob(RuntimeMoniker.NativeAot80)]
-    public class PtrHashCoreBenchmark
+    [SimpleJob(RuntimeMoniker.NativeAot80)]
+    public class NativeVsPortPerformanceBenchmark
     {
         private class Config : ManualConfig
         {
@@ -81,6 +81,13 @@ namespace PtrHash.Benchmarks
                     _lookupKeys[i] = (ulong)random.NextInt64(long.MaxValue / 2, long.MaxValue); // 50% misses
             }
 
+            // Shuffle lookup keys to mix hits and misses randomly
+            for (int i = actualLookupCount - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                (_lookupKeys[i], _lookupKeys[j]) = (_lookupKeys[j], _lookupKeys[i]);
+            }
+
             // Multi-part PtrHash (default)
             _multiPartPtrHash = new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, PtrHashParams.DefaultFast);
             
@@ -112,11 +119,11 @@ namespace PtrHash.Benchmarks
             _nativeSinglePartPtrHash?.Dispose();
         }
 
-        // === MULTI-PART COMPARISONS ===
+        // === MULTI-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
         
         // Multi-Part: Native vs Port Point Lookups
         [Benchmark(Baseline = true)]
-        public ulong MultiPart_Native_Point()
+        public ulong PtrHashNative_MultiPart_Point_GetIndex()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -127,7 +134,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong MultiPart_Port_Point()
+        public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Point_GetIndex()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -139,7 +146,7 @@ namespace PtrHash.Benchmarks
 
         // Multi-Part: Native vs Port Stream Lookups
         [Benchmark]
-        public ulong MultiPart_Native_Stream()
+        public ulong PtrHashNative_MultiPart_Stream_GetIndicesStream_Prefetch32()
         {
             ulong sum = 0;
             _nativeMultiPartPtrHash.GetIndicesStream(
@@ -156,7 +163,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong MultiPart_Port_Stream()
+        public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Stream_GetIndicesStream()
         {
             ulong sum = 0;
             _multiPartPtrHash.GetIndicesStream(
@@ -172,7 +179,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong MultiPart_Port_StreamPrefetch()
+        public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Stream_GetIndicesStreamPrefetch()
         {
             ulong sum = 0;
             _multiPartPtrHash.GetIndicesStreamPrefetch(
@@ -187,11 +194,11 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // === SINGLE-PART COMPARISONS ===
+        // === SINGLE-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
         
         // Single-Part: Native vs Port Point Lookups
         [Benchmark]
-        public ulong SinglePart_Native_Point()
+        public ulong PtrHashNative_SinglePart_Point_GetIndex()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -202,7 +209,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong SinglePart_Port_Point()
+        public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Point_GetIndex()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -214,7 +221,7 @@ namespace PtrHash.Benchmarks
 
         // Single-Part: Native vs Port Stream Lookups
         [Benchmark]
-        public ulong SinglePart_Native_Stream()
+        public ulong PtrHashNative_SinglePart_Stream_GetIndicesStream_Prefetch32()
         {
             ulong sum = 0;
             _nativeSinglePartPtrHash.GetIndicesStream(
@@ -231,7 +238,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong SinglePart_Port_Stream()
+        public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Stream_GetIndicesStream()
         {
             ulong sum = 0;
             _singlePartPtrHash.GetIndicesStream(
@@ -247,7 +254,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong SinglePart_Port_StreamPrefetch()
+        public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Stream_GetIndicesStreamPrefetch()
         {
             ulong sum = 0;
             _singlePartPtrHash.GetIndicesStreamPrefetch(

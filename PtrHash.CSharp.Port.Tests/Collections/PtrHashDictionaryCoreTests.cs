@@ -46,13 +46,15 @@ namespace PtrHash.CSharp.Port.Tests
             // Test valid keys
             Assert.IsTrue(dictionary.TryGetValue(20, out int value));
             Assert.AreEqual(200, value);
-            Assert.AreEqual(400, dictionary.GetValueOrSentinel(40));
+            Assert.IsTrue(dictionary.TryGetValue(40, out var value40));
+            Assert.AreEqual(400, value40);
             Assert.AreEqual(300, dictionary[30]);
 
             // Test invalid keys
             Assert.IsFalse(dictionary.TryGetValue(15, out int missingValue));
             Assert.AreEqual(sentinel, missingValue);
-            Assert.AreEqual(sentinel, dictionary.GetValueOrSentinel(99));
+            Assert.IsFalse(dictionary.TryGetValue(99, out var value99));
+            Assert.AreEqual(sentinel, value99);
             Assert.ThrowsException<KeyNotFoundException>(() => { var x = dictionary[99]; });
         }
 
@@ -71,7 +73,7 @@ namespace PtrHash.CSharp.Port.Tests
 
             // Mix of valid and invalid keys
             var queryKeys = new ulong[] { 1, 999, 50, 888, 100, 777, 150, 666, 200 };
-            var expectedPoint = queryKeys.Select(k => dictionary.GetValueOrSentinel(k)).ToArray();
+            var expectedPoint = queryKeys.Select(k => dictionary.TryGetValue(k, out var v) ? v : dictionary.Sentinel).ToArray();
             
             // Test streaming
             var streamResults = new string[queryKeys.Length];
@@ -112,7 +114,8 @@ namespace PtrHash.CSharp.Port.Tests
 
             // Test point lookups
             Assert.AreEqual("#FF0000", dictionary["red"]);
-            Assert.AreEqual(sentinel, dictionary.GetValueOrSentinel("missing"));
+            Assert.IsFalse(dictionary.TryGetValue("missing", out var missingColor));
+            Assert.AreEqual(sentinel, missingColor);
 
             // Test streaming
             var queryKeys = new[] { "blue", "invalid", "yellow" };
@@ -180,7 +183,7 @@ namespace PtrHash.CSharp.Port.Tests
                 .ToArray();
 
             // Test point vs stream consistency
-            var pointResults = testKeys.Select(k => dictionary.GetValueOrSentinel(k)).ToArray();
+            var pointResults = testKeys.Select(k => dictionary.TryGetValue(k, out var v) ? v : dictionary.Sentinel).ToArray();
             var streamResults = new int[testKeys.Length];
             dictionary.TryGetValueStream(testKeys, streamResults);
 

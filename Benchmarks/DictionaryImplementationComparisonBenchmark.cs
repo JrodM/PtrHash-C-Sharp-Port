@@ -16,7 +16,7 @@ namespace PtrHash.Benchmarks
     [Config(typeof(Config))]
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net80)]
-    public class PtrHashDictionariesVsDictionaryBenchmark
+    public class DictionaryImplementationComparisonBenchmark
     {
         private class Config : ManualConfig
         {
@@ -121,7 +121,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark(Baseline = true)]
-        public ulong DictionaryLookup()
+        public ulong Dictionary_Point_TryGetValue()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
@@ -131,7 +131,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong NativeSentinelPtrHashStreamLookup()
+        public ulong PtrHashNative_MultiPart_Stream_TryGetValueStream()
         {
             ulong sum = 0;
             _nativeSentinelPtrHash.TryGetValueStream(
@@ -148,20 +148,19 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public ulong PortPtrHashMapPointLookup()
+        public ulong PtrHashPort_MultiPart_Point_TryGetValue()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
             {
-                var value = _portPtrHashMap.GetValueOrSentinel(key);
-                if (value != _portPtrHashMap.Sentinel)
+                if (_portPtrHashMap.TryGetValue(key, out var value))
                     sum += value;
             }
             return sum;
         }
 
         [Benchmark]
-        public ulong PortPtrHashMapStreamLookup()
+        public ulong PtrHashPort_MultiPart_Stream_TryGetValueStream()
         {
             ulong sum = 0;
             _portPtrHashMap.TryGetValueStream(
@@ -178,20 +177,19 @@ namespace PtrHash.Benchmarks
         }
         
         [Benchmark]
-        public ulong SinglePartPtrHashMapPointLookup()
+        public ulong PtrHashPort_SinglePart_Point_TryGetValue()
         {
             ulong sum = 0;
             foreach (var key in _lookupKeys)
             {
-                var value = _singlePartPtrHashMap.GetValueOrSentinel(key);
-                if (value != _singlePartPtrHashMap.Sentinel)
+                if (_singlePartPtrHashMap.TryGetValue(key, out var value))
                     sum += value;
             }
             return sum;
         }
 
         [Benchmark]
-        public ulong SinglePartPtrHashMapStreamLookup()
+        public ulong PtrHashPort_SinglePart_Stream_TryGetValueStream()
         {
             ulong sum = 0;
             _singlePartPtrHashMap.TryGetValueStream(
