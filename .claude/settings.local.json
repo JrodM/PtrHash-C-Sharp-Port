@@ -62,7 +62,8 @@
       "Bash(cargo --version)",
       "Bash(./scripts/generate_jit_asm.sh:*)",
       "Bash(./scripts/generate_dictionary_jit_asm.sh:*)",
-      "Bash(export:*)"
+      "Bash(export:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }

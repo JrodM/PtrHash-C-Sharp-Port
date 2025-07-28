@@ -69,3 +69,18 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Generated assembly files (build artifacts)
+*.asm
+aot/
+jit/
+ASM_Generated/aot/
+ASM_Generated/jit/
+
+# Claude AI assistant files
+.claude/
+**/claude.md
+**/.claude/
+claude-*
+*claude*
+CLAUDE.md
