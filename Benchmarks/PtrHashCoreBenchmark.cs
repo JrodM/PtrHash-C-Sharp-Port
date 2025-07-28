@@ -19,7 +19,7 @@ namespace PtrHash.Benchmarks
     [Config(typeof(Config))]
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
-    [SimpleJob(RuntimeMoniker.NativeAot80)]
+ //   [SimpleJob(RuntimeMoniker.NativeAot80)]
     public class PtrHashCoreBenchmark
     {
         private class Config : ManualConfig
@@ -34,7 +34,7 @@ namespace PtrHash.Benchmarks
         [Params(5_000_000)]
         public int KeyCount { get; set; }
 
-        [Params(1_000, 100_000, 1_000_000)]
+        [Params(1_000, 100_000)]//, 1_000_000)]
        // [Params( 10_000)]
         public int LookupCount { get; set; }
 
@@ -132,7 +132,7 @@ namespace PtrHash.Benchmarks
             ulong sum = 0;
             foreach (var key in _lookupKeys)
             {
-                sum += _multiPartPtrHash.GetIndexNoRemap(key);
+                sum += _multiPartPtrHash.GetIndex(key);
             }
             return sum;
         }
@@ -207,7 +207,7 @@ namespace PtrHash.Benchmarks
             ulong sum = 0;
             foreach (var key in _lookupKeys)
             {
-                sum += _singlePartPtrHash.GetIndexNoRemap(key);
+                sum += _singlePartPtrHash.GetIndex(key);
             }
             return sum;
         }

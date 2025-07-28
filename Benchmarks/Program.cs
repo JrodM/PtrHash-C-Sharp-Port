@@ -26,10 +26,11 @@ namespace PtrHash.Benchmarks
                 Console.WriteLine("Available benchmarks:");
                 Console.WriteLine("  1. dictionaries        - PtrHash Dictionaries vs Standard Dictionary");
                 Console.WriteLine("  2. dict-scaling        - Dictionary lookup scaling with fixed 2M keys");
-                Console.WriteLine("  3. construct           - Construction time benchmark");
-                Console.WriteLine("  4. core                - Core PtrHash single-part vs multi-part performance");
-                Console.WriteLine("  5. stream              - PtrHash streaming lookups (10^9 keys, 10k lookups)");
-                Console.WriteLine("  6. all                 - Run all benchmarks");
+                Console.WriteLine("  3. dict-interface      - Dictionary interface dispatch overhead");
+                Console.WriteLine("  4. construct           - Construction time benchmark");
+                Console.WriteLine("  5. core                - Core PtrHash single-part vs multi-part performance");
+                Console.WriteLine("  6. stream              - PtrHash streaming lookups (10^9 keys, 10k lookups)");
+                Console.WriteLine("  7. all                 - Run all benchmarks");
                 Console.WriteLine();
                 Console.WriteLine("Usage: dotnet run [benchmark]");
                 Console.WriteLine("Example: dotnet run interop-vs-port");
@@ -63,6 +64,11 @@ namespace PtrHash.Benchmarks
                 case "dict-scaling":
                     Console.WriteLine("Running Dictionary lookup scaling benchmark...");
                     BenchmarkRunner.Run<DictionaryLookupScalingBenchmark>(config);
+                    break;
+
+                case "dict-interface":
+                    Console.WriteLine("Running Dictionary interface dispatch overhead benchmark...");
+                    BenchmarkRunner.Run<DictionaryInterfaceOverheadBenchmark>(config);
                     break;
 
                 // case "lookup-port":
@@ -128,7 +134,7 @@ namespace PtrHash.Benchmarks
 
                 default:
                     Console.WriteLine($"Unknown benchmark: {args[0]}");
-                    Console.WriteLine("Available options: dictionaries, dict-scaling, construct, core, stream, all");
+                    Console.WriteLine("Available options: dictionaries, dict-scaling, dict-interface, construct, core, stream, all");
                     break;
             }
 

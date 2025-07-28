@@ -1,0 +1,165 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+namespace AsmGeneration
+{
+    // Sealed derived dictionary with no overrides - tests if sealing eliminates callvirt
+    public sealed class SealedDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+        where TKey : notnull
+    {
+        public SealedDictionary() : base() { }
+        public SealedDictionary(int capacity) : base(capacity) { }
+        
+        // No method overrides - inherits all Dictionary behavior
+    }
+
+    class DictionaryJitAnalysis
+    {
+        private static ulong[] _keys = null!;
+        private static ulong[] _lookupKeys = null!;
+        
+        // Concrete Dictionary - direct method calls, no dispatch overhead
+        private static Dictionary<ulong, ulong> _concreteDictionary = null!;
+        
+        // Sealed derived dictionary - tests if sealing eliminates callvirt
+        private static SealedDictionary<ulong, ulong> _sealedDictionary = null!;
+        
+        // IDictionary interface - interface dispatch overhead
+        private static IDictionary<ulong, ulong> _interfaceDictionary = null!;
+        
+        // IReadOnlyDictionary interface - interface dispatch overhead (read-only)
+        private static IReadOnlyDictionary<ulong, ulong> _readOnlyInterfaceDictionary = null!;
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Dictionary Interface JIT Analysis");
+            Console.WriteLine("=================================");
+            
+            SetupDictionaries();
+            WarmupMethods();
+            
+            Console.WriteLine("Running dictionary tests to generate JIT assembly...");
+            
+            // These method calls will trigger JIT compilation and assembly generation
+            RunConcreteDictionaryTest();
+            RunSealedDictionaryTest();
+            RunInterfaceDictionaryTest();
+            RunReadOnlyInterfaceDictionaryTest();
+            
+            Console.WriteLine("JIT analysis complete.");
+        }
+
+        private static void SetupDictionaries()
+        {
+            const int KEY_COUNT = 10_000;
+            const int LOOKUP_COUNT = 1_000;
+            
+            var random = new Random(42);
+            var keySet = new HashSet<ulong>();
+            while (keySet.Count < KEY_COUNT)
+                keySet.Add((ulong)random.NextInt64(1, long.MaxValue));
+            _keys = keySet.ToArray();
+
+            _lookupKeys = new ulong[LOOKUP_COUNT];
+            for (int i = 0; i < LOOKUP_COUNT; i++)
+                _lookupKeys[i] = _keys[random.Next(KEY_COUNT)];
+
+            // Create the dictionaries
+            var baseDictionary = new Dictionary<ulong, ulong>(KEY_COUNT);
+            var sealedDictionary = new SealedDictionary<ulong, ulong>(KEY_COUNT);
+            
+            for (int i = 0; i < KEY_COUNT; i++)
+            {
+                ulong value = (ulong)random.NextInt64(1, long.MaxValue);
+                baseDictionary[_keys[i]] = value;
+                sealedDictionary[_keys[i]] = value;
+            }
+                
+            _concreteDictionary = baseDictionary;
+            _sealedDictionary = sealedDictionary;
+            _interfaceDictionary = baseDictionary;  // Same instance, interface reference
+            _readOnlyInterfaceDictionary = baseDictionary;  // Same instance, read-only interface reference
+            
+            Console.WriteLine($"Setup complete: {KEY_COUNT} keys, {LOOKUP_COUNT} lookups");
+        }
+
+        private static void WarmupMethods()
+        {
+            Console.WriteLine("Warming up JIT...");
+            
+            // Warmup all methods to ensure JIT compilation
+            var testKeys = new ulong[] { _lookupKeys[0], _lookupKeys[1], _lookupKeys[2] };
+            
+            foreach (var key in testKeys)
+            {
+                _concreteDictionary.TryGetValue(key, out _);
+                _sealedDictionary.TryGetValue(key, out _);
+                _interfaceDictionary.TryGetValue(key, out _);
+                _readOnlyInterfaceDictionary.TryGetValue(key, out _);
+            }
+            
+            Console.WriteLine("JIT warmup complete.");
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void RunConcreteDictionaryTest()
+        {
+            Console.WriteLine("Testing ConcreteDictionary_TryGetValue...");
+            
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_concreteDictionary.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            
+            Console.WriteLine($"  ConcreteDictionary sum: {sum}");
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void RunSealedDictionaryTest()
+        {
+            Console.WriteLine("Testing SealedDictionary_TryGetValue...");
+            
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_sealedDictionary.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            
+            Console.WriteLine($"  SealedDictionary sum: {sum}");
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void RunInterfaceDictionaryTest()
+        {
+            Console.WriteLine("Testing IDictionary_TryGetValue...");
+            
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_interfaceDictionary.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            
+            Console.WriteLine($"  IDictionary sum: {sum}");
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void RunReadOnlyInterfaceDictionaryTest()
+        {
+            Console.WriteLine("Testing IReadOnlyDictionary_TryGetValue...");
+            
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_readOnlyInterfaceDictionary.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            
+            Console.WriteLine($"  IReadOnlyDictionary sum: {sum}");
+        }
+    }
+}

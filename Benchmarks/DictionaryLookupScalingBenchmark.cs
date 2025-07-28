@@ -50,6 +50,7 @@ namespace PtrHash.Benchmarks
         private ulong[] _valuesBuffer3 = null!;
         private ulong[] _valuesBuffer4 = null!;
         private ulong[] _valuesBuffer5 = null!;
+        private ulong[] _valuesBuffer6 = null!;
 
         [GlobalSetup]
         public void Setup()
@@ -120,6 +121,7 @@ namespace PtrHash.Benchmarks
             _valuesBuffer3 = new ulong[LookupCount];
             _valuesBuffer4 = new ulong[LookupCount];
             _valuesBuffer5 = new ulong[LookupCount];
+            _valuesBuffer6 = new ulong[LookupCount];
         }
 
         [GlobalCleanup]
@@ -248,6 +250,23 @@ namespace PtrHash.Benchmarks
             {
                 ulong v = _valuesBuffer5[i];
                 if (v != _singlePartU64PtrHashDict.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong SinglePartDict_StreamOptimalLookup()
+        {
+            ulong sum = 0;
+            _singlePartPtrHashDict.TryGetValueStreamOptimal(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer6);
+
+            for (int i = 0; i < _valuesBuffer6.Length; i++)
+            {
+                ulong v = _valuesBuffer6[i];
+                if (v != _singlePartPtrHashDict.Sentinel)
                     sum += v;
             }
             return sum;

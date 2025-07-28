@@ -1,3232 +1,3247 @@
-   77384:	e8 27 07 00 00       	call   77ab0 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch>
-   77389:	e8 f2 08 00 00       	call   77c80 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream>
-   7738e:	e8 8d 0e 00 00       	call   78220 <ASM_Analysis_AsmGeneration_Program__TestSingleLookups>
-   77393:	e8 e8 11 00 00       	call   78580 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern>
-   77398:	48 8d 3d d1 3a 1c 00 	lea    0x1c3ad1(%rip),%rdi        # 23ae70 <__Str_Assembly_generation_complete__E694E220ABB5E659C8FE3A93D59496D8C08AFB825EDBB706847AAF14012E93FD>
-   7739f:	e8 ac 53 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   773a4:	48 8d 3d e5 43 1c 00 	lea    0x1c43e5(%rip),%rdi        # 23b790 <__Str_Check_output_for_JIT_generated_E88BF50A10FDFF15CB02EFCA372E5395BD12F2100779560FE4DB5574C46B7085>
-   773ab:	e8 a0 53 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   773b0:	90                   	nop
-   773b1:	48 83 c4 60          	add    $0x60,%rsp
-   773b5:	5b                   	pop    %rbx
-   773b6:	41 5d                	pop    %r13
-   773b8:	41 5e                	pop    %r14
-   773ba:	41 5f                	pop    %r15
-   773bc:	5d                   	pop    %rbp
-   773bd:	c3                   	ret
-   773be:	e8 7d b4 01 00       	call   92840 <S_P_CoreLib_System_ThrowHelper__ThrowArgumentOutOfRangeException>
-   773c3:	cc                   	int3
-   773c4:	90                   	nop
-   773c5:	90                   	nop
-   773c6:	90                   	nop
-   773c7:	90                   	nop
-   773c8:	90                   	nop
-   773c9:	90                   	nop
-   773ca:	90                   	nop
-   773cb:	90                   	nop
-   773cc:	90                   	nop
-   773cd:	90                   	nop
-   773ce:	90                   	nop
-   773cf:	90                   	nop
-   773d0:	90                   	nop
-   773d1:	90                   	nop
-   773d2:	90                   	nop
-   773d3:	90                   	nop
-   773d4:	90                   	nop
-   773d5:	90                   	nop
-   773d6:	90                   	nop
-   773d7:	90                   	nop
-   773d8:	90                   	nop
-   773d9:	90                   	nop
-   773da:	90                   	nop
-   773db:	90                   	nop
-   773dc:	90                   	nop
-   773dd:	90                   	nop
-   773de:	90                   	nop
-   773df:	90                   	nop
+   774f7:	e8 34 07 00 00       	call   77c30 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch>
+   774fc:	e8 ff 08 00 00       	call   77e00 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream>
+   77501:	e8 9a 0e 00 00       	call   783a0 <ASM_Analysis_AsmGeneration_Program__TestSingleLookups>
+   77506:	e8 f5 11 00 00       	call   78700 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern>
+   7750b:	e8 c0 13 00 00       	call   788d0 <ASM_Analysis_AsmGeneration_Program__TestDictionaryMethods>
+   77510:	48 8d 3d 89 e5 1c 00 	lea    0x1ce589(%rip),%rdi        # 245aa0 <__Str_Assembly_generation_complete__E694E220ABB5E659C8FE3A93D59496D8C08AFB825EDBB706847AAF14012E93FD>
+   77517:	e8 14 55 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   7751c:	48 8d 3d 9d ee 1c 00 	lea    0x1cee9d(%rip),%rdi        # 2463c0 <__Str_Check_output_for_JIT_generated_E88BF50A10FDFF15CB02EFCA372E5395BD12F2100779560FE4DB5574C46B7085>
+   77523:	e8 08 55 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   77528:	90                   	nop
+   77529:	48 81 c4 88 00 00 00 	add    $0x88,%rsp
+   77530:	5b                   	pop    %rbx
+   77531:	41 5c                	pop    %r12
+   77533:	41 5d                	pop    %r13
+   77535:	41 5e                	pop    %r14
+   77537:	41 5f                	pop    %r15
+   77539:	5d                   	pop    %rbp
+   7753a:	c3                   	ret
+   7753b:	e8 e0 b5 01 00       	call   92b20 <S_P_CoreLib_System_ThrowHelper__ThrowArgumentOutOfRangeException>
+   77540:	cc                   	int3
+   77541:	90                   	nop
+   77542:	90                   	nop
+   77543:	90                   	nop
+   77544:	90                   	nop
+   77545:	90                   	nop
+   77546:	90                   	nop
+   77547:	90                   	nop
+   77548:	90                   	nop
+   77549:	90                   	nop
+   7754a:	90                   	nop
+   7754b:	90                   	nop
+   7754c:	90                   	nop
+   7754d:	90                   	nop
+   7754e:	90                   	nop
+   7754f:	90                   	nop
+   77550:	90                   	nop
+   77551:	90                   	nop
+   77552:	90                   	nop
+   77553:	90                   	nop
+   77554:	90                   	nop
+   77555:	90                   	nop
+   77556:	90                   	nop
+   77557:	90                   	nop
+   77558:	90                   	nop
+   77559:	90                   	nop
+   7755a:	90                   	nop
+   7755b:	90                   	nop
+   7755c:	90                   	nop
+   7755d:	90                   	nop
+   7755e:	90                   	nop
+   7755f:	90                   	nop
 
-   774ac:	e8 4f d1 08 00       	call   104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
-   774b1:	eb 0b                	jmp    774be <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0xde>
-   774b3:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   774b9:	e8 a2 d6 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
-   774be:	48 8b 0d 0b a6 1a 00 	mov    0x1aa60b(%rip),%rcx        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   774c5:	48 8b 79 18          	mov    0x18(%rcx),%rdi
-   774c9:	4d 85 ff             	test   %r15,%r15
-   774cc:	75 06                	jne    774d4 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0xf4>
-   774ce:	33 f6                	xor    %esi,%esi
-   774d0:	33 d2                	xor    %edx,%edx
-   774d2:	eb 08                	jmp    774dc <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0xfc>
-   774d4:	49 8d 77 10          	lea    0x10(%r15),%rsi
-   774d8:	41 8b 57 08          	mov    0x8(%r15),%edx
-   774dc:	48 8d 4b 10          	lea    0x10(%rbx),%rcx
-   774e0:	41 b8 64 00 00 00    	mov    $0x64,%r8d
-   774e6:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
-   774ea:	74 0a                	je     774f6 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x116>
-   774ec:	45 33 c9             	xor    %r9d,%r9d
-   774ef:	e8 0c d1 08 00       	call   104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
-   774f4:	eb 08                	jmp    774fe <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x11e>
-   774f6:	45 33 c9             	xor    %r9d,%r9d
-   774f9:	e8 62 d6 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
-   774fe:	48 8b 15 cb a5 1a 00 	mov    0x1aa5cb(%rip),%rdx        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   77505:	4c 8b 72 18          	mov    0x18(%rdx),%r14
-   77509:	4d 85 ff             	test   %r15,%r15
-   7750c:	75 06                	jne    77514 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x134>
-   7750e:	33 d2                	xor    %edx,%edx
-   77510:	33 ff                	xor    %edi,%edi
-   77512:	eb 08                	jmp    7751c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x13c>
-   77514:	49 8d 57 10          	lea    0x10(%r15),%rdx
-   77518:	41 8b 7f 08          	mov    0x8(%r15),%edi
-   7751c:	48 8d 73 10          	lea    0x10(%rbx),%rsi
-   77520:	b8 64 00 00 00       	mov    $0x64,%eax
-   77525:	41 80 7e 55 00       	cmpb   $0x0,0x55(%r14)
-   7752a:	0f 84 b5 01 00 00    	je     776e5 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x305>
-   77530:	3b f8                	cmp    %eax,%edi
-   77532:	0f 85 21 05 00 00    	jne    77a59 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x679>
-   77538:	41 0f b6 4e 54       	movzbl 0x54(%r14),%ecx
-   7753d:	4d 8b 46 38          	mov    0x38(%r14),%r8
-   77541:	45 33 c9             	xor    %r9d,%r9d
-   77544:	85 ff                	test   %edi,%edi
-   77546:	4c 0f 45 ca          	cmovne %rdx,%r9
-   7754a:	4c 89 4d d0          	mov    %r9,-0x30(%rbp)
-   7754e:	33 d2                	xor    %edx,%edx
-   77550:	85 c0                	test   %eax,%eax
-   77552:	48 0f 45 d6          	cmovne %rsi,%rdx
-   77556:	48 89 55 c8          	mov    %rdx,-0x38(%rbp)
-   7755a:	48 8b f2             	mov    %rdx,%rsi
-   7755d:	85 c9                	test   %ecx,%ecx
-   7755f:	0f 84 c4 00 00 00    	je     77629 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x249>
-   77565:	33 c0                	xor    %eax,%eax
-   77567:	85 ff                	test   %edi,%edi
-   77569:	0f 8e 67 01 00 00    	jle    776d6 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x2f6>
-   7756f:	4d 8d ae 80 00 00 00 	lea    0x80(%r14),%r13
-   77576:	48 63 d0             	movslq %eax,%rdx
-   77579:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
-   7757d:	49 33 56 48          	xor    0x48(%r14),%rdx
-   77581:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77588:	c1 7c 51 
-   7758b:	4c 8d 55 c0          	lea    -0x40(%rbp),%r10
-   7758f:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
-   77594:	4d 89 1a             	mov    %r11,(%r10)
-   77597:	48 8b 4d c0          	mov    -0x40(%rbp),%rcx
-   7759b:	48 33 d1             	xor    %rcx,%rdx
-   7759e:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   775a5:	c1 7c 51 
-   775a8:	48 0f af d1          	imul   %rcx,%rdx
-   775ac:	48 89 95 28 ff ff ff 	mov    %rdx,-0xd8(%rbp)
-   775b3:	49 8b 4e 70          	mov    0x70(%r14),%rcx
-   775b7:	4c 8d 55 b8          	lea    -0x48(%rbp),%r10
-   775bb:	4c 8b 9d 28 ff ff ff 	mov    -0xd8(%rbp),%r11
-   775c2:	48 8b d1             	mov    %rcx,%rdx
-   775c5:	c4 c2 9b f6 d3       	mulx   %r11,%r12,%rdx
-   775ca:	4d 89 22             	mov    %r12,(%r10)
-   775cd:	49 8b 4e 08          	mov    0x8(%r14),%rcx
-   775d1:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
-   775d5:	49 33 56 48          	xor    0x48(%r14),%rdx
-   775d9:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   775e0:	c1 7c 51 
-   775e3:	48 0f af d1          	imul   %rcx,%rdx
-   775e7:	49 8b cd             	mov    %r13,%rcx
-   775ea:	49 33 d3             	xor    %r11,%rdx
-   775ed:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
-   775f2:	48 8b 09             	mov    (%rcx),%rcx
-   775f5:	4c 8d 55 b0          	lea    -0x50(%rbp),%r10
-   775f9:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
-   775fe:	4d 89 1a             	mov    %r11,(%r10)
-   77601:	49 3b d0             	cmp    %r8,%rdx
-   77604:	72 0d                	jb     77613 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x233>
-   77606:	41 2b d0             	sub    %r8d,%edx
-   77609:	49 8b 4e 58          	mov    0x58(%r14),%rcx
-   7760d:	48 63 d2             	movslq %edx,%rdx
-   77610:	8b 14 91             	mov    (%rcx,%rdx,4),%edx
-   77613:	48 63 c8             	movslq %eax,%rcx
-   77616:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
-   7761a:	ff c0                	inc    %eax
-   7761c:	3b c7                	cmp    %edi,%eax
-   7761e:	0f 8c 52 ff ff ff    	jl     77576 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x196>
-   77624:	e9 ad 00 00 00       	jmp    776d6 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x2f6>
-   77629:	33 c0                	xor    %eax,%eax
-   7762b:	85 ff                	test   %edi,%edi
-   7762d:	0f 8e a3 00 00 00    	jle    776d6 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x2f6>
-   77633:	4d 8d ae 80 00 00 00 	lea    0x80(%r14),%r13
-   7763a:	48 63 d0             	movslq %eax,%rdx
-   7763d:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
-   77641:	49 33 56 48          	xor    0x48(%r14),%rdx
-   77645:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   7764c:	c1 7c 51 
-   7764f:	4c 8d 45 a8          	lea    -0x58(%rbp),%r8
-   77653:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
-   77658:	4d 89 10             	mov    %r10,(%r8)
-   7765b:	48 8b 4d a8          	mov    -0x58(%rbp),%rcx
-   7765f:	48 33 d1             	xor    %rcx,%rdx
-   77662:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77669:	c1 7c 51 
-   7766c:	48 0f af d1          	imul   %rcx,%rdx
-   77670:	48 89 95 20 ff ff ff 	mov    %rdx,-0xe0(%rbp)
-   77677:	49 8b 4e 70          	mov    0x70(%r14),%rcx
-   7767b:	4c 8d 45 a0          	lea    -0x60(%rbp),%r8
-   7767f:	4c 8b 95 20 ff ff ff 	mov    -0xe0(%rbp),%r10
-   77686:	48 8b d1             	mov    %rcx,%rdx
-   77689:	c4 c2 a3 f6 d2       	mulx   %r10,%r11,%rdx
-   7768e:	4d 89 18             	mov    %r11,(%r8)
-   77691:	49 8b 4e 08          	mov    0x8(%r14),%rcx
-   77695:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
-   77699:	49 33 56 48          	xor    0x48(%r14),%rdx
-   7769d:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   776a4:	c1 7c 51 
-   776a7:	48 0f af d1          	imul   %rcx,%rdx
-   776ab:	49 8b cd             	mov    %r13,%rcx
-   776ae:	49 33 d2             	xor    %r10,%rdx
-   776b1:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
-   776b6:	48 8b 09             	mov    (%rcx),%rcx
-   776b9:	4c 8d 45 98          	lea    -0x68(%rbp),%r8
-   776bd:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
-   776c2:	4d 89 10             	mov    %r10,(%r8)
-   776c5:	48 63 c8             	movslq %eax,%rcx
-   776c8:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
-   776cc:	ff c0                	inc    %eax
-   776ce:	3b c7                	cmp    %edi,%eax
-   776d0:	0f 8c 64 ff ff ff    	jl     7763a <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x25a>
-   776d6:	33 d2                	xor    %edx,%edx
-   776d8:	48 89 55 c8          	mov    %rdx,-0x38(%rbp)
-   776dc:	48 89 55 d0          	mov    %rdx,-0x30(%rbp)
-   776e0:	e9 62 02 00 00       	jmp    77947 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x567>
-   776e5:	44 8b e7             	mov    %edi,%r12d
-   776e8:	48 8b fe             	mov    %rsi,%rdi
-   776eb:	8b f0                	mov    %eax,%esi
-   776ed:	44 3b e6             	cmp    %esi,%r12d
-   776f0:	0f 85 89 03 00 00    	jne    77a7f <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x69f>
-   776f6:	41 0f b6 46 54       	movzbl 0x54(%r14),%eax
-   776fb:	49 8b 4e 38          	mov    0x38(%r14),%rcx
-   776ff:	45 33 c0             	xor    %r8d,%r8d
-   77702:	45 85 e4             	test   %r12d,%r12d
-   77705:	4c 0f 45 c2          	cmovne %rdx,%r8
-   77709:	4c 89 45 90          	mov    %r8,-0x70(%rbp)
-   7770d:	4d 8b e8             	mov    %r8,%r13
-   77710:	33 d2                	xor    %edx,%edx
-   77712:	85 f6                	test   %esi,%esi
-   77714:	48 0f 45 d7          	cmovne %rdi,%rdx
-   77718:	48 89 55 88          	mov    %rdx,-0x78(%rbp)
-   7771c:	4c 8b c2             	mov    %rdx,%r8
-   7771f:	4c 89 45 80          	mov    %r8,-0x80(%rbp)
-   77723:	85 c0                	test   %eax,%eax
-   77725:	0f 84 22 01 00 00    	je     7784d <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x46d>
-   7772b:	33 ff                	xor    %edi,%edi
-   7772d:	45 85 e4             	test   %r12d,%r12d
-   77730:	0f 8e 07 02 00 00    	jle    7793d <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x55d>
-   77736:	49 8d 76 78          	lea    0x78(%r14),%rsi
-   7773a:	48 89 b5 00 ff ff ff 	mov    %rsi,-0x100(%rbp)
-   77741:	49 8d 96 80 00 00 00 	lea    0x80(%r14),%rdx
-   77748:	48 89 95 08 ff ff ff 	mov    %rdx,-0xf8(%rbp)
-   7774f:	48 63 c7             	movslq %edi,%rax
-   77752:	49 8b 44 c5 00       	mov    0x0(%r13,%rax,8),%rax
-   77757:	49 33 46 48          	xor    0x48(%r14),%rax
-   7775b:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
-   77762:	c1 7c 51 
-   77765:	4c 8d 95 68 ff ff ff 	lea    -0x98(%rbp),%r10
-   7776c:	48 8b d0             	mov    %rax,%rdx
-   7776f:	c4 c2 a3 f6 d1       	mulx   %r9,%r11,%rdx
-   77774:	4d 89 1a             	mov    %r11,(%r10)
-   77777:	48 8b 85 68 ff ff ff 	mov    -0x98(%rbp),%rax
-   7777e:	48 33 d0             	xor    %rax,%rdx
-   77781:	49 0f af d1          	imul   %r9,%rdx
-   77785:	48 89 95 18 ff ff ff 	mov    %rdx,-0xe8(%rbp)
-   7778c:	48 8b c6             	mov    %rsi,%rax
-   7778f:	48 8b 00             	mov    (%rax),%rax
-   77792:	4c 8d 8d 60 ff ff ff 	lea    -0xa0(%rbp),%r9
-   77799:	4c 8b 95 18 ff ff ff 	mov    -0xe8(%rbp),%r10
-   777a0:	48 8b d0             	mov    %rax,%rdx
-   777a3:	c4 c2 a3 f6 d2       	mulx   %r10,%r11,%rdx
-   777a8:	4d 89 19             	mov    %r11,(%r9)
-   777ab:	49 8b 46 08          	mov    0x8(%r14),%rax
-   777af:	0f b6 14 10          	movzbl (%rax,%rdx,1),%edx
-   777b3:	48 89 95 70 ff ff ff 	mov    %rdx,-0x90(%rbp)
-   777ba:	49 8d 46 68          	lea    0x68(%r14),%rax
-   777be:	48 8b 00             	mov    (%rax),%rax
-   777c1:	4c 8d 8d 58 ff ff ff 	lea    -0xa8(%rbp),%r9
-   777c8:	48 8b d0             	mov    %rax,%rdx
-   777cb:	c4 c2 a3 f6 c2       	mulx   %r10,%r11,%rax
-   777d0:	4d 89 19             	mov    %r11,(%r9)
-   777d3:	49 0f af 46 18       	imul   0x18(%r14),%rax
-   777d8:	48 8b 95 70 ff ff ff 	mov    -0x90(%rbp),%rdx
-   777df:	49 33 56 48          	xor    0x48(%r14),%rdx
-   777e3:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
-   777ea:	c1 7c 51 
-   777ed:	49 0f af d1          	imul   %r9,%rdx
-   777f1:	4c 8b 8d 08 ff ff ff 	mov    -0xf8(%rbp),%r9
-   777f8:	4d 8b d9             	mov    %r9,%r11
-   777fb:	49 33 d2             	xor    %r10,%rdx
-   777fe:	49 0f af 53 08       	imul   0x8(%r11),%rdx
-   77803:	4d 8b 13             	mov    (%r11),%r10
-   77806:	4c 8d 9d 50 ff ff ff 	lea    -0xb0(%rbp),%r11
-   7780d:	c4 c2 cb f6 d2       	mulx   %r10,%rsi,%rdx
-   77812:	49 89 33             	mov    %rsi,(%r11)
-   77815:	48 03 c2             	add    %rdx,%rax
-   77818:	48 3b c1             	cmp    %rcx,%rax
-   7781b:	72 0b                	jb     77828 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x448>
-   7781d:	2b c1                	sub    %ecx,%eax
-   7781f:	49 8b 76 58          	mov    0x58(%r14),%rsi
-   77823:	48 98                	cltq
-   77825:	8b 04 86             	mov    (%rsi,%rax,4),%eax
-   77828:	48 63 f7             	movslq %edi,%rsi
-   7782b:	49 89 04 f0          	mov    %rax,(%r8,%rsi,8)
-   7782f:	ff c7                	inc    %edi
-   77831:	41 3b fc             	cmp    %r12d,%edi
-   77834:	4c 89 8d 08 ff ff ff 	mov    %r9,-0xf8(%rbp)
-   7783b:	48 8b b5 00 ff ff ff 	mov    -0x100(%rbp),%rsi
-   77842:	0f 8c 07 ff ff ff    	jl     7774f <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x36f>
-   77848:	e9 f0 00 00 00       	jmp    7793d <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x55d>
-   7784d:	33 c0                	xor    %eax,%eax
-   7784f:	45 85 e4             	test   %r12d,%r12d
-   77852:	0f 8e e5 00 00 00    	jle    7793d <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x55d>
-   77858:	89 85 7c ff ff ff    	mov    %eax,-0x84(%rbp)
-   7785e:	48 63 f8             	movslq %eax,%rdi
-   77861:	49 8b 7c fd 00       	mov    0x0(%r13,%rdi,8),%rdi
-   77866:	49 8b 76 48          	mov    0x48(%r14),%rsi
-   7786a:	e8 81 29 00 00       	call   7a1f0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__Hash>
-   7786f:	48 89 85 10 ff ff ff 	mov    %rax,-0xf0(%rbp)
-   77876:	49 8b fe             	mov    %r14,%rdi
-   77879:	48 8b b5 10 ff ff ff 	mov    -0xf0(%rbp),%rsi
-   77880:	e8 5b c3 08 00       	call   103be0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__Bucket>
-   77885:	49 8b 7e 08          	mov    0x8(%r14),%rdi
-   77889:	0f b6 04 07          	movzbl (%rdi,%rax,1),%eax
-   7788d:	48 89 85 48 ff ff ff 	mov    %rax,-0xb8(%rbp)
-   77894:	49 8d 76 68          	lea    0x68(%r14),%rsi
-   77898:	48 8b 36             	mov    (%rsi),%rsi
-   7789b:	48 8b fe             	mov    %rsi,%rdi
-   7789e:	33 f6                	xor    %esi,%esi
-   778a0:	48 8b 95 10 ff ff ff 	mov    -0xf0(%rbp),%rdx
-   778a7:	33 c9                	xor    %ecx,%ecx
-   778a9:	e8 92 c5 01 00       	call   93e40 <S_P_CoreLib_System_UInt128__op_Multiply>
-   778ae:	48 8b f8             	mov    %rax,%rdi
-   778b1:	48 8b f2             	mov    %rdx,%rsi
-   778b4:	ba 40 00 00 00       	mov    $0x40,%edx
-   778b9:	e8 c2 c5 01 00       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-   778be:	49 0f af 46 18       	imul   0x18(%r14),%rax
-   778c3:	48 89 85 40 ff ff ff 	mov    %rax,-0xc0(%rbp)
-   778ca:	48 8b bd 48 ff ff ff 	mov    -0xb8(%rbp),%rdi
-   778d1:	49 33 7e 48          	xor    0x48(%r14),%rdi
-   778d5:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
-   778dc:	c1 7c 51 
-   778df:	48 0f af fe          	imul   %rsi,%rdi
-   778e3:	4d 8d 8e 80 00 00 00 	lea    0x80(%r14),%r9
-   778ea:	48 8b b5 10 ff ff ff 	mov    -0xf0(%rbp),%rsi
-   778f1:	48 33 fe             	xor    %rsi,%rdi
-   778f4:	49 0f af 79 08       	imul   0x8(%r9),%rdi
-   778f9:	49 8b 11             	mov    (%r9),%rdx
-   778fc:	33 f6                	xor    %esi,%esi
-   778fe:	33 c9                	xor    %ecx,%ecx
-   77900:	e8 3b c5 01 00       	call   93e40 <S_P_CoreLib_System_UInt128__op_Multiply>
-   77905:	48 8b f8             	mov    %rax,%rdi
-   77908:	48 8b f2             	mov    %rdx,%rsi
-   7790b:	ba 40 00 00 00       	mov    $0x40,%edx
-   77910:	e8 6b c5 01 00       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-   77915:	48 8b bd 40 ff ff ff 	mov    -0xc0(%rbp),%rdi
-   7791c:	48 03 f8             	add    %rax,%rdi
-   7791f:	8b b5 7c ff ff ff    	mov    -0x84(%rbp),%esi
-   77925:	48 63 c6             	movslq %esi,%rax
-   77928:	4c 8b 45 80          	mov    -0x80(%rbp),%r8
-   7792c:	49 89 3c c0          	mov    %rdi,(%r8,%rax,8)
-   77930:	ff c6                	inc    %esi
-   77932:	41 3b f4             	cmp    %r12d,%esi
-   77935:	8b c6                	mov    %esi,%eax
-   77937:	0f 8c 1b ff ff ff    	jl     77858 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x478>
-   7793d:	33 ff                	xor    %edi,%edi
-   7793f:	48 89 7d 88          	mov    %rdi,-0x78(%rbp)
-   77943:	48 89 7d 90          	mov    %rdi,-0x70(%rbp)
-   77947:	48 8b 3d 82 a1 1a 00 	mov    0x1aa182(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   7794e:	4c 8b 77 18          	mov    0x18(%rdi),%r14
-   77952:	4d 85 ff             	test   %r15,%r15
-   77955:	75 08                	jne    7795f <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x57f>
-   77957:	45 33 ed             	xor    %r13d,%r13d
-   7795a:	45 33 e4             	xor    %r12d,%r12d
-   7795d:	eb 08                	jmp    77967 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x587>
-   7795f:	4d 8d 6f 10          	lea    0x10(%r15),%r13
-   77963:	45 8b 67 08          	mov    0x8(%r15),%r12d
-   77967:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
-   7796b:	c5 fa 7f 85 30 ff ff 	vmovdqu %xmm0,-0xd0(%rbp)
-   77972:	ff 
-   77973:	48 8d bd 30 ff ff ff 	lea    -0xd0(%rbp),%rdi
-   7797a:	48 8b f3             	mov    %rbx,%rsi
-   7797d:	e8 4e 0b 09 00       	call   1084d0 <S_P_CoreLib_System_Span_1<UIntPtr>___ctor>
-   77982:	48 8b 8d 30 ff ff ff 	mov    -0xd0(%rbp),%rcx
-   77989:	44 8b 85 38 ff ff ff 	mov    -0xc8(%rbp),%r8d
-   77990:	49 8b f5             	mov    %r13,%rsi
-   77993:	41 8b d4             	mov    %r12d,%edx
-   77996:	49 8b fe             	mov    %r14,%rdi
-   77999:	45 33 c9             	xor    %r9d,%r9d
-   7799c:	39 3f                	cmp    %edi,(%rdi)
-   7799e:	e8 bd c3 08 00       	call   103d60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream>
-   779a3:	33 db                	xor    %ebx,%ebx
-   779a5:	4d 85 ff             	test   %r15,%r15
-   779a8:	74 42                	je     779ec <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
-   779aa:	41 83 7f 08 64       	cmpl   $0x64,0x8(%r15)
-   779af:	7c 3b                	jl     779ec <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
-   779b1:	48 8b 3d 18 a1 1a 00 	mov    0x1aa118(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   779b8:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   779bc:	8b f3                	mov    %ebx,%esi
-   779be:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   779c3:	39 3f                	cmp    %edi,(%rdi)
-   779c5:	e8 a6 be 08 00       	call   103870 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
-   779ca:	48 8b 3d ff a0 1a 00 	mov    0x1aa0ff(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   779d1:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   779d5:	8b f3                	mov    %ebx,%esi
-   779d7:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   779dc:	39 3f                	cmp    %edi,(%rdi)
-   779de:	e8 5d c0 08 00       	call   103a40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
-   779e3:	ff c3                	inc    %ebx
-   779e5:	83 fb 64             	cmp    $0x64,%ebx
-   779e8:	7c c7                	jl     779b1 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x5d1>
-   779ea:	eb 43                	jmp    77a2f <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x64f>
-   779ec:	48 8b 3d dd a0 1a 00 	mov    0x1aa0dd(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   779f3:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   779f7:	41 3b 5f 08          	cmp    0x8(%r15),%ebx
-   779fb:	0f 83 a4 00 00 00    	jae    77aa5 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x6c5>
-   77a01:	8b f3                	mov    %ebx,%esi
-   77a03:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   77a08:	39 3f                	cmp    %edi,(%rdi)
-   77a0a:	e8 61 be 08 00       	call   103870 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
-   77a0f:	48 8b 3d ba a0 1a 00 	mov    0x1aa0ba(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   77a16:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   77a1a:	8b f3                	mov    %ebx,%esi
-   77a1c:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   77a21:	39 3f                	cmp    %edi,(%rdi)
-   77a23:	e8 18 c0 08 00       	call   103a40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
-   77a28:	ff c3                	inc    %ebx
-   77a2a:	83 fb 64             	cmp    $0x64,%ebx
-   77a2d:	7c bd                	jl     779ec <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
-   77a2f:	48 8d 3d 82 79 1c 00 	lea    0x1c7982(%rip),%rdi        # 23f3b8 <__Str_JIT_warmup_complete__0DAE2BD7E8651565932C6EA373EC942BC13BA8E721DA0F4E914F424C749DD85D>
-   77a36:	e8 15 4d 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   77a3b:	90                   	nop
-   77a3c:	48 81 c4 d8 00 00 00 	add    $0xd8,%rsp
-   77a43:	5b                   	pop    %rbx
-   77a44:	41 5c                	pop    %r12
-   77a46:	41 5d                	pop    %r13
-   77a48:	41 5e                	pop    %r14
-   77a4a:	41 5f                	pop    %r15
-   77a4c:	5d                   	pop    %rbp
-   77a4d:	c3                   	ret
-   77a4e:	bf 10 00 00 00       	mov    $0x10,%edi
-   77a53:	e8 38 85 00 00       	call   7ff90 <System_Linq_System_Linq_ThrowHelper__ThrowArgumentNullException>
-   77a58:	cc                   	int3
-   77a59:	48 8d 3d 78 a3 1d 00 	lea    0x1da378(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-   77a60:	e8 af da fe ff       	call   65514 <RhpNewFast>
-   77a65:	48 8b d8             	mov    %rax,%rbx
-   77a68:	48 8b fb             	mov    %rbx,%rdi
-   77a6b:	48 8d 35 4e 7a 1c 00 	lea    0x1c7a4e(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-   77a72:	e8 f9 31 01 00       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-   77a77:	48 8b fb             	mov    %rbx,%rdi
-   77a7a:	e8 ff dc fe ff       	call   6577e <RhpThrowEx>
-   77a7f:	48 8d 3d 52 a3 1d 00 	lea    0x1da352(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-   77a86:	e8 89 da fe ff       	call   65514 <RhpNewFast>
-   77a8b:	48 8b d8             	mov    %rax,%rbx
-   77a8e:	48 8b fb             	mov    %rbx,%rdi
-   77a91:	48 8d 35 28 7a 1c 00 	lea    0x1c7a28(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-   77a98:	e8 d3 31 01 00       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-   77a9d:	48 8b fb             	mov    %rbx,%rdi
-   77aa0:	e8 d9 dc fe ff       	call   6577e <RhpThrowEx>
-   77aa5:	e8 16 31 05 00       	call   cabc0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
-   77aaa:	cc                   	int3
-   77aab:	90                   	nop
-   77aac:	90                   	nop
-   77aad:	90                   	nop
-   77aae:	90                   	nop
-   77aaf:	90                   	nop
+   7762c:	e8 0f da 08 00       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+   77631:	eb 0b                	jmp    7763e <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0xde>
+   77633:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   77639:	e8 a2 dd 08 00       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+   7763e:	48 8b 0d e3 44 1b 00 	mov    0x1b44e3(%rip),%rcx        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77645:	48 8b 79 18          	mov    0x18(%rcx),%rdi
+   77649:	4d 85 ff             	test   %r15,%r15
+   7764c:	75 06                	jne    77654 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0xf4>
+   7764e:	33 f6                	xor    %esi,%esi
+   77650:	33 d2                	xor    %edx,%edx
+   77652:	eb 08                	jmp    7765c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0xfc>
+   77654:	49 8d 77 10          	lea    0x10(%r15),%rsi
+   77658:	41 8b 57 08          	mov    0x8(%r15),%edx
+   7765c:	48 8d 4b 10          	lea    0x10(%rbx),%rcx
+   77660:	41 b8 64 00 00 00    	mov    $0x64,%r8d
+   77666:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
+   7766a:	74 0a                	je     77676 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x116>
+   7766c:	45 33 c9             	xor    %r9d,%r9d
+   7766f:	e8 cc d9 08 00       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+   77674:	eb 08                	jmp    7767e <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x11e>
+   77676:	45 33 c9             	xor    %r9d,%r9d
+   77679:	e8 62 dd 08 00       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+   7767e:	48 8b 15 a3 44 1b 00 	mov    0x1b44a3(%rip),%rdx        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77685:	4c 8b 72 18          	mov    0x18(%rdx),%r14
+   77689:	4d 85 ff             	test   %r15,%r15
+   7768c:	75 06                	jne    77694 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x134>
+   7768e:	33 d2                	xor    %edx,%edx
+   77690:	33 ff                	xor    %edi,%edi
+   77692:	eb 08                	jmp    7769c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x13c>
+   77694:	49 8d 57 10          	lea    0x10(%r15),%rdx
+   77698:	41 8b 7f 08          	mov    0x8(%r15),%edi
+   7769c:	48 8d 73 10          	lea    0x10(%rbx),%rsi
+   776a0:	b8 64 00 00 00       	mov    $0x64,%eax
+   776a5:	41 80 7e 55 00       	cmpb   $0x0,0x55(%r14)
+   776aa:	0f 84 b5 01 00 00    	je     77865 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x305>
+   776b0:	3b f8                	cmp    %eax,%edi
+   776b2:	0f 85 21 05 00 00    	jne    77bd9 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x679>
+   776b8:	41 0f b6 4e 54       	movzbl 0x54(%r14),%ecx
+   776bd:	4d 8b 46 38          	mov    0x38(%r14),%r8
+   776c1:	45 33 c9             	xor    %r9d,%r9d
+   776c4:	85 ff                	test   %edi,%edi
+   776c6:	4c 0f 45 ca          	cmovne %rdx,%r9
+   776ca:	4c 89 4d d0          	mov    %r9,-0x30(%rbp)
+   776ce:	33 d2                	xor    %edx,%edx
+   776d0:	85 c0                	test   %eax,%eax
+   776d2:	48 0f 45 d6          	cmovne %rsi,%rdx
+   776d6:	48 89 55 c8          	mov    %rdx,-0x38(%rbp)
+   776da:	48 8b f2             	mov    %rdx,%rsi
+   776dd:	85 c9                	test   %ecx,%ecx
+   776df:	0f 84 c4 00 00 00    	je     777a9 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x249>
+   776e5:	33 c0                	xor    %eax,%eax
+   776e7:	85 ff                	test   %edi,%edi
+   776e9:	0f 8e 67 01 00 00    	jle    77856 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x2f6>
+   776ef:	4d 8d ae 80 00 00 00 	lea    0x80(%r14),%r13
+   776f6:	48 63 d0             	movslq %eax,%rdx
+   776f9:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
+   776fd:	49 33 56 48          	xor    0x48(%r14),%rdx
+   77701:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77708:	c1 7c 51 
+   7770b:	4c 8d 55 c0          	lea    -0x40(%rbp),%r10
+   7770f:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
+   77714:	4d 89 1a             	mov    %r11,(%r10)
+   77717:	48 8b 4d c0          	mov    -0x40(%rbp),%rcx
+   7771b:	48 33 d1             	xor    %rcx,%rdx
+   7771e:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77725:	c1 7c 51 
+   77728:	48 0f af d1          	imul   %rcx,%rdx
+   7772c:	48 89 95 28 ff ff ff 	mov    %rdx,-0xd8(%rbp)
+   77733:	49 8b 4e 70          	mov    0x70(%r14),%rcx
+   77737:	4c 8d 55 b8          	lea    -0x48(%rbp),%r10
+   7773b:	4c 8b 9d 28 ff ff ff 	mov    -0xd8(%rbp),%r11
+   77742:	48 8b d1             	mov    %rcx,%rdx
+   77745:	c4 c2 9b f6 d3       	mulx   %r11,%r12,%rdx
+   7774a:	4d 89 22             	mov    %r12,(%r10)
+   7774d:	49 8b 4e 08          	mov    0x8(%r14),%rcx
+   77751:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
+   77755:	49 33 56 48          	xor    0x48(%r14),%rdx
+   77759:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77760:	c1 7c 51 
+   77763:	48 0f af d1          	imul   %rcx,%rdx
+   77767:	49 8b cd             	mov    %r13,%rcx
+   7776a:	49 33 d3             	xor    %r11,%rdx
+   7776d:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
+   77772:	48 8b 09             	mov    (%rcx),%rcx
+   77775:	4c 8d 55 b0          	lea    -0x50(%rbp),%r10
+   77779:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
+   7777e:	4d 89 1a             	mov    %r11,(%r10)
+   77781:	49 3b d0             	cmp    %r8,%rdx
+   77784:	72 0d                	jb     77793 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x233>
+   77786:	41 2b d0             	sub    %r8d,%edx
+   77789:	49 8b 4e 58          	mov    0x58(%r14),%rcx
+   7778d:	48 63 d2             	movslq %edx,%rdx
+   77790:	8b 14 91             	mov    (%rcx,%rdx,4),%edx
+   77793:	48 63 c8             	movslq %eax,%rcx
+   77796:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
+   7779a:	ff c0                	inc    %eax
+   7779c:	3b c7                	cmp    %edi,%eax
+   7779e:	0f 8c 52 ff ff ff    	jl     776f6 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x196>
+   777a4:	e9 ad 00 00 00       	jmp    77856 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x2f6>
+   777a9:	33 c0                	xor    %eax,%eax
+   777ab:	85 ff                	test   %edi,%edi
+   777ad:	0f 8e a3 00 00 00    	jle    77856 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x2f6>
+   777b3:	4d 8d ae 80 00 00 00 	lea    0x80(%r14),%r13
+   777ba:	48 63 d0             	movslq %eax,%rdx
+   777bd:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
+   777c1:	49 33 56 48          	xor    0x48(%r14),%rdx
+   777c5:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   777cc:	c1 7c 51 
+   777cf:	4c 8d 45 a8          	lea    -0x58(%rbp),%r8
+   777d3:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
+   777d8:	4d 89 10             	mov    %r10,(%r8)
+   777db:	48 8b 4d a8          	mov    -0x58(%rbp),%rcx
+   777df:	48 33 d1             	xor    %rcx,%rdx
+   777e2:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   777e9:	c1 7c 51 
+   777ec:	48 0f af d1          	imul   %rcx,%rdx
+   777f0:	48 89 95 20 ff ff ff 	mov    %rdx,-0xe0(%rbp)
+   777f7:	49 8b 4e 70          	mov    0x70(%r14),%rcx
+   777fb:	4c 8d 45 a0          	lea    -0x60(%rbp),%r8
+   777ff:	4c 8b 95 20 ff ff ff 	mov    -0xe0(%rbp),%r10
+   77806:	48 8b d1             	mov    %rcx,%rdx
+   77809:	c4 c2 a3 f6 d2       	mulx   %r10,%r11,%rdx
+   7780e:	4d 89 18             	mov    %r11,(%r8)
+   77811:	49 8b 4e 08          	mov    0x8(%r14),%rcx
+   77815:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
+   77819:	49 33 56 48          	xor    0x48(%r14),%rdx
+   7781d:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77824:	c1 7c 51 
+   77827:	48 0f af d1          	imul   %rcx,%rdx
+   7782b:	49 8b cd             	mov    %r13,%rcx
+   7782e:	49 33 d2             	xor    %r10,%rdx
+   77831:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
+   77836:	48 8b 09             	mov    (%rcx),%rcx
+   77839:	4c 8d 45 98          	lea    -0x68(%rbp),%r8
+   7783d:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
+   77842:	4d 89 10             	mov    %r10,(%r8)
+   77845:	48 63 c8             	movslq %eax,%rcx
+   77848:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
+   7784c:	ff c0                	inc    %eax
+   7784e:	3b c7                	cmp    %edi,%eax
+   77850:	0f 8c 64 ff ff ff    	jl     777ba <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x25a>
+   77856:	33 d2                	xor    %edx,%edx
+   77858:	48 89 55 c8          	mov    %rdx,-0x38(%rbp)
+   7785c:	48 89 55 d0          	mov    %rdx,-0x30(%rbp)
+   77860:	e9 62 02 00 00       	jmp    77ac7 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x567>
+   77865:	44 8b e7             	mov    %edi,%r12d
+   77868:	48 8b fe             	mov    %rsi,%rdi
+   7786b:	8b f0                	mov    %eax,%esi
+   7786d:	44 3b e6             	cmp    %esi,%r12d
+   77870:	0f 85 89 03 00 00    	jne    77bff <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x69f>
+   77876:	41 0f b6 46 54       	movzbl 0x54(%r14),%eax
+   7787b:	49 8b 4e 38          	mov    0x38(%r14),%rcx
+   7787f:	45 33 c0             	xor    %r8d,%r8d
+   77882:	45 85 e4             	test   %r12d,%r12d
+   77885:	4c 0f 45 c2          	cmovne %rdx,%r8
+   77889:	4c 89 45 90          	mov    %r8,-0x70(%rbp)
+   7788d:	4d 8b e8             	mov    %r8,%r13
+   77890:	33 d2                	xor    %edx,%edx
+   77892:	85 f6                	test   %esi,%esi
+   77894:	48 0f 45 d7          	cmovne %rdi,%rdx
+   77898:	48 89 55 88          	mov    %rdx,-0x78(%rbp)
+   7789c:	4c 8b c2             	mov    %rdx,%r8
+   7789f:	4c 89 45 80          	mov    %r8,-0x80(%rbp)
+   778a3:	85 c0                	test   %eax,%eax
+   778a5:	0f 84 22 01 00 00    	je     779cd <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x46d>
+   778ab:	33 ff                	xor    %edi,%edi
+   778ad:	45 85 e4             	test   %r12d,%r12d
+   778b0:	0f 8e 07 02 00 00    	jle    77abd <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x55d>
+   778b6:	49 8d 76 78          	lea    0x78(%r14),%rsi
+   778ba:	48 89 b5 00 ff ff ff 	mov    %rsi,-0x100(%rbp)
+   778c1:	49 8d 96 80 00 00 00 	lea    0x80(%r14),%rdx
+   778c8:	48 89 95 08 ff ff ff 	mov    %rdx,-0xf8(%rbp)
+   778cf:	48 63 c7             	movslq %edi,%rax
+   778d2:	49 8b 44 c5 00       	mov    0x0(%r13,%rax,8),%rax
+   778d7:	49 33 46 48          	xor    0x48(%r14),%rax
+   778db:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
+   778e2:	c1 7c 51 
+   778e5:	4c 8d 95 68 ff ff ff 	lea    -0x98(%rbp),%r10
+   778ec:	48 8b d0             	mov    %rax,%rdx
+   778ef:	c4 c2 a3 f6 d1       	mulx   %r9,%r11,%rdx
+   778f4:	4d 89 1a             	mov    %r11,(%r10)
+   778f7:	48 8b 85 68 ff ff ff 	mov    -0x98(%rbp),%rax
+   778fe:	48 33 d0             	xor    %rax,%rdx
+   77901:	49 0f af d1          	imul   %r9,%rdx
+   77905:	48 89 95 18 ff ff ff 	mov    %rdx,-0xe8(%rbp)
+   7790c:	48 8b c6             	mov    %rsi,%rax
+   7790f:	48 8b 00             	mov    (%rax),%rax
+   77912:	4c 8d 8d 60 ff ff ff 	lea    -0xa0(%rbp),%r9
+   77919:	4c 8b 95 18 ff ff ff 	mov    -0xe8(%rbp),%r10
+   77920:	48 8b d0             	mov    %rax,%rdx
+   77923:	c4 c2 a3 f6 d2       	mulx   %r10,%r11,%rdx
+   77928:	4d 89 19             	mov    %r11,(%r9)
+   7792b:	49 8b 46 08          	mov    0x8(%r14),%rax
+   7792f:	0f b6 14 10          	movzbl (%rax,%rdx,1),%edx
+   77933:	48 89 95 70 ff ff ff 	mov    %rdx,-0x90(%rbp)
+   7793a:	49 8d 46 68          	lea    0x68(%r14),%rax
+   7793e:	48 8b 00             	mov    (%rax),%rax
+   77941:	4c 8d 8d 58 ff ff ff 	lea    -0xa8(%rbp),%r9
+   77948:	48 8b d0             	mov    %rax,%rdx
+   7794b:	c4 c2 a3 f6 c2       	mulx   %r10,%r11,%rax
+   77950:	4d 89 19             	mov    %r11,(%r9)
+   77953:	49 0f af 46 18       	imul   0x18(%r14),%rax
+   77958:	48 8b 95 70 ff ff ff 	mov    -0x90(%rbp),%rdx
+   7795f:	49 33 56 48          	xor    0x48(%r14),%rdx
+   77963:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
+   7796a:	c1 7c 51 
+   7796d:	49 0f af d1          	imul   %r9,%rdx
+   77971:	4c 8b 8d 08 ff ff ff 	mov    -0xf8(%rbp),%r9
+   77978:	4d 8b d9             	mov    %r9,%r11
+   7797b:	49 33 d2             	xor    %r10,%rdx
+   7797e:	49 0f af 53 08       	imul   0x8(%r11),%rdx
+   77983:	4d 8b 13             	mov    (%r11),%r10
+   77986:	4c 8d 9d 50 ff ff ff 	lea    -0xb0(%rbp),%r11
+   7798d:	c4 c2 cb f6 d2       	mulx   %r10,%rsi,%rdx
+   77992:	49 89 33             	mov    %rsi,(%r11)
+   77995:	48 03 c2             	add    %rdx,%rax
+   77998:	48 3b c1             	cmp    %rcx,%rax
+   7799b:	72 0b                	jb     779a8 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x448>
+   7799d:	2b c1                	sub    %ecx,%eax
+   7799f:	49 8b 76 58          	mov    0x58(%r14),%rsi
+   779a3:	48 98                	cltq
+   779a5:	8b 04 86             	mov    (%rsi,%rax,4),%eax
+   779a8:	48 63 f7             	movslq %edi,%rsi
+   779ab:	49 89 04 f0          	mov    %rax,(%r8,%rsi,8)
+   779af:	ff c7                	inc    %edi
+   779b1:	41 3b fc             	cmp    %r12d,%edi
+   779b4:	4c 89 8d 08 ff ff ff 	mov    %r9,-0xf8(%rbp)
+   779bb:	48 8b b5 00 ff ff ff 	mov    -0x100(%rbp),%rsi
+   779c2:	0f 8c 07 ff ff ff    	jl     778cf <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x36f>
+   779c8:	e9 f0 00 00 00       	jmp    77abd <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x55d>
+   779cd:	33 c0                	xor    %eax,%eax
+   779cf:	45 85 e4             	test   %r12d,%r12d
+   779d2:	0f 8e e5 00 00 00    	jle    77abd <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x55d>
+   779d8:	89 85 7c ff ff ff    	mov    %eax,-0x84(%rbp)
+   779de:	48 63 f8             	movslq %eax,%rdi
+   779e1:	49 8b 7c fd 00       	mov    0x0(%r13,%rdi,8),%rdi
+   779e6:	49 8b 76 48          	mov    0x48(%r14),%rsi
+   779ea:	e8 31 2b 00 00       	call   7a520 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__Hash>
+   779ef:	48 89 85 10 ff ff ff 	mov    %rax,-0xf0(%rbp)
+   779f6:	49 8b fe             	mov    %r14,%rdi
+   779f9:	48 8b b5 10 ff ff ff 	mov    -0xf0(%rbp),%rsi
+   77a00:	e8 1b cc 08 00       	call   104620 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__Bucket>
+   77a05:	49 8b 7e 08          	mov    0x8(%r14),%rdi
+   77a09:	0f b6 04 07          	movzbl (%rdi,%rax,1),%eax
+   77a0d:	48 89 85 48 ff ff ff 	mov    %rax,-0xb8(%rbp)
+   77a14:	49 8d 76 68          	lea    0x68(%r14),%rsi
+   77a18:	48 8b 36             	mov    (%rsi),%rsi
+   77a1b:	48 8b fe             	mov    %rsi,%rdi
+   77a1e:	33 f6                	xor    %esi,%esi
+   77a20:	48 8b 95 10 ff ff ff 	mov    -0xf0(%rbp),%rdx
+   77a27:	33 c9                	xor    %ecx,%ecx
+   77a29:	e8 02 c7 01 00       	call   94130 <S_P_CoreLib_System_UInt128__op_Multiply>
+   77a2e:	48 8b f8             	mov    %rax,%rdi
+   77a31:	48 8b f2             	mov    %rdx,%rsi
+   77a34:	ba 40 00 00 00       	mov    $0x40,%edx
+   77a39:	e8 42 c7 01 00       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+   77a3e:	49 0f af 46 18       	imul   0x18(%r14),%rax
+   77a43:	48 89 85 40 ff ff ff 	mov    %rax,-0xc0(%rbp)
+   77a4a:	48 8b bd 48 ff ff ff 	mov    -0xb8(%rbp),%rdi
+   77a51:	49 33 7e 48          	xor    0x48(%r14),%rdi
+   77a55:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
+   77a5c:	c1 7c 51 
+   77a5f:	48 0f af fe          	imul   %rsi,%rdi
+   77a63:	4d 8d 8e 80 00 00 00 	lea    0x80(%r14),%r9
+   77a6a:	48 8b b5 10 ff ff ff 	mov    -0xf0(%rbp),%rsi
+   77a71:	48 33 fe             	xor    %rsi,%rdi
+   77a74:	49 0f af 79 08       	imul   0x8(%r9),%rdi
+   77a79:	49 8b 11             	mov    (%r9),%rdx
+   77a7c:	33 f6                	xor    %esi,%esi
+   77a7e:	33 c9                	xor    %ecx,%ecx
+   77a80:	e8 ab c6 01 00       	call   94130 <S_P_CoreLib_System_UInt128__op_Multiply>
+   77a85:	48 8b f8             	mov    %rax,%rdi
+   77a88:	48 8b f2             	mov    %rdx,%rsi
+   77a8b:	ba 40 00 00 00       	mov    $0x40,%edx
+   77a90:	e8 eb c6 01 00       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+   77a95:	48 8b bd 40 ff ff ff 	mov    -0xc0(%rbp),%rdi
+   77a9c:	48 03 f8             	add    %rax,%rdi
+   77a9f:	8b b5 7c ff ff ff    	mov    -0x84(%rbp),%esi
+   77aa5:	48 63 c6             	movslq %esi,%rax
+   77aa8:	4c 8b 45 80          	mov    -0x80(%rbp),%r8
+   77aac:	49 89 3c c0          	mov    %rdi,(%r8,%rax,8)
+   77ab0:	ff c6                	inc    %esi
+   77ab2:	41 3b f4             	cmp    %r12d,%esi
+   77ab5:	8b c6                	mov    %esi,%eax
+   77ab7:	0f 8c 1b ff ff ff    	jl     779d8 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x478>
+   77abd:	33 ff                	xor    %edi,%edi
+   77abf:	48 89 7d 88          	mov    %rdi,-0x78(%rbp)
+   77ac3:	48 89 7d 90          	mov    %rdi,-0x70(%rbp)
+   77ac7:	48 8b 3d 5a 40 1b 00 	mov    0x1b405a(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77ace:	4c 8b 77 18          	mov    0x18(%rdi),%r14
+   77ad2:	4d 85 ff             	test   %r15,%r15
+   77ad5:	75 08                	jne    77adf <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x57f>
+   77ad7:	45 33 ed             	xor    %r13d,%r13d
+   77ada:	45 33 e4             	xor    %r12d,%r12d
+   77add:	eb 08                	jmp    77ae7 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x587>
+   77adf:	4d 8d 6f 10          	lea    0x10(%r15),%r13
+   77ae3:	45 8b 67 08          	mov    0x8(%r15),%r12d
+   77ae7:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   77aeb:	c5 fa 7f 85 30 ff ff 	vmovdqu %xmm0,-0xd0(%rbp)
+   77af2:	ff 
+   77af3:	48 8d bd 30 ff ff ff 	lea    -0xd0(%rbp),%rdi
+   77afa:	48 8b f3             	mov    %rbx,%rsi
+   77afd:	e8 6e 37 09 00       	call   10b270 <S_P_CoreLib_System_Span_1<UIntPtr>___ctor>
+   77b02:	48 8b 8d 30 ff ff ff 	mov    -0xd0(%rbp),%rcx
+   77b09:	44 8b 85 38 ff ff ff 	mov    -0xc8(%rbp),%r8d
+   77b10:	49 8b f5             	mov    %r13,%rsi
+   77b13:	41 8b d4             	mov    %r12d,%edx
+   77b16:	49 8b fe             	mov    %r14,%rdi
+   77b19:	45 33 c9             	xor    %r9d,%r9d
+   77b1c:	39 3f                	cmp    %edi,(%rdi)
+   77b1e:	e8 7d cc 08 00       	call   1047a0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream>
+   77b23:	33 db                	xor    %ebx,%ebx
+   77b25:	4d 85 ff             	test   %r15,%r15
+   77b28:	74 42                	je     77b6c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
+   77b2a:	41 83 7f 08 64       	cmpl   $0x64,0x8(%r15)
+   77b2f:	7c 3b                	jl     77b6c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
+   77b31:	48 8b 3d f0 3f 1b 00 	mov    0x1b3ff0(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b38:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b3c:	8b f3                	mov    %ebx,%esi
+   77b3e:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77b43:	39 3f                	cmp    %edi,(%rdi)
+   77b45:	e8 66 c7 08 00       	call   1042b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
+   77b4a:	48 8b 3d d7 3f 1b 00 	mov    0x1b3fd7(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b51:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b55:	8b f3                	mov    %ebx,%esi
+   77b57:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77b5c:	39 3f                	cmp    %edi,(%rdi)
+   77b5e:	e8 1d c9 08 00       	call   104480 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
+   77b63:	ff c3                	inc    %ebx
+   77b65:	83 fb 64             	cmp    $0x64,%ebx
+   77b68:	7c c7                	jl     77b31 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x5d1>
+   77b6a:	eb 43                	jmp    77baf <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x64f>
+   77b6c:	48 8b 3d b5 3f 1b 00 	mov    0x1b3fb5(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b73:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b77:	41 3b 5f 08          	cmp    0x8(%r15),%ebx
+   77b7b:	0f 83 a4 00 00 00    	jae    77c25 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x6c5>
+   77b81:	8b f3                	mov    %ebx,%esi
+   77b83:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77b88:	39 3f                	cmp    %edi,(%rdi)
+   77b8a:	e8 21 c7 08 00       	call   1042b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
+   77b8f:	48 8b 3d 92 3f 1b 00 	mov    0x1b3f92(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b96:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b9a:	8b f3                	mov    %ebx,%esi
+   77b9c:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77ba1:	39 3f                	cmp    %edi,(%rdi)
+   77ba3:	e8 d8 c8 08 00       	call   104480 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
+   77ba8:	ff c3                	inc    %ebx
+   77baa:	83 fb 64             	cmp    $0x64,%ebx
+   77bad:	7c bd                	jl     77b6c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
+   77baf:	48 8d 3d 32 24 1d 00 	lea    0x1d2432(%rip),%rdi        # 249fe8 <__Str_JIT_warmup_complete__0DAE2BD7E8651565932C6EA373EC942BC13BA8E721DA0F4E914F424C749DD85D>
+   77bb6:	e8 75 4e 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   77bbb:	90                   	nop
+   77bbc:	48 81 c4 d8 00 00 00 	add    $0xd8,%rsp
+   77bc3:	5b                   	pop    %rbx
+   77bc4:	41 5c                	pop    %r12
+   77bc6:	41 5d                	pop    %r13
+   77bc8:	41 5e                	pop    %r14
+   77bca:	41 5f                	pop    %r15
+   77bcc:	5d                   	pop    %rbp
+   77bcd:	c3                   	ret
+   77bce:	bf 10 00 00 00       	mov    $0x10,%edi
+   77bd3:	e8 98 86 00 00       	call   80270 <System_Linq_System_Linq_ThrowHelper__ThrowArgumentNullException>
+   77bd8:	cc                   	int3
+   77bd9:	48 8d 3d 28 56 1e 00 	lea    0x1e5628(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+   77be0:	e8 bf d9 fe ff       	call   655a4 <RhpNewFast>
+   77be5:	48 8b d8             	mov    %rax,%rbx
+   77be8:	48 8b fb             	mov    %rbx,%rdi
+   77beb:	48 8d 35 6e 25 1d 00 	lea    0x1d256e(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+   77bf2:	e8 59 33 01 00       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+   77bf7:	48 8b fb             	mov    %rbx,%rdi
+   77bfa:	e8 0f dc fe ff       	call   6580e <RhpThrowEx>
+   77bff:	48 8d 3d 02 56 1e 00 	lea    0x1e5602(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+   77c06:	e8 99 d9 fe ff       	call   655a4 <RhpNewFast>
+   77c0b:	48 8b d8             	mov    %rax,%rbx
+   77c0e:	48 8b fb             	mov    %rbx,%rdi
+   77c11:	48 8d 35 48 25 1d 00 	lea    0x1d2548(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+   77c18:	e8 33 33 01 00       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+   77c1d:	48 8b fb             	mov    %rbx,%rdi
+   77c20:	e8 e9 db fe ff       	call   6580e <RhpThrowEx>
+   77c25:	e8 96 32 05 00       	call   caec0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
+   77c2a:	cc                   	int3
+   77c2b:	90                   	nop
+   77c2c:	90                   	nop
+   77c2d:	90                   	nop
+   77c2e:	90                   	nop
+   77c2f:	90                   	nop
 
-0000000000077ab0 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch>:
-   77ab0:	55                   	push   %rbp
-   77ab1:	41 57                	push   %r15
-   77ab3:	41 56                	push   %r14
-   77ab5:	53                   	push   %rbx
-   77ab6:	48 83 ec 28          	sub    $0x28,%rsp
-   77aba:	c5 f8 77             	vzeroupper
-   77abd:	48 8d 6c 24 40       	lea    0x40(%rsp),%rbp
-   77ac2:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-   77ac7:	c5 79 7f 45 c0       	vmovdqa %xmm8,-0x40(%rbp)
-   77acc:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
-   77ad1:	33 c0                	xor    %eax,%eax
-   77ad3:	48 89 45 e0          	mov    %rax,-0x20(%rbp)
-   77ad7:	48 8d 3d 7a bb 1c 00 	lea    0x1cbb7a(%rip),%rdi        # 243658 <__Str_Testing_GetIndicesStreamPrefet_DFEC981FE3992F56C08A364E99D8E9725ED1C914578F7F525692F9A2069E1387>
-   77ade:	e8 6d 4c 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   77ae3:	48 8b 1d e6 9f 1a 00 	mov    0x1a9fe6(%rip),%rbx        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   77aea:	4c 8b 7b 10          	mov    0x10(%rbx),%r15
-   77aee:	41 8b 77 08          	mov    0x8(%r15),%esi
-   77af2:	48 8d 3d 57 15 21 00 	lea    0x211557(%rip),%rdi        # 289050 <_ZTV16__Array<UIntPtr>>
-   77af9:	e8 2c db fe ff       	call   6562a <RhpNewArray>
-   77afe:	4c 8b f0             	mov    %rax,%r14
-   77b01:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
-   77b05:	4d 85 ff             	test   %r15,%r15
-   77b08:	75 06                	jne    77b10 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x60>
-   77b0a:	33 f6                	xor    %esi,%esi
-   77b0c:	33 d2                	xor    %edx,%edx
-   77b0e:	eb 08                	jmp    77b18 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x68>
-   77b10:	49 8d 77 10          	lea    0x10(%r15),%rsi
-   77b14:	41 8b 57 08          	mov    0x8(%r15),%edx
-   77b18:	49 8d 4e 10          	lea    0x10(%r14),%rcx
-   77b1c:	45 8b 46 08          	mov    0x8(%r14),%r8d
-   77b20:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
-   77b24:	74 0d                	je     77b33 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x83>
-   77b26:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   77b2c:	e8 cf ca 08 00       	call   104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
-   77b31:	eb 0b                	jmp    77b3e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x8e>
-   77b33:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   77b39:	e8 22 d0 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
-   77b3e:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
-   77b42:	48 8b 4b 10          	mov    0x10(%rbx),%rcx
-   77b46:	48 85 c9             	test   %rcx,%rcx
-   77b49:	75 06                	jne    77b51 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xa1>
-   77b4b:	33 f6                	xor    %esi,%esi
-   77b4d:	33 d2                	xor    %edx,%edx
-   77b4f:	eb 07                	jmp    77b58 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xa8>
-   77b51:	48 8d 71 10          	lea    0x10(%rcx),%rsi
-   77b55:	8b 51 08             	mov    0x8(%rcx),%edx
-   77b58:	49 8d 4e 10          	lea    0x10(%r14),%rcx
-   77b5c:	45 8b 46 08          	mov    0x8(%r14),%r8d
-   77b60:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
-   77b64:	74 0a                	je     77b70 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xc0>
-   77b66:	45 33 c9             	xor    %r9d,%r9d
-   77b69:	e8 92 ca 08 00       	call   104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
-   77b6e:	eb 08                	jmp    77b78 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xc8>
-   77b70:	45 33 c9             	xor    %r9d,%r9d
-   77b73:	e8 e8 cf 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
-   77b78:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
-   77b7c:	be 22 00 00 00       	mov    $0x22,%esi
-   77b81:	ba 01 00 00 00       	mov    $0x1,%edx
-   77b86:	e8 75 93 04 00       	call   c0f00 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler___ctor>
-   77b8b:	8b 7d d0             	mov    -0x30(%rbp),%edi
-   77b8e:	3b 7d e0             	cmp    -0x20(%rbp),%edi
-   77b91:	0f 87 cd 00 00 00    	ja     77c64 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x1b4>
-   77b97:	48 8b 75 d8          	mov    -0x28(%rbp),%rsi
-   77b9b:	8b c7                	mov    %edi,%eax
-   77b9d:	48 8d 34 46          	lea    (%rsi,%rax,2),%rsi
-   77ba1:	8b 45 e0             	mov    -0x20(%rbp),%eax
-   77ba4:	2b c7                	sub    %edi,%eax
-   77ba6:	83 f8 0c             	cmp    $0xc,%eax
-   77ba9:	72 28                	jb     77bd3 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x123>
-   77bab:	48 8d 3d ae fa 1b 00 	lea    0x1bfaae(%rip),%rdi        # 237660 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
-   77bb2:	48 83 c7 0c          	add    $0xc,%rdi
-   77bb6:	c5 fa 6f 07          	vmovdqu (%rdi),%xmm0
-   77bba:	c5 fa 6f 4f 08       	vmovdqu 0x8(%rdi),%xmm1
-   77bbf:	c5 fa 7f 06          	vmovdqu %xmm0,(%rsi)
-   77bc3:	c5 fa 7f 4e 08       	vmovdqu %xmm1,0x8(%rsi)
-   77bc8:	8b 7d d0             	mov    -0x30(%rbp),%edi
-   77bcb:	83 c7 0c             	add    $0xc,%edi
-   77bce:	89 7d d0             	mov    %edi,-0x30(%rbp)
-   77bd1:	eb 10                	jmp    77be3 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x133>
-   77bd3:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
-   77bd7:	48 8d 35 82 fa 1b 00 	lea    0x1bfa82(%rip),%rsi        # 237660 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
-   77bde:	e8 fd 94 04 00       	call   c10e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
-   77be3:	48 8b 73 10          	mov    0x10(%rbx),%rsi
-   77be7:	8b 76 08             	mov    0x8(%rsi),%esi
-   77bea:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
-   77bee:	e8 ed 7f 0b 00       	call   12fbe0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__AppendFormatted<Int32>>
-   77bf3:	8b 7d d0             	mov    -0x30(%rbp),%edi
-   77bf6:	3b 7d e0             	cmp    -0x20(%rbp),%edi
-   77bf9:	77 69                	ja     77c64 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x1b4>
-   77bfb:	48 8b 75 d8          	mov    -0x28(%rbp),%rsi
-   77bff:	8b c7                	mov    %edi,%eax
-   77c01:	48 8d 34 46          	lea    (%rsi,%rax,2),%rsi
-   77c05:	8b 45 e0             	mov    -0x20(%rbp),%eax
-   77c08:	2b c7                	sub    %edi,%eax
-   77c0a:	83 f8 16             	cmp    $0x16,%eax
-   77c0d:	72 28                	jb     77c37 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x187>
-   77c0f:	48 8d 3d ca fe 1b 00 	lea    0x1bfeca(%rip),%rdi        # 237ae0 <__Str__keys_with_prefetching_7D74716B97304C78AC45626F98B1BB0F1083D62C00EA0EBE1B5AB87B36CE273A>
-   77c16:	48 83 c7 0c          	add    $0xc,%rdi
-   77c1a:	c5 fe 6f 07          	vmovdqu (%rdi),%ymm0
-   77c1e:	c5 fa 6f 4f 1c       	vmovdqu 0x1c(%rdi),%xmm1
-   77c23:	c5 fe 7f 06          	vmovdqu %ymm0,(%rsi)
-   77c27:	c5 fa 7f 4e 1c       	vmovdqu %xmm1,0x1c(%rsi)
-   77c2c:	8b 7d d0             	mov    -0x30(%rbp),%edi
-   77c2f:	83 c7 16             	add    $0x16,%edi
-   77c32:	89 7d d0             	mov    %edi,-0x30(%rbp)
-   77c35:	eb 10                	jmp    77c47 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x197>
-   77c37:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
-   77c3b:	48 8d 35 9e fe 1b 00 	lea    0x1bfe9e(%rip),%rsi        # 237ae0 <__Str__keys_with_prefetching_7D74716B97304C78AC45626F98B1BB0F1083D62C00EA0EBE1B5AB87B36CE273A>
-   77c42:	e8 99 94 04 00       	call   c10e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
-   77c47:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
-   77c4b:	e8 50 93 04 00       	call   c0fa0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__ToStringAndClear>
-   77c50:	48 8b f8             	mov    %rax,%rdi
-   77c53:	e8 f8 4a 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   77c58:	90                   	nop
-   77c59:	48 83 c4 28          	add    $0x28,%rsp
-   77c5d:	5b                   	pop    %rbx
-   77c5e:	41 5e                	pop    %r14
-   77c60:	41 5f                	pop    %r15
-   77c62:	5d                   	pop    %rbp
-   77c63:	c3                   	ret
-   77c64:	e8 d7 ab 01 00       	call   92840 <S_P_CoreLib_System_ThrowHelper__ThrowArgumentOutOfRangeException>
-   77c69:	cc                   	int3
-   77c6a:	90                   	nop
-   77c6b:	90                   	nop
-   77c6c:	90                   	nop
-   77c6d:	90                   	nop
-   77c6e:	90                   	nop
-   77c6f:	90                   	nop
-   77c70:	90                   	nop
-   77c71:	90                   	nop
-   77c72:	90                   	nop
-   77c73:	90                   	nop
-   77c74:	90                   	nop
-   77c75:	90                   	nop
-   77c76:	90                   	nop
-   77c77:	90                   	nop
-   77c78:	90                   	nop
-   77c79:	90                   	nop
-   77c7a:	90                   	nop
-   77c7b:	90                   	nop
-   77c7c:	90                   	nop
-   77c7d:	90                   	nop
-   77c7e:	90                   	nop
-   77c7f:	90                   	nop
+0000000000077c30 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch>:
+   77c30:	55                   	push   %rbp
+   77c31:	41 57                	push   %r15
+   77c33:	41 56                	push   %r14
+   77c35:	53                   	push   %rbx
+   77c36:	48 83 ec 28          	sub    $0x28,%rsp
+   77c3a:	c5 f8 77             	vzeroupper
+   77c3d:	48 8d 6c 24 40       	lea    0x40(%rsp),%rbp
+   77c42:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+   77c47:	c5 79 7f 45 c0       	vmovdqa %xmm8,-0x40(%rbp)
+   77c4c:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
+   77c51:	33 c0                	xor    %eax,%eax
+   77c53:	48 89 45 e0          	mov    %rax,-0x20(%rbp)
+   77c57:	48 8d 3d fa 66 1d 00 	lea    0x1d66fa(%rip),%rdi        # 24e358 <__Str_Testing_GetIndicesStreamPrefet_DFEC981FE3992F56C08A364E99D8E9725ED1C914578F7F525692F9A2069E1387>
+   77c5e:	e8 cd 4d 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   77c63:	48 8b 1d be 3e 1b 00 	mov    0x1b3ebe(%rip),%rbx        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77c6a:	4c 8b 7b 10          	mov    0x10(%rbx),%r15
+   77c6e:	41 8b 77 08          	mov    0x8(%r15),%esi
+   77c72:	48 8d 3d a7 d6 21 00 	lea    0x21d6a7(%rip),%rdi        # 295320 <_ZTV16__Array<UIntPtr>>
+   77c79:	e8 3c da fe ff       	call   656ba <RhpNewArray>
+   77c7e:	4c 8b f0             	mov    %rax,%r14
+   77c81:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
+   77c85:	4d 85 ff             	test   %r15,%r15
+   77c88:	75 06                	jne    77c90 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x60>
+   77c8a:	33 f6                	xor    %esi,%esi
+   77c8c:	33 d2                	xor    %edx,%edx
+   77c8e:	eb 08                	jmp    77c98 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x68>
+   77c90:	49 8d 77 10          	lea    0x10(%r15),%rsi
+   77c94:	41 8b 57 08          	mov    0x8(%r15),%edx
+   77c98:	49 8d 4e 10          	lea    0x10(%r14),%rcx
+   77c9c:	45 8b 46 08          	mov    0x8(%r14),%r8d
+   77ca0:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
+   77ca4:	74 0d                	je     77cb3 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x83>
+   77ca6:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   77cac:	e8 8f d3 08 00       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+   77cb1:	eb 0b                	jmp    77cbe <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x8e>
+   77cb3:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   77cb9:	e8 22 d7 08 00       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+   77cbe:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
+   77cc2:	48 8b 4b 10          	mov    0x10(%rbx),%rcx
+   77cc6:	48 85 c9             	test   %rcx,%rcx
+   77cc9:	75 06                	jne    77cd1 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xa1>
+   77ccb:	33 f6                	xor    %esi,%esi
+   77ccd:	33 d2                	xor    %edx,%edx
+   77ccf:	eb 07                	jmp    77cd8 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xa8>
+   77cd1:	48 8d 71 10          	lea    0x10(%rcx),%rsi
+   77cd5:	8b 51 08             	mov    0x8(%rcx),%edx
+   77cd8:	49 8d 4e 10          	lea    0x10(%r14),%rcx
+   77cdc:	45 8b 46 08          	mov    0x8(%r14),%r8d
+   77ce0:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
+   77ce4:	74 0a                	je     77cf0 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xc0>
+   77ce6:	45 33 c9             	xor    %r9d,%r9d
+   77ce9:	e8 52 d3 08 00       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+   77cee:	eb 08                	jmp    77cf8 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0xc8>
+   77cf0:	45 33 c9             	xor    %r9d,%r9d
+   77cf3:	e8 e8 d6 08 00       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+   77cf8:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
+   77cfc:	be 22 00 00 00       	mov    $0x22,%esi
+   77d01:	ba 01 00 00 00       	mov    $0x1,%edx
+   77d06:	e8 f5 94 04 00       	call   c1200 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler___ctor>
+   77d0b:	8b 7d d0             	mov    -0x30(%rbp),%edi
+   77d0e:	3b 7d e0             	cmp    -0x20(%rbp),%edi
+   77d11:	0f 87 cd 00 00 00    	ja     77de4 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x1b4>
+   77d17:	48 8b 75 d8          	mov    -0x28(%rbp),%rsi
+   77d1b:	8b c7                	mov    %edi,%eax
+   77d1d:	48 8d 34 46          	lea    (%rsi,%rax,2),%rsi
+   77d21:	8b 45 e0             	mov    -0x20(%rbp),%eax
+   77d24:	2b c7                	sub    %edi,%eax
+   77d26:	83 f8 0c             	cmp    $0xc,%eax
+   77d29:	72 28                	jb     77d53 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x123>
+   77d2b:	48 8d 3d e6 a4 1c 00 	lea    0x1ca4e6(%rip),%rdi        # 242218 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
+   77d32:	48 83 c7 0c          	add    $0xc,%rdi
+   77d36:	c5 fa 6f 07          	vmovdqu (%rdi),%xmm0
+   77d3a:	c5 fa 6f 4f 08       	vmovdqu 0x8(%rdi),%xmm1
+   77d3f:	c5 fa 7f 06          	vmovdqu %xmm0,(%rsi)
+   77d43:	c5 fa 7f 4e 08       	vmovdqu %xmm1,0x8(%rsi)
+   77d48:	8b 7d d0             	mov    -0x30(%rbp),%edi
+   77d4b:	83 c7 0c             	add    $0xc,%edi
+   77d4e:	89 7d d0             	mov    %edi,-0x30(%rbp)
+   77d51:	eb 10                	jmp    77d63 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x133>
+   77d53:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
+   77d57:	48 8d 35 ba a4 1c 00 	lea    0x1ca4ba(%rip),%rsi        # 242218 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
+   77d5e:	e8 7d 96 04 00       	call   c13e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
+   77d63:	48 8b 73 10          	mov    0x10(%rbx),%rsi
+   77d67:	8b 76 08             	mov    0x8(%rsi),%esi
+   77d6a:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
+   77d6e:	e8 ed be 0b 00       	call   133c60 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__AppendFormatted<Int32>>
+   77d73:	8b 7d d0             	mov    -0x30(%rbp),%edi
+   77d76:	3b 7d e0             	cmp    -0x20(%rbp),%edi
+   77d79:	77 69                	ja     77de4 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x1b4>
+   77d7b:	48 8b 75 d8          	mov    -0x28(%rbp),%rsi
+   77d7f:	8b c7                	mov    %edi,%eax
+   77d81:	48 8d 34 46          	lea    (%rsi,%rax,2),%rsi
+   77d85:	8b 45 e0             	mov    -0x20(%rbp),%eax
+   77d88:	2b c7                	sub    %edi,%eax
+   77d8a:	83 f8 16             	cmp    $0x16,%eax
+   77d8d:	72 28                	jb     77db7 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x187>
+   77d8f:	48 8d 3d 7a a9 1c 00 	lea    0x1ca97a(%rip),%rdi        # 242710 <__Str__keys_with_prefetching_7D74716B97304C78AC45626F98B1BB0F1083D62C00EA0EBE1B5AB87B36CE273A>
+   77d96:	48 83 c7 0c          	add    $0xc,%rdi
+   77d9a:	c5 fe 6f 07          	vmovdqu (%rdi),%ymm0
+   77d9e:	c5 fa 6f 4f 1c       	vmovdqu 0x1c(%rdi),%xmm1
+   77da3:	c5 fe 7f 06          	vmovdqu %ymm0,(%rsi)
+   77da7:	c5 fa 7f 4e 1c       	vmovdqu %xmm1,0x1c(%rsi)
+   77dac:	8b 7d d0             	mov    -0x30(%rbp),%edi
+   77daf:	83 c7 16             	add    $0x16,%edi
+   77db2:	89 7d d0             	mov    %edi,-0x30(%rbp)
+   77db5:	eb 10                	jmp    77dc7 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStreamPrefetch+0x197>
+   77db7:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
+   77dbb:	48 8d 35 4e a9 1c 00 	lea    0x1ca94e(%rip),%rsi        # 242710 <__Str__keys_with_prefetching_7D74716B97304C78AC45626F98B1BB0F1083D62C00EA0EBE1B5AB87B36CE273A>
+   77dc2:	e8 19 96 04 00       	call   c13e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
+   77dc7:	48 8d 7d c0          	lea    -0x40(%rbp),%rdi
+   77dcb:	e8 d0 94 04 00       	call   c12a0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__ToStringAndClear>
+   77dd0:	48 8b f8             	mov    %rax,%rdi
+   77dd3:	e8 58 4c 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   77dd8:	90                   	nop
+   77dd9:	48 83 c4 28          	add    $0x28,%rsp
+   77ddd:	5b                   	pop    %rbx
+   77dde:	41 5e                	pop    %r14
+   77de0:	41 5f                	pop    %r15
+   77de2:	5d                   	pop    %rbp
+   77de3:	c3                   	ret
+   77de4:	e8 37 ad 01 00       	call   92b20 <S_P_CoreLib_System_ThrowHelper__ThrowArgumentOutOfRangeException>
+   77de9:	cc                   	int3
+   77dea:	90                   	nop
+   77deb:	90                   	nop
+   77dec:	90                   	nop
+   77ded:	90                   	nop
+   77dee:	90                   	nop
+   77def:	90                   	nop
+   77df0:	90                   	nop
+   77df1:	90                   	nop
+   77df2:	90                   	nop
+   77df3:	90                   	nop
+   77df4:	90                   	nop
+   77df5:	90                   	nop
+   77df6:	90                   	nop
+   77df7:	90                   	nop
+   77df8:	90                   	nop
+   77df9:	90                   	nop
+   77dfa:	90                   	nop
+   77dfb:	90                   	nop
+   77dfc:	90                   	nop
+   77dfd:	90                   	nop
+   77dfe:	90                   	nop
+   77dff:	90                   	nop
 
-   7867a:	e8 81 bf 08 00       	call   104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
-   7867f:	eb 0e                	jmp    7868f <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x10f>
-   78681:	49 8b cc             	mov    %r12,%rcx
-   78684:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   7868a:	e8 d1 c4 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
-   7868f:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
-   78693:	4d 85 f6             	test   %r14,%r14
-   78696:	75 06                	jne    7869e <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x11e>
-   78698:	33 f6                	xor    %esi,%esi
-   7869a:	33 d2                	xor    %edx,%edx
-   7869c:	eb 08                	jmp    786a6 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x126>
-   7869e:	49 8d 76 10          	lea    0x10(%r14),%rsi
-   786a2:	41 8b 56 08          	mov    0x8(%r14),%edx
-   786a6:	4c 8b 7d d0          	mov    -0x30(%rbp),%r15
-   786aa:	49 83 c7 10          	add    $0x10,%r15
-   786ae:	49 8b cf             	mov    %r15,%rcx
-   786b1:	41 b8 00 02 00 00    	mov    $0x200,%r8d
-   786b7:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
-   786bb:	74 0d                	je     786ca <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x14a>
-   786bd:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   786c3:	e8 38 bf 08 00       	call   104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
-   786c8:	eb 0b                	jmp    786d5 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x155>
-   786ca:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   786d0:	e8 8b c4 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
-   786d5:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
-   786d9:	4d 85 ed             	test   %r13,%r13
-   786dc:	75 06                	jne    786e4 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x164>
-   786de:	33 f6                	xor    %esi,%esi
-   786e0:	33 d2                	xor    %edx,%edx
-   786e2:	eb 08                	jmp    786ec <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x16c>
-   786e4:	49 8d 75 10          	lea    0x10(%r13),%rsi
-   786e8:	41 8b 55 08          	mov    0x8(%r13),%edx
-   786ec:	48 8b 5d c8          	mov    -0x38(%rbp),%rbx
-   786f0:	48 83 c3 10          	add    $0x10,%rbx
-   786f4:	48 8b cb             	mov    %rbx,%rcx
-   786f7:	41 b8 00 10 00 00    	mov    $0x1000,%r8d
-   786fd:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
-   78701:	74 0d                	je     78710 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x190>
-   78703:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   78709:	e8 f2 be 08 00       	call   104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
-   7870e:	eb 0b                	jmp    7871b <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x19b>
-   78710:	41 b9 01 00 00 00    	mov    $0x1,%r9d
-   78716:	e8 45 c4 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
-   7871b:	48 8d 3d ae ef 1b 00 	lea    0x1befae(%rip),%rdi        # 2376d0 <__Str___Tested_prefetch_patterns_for_DE81E3DAF059C0B18D33D0B771E134E96E0008DA1110A965332E23E19D043BB8>
-   78722:	e8 29 40 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   78727:	90                   	nop
-   78728:	48 83 c4 18          	add    $0x18,%rsp
-   7872c:	5b                   	pop    %rbx
-   7872d:	41 5c                	pop    %r12
-   7872f:	41 5d                	pop    %r13
-   78731:	41 5e                	pop    %r14
-   78733:	41 5f                	pop    %r15
-   78735:	5d                   	pop    %rbp
-   78736:	c3                   	ret
-   78737:	bf 10 00 00 00       	mov    $0x10,%edi
-   7873c:	e8 4f 78 00 00       	call   7ff90 <System_Linq_System_Linq_ThrowHelper__ThrowArgumentNullException>
-   78741:	cc                   	int3
-   78742:	90                   	nop
-   78743:	90                   	nop
-   78744:	90                   	nop
-   78745:	90                   	nop
-   78746:	90                   	nop
-   78747:	90                   	nop
-   78748:	90                   	nop
-   78749:	90                   	nop
-   7874a:	90                   	nop
-   7874b:	90                   	nop
-   7874c:	90                   	nop
-   7874d:	90                   	nop
-   7874e:	90                   	nop
-   7874f:	90                   	nop
+   787fa:	e8 41 c8 08 00       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+   787ff:	eb 0e                	jmp    7880f <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x10f>
+   78801:	49 8b cc             	mov    %r12,%rcx
+   78804:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   7880a:	e8 d1 cb 08 00       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+   7880f:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
+   78813:	4d 85 f6             	test   %r14,%r14
+   78816:	75 06                	jne    7881e <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x11e>
+   78818:	33 f6                	xor    %esi,%esi
+   7881a:	33 d2                	xor    %edx,%edx
+   7881c:	eb 08                	jmp    78826 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x126>
+   7881e:	49 8d 76 10          	lea    0x10(%r14),%rsi
+   78822:	41 8b 56 08          	mov    0x8(%r14),%edx
+   78826:	4c 8b 7d d0          	mov    -0x30(%rbp),%r15
+   7882a:	49 83 c7 10          	add    $0x10,%r15
+   7882e:	49 8b cf             	mov    %r15,%rcx
+   78831:	41 b8 00 02 00 00    	mov    $0x200,%r8d
+   78837:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
+   7883b:	74 0d                	je     7884a <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x14a>
+   7883d:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   78843:	e8 f8 c7 08 00       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+   78848:	eb 0b                	jmp    78855 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x155>
+   7884a:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   78850:	e8 8b cb 08 00       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+   78855:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
+   78859:	4d 85 ed             	test   %r13,%r13
+   7885c:	75 06                	jne    78864 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x164>
+   7885e:	33 f6                	xor    %esi,%esi
+   78860:	33 d2                	xor    %edx,%edx
+   78862:	eb 08                	jmp    7886c <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x16c>
+   78864:	49 8d 75 10          	lea    0x10(%r13),%rsi
+   78868:	41 8b 55 08          	mov    0x8(%r13),%edx
+   7886c:	48 8b 5d c8          	mov    -0x38(%rbp),%rbx
+   78870:	48 83 c3 10          	add    $0x10,%rbx
+   78874:	48 8b cb             	mov    %rbx,%rcx
+   78877:	41 b8 00 10 00 00    	mov    $0x1000,%r8d
+   7887d:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
+   78881:	74 0d                	je     78890 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x190>
+   78883:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   78889:	e8 b2 c7 08 00       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+   7888e:	eb 0b                	jmp    7889b <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern+0x19b>
+   78890:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+   78896:	e8 45 cb 08 00       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+   7889b:	48 8d 3d 5e 9a 1c 00 	lea    0x1c9a5e(%rip),%rdi        # 242300 <__Str___Tested_prefetch_patterns_for_DE81E3DAF059C0B18D33D0B771E134E96E0008DA1110A965332E23E19D043BB8>
+   788a2:	e8 89 41 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   788a7:	90                   	nop
+   788a8:	48 83 c4 18          	add    $0x18,%rsp
+   788ac:	5b                   	pop    %rbx
+   788ad:	41 5c                	pop    %r12
+   788af:	41 5d                	pop    %r13
+   788b1:	41 5e                	pop    %r14
+   788b3:	41 5f                	pop    %r15
+   788b5:	5d                   	pop    %rbp
+   788b6:	c3                   	ret
+   788b7:	bf 10 00 00 00       	mov    $0x10,%edi
+   788bc:	e8 af 79 00 00       	call   80270 <System_Linq_System_Linq_ThrowHelper__ThrowArgumentNullException>
+   788c1:	cc                   	int3
+   788c2:	90                   	nop
+   788c3:	90                   	nop
+   788c4:	90                   	nop
+   788c5:	90                   	nop
+   788c6:	90                   	nop
+   788c7:	90                   	nop
+   788c8:	90                   	nop
+   788c9:	90                   	nop
+   788ca:	90                   	nop
+   788cb:	90                   	nop
+   788cc:	90                   	nop
+   788cd:	90                   	nop
+   788ce:	90                   	nop
+   788cf:	90                   	nop
 
-0000000000104600 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>:
-  104600:	55                   	push   %rbp
-  104601:	41 57                	push   %r15
-  104603:	41 56                	push   %r14
-  104605:	41 55                	push   %r13
-  104607:	41 54                	push   %r12
-  104609:	53                   	push   %rbx
-  10460a:	48 81 ec 08 01 00 00 	sub    $0x108,%rsp
-  104611:	c5 f8 77             	vzeroupper
-  104614:	48 8d ac 24 30 01 00 	lea    0x130(%rsp),%rbp
-  10461b:	00 
-  10461c:	33 c0                	xor    %eax,%eax
-  10461e:	48 89 45 c0          	mov    %rax,-0x40(%rbp)
-  104622:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
-  104626:	48 8b 05 e3 7d 0b 00 	mov    0xb7de3(%rip),%rax        # 1bc410 <__security_cookie>
-  10462d:	48 89 85 e0 fe ff ff 	mov    %rax,-0x120(%rbp)
-  104634:	48 8b df             	mov    %rdi,%rbx
-  104637:	44 8b fa             	mov    %edx,%r15d
-  10463a:	45 3b f8             	cmp    %r8d,%r15d
-  10463d:	0f 85 f2 04 00 00    	jne    104b35 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x535>
-  104643:	45 84 c9             	test   %r9b,%r9b
-  104646:	74 06                	je     10464e <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x4e>
-  104648:	0f b6 53 54          	movzbl 0x54(%rbx),%edx
-  10464c:	eb 02                	jmp    104650 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x50>
-  10464e:	33 d2                	xor    %edx,%edx
-  104650:	44 0f b6 f2          	movzbl %dl,%r14d
-  104654:	44 89 75 d4          	mov    %r14d,-0x2c(%rbp)
-  104658:	4c 8b 6b 38          	mov    0x38(%rbx),%r13
-  10465c:	4c 89 6d c8          	mov    %r13,-0x38(%rbp)
-  104660:	85 24 24             	test   %esp,(%rsp)
-  104663:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
-  10466a:	4c 8d 24 24          	lea    (%rsp),%r12
-  10466e:	85 24 24             	test   %esp,(%rsp)
-  104671:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
-  104678:	48 8d 04 24          	lea    (%rsp),%rax
-  10467c:	4c 8b c6             	mov    %rsi,%r8
-  10467f:	4c 89 85 f0 fe ff ff 	mov    %r8,-0x110(%rbp)
-  104686:	48 89 8d e8 fe ff ff 	mov    %rcx,-0x118(%rbp)
-  10468d:	4c 89 65 c0          	mov    %r12,-0x40(%rbp)
-  104691:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
-  104695:	48 89 45 b8          	mov    %rax,-0x48(%rbp)
-  104699:	41 8b d7             	mov    %r15d,%edx
-  10469c:	bf 20 00 00 00       	mov    $0x20,%edi
-  1046a1:	83 fa 20             	cmp    $0x20,%edx
-  1046a4:	41 0f 4c ff          	cmovl  %r15d,%edi
-  1046a8:	89 7d ac             	mov    %edi,-0x54(%rbp)
-  1046ab:	8b f7                	mov    %edi,%esi
-  1046ad:	83 e6 fc             	and    $0xfffffffc,%esi
-  1046b0:	89 75 a8             	mov    %esi,-0x58(%rbp)
-  1046b3:	45 33 c9             	xor    %r9d,%r9d
-  1046b6:	85 f6                	test   %esi,%esi
-  1046b8:	0f 8e 6f 04 00 00    	jle    104b2d <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x52d>
-  1046be:	4d 63 d1             	movslq %r9d,%r10
-  1046c1:	4b 8b 14 d0          	mov    (%r8,%r10,8),%rdx
-  1046c5:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
-  1046c9:	45 8d 59 01          	lea    0x1(%r9),%r11d
-  1046cd:	4d 63 db             	movslq %r11d,%r11
-  1046d0:	4b 8b 34 d8          	mov    (%r8,%r11,8),%rsi
-  1046d4:	48 89 75 98          	mov    %rsi,-0x68(%rbp)
-  1046d8:	41 8d 79 02          	lea    0x2(%r9),%edi
-  1046dc:	48 63 ff             	movslq %edi,%rdi
-  1046df:	49 8b 34 f8          	mov    (%r8,%rdi,8),%rsi
-  1046e3:	48 89 75 90          	mov    %rsi,-0x70(%rbp)
-  1046e7:	41 8d 71 03          	lea    0x3(%r9),%esi
-  1046eb:	48 63 f6             	movslq %esi,%rsi
-  1046ee:	49 8b 14 f0          	mov    (%r8,%rsi,8),%rdx
-  1046f2:	48 89 55 88          	mov    %rdx,-0x78(%rbp)
-  1046f6:	48 8b 55 a0          	mov    -0x60(%rbp),%rdx
-  1046fa:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  1046fe:	48 89 95 00 ff ff ff 	mov    %rdx,-0x100(%rbp)
-  104705:	48 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdx
-  10470c:	c1 7c 51 
-  10470f:	48 89 95 d8 fe ff ff 	mov    %rdx,-0x128(%rbp)
-  104716:	4c 8d ad 78 ff ff ff 	lea    -0x88(%rbp),%r13
-  10471d:	48 8b 95 00 ff ff ff 	mov    -0x100(%rbp),%rdx
-  104724:	4c 8b b5 d8 fe ff ff 	mov    -0x128(%rbp),%r14
-  10472b:	c4 c2 f3 f6 d6       	mulx   %r14,%rcx,%rdx
-  104730:	49 89 4d 00          	mov    %rcx,0x0(%r13)
-  104734:	48 8b 8d 78 ff ff ff 	mov    -0x88(%rbp),%rcx
-  10473b:	48 33 d1             	xor    %rcx,%rdx
-  10473e:	49 0f af d6          	imul   %r14,%rdx
-  104742:	4b 89 14 d4          	mov    %rdx,(%r12,%r10,8)
-  104746:	48 8b 55 98          	mov    -0x68(%rbp),%rdx
-  10474a:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  10474e:	48 8d 8d 70 ff ff ff 	lea    -0x90(%rbp),%rcx
-  104755:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
-  10475a:	4c 89 29             	mov    %r13,(%rcx)
-  10475d:	48 8b 8d 70 ff ff ff 	mov    -0x90(%rbp),%rcx
-  104764:	48 33 d1             	xor    %rcx,%rdx
-  104767:	49 0f af d6          	imul   %r14,%rdx
-  10476b:	4b 89 14 dc          	mov    %rdx,(%r12,%r11,8)
-  10476f:	48 8b 55 90          	mov    -0x70(%rbp),%rdx
-  104773:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  104777:	48 8d 8d 68 ff ff ff 	lea    -0x98(%rbp),%rcx
-  10477e:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
-  104783:	4c 89 29             	mov    %r13,(%rcx)
-  104786:	48 8b 8d 68 ff ff ff 	mov    -0x98(%rbp),%rcx
-  10478d:	48 33 d1             	xor    %rcx,%rdx
-  104790:	49 0f af d6          	imul   %r14,%rdx
-  104794:	49 89 14 fc          	mov    %rdx,(%r12,%rdi,8)
-  104798:	48 8b 55 88          	mov    -0x78(%rbp),%rdx
-  10479c:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  1047a0:	48 8d 8d 60 ff ff ff 	lea    -0xa0(%rbp),%rcx
-  1047a7:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
-  1047ac:	4c 89 29             	mov    %r13,(%rcx)
-  1047af:	48 8b 8d 60 ff ff ff 	mov    -0xa0(%rbp),%rcx
-  1047b6:	48 33 d1             	xor    %rcx,%rdx
-  1047b9:	49 0f af d6          	imul   %r14,%rdx
-  1047bd:	49 89 14 f4          	mov    %rdx,(%r12,%rsi,8)
-  1047c1:	4b 8b 0c d4          	mov    (%r12,%r10,8),%rcx
-  1047c5:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  1047c9:	4c 8d b5 58 ff ff ff 	lea    -0xa8(%rbp),%r14
-  1047d0:	c4 e2 93 f6 d1       	mulx   %rcx,%r13,%rdx
-  1047d5:	4d 89 2e             	mov    %r13,(%r14)
-  1047d8:	4a 89 14 d0          	mov    %rdx,(%rax,%r10,8)
-  1047dc:	4b 8b 0c dc          	mov    (%r12,%r11,8),%rcx
-  1047e0:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  1047e4:	4c 8d b5 50 ff ff ff 	lea    -0xb0(%rbp),%r14
-  1047eb:	c4 e2 93 f6 d1       	mulx   %rcx,%r13,%rdx
-  1047f0:	4d 89 2e             	mov    %r13,(%r14)
-  1047f3:	4a 89 14 d8          	mov    %rdx,(%rax,%r11,8)
-  1047f7:	49 8b 0c fc          	mov    (%r12,%rdi,8),%rcx
-  1047fb:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  1047ff:	4c 8d b5 48 ff ff ff 	lea    -0xb8(%rbp),%r14
-  104806:	c4 e2 93 f6 d1       	mulx   %rcx,%r13,%rdx
-  10480b:	4d 89 2e             	mov    %r13,(%r14)
-  10480e:	48 89 14 f8          	mov    %rdx,(%rax,%rdi,8)
-  104812:	49 8b 0c f4          	mov    (%r12,%rsi,8),%rcx
-  104816:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  10481a:	4c 8d b5 40 ff ff ff 	lea    -0xc0(%rbp),%r14
-  104821:	c4 e2 93 f6 d1       	mulx   %rcx,%r13,%rdx
-  104826:	4d 89 2e             	mov    %r13,(%r14)
-  104829:	48 89 14 f0          	mov    %rdx,(%rax,%rsi,8)
-  10482d:	48 8b 53 08          	mov    0x8(%rbx),%rdx
-  104831:	48 8b ca             	mov    %rdx,%rcx
-  104834:	4a 03 0c d0          	add    (%rax,%r10,8),%rcx
-  104838:	0f 18 09             	prefetcht0 (%rcx)
-  10483b:	48 8b ca             	mov    %rdx,%rcx
-  10483e:	4a 03 0c d8          	add    (%rax,%r11,8),%rcx
-  104842:	0f 18 09             	prefetcht0 (%rcx)
-  104845:	48 8b ca             	mov    %rdx,%rcx
-  104848:	48 03 0c f8          	add    (%rax,%rdi,8),%rcx
-  10484c:	0f 18 09             	prefetcht0 (%rcx)
-  10484f:	48 03 14 f0          	add    (%rax,%rsi,8),%rdx
-  104853:	0f 18 0a             	prefetcht0 (%rdx)
-  104856:	41 83 c1 04          	add    $0x4,%r9d
-  10485a:	8b 75 a8             	mov    -0x58(%rbp),%esi
-  10485d:	44 3b ce             	cmp    %esi,%r9d
-  104860:	0f 8c c2 02 00 00    	jl     104b28 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x528>
-  104866:	8b 7d ac             	mov    -0x54(%rbp),%edi
-  104869:	3b f7                	cmp    %edi,%esi
-  10486b:	7d 6c                	jge    1048d9 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x2d9>
-  10486d:	48 63 ce             	movslq %esi,%rcx
-  104870:	49 8b 14 c8          	mov    (%r8,%rcx,8),%rdx
-  104874:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  104878:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
-  10487f:	c1 7c 51 
-  104882:	4c 8d 95 38 ff ff ff 	lea    -0xc8(%rbp),%r10
-  104889:	c4 c2 a3 f6 d1       	mulx   %r9,%r11,%rdx
-  10488e:	4d 89 1a             	mov    %r11,(%r10)
-  104891:	4c 8b 8d 38 ff ff ff 	mov    -0xc8(%rbp),%r9
-  104898:	49 33 d1             	xor    %r9,%rdx
-  10489b:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
-  1048a2:	c1 7c 51 
-  1048a5:	49 0f af d1          	imul   %r9,%rdx
-  1048a9:	49 89 14 cc          	mov    %rdx,(%r12,%rcx,8)
-  1048ad:	4d 8b 0c cc          	mov    (%r12,%rcx,8),%r9
-  1048b1:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  1048b5:	4c 8d 95 30 ff ff ff 	lea    -0xd0(%rbp),%r10
-  1048bc:	c4 c2 a3 f6 d1       	mulx   %r9,%r11,%rdx
-  1048c1:	4d 89 1a             	mov    %r11,(%r10)
-  1048c4:	48 89 14 c8          	mov    %rdx,(%rax,%rcx,8)
-  1048c8:	48 8b 53 08          	mov    0x8(%rbx),%rdx
-  1048cc:	48 03 14 c8          	add    (%rax,%rcx,8),%rdx
-  1048d0:	0f 18 0a             	prefetcht0 (%rdx)
-  1048d3:	ff c6                	inc    %esi
-  1048d5:	3b f7                	cmp    %edi,%esi
-  1048d7:	7c 94                	jl     10486d <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x26d>
-  1048d9:	83 ff 20             	cmp    $0x20,%edi
-  1048dc:	7d 19                	jge    1048f7 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x2f7>
-  1048de:	66 90                	xchg   %ax,%ax
-  1048e0:	48 63 d7             	movslq %edi,%rdx
-  1048e3:	33 f6                	xor    %esi,%esi
-  1048e5:	49 89 34 d4          	mov    %rsi,(%r12,%rdx,8)
-  1048e9:	48 63 d7             	movslq %edi,%rdx
-  1048ec:	48 89 34 d0          	mov    %rsi,(%rax,%rdx,8)
-  1048f0:	ff c7                	inc    %edi
-  1048f2:	83 ff 20             	cmp    $0x20,%edi
-  1048f5:	7c e9                	jl     1048e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x2e0>
-  1048f7:	45 33 f6             	xor    %r14d,%r14d
-  1048fa:	41 8d 57 e0          	lea    -0x20(%r15),%edx
-  1048fe:	45 33 ed             	xor    %r13d,%r13d
-  104901:	85 d2                	test   %edx,%edx
-  104903:	44 0f 4f ea          	cmovg  %edx,%r13d
-  104907:	45 85 ed             	test   %r13d,%r13d
-  10490a:	0f 8e 13 02 00 00    	jle    104b23 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x523>
-  104910:	41 8b d6             	mov    %r14d,%edx
-  104913:	c1 fa 1f             	sar    $0x1f,%edx
-  104916:	83 e2 1f             	and    $0x1f,%edx
-  104919:	41 03 d6             	add    %r14d,%edx
-  10491c:	83 e2 e0             	and    $0xffffffe0,%edx
-  10491f:	41 8b fe             	mov    %r14d,%edi
-  104922:	2b fa                	sub    %edx,%edi
-  104924:	48 63 cf             	movslq %edi,%rcx
-  104927:	48 89 8d f8 fe ff ff 	mov    %rcx,-0x108(%rbp)
-  10492e:	4d 8b 0c cc          	mov    (%r12,%rcx,8),%r9
-  104932:	4c 89 8d 08 ff ff ff 	mov    %r9,-0xf8(%rbp)
-  104939:	4c 8b 14 c8          	mov    (%rax,%rcx,8),%r10
-  10493d:	4c 89 55 80          	mov    %r10,-0x80(%rbp)
-  104941:	41 8d 56 20          	lea    0x20(%r14),%edx
-  104945:	48 63 d2             	movslq %edx,%rdx
-  104948:	49 8b 14 d0          	mov    (%r8,%rdx,8),%rdx
-  10494c:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  104950:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  104957:	c1 7c 51 
-  10495a:	48 8d b5 28 ff ff ff 	lea    -0xd8(%rbp),%rsi
-  104961:	c4 e2 a3 f6 d7       	mulx   %rdi,%r11,%rdx
-  104966:	4c 89 1e             	mov    %r11,(%rsi)
-  104969:	48 8b bd 28 ff ff ff 	mov    -0xd8(%rbp),%rdi
-  104970:	48 33 d7             	xor    %rdi,%rdx
-  104973:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  10497a:	c1 7c 51 
-  10497d:	48 0f af d7          	imul   %rdi,%rdx
-  104981:	49 89 14 cc          	mov    %rdx,(%r12,%rcx,8)
-  104985:	49 8b 3c cc          	mov    (%r12,%rcx,8),%rdi
-  104989:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  10498d:	48 8d b5 20 ff ff ff 	lea    -0xe0(%rbp),%rsi
-  104994:	c4 e2 a3 f6 d7       	mulx   %rdi,%r11,%rdx
-  104999:	4c 89 1e             	mov    %r11,(%rsi)
-  10499c:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
-  1049a0:	c5 f8 11 85 10 ff ff 	vmovups %xmm0,-0xf0(%rbp)
-  1049a7:	ff 
-  1049a8:	48 8d bd 10 ff ff ff 	lea    -0xf0(%rbp),%rdi
-  1049af:	33 f6                	xor    %esi,%esi
-  1049b1:	e8 6a f4 f8 ff       	call   93e20 <S_P_CoreLib_System_UInt128___ctor>
-  1049b6:	48 8b bd 10 ff ff ff 	mov    -0xf0(%rbp),%rdi
-  1049bd:	48 8b b5 18 ff ff ff 	mov    -0xe8(%rbp),%rsi
-  1049c4:	e8 67 f4 f8 ff       	call   93e30 <S_P_CoreLib_System_UInt128__op_Explicit_14>
-  1049c9:	48 8b 4d b8          	mov    -0x48(%rbp),%rcx
-  1049cd:	48 8b b5 f8 fe ff ff 	mov    -0x108(%rbp),%rsi
-  1049d4:	48 89 04 f1          	mov    %rax,(%rcx,%rsi,8)
-  1049d8:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
-  1049dc:	48 8b c7             	mov    %rdi,%rax
-  1049df:	48 03 04 f1          	add    (%rcx,%rsi,8),%rax
-  1049e3:	0f 18 08             	prefetcht0 (%rax)
-  1049e6:	48 8b 75 80          	mov    -0x80(%rbp),%rsi
-  1049ea:	40 0f b6 34 37       	rex movzbl (%rdi,%rsi,1),%esi
-  1049ef:	48 8b fb             	mov    %rbx,%rdi
-  1049f2:	e8 49 f3 ff ff       	call   103d40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__HashPilot>
-  1049f7:	48 8b d0             	mov    %rax,%rdx
-  1049fa:	48 8b b5 08 ff ff ff 	mov    -0xf8(%rbp),%rsi
-  104a01:	48 8b fb             	mov    %rbx,%rdi
-  104a04:	e8 f7 f2 ff ff       	call   103d00 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__SlotInPartHp>
-  104a09:	48 8b d0             	mov    %rax,%rdx
-  104a0c:	83 7d d4 00          	cmpl   $0x0,-0x2c(%rbp)
-  104a10:	74 1f                	je     104a31 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x431>
-  104a12:	48 8b 4d c8          	mov    -0x38(%rbp),%rcx
-  104a16:	48 3b d1             	cmp    %rcx,%rdx
-  104a19:	0f 82 ff 00 00 00    	jb     104b1e <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x51e>
-  104a1f:	48 8b 7b 58          	mov    0x58(%rbx),%rdi
-  104a23:	48 8b 73 60          	mov    0x60(%rbx),%rsi
-  104a27:	2b d1                	sub    %ecx,%edx
-  104a29:	e8 f2 55 f7 ff       	call   7a020 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage__Index>
-  104a2e:	48 8b d0             	mov    %rax,%rdx
-  104a31:	49 63 f6             	movslq %r14d,%rsi
-  104a34:	48 8b 8d e8 fe ff ff 	mov    -0x118(%rbp),%rcx
-  104a3b:	48 89 14 f1          	mov    %rdx,(%rcx,%rsi,8)
-  104a3f:	41 ff c6             	inc    %r14d
-  104a42:	45 3b f5             	cmp    %r13d,%r14d
-  104a45:	4c 8b 85 f0 fe ff ff 	mov    -0x110(%rbp),%r8
-  104a4c:	0f 8c c3 00 00 00    	jl     104b15 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x515>
-  104a52:	45 3b f7             	cmp    %r15d,%r14d
-  104a55:	0f 8d 86 00 00 00    	jge    104ae1 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x4e1>
-  104a5b:	41 8b f6             	mov    %r14d,%esi
-  104a5e:	c1 fe 1f             	sar    $0x1f,%esi
-  104a61:	83 e6 1f             	and    $0x1f,%esi
-  104a64:	41 03 f6             	add    %r14d,%esi
-  104a67:	83 e6 e0             	and    $0xffffffe0,%esi
-  104a6a:	41 8b fe             	mov    %r14d,%edi
-  104a6d:	2b fe                	sub    %esi,%edi
-  104a6f:	48 63 f7             	movslq %edi,%rsi
-  104a72:	4d 8b 2c f4          	mov    (%r12,%rsi,8),%r13
-  104a76:	48 8b 73 08          	mov    0x8(%rbx),%rsi
-  104a7a:	48 63 ff             	movslq %edi,%rdi
-  104a7d:	48 8b 55 b8          	mov    -0x48(%rbp),%rdx
-  104a81:	48 8b 3c fa          	mov    (%rdx,%rdi,8),%rdi
-  104a85:	40 0f b6 34 3e       	rex movzbl (%rsi,%rdi,1),%esi
-  104a8a:	48 8b fb             	mov    %rbx,%rdi
-  104a8d:	e8 ae f2 ff ff       	call   103d40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__HashPilot>
-  104a92:	48 8b d0             	mov    %rax,%rdx
-  104a95:	49 8b f5             	mov    %r13,%rsi
-  104a98:	48 8b fb             	mov    %rbx,%rdi
-  104a9b:	e8 60 f2 ff ff       	call   103d00 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__SlotInPartHp>
-  104aa0:	48 8b d0             	mov    %rax,%rdx
-  104aa3:	44 8b 6d d4          	mov    -0x2c(%rbp),%r13d
-  104aa7:	45 85 ed             	test   %r13d,%r13d
-  104aaa:	74 1b                	je     104ac7 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x4c7>
-  104aac:	48 8b 45 c8          	mov    -0x38(%rbp),%rax
-  104ab0:	48 3b d0             	cmp    %rax,%rdx
-  104ab3:	72 5e                	jb     104b13 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x513>
-  104ab5:	48 8b 7b 58          	mov    0x58(%rbx),%rdi
-  104ab9:	48 8b 73 60          	mov    0x60(%rbx),%rsi
-  104abd:	2b d0                	sub    %eax,%edx
-  104abf:	e8 5c 55 f7 ff       	call   7a020 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage__Index>
-  104ac4:	48 8b d0             	mov    %rax,%rdx
-  104ac7:	49 63 fe             	movslq %r14d,%rdi
-  104aca:	48 8b 8d e8 fe ff ff 	mov    -0x118(%rbp),%rcx
-  104ad1:	48 89 14 f9          	mov    %rdx,(%rcx,%rdi,8)
-  104ad5:	41 ff c6             	inc    %r14d
-  104ad8:	45 3b f7             	cmp    %r15d,%r14d
-  104adb:	0f 8c 7a ff ff ff    	jl     104a5b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x45b>
-  104ae1:	33 ff                	xor    %edi,%edi
-  104ae3:	48 89 7d b0          	mov    %rdi,-0x50(%rbp)
-  104ae7:	48 89 7d c0          	mov    %rdi,-0x40(%rbp)
-  104aeb:	48 8d 3d 1e 79 0b 00 	lea    0xb791e(%rip),%rdi        # 1bc410 <__security_cookie>
-  104af2:	48 8b 3f             	mov    (%rdi),%rdi
-  104af5:	48 39 bd e0 fe ff ff 	cmp    %rdi,-0x120(%rbp)
-  104afc:	74 05                	je     104b03 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x503>
-  104afe:	e8 fd 53 f0 ff       	call   9f00 <RhpFallbackFailFast>
-  104b03:	90                   	nop
-  104b04:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
-  104b08:	5b                   	pop    %rbx
-  104b09:	41 5c                	pop    %r12
-  104b0b:	41 5d                	pop    %r13
-  104b0d:	41 5e                	pop    %r14
-  104b0f:	41 5f                	pop    %r15
-  104b11:	5d                   	pop    %rbp
-  104b12:	c3                   	ret
-  104b13:	eb b2                	jmp    104ac7 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x4c7>
-  104b15:	48 8b 45 b8          	mov    -0x48(%rbp),%rax
-  104b19:	e9 f2 fd ff ff       	jmp    104910 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x310>
-  104b1e:	e9 0e ff ff ff       	jmp    104a31 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x431>
-  104b23:	e9 2a ff ff ff       	jmp    104a52 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x452>
-  104b28:	e9 91 fb ff ff       	jmp    1046be <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0xbe>
-  104b2d:	8b 75 a8             	mov    -0x58(%rbp),%esi
-  104b30:	e9 31 fd ff ff       	jmp    104866 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x266>
-  104b35:	48 8d 3d 9c d2 14 00 	lea    0x14d29c(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-  104b3c:	e8 d3 09 f6 ff       	call   65514 <RhpNewFast>
-  104b41:	48 8b d8             	mov    %rax,%rbx
-  104b44:	48 8b fb             	mov    %rbx,%rdi
-  104b47:	48 8d 35 72 a9 13 00 	lea    0x13a972(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-  104b4e:	e8 1d 61 f8 ff       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-  104b53:	48 8b fb             	mov    %rbx,%rdi
-  104b56:	e8 23 0c f6 ff       	call   6577e <RhpThrowEx>
-  104b5b:	cc                   	int3
-  104b5c:	90                   	nop
-  104b5d:	90                   	nop
-  104b5e:	90                   	nop
+0000000000105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>:
+  105040:	55                   	push   %rbp
+  105041:	41 57                	push   %r15
+  105043:	41 56                	push   %r14
+  105045:	41 55                	push   %r13
+  105047:	41 54                	push   %r12
+  105049:	53                   	push   %rbx
+  10504a:	48 83 ec 68          	sub    $0x68,%rsp
+  10504e:	c5 f8 77             	vzeroupper
+  105051:	48 8d ac 24 90 00 00 	lea    0x90(%rsp),%rbp
+  105058:	00 
+  105059:	33 c0                	xor    %eax,%eax
+  10505b:	48 89 45 88          	mov    %rax,-0x78(%rbp)
+  10505f:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  105064:	c5 79 7f 45 90       	vmovdqa %xmm8,-0x70(%rbp)
+  105069:	c5 79 7f 45 a0       	vmovdqa %xmm8,-0x60(%rbp)
+  10506e:	c5 79 7f 45 b0       	vmovdqa %xmm8,-0x50(%rbp)
+  105073:	c5 79 7f 45 c0       	vmovdqa %xmm8,-0x40(%rbp)
+  105078:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
+  10507c:	48 8b 05 fd e5 0b 00 	mov    0xbe5fd(%rip),%rax        # 1c3680 <__security_cookie>
+  105083:	48 89 85 70 ff ff ff 	mov    %rax,-0x90(%rbp)
+  10508a:	41 3b d0             	cmp    %r8d,%edx
+  10508d:	0f 85 24 03 00 00    	jne    1053b7 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x377>
+  105093:	45 84 c9             	test   %r9b,%r9b
+  105096:	74 06                	je     10509e <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x5e>
+  105098:	0f b6 47 54          	movzbl 0x54(%rdi),%eax
+  10509c:	eb 02                	jmp    1050a0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x60>
+  10509e:	33 c0                	xor    %eax,%eax
+  1050a0:	0f b6 c0             	movzbl %al,%eax
+  1050a3:	4c 8b 47 38          	mov    0x38(%rdi),%r8
+  1050a7:	85 24 24             	test   %esp,(%rsp)
+  1050aa:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
+  1050b1:	4c 8d 0c 24          	lea    (%rsp),%r9
+  1050b5:	c5 fc 57 c0          	vxorps %ymm0,%ymm0,%ymm0
+  1050b9:	62 d1 7e 48 7f 01    	vmovdqu32 %zmm0,(%r9)
+  1050bf:	62 d1 7e 48 7f 41 01 	vmovdqu32 %zmm0,0x40(%r9)
+  1050c6:	62 d1 7e 48 7f 41 02 	vmovdqu32 %zmm0,0x80(%r9)
+  1050cd:	62 d1 7e 48 7f 41 03 	vmovdqu32 %zmm0,0xc0(%r9)
+  1050d4:	85 24 24             	test   %esp,(%rsp)
+  1050d7:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
+  1050de:	4c 8d 14 24          	lea    (%rsp),%r10
+  1050e2:	c5 fc 57 c0          	vxorps %ymm0,%ymm0,%ymm0
+  1050e6:	62 d1 7e 48 7f 02    	vmovdqu32 %zmm0,(%r10)
+  1050ec:	62 d1 7e 48 7f 42 01 	vmovdqu32 %zmm0,0x40(%r10)
+  1050f3:	62 d1 7e 48 7f 42 02 	vmovdqu32 %zmm0,0x80(%r10)
+  1050fa:	62 d1 7e 48 7f 42 03 	vmovdqu32 %zmm0,0xc0(%r10)
+  105101:	4c 89 4d d0          	mov    %r9,-0x30(%rbp)
+  105105:	4c 89 55 c8          	mov    %r10,-0x38(%rbp)
+  105109:	44 8b da             	mov    %edx,%r11d
+  10510c:	bb 20 00 00 00       	mov    $0x20,%ebx
+  105111:	41 83 fb 20          	cmp    $0x20,%r11d
+  105115:	89 55 84             	mov    %edx,-0x7c(%rbp)
+  105118:	0f 4c da             	cmovl  %edx,%ebx
+  10511b:	89 5d c4             	mov    %ebx,-0x3c(%rbp)
+  10511e:	45 33 db             	xor    %r11d,%r11d
+  105121:	85 db                	test   %ebx,%ebx
+  105123:	0f 8e 86 02 00 00    	jle    1053af <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x36f>
+  105129:	4d 63 fb             	movslq %r11d,%r15
+  10512c:	4e 8b 34 fe          	mov    (%rsi,%r15,8),%r14
+  105130:	4c 33 77 48          	xor    0x48(%rdi),%r14
+  105134:	49 bd 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r13
+  10513b:	c1 7c 51 
+  10513e:	4c 8d 65 b0          	lea    -0x50(%rbp),%r12
+  105142:	49 8b d6             	mov    %r14,%rdx
+  105145:	c4 c2 e3 f6 d5       	mulx   %r13,%rbx,%rdx
+  10514a:	49 89 1c 24          	mov    %rbx,(%r12)
+  10514e:	48 8b 5d b0          	mov    -0x50(%rbp),%rbx
+  105152:	48 33 d3             	xor    %rbx,%rdx
+  105155:	49 0f af d5          	imul   %r13,%rdx
+  105159:	4b 89 14 f9          	mov    %rdx,(%r9,%r15,8)
+  10515d:	4b 8b 1c f9          	mov    (%r9,%r15,8),%rbx
+  105161:	48 8b 57 70          	mov    0x70(%rdi),%rdx
+  105165:	4c 8d 75 a8          	lea    -0x58(%rbp),%r14
+  105169:	c4 e2 93 f6 d3       	mulx   %rbx,%r13,%rdx
+  10516e:	4d 89 2e             	mov    %r13,(%r14)
+  105171:	4b 89 14 fa          	mov    %rdx,(%r10,%r15,8)
+  105175:	48 8b 57 08          	mov    0x8(%rdi),%rdx
+  105179:	4b 03 14 fa          	add    (%r10,%r15,8),%rdx
+  10517d:	0f 18 0a             	prefetcht0 (%rdx)
+  105180:	41 ff c3             	inc    %r11d
+  105183:	8b 5d c4             	mov    -0x3c(%rbp),%ebx
+  105186:	44 3b db             	cmp    %ebx,%r11d
+  105189:	0f 8c 1b 02 00 00    	jl     1053aa <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x36a>
+  10518f:	83 fb 20             	cmp    $0x20,%ebx
+  105192:	7d 24                	jge    1051b8 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x178>
+  105194:	0f 1f 40 00          	nopl   0x0(%rax)
+  105198:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  10519f:	00 
+  1051a0:	48 63 d3             	movslq %ebx,%rdx
+  1051a3:	45 33 db             	xor    %r11d,%r11d
+  1051a6:	4d 89 1c d1          	mov    %r11,(%r9,%rdx,8)
+  1051aa:	48 63 d3             	movslq %ebx,%rdx
+  1051ad:	4d 89 1c d2          	mov    %r11,(%r10,%rdx,8)
+  1051b1:	ff c3                	inc    %ebx
+  1051b3:	83 fb 20             	cmp    $0x20,%ebx
+  1051b6:	7c e8                	jl     1051a0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x160>
+  1051b8:	45 33 db             	xor    %r11d,%r11d
+  1051bb:	8b 55 84             	mov    -0x7c(%rbp),%edx
+  1051be:	8d 5a e0             	lea    -0x20(%rdx),%ebx
+  1051c1:	45 33 ff             	xor    %r15d,%r15d
+  1051c4:	85 db                	test   %ebx,%ebx
+  1051c6:	44 0f 4f fb          	cmovg  %ebx,%r15d
+  1051ca:	44 89 7d c0          	mov    %r15d,-0x40(%rbp)
+  1051ce:	45 85 ff             	test   %r15d,%r15d
+  1051d1:	0f 8e 06 01 00 00    	jle    1052dd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x29d>
+  1051d7:	48 8d 9f 80 00 00 00 	lea    0x80(%rdi),%rbx
+  1051de:	45 8b f3             	mov    %r11d,%r14d
+  1051e1:	41 c1 fe 1f          	sar    $0x1f,%r14d
+  1051e5:	41 83 e6 1f          	and    $0x1f,%r14d
+  1051e9:	45 03 f3             	add    %r11d,%r14d
+  1051ec:	41 83 e6 e0          	and    $0xffffffe0,%r14d
+  1051f0:	45 8b eb             	mov    %r11d,%r13d
+  1051f3:	45 2b ee             	sub    %r14d,%r13d
+  1051f6:	4d 63 f5             	movslq %r13d,%r14
+  1051f9:	4f 8b 2c f1          	mov    (%r9,%r14,8),%r13
+  1051fd:	4c 89 ad 78 ff ff ff 	mov    %r13,-0x88(%rbp)
+  105204:	4f 8b 24 f2          	mov    (%r10,%r14,8),%r12
+  105208:	4c 89 65 b8          	mov    %r12,-0x48(%rbp)
+  10520c:	41 8d 53 20          	lea    0x20(%r11),%edx
+  105210:	48 63 d2             	movslq %edx,%rdx
+  105213:	48 8b 14 d6          	mov    (%rsi,%rdx,8),%rdx
+  105217:	48 33 57 48          	xor    0x48(%rdi),%rdx
+  10521b:	49 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r15
+  105222:	c1 7c 51 
+  105225:	4c 8d 6d a0          	lea    -0x60(%rbp),%r13
+  105229:	c4 c2 9b f6 d7       	mulx   %r15,%r12,%rdx
+  10522e:	4d 89 65 00          	mov    %r12,0x0(%r13)
+  105232:	4c 8b 7d a0          	mov    -0x60(%rbp),%r15
+  105236:	49 33 d7             	xor    %r15,%rdx
+  105239:	49 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r15
+  105240:	c1 7c 51 
+  105243:	49 0f af d7          	imul   %r15,%rdx
+  105247:	4b 89 14 f1          	mov    %rdx,(%r9,%r14,8)
+  10524b:	4f 8b 3c f1          	mov    (%r9,%r14,8),%r15
+  10524f:	48 8b 57 70          	mov    0x70(%rdi),%rdx
+  105253:	4c 8d 6d 98          	lea    -0x68(%rbp),%r13
+  105257:	c4 c2 9b f6 d7       	mulx   %r15,%r12,%rdx
+  10525c:	4d 89 65 00          	mov    %r12,0x0(%r13)
+  105260:	4b 89 14 f2          	mov    %rdx,(%r10,%r14,8)
+  105264:	48 8b 57 08          	mov    0x8(%rdi),%rdx
+  105268:	4c 8b fa             	mov    %rdx,%r15
+  10526b:	4f 03 3c f2          	add    (%r10,%r14,8),%r15
+  10526f:	41 0f 18 0f          	prefetcht0 (%r15)
+  105273:	4c 8b 65 b8          	mov    -0x48(%rbp),%r12
+  105277:	42 0f b6 14 22       	movzbl (%rdx,%r12,1),%edx
+  10527c:	48 33 57 48          	xor    0x48(%rdi),%rdx
+  105280:	49 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r15
+  105287:	c1 7c 51 
+  10528a:	49 0f af d7          	imul   %r15,%rdx
+  10528e:	4c 8b fb             	mov    %rbx,%r15
+  105291:	4c 8b ad 78 ff ff ff 	mov    -0x88(%rbp),%r13
+  105298:	49 33 d5             	xor    %r13,%rdx
+  10529b:	49 0f af 57 08       	imul   0x8(%r15),%rdx
+  1052a0:	4d 8b 3f             	mov    (%r15),%r15
+  1052a3:	4c 8d 75 90          	lea    -0x70(%rbp),%r14
+  1052a7:	c4 c2 93 f6 d7       	mulx   %r15,%r13,%rdx
+  1052ac:	4d 89 2e             	mov    %r13,(%r14)
+  1052af:	85 c0                	test   %eax,%eax
+  1052b1:	74 13                	je     1052c6 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x286>
+  1052b3:	49 3b d0             	cmp    %r8,%rdx
+  1052b6:	72 0e                	jb     1052c6 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x286>
+  1052b8:	4c 8b 7f 58          	mov    0x58(%rdi),%r15
+  1052bc:	41 2b d0             	sub    %r8d,%edx
+  1052bf:	48 63 d2             	movslq %edx,%rdx
+  1052c2:	41 8b 14 97          	mov    (%r15,%rdx,4),%edx
+  1052c6:	4d 63 fb             	movslq %r11d,%r15
+  1052c9:	4a 89 14 f9          	mov    %rdx,(%rcx,%r15,8)
+  1052cd:	41 ff c3             	inc    %r11d
+  1052d0:	44 8b 7d c0          	mov    -0x40(%rbp),%r15d
+  1052d4:	45 3b df             	cmp    %r15d,%r11d
+  1052d7:	0f 8c 01 ff ff ff    	jl     1051de <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x19e>
+  1052dd:	44 3b 5d 84          	cmp    -0x7c(%rbp),%r11d
+  1052e1:	0f 8d 91 00 00 00    	jge    105378 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x338>
+  1052e7:	48 8d 9f 80 00 00 00 	lea    0x80(%rdi),%rbx
+  1052ee:	41 8b f3             	mov    %r11d,%esi
+  1052f1:	c1 fe 1f             	sar    $0x1f,%esi
+  1052f4:	83 e6 1f             	and    $0x1f,%esi
+  1052f7:	41 03 f3             	add    %r11d,%esi
+  1052fa:	83 e6 e0             	and    $0xffffffe0,%esi
+  1052fd:	45 8b fb             	mov    %r11d,%r15d
+  105300:	44 2b fe             	sub    %esi,%r15d
+  105303:	49 63 f7             	movslq %r15d,%rsi
+  105306:	49 8b 34 f1          	mov    (%r9,%rsi,8),%rsi
+  10530a:	4c 8b 77 08          	mov    0x8(%rdi),%r14
+  10530e:	4d 63 ff             	movslq %r15d,%r15
+  105311:	4f 8b 3c fa          	mov    (%r10,%r15,8),%r15
+  105315:	47 0f b6 3c 3e       	movzbl (%r14,%r15,1),%r15d
+  10531a:	4c 33 7f 48          	xor    0x48(%rdi),%r15
+  10531e:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
+  105325:	c1 7c 51 
+  105328:	4d 0f af fe          	imul   %r14,%r15
+  10532c:	4c 8b f3             	mov    %rbx,%r14
+  10532f:	49 33 f7             	xor    %r15,%rsi
+  105332:	49 0f af 76 08       	imul   0x8(%r14),%rsi
+  105337:	4d 8b 3e             	mov    (%r14),%r15
+  10533a:	4c 8d 75 88          	lea    -0x78(%rbp),%r14
+  10533e:	48 8b d6             	mov    %rsi,%rdx
+  105341:	c4 c2 93 f6 d7       	mulx   %r15,%r13,%rdx
+  105346:	4d 89 2e             	mov    %r13,(%r14)
+  105349:	85 c0                	test   %eax,%eax
+  10534b:	74 12                	je     10535f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x31f>
+  10534d:	49 3b d0             	cmp    %r8,%rdx
+  105350:	72 0d                	jb     10535f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x31f>
+  105352:	48 8b 77 58          	mov    0x58(%rdi),%rsi
+  105356:	41 2b d0             	sub    %r8d,%edx
+  105359:	48 63 d2             	movslq %edx,%rdx
+  10535c:	8b 14 96             	mov    (%rsi,%rdx,4),%edx
+  10535f:	49 63 f3             	movslq %r11d,%rsi
+  105362:	48 89 14 f1          	mov    %rdx,(%rcx,%rsi,8)
+  105366:	41 ff c3             	inc    %r11d
+  105369:	8b 55 84             	mov    -0x7c(%rbp),%edx
+  10536c:	44 3b da             	cmp    %edx,%r11d
+  10536f:	89 55 84             	mov    %edx,-0x7c(%rbp)
+  105372:	0f 8c 76 ff ff ff    	jl     1052ee <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x2ae>
+  105378:	33 ff                	xor    %edi,%edi
+  10537a:	48 89 7d c8          	mov    %rdi,-0x38(%rbp)
+  10537e:	48 89 7d d0          	mov    %rdi,-0x30(%rbp)
+  105382:	48 8d 3d f7 e2 0b 00 	lea    0xbe2f7(%rip),%rdi        # 1c3680 <__security_cookie>
+  105389:	48 8b 3f             	mov    (%rdi),%rdi
+  10538c:	48 39 bd 70 ff ff ff 	cmp    %rdi,-0x90(%rbp)
+  105393:	74 05                	je     10539a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x35a>
+  105395:	e8 f6 4b f0 ff       	call   9f90 <RhpFallbackFailFast>
+  10539a:	90                   	nop
+  10539b:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
+  10539f:	5b                   	pop    %rbx
+  1053a0:	41 5c                	pop    %r12
+  1053a2:	41 5d                	pop    %r13
+  1053a4:	41 5e                	pop    %r14
+  1053a6:	41 5f                	pop    %r15
+  1053a8:	5d                   	pop    %rbp
+  1053a9:	c3                   	ret
+  1053aa:	e9 7a fd ff ff       	jmp    105129 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0xe9>
+  1053af:	8b 5d c4             	mov    -0x3c(%rbp),%ebx
+  1053b2:	e9 d8 fd ff ff       	jmp    10518f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart+0x14f>
+  1053b7:	48 8d 3d 4a 7e 15 00 	lea    0x157e4a(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+  1053be:	e8 e1 01 f6 ff       	call   655a4 <RhpNewFast>
+  1053c3:	48 8b d8             	mov    %rax,%rbx
+  1053c6:	48 8b fb             	mov    %rbx,%rdi
+  1053c9:	48 8d 35 90 4d 14 00 	lea    0x144d90(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+  1053d0:	e8 7b 5b f8 ff       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+  1053d5:	48 8b fb             	mov    %rbx,%rdi
+  1053d8:	e8 31 04 f6 ff       	call   6580e <RhpThrowEx>
+  1053dd:	cc                   	int3
+  1053de:	90                   	nop
+  1053df:	90                   	nop
+
+00000000001053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>:
+  1053e0:	55                   	push   %rbp
+  1053e1:	41 57                	push   %r15
+  1053e3:	41 56                	push   %r14
+  1053e5:	41 55                	push   %r13
+  1053e7:	41 54                	push   %r12
+  1053e9:	53                   	push   %rbx
+  1053ea:	48 81 ec a8 00 00 00 	sub    $0xa8,%rsp
+  1053f1:	c5 f8 77             	vzeroupper
+  1053f4:	48 8d ac 24 d0 00 00 	lea    0xd0(%rsp),%rbp
+  1053fb:	00 
+  1053fc:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  105401:	c5 79 7f 85 60 ff ff 	vmovdqa %xmm8,-0xa0(%rbp)
+  105408:	ff 
+  105409:	48 b8 a0 ff ff ff ff 	movabs $0xffffffffffffffa0,%rax
+  105410:	ff ff ff 
+  105413:	c5 79 7f 44 05 d0    	vmovdqa %xmm8,-0x30(%rbp,%rax,1)
+  105419:	c5 79 7f 44 05 e0    	vmovdqa %xmm8,-0x20(%rbp,%rax,1)
+  10541f:	c5 79 7f 44 05 f0    	vmovdqa %xmm8,-0x10(%rbp,%rax,1)
+  105425:	48 83 c0 30          	add    $0x30,%rax
+  105429:	75 e8                	jne    105413 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x33>
+  10542b:	48 8b 05 4e e2 0b 00 	mov    0xbe24e(%rip),%rax        # 1c3680 <__security_cookie>
+  105432:	48 89 85 38 ff ff ff 	mov    %rax,-0xc8(%rbp)
+  105439:	41 3b d0             	cmp    %r8d,%edx
+  10543c:	0f 85 16 04 00 00    	jne    105858 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x478>
+  105442:	45 84 c9             	test   %r9b,%r9b
+  105445:	74 06                	je     10544d <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x6d>
+  105447:	0f b6 47 54          	movzbl 0x54(%rdi),%eax
+  10544b:	eb 02                	jmp    10544f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x6f>
+  10544d:	33 c0                	xor    %eax,%eax
+  10544f:	0f b6 c0             	movzbl %al,%eax
+  105452:	4c 8b 47 38          	mov    0x38(%rdi),%r8
+  105456:	4c 89 45 d0          	mov    %r8,-0x30(%rbp)
+  10545a:	85 24 24             	test   %esp,(%rsp)
+  10545d:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
+  105464:	4c 8d 0c 24          	lea    (%rsp),%r9
+  105468:	c5 fc 57 c0          	vxorps %ymm0,%ymm0,%ymm0
+  10546c:	62 d1 7e 48 7f 01    	vmovdqu32 %zmm0,(%r9)
+  105472:	62 d1 7e 48 7f 41 01 	vmovdqu32 %zmm0,0x40(%r9)
+  105479:	62 d1 7e 48 7f 41 02 	vmovdqu32 %zmm0,0x80(%r9)
+  105480:	62 d1 7e 48 7f 41 03 	vmovdqu32 %zmm0,0xc0(%r9)
+  105487:	85 24 24             	test   %esp,(%rsp)
+  10548a:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
+  105491:	4c 8d 14 24          	lea    (%rsp),%r10
+  105495:	c5 fc 57 c0          	vxorps %ymm0,%ymm0,%ymm0
+  105499:	62 d1 7e 48 7f 02    	vmovdqu32 %zmm0,(%r10)
+  10549f:	62 d1 7e 48 7f 42 01 	vmovdqu32 %zmm0,0x40(%r10)
+  1054a6:	62 d1 7e 48 7f 42 02 	vmovdqu32 %zmm0,0x80(%r10)
+  1054ad:	62 d1 7e 48 7f 42 03 	vmovdqu32 %zmm0,0xc0(%r10)
+  1054b4:	85 24 24             	test   %esp,(%rsp)
+  1054b7:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
+  1054be:	4c 8d 1c 24          	lea    (%rsp),%r11
+  1054c2:	c5 fc 57 c0          	vxorps %ymm0,%ymm0,%ymm0
+  1054c6:	62 d1 7e 48 7f 03    	vmovdqu32 %zmm0,(%r11)
+  1054cc:	62 d1 7e 48 7f 43 01 	vmovdqu32 %zmm0,0x40(%r11)
+  1054d3:	62 d1 7e 48 7f 43 02 	vmovdqu32 %zmm0,0x80(%r11)
+  1054da:	62 d1 7e 48 7f 43 03 	vmovdqu32 %zmm0,0xc0(%r11)
+  1054e1:	48 89 8d 40 ff ff ff 	mov    %rcx,-0xc0(%rbp)
+  1054e8:	4c 89 4d c8          	mov    %r9,-0x38(%rbp)
+  1054ec:	4c 89 55 c0          	mov    %r10,-0x40(%rbp)
+  1054f0:	4c 89 5d b8          	mov    %r11,-0x48(%rbp)
+  1054f4:	8b da                	mov    %edx,%ebx
+  1054f6:	41 bf 20 00 00 00    	mov    $0x20,%r15d
+  1054fc:	83 fb 20             	cmp    $0x20,%ebx
+  1054ff:	89 95 5c ff ff ff    	mov    %edx,-0xa4(%rbp)
+  105505:	44 0f 4c fa          	cmovl  %edx,%r15d
+  105509:	44 89 7d b4          	mov    %r15d,-0x4c(%rbp)
+  10550d:	33 db                	xor    %ebx,%ebx
+  10550f:	45 85 ff             	test   %r15d,%r15d
+  105512:	0f 8e 37 03 00 00    	jle    10584f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x46f>
+  105518:	4c 63 f3             	movslq %ebx,%r14
+  10551b:	4e 8b 2c f6          	mov    (%rsi,%r14,8),%r13
+  10551f:	4c 33 6f 48          	xor    0x48(%rdi),%r13
+  105523:	49 bc 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r12
+  10552a:	c1 7c 51 
+  10552d:	4c 8d 7d 98          	lea    -0x68(%rbp),%r15
+  105531:	49 8b d5             	mov    %r13,%rdx
+  105534:	c4 c2 f3 f6 d4       	mulx   %r12,%rcx,%rdx
+  105539:	49 89 0f             	mov    %rcx,(%r15)
+  10553c:	48 8b 4d 98          	mov    -0x68(%rbp),%rcx
+  105540:	48 33 d1             	xor    %rcx,%rdx
+  105543:	49 0f af d4          	imul   %r12,%rdx
+  105547:	4b 89 14 f1          	mov    %rdx,(%r9,%r14,8)
+  10554b:	4b 8b 0c f1          	mov    (%r9,%r14,8),%rcx
+  10554f:	48 8b 57 68          	mov    0x68(%rdi),%rdx
+  105553:	4c 8d 7d 90          	lea    -0x70(%rbp),%r15
+  105557:	c4 e2 93 f6 c9       	mulx   %rcx,%r13,%rcx
+  10555c:	4d 89 2f             	mov    %r13,(%r15)
+  10555f:	48 8b 55 90          	mov    -0x70(%rbp),%rdx
+  105563:	48 89 95 48 ff ff ff 	mov    %rdx,-0xb8(%rbp)
+  10556a:	4b 89 0c f3          	mov    %rcx,(%r11,%r14,8)
+  10556e:	4c 8b 7f 70          	mov    0x70(%rdi),%r15
+  105572:	4c 8d 6d 88          	lea    -0x78(%rbp),%r13
+  105576:	4c 8b a5 48 ff ff ff 	mov    -0xb8(%rbp),%r12
+  10557d:	49 8b d7             	mov    %r15,%rdx
+  105580:	c4 c2 bb f6 d4       	mulx   %r12,%r8,%rdx
+  105585:	4d 89 45 00          	mov    %r8,0x0(%r13)
+  105589:	48 0f af 4f 28       	imul   0x28(%rdi),%rcx
+  10558e:	48 03 d1             	add    %rcx,%rdx
+  105591:	4b 89 14 f2          	mov    %rdx,(%r10,%r14,8)
+  105595:	48 8b 57 08          	mov    0x8(%rdi),%rdx
+  105599:	4b 03 14 f2          	add    (%r10,%r14,8),%rdx
+  10559d:	0f 18 0a             	prefetcht0 (%rdx)
+  1055a0:	ff c3                	inc    %ebx
+  1055a2:	44 8b 7d b4          	mov    -0x4c(%rbp),%r15d
+  1055a6:	41 3b df             	cmp    %r15d,%ebx
+  1055a9:	0f 8c 9b 02 00 00    	jl     10584a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x46a>
+  1055af:	41 83 ff 20          	cmp    $0x20,%r15d
+  1055b3:	7d 25                	jge    1055da <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x1fa>
+  1055b5:	66 66 66 0f 1f 84 00 	data16 data16 nopw 0x0(%rax,%rax,1)
+  1055bc:	00 00 00 00 
+  1055c0:	49 63 d7             	movslq %r15d,%rdx
+  1055c3:	33 c9                	xor    %ecx,%ecx
+  1055c5:	49 89 0c d1          	mov    %rcx,(%r9,%rdx,8)
+  1055c9:	49 89 0c d2          	mov    %rcx,(%r10,%rdx,8)
+  1055cd:	49 89 0c d3          	mov    %rcx,(%r11,%rdx,8)
+  1055d1:	41 ff c7             	inc    %r15d
+  1055d4:	41 83 ff 20          	cmp    $0x20,%r15d
+  1055d8:	7c e6                	jl     1055c0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x1e0>
+  1055da:	33 c9                	xor    %ecx,%ecx
+  1055dc:	8b 95 5c ff ff ff    	mov    -0xa4(%rbp),%edx
+  1055e2:	44 8d 42 e0          	lea    -0x20(%rdx),%r8d
+  1055e6:	33 db                	xor    %ebx,%ebx
+  1055e8:	45 85 c0             	test   %r8d,%r8d
+  1055eb:	41 0f 4f d8          	cmovg  %r8d,%ebx
+  1055ef:	89 5d b0             	mov    %ebx,-0x50(%rbp)
+  1055f2:	85 db                	test   %ebx,%ebx
+  1055f4:	0f 8e 44 02 00 00    	jle    10583e <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x45e>
+  1055fa:	44 8b c1             	mov    %ecx,%r8d
+  1055fd:	41 c1 f8 1f          	sar    $0x1f,%r8d
+  105601:	41 83 e0 1f          	and    $0x1f,%r8d
+  105605:	44 03 c1             	add    %ecx,%r8d
+  105608:	41 83 e0 e0          	and    $0xffffffe0,%r8d
+  10560c:	44 8b f9             	mov    %ecx,%r15d
+  10560f:	45 2b f8             	sub    %r8d,%r15d
+  105612:	4d 63 c7             	movslq %r15d,%r8
+  105615:	4f 8b 3c c1          	mov    (%r9,%r8,8),%r15
+  105619:	4c 89 bd 50 ff ff ff 	mov    %r15,-0xb0(%rbp)
+  105620:	4f 8b 34 c2          	mov    (%r10,%r8,8),%r14
+  105624:	4f 8b 2c c3          	mov    (%r11,%r8,8),%r13
+  105628:	4c 89 6d a8          	mov    %r13,-0x58(%rbp)
+  10562c:	44 8d 61 20          	lea    0x20(%rcx),%r12d
+  105630:	4d 63 e4             	movslq %r12d,%r12
+  105633:	4e 8b 24 e6          	mov    (%rsi,%r12,8),%r12
+  105637:	4c 33 67 48          	xor    0x48(%rdi),%r12
+  10563b:	48 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdx
+  105642:	c1 7c 51 
+  105645:	48 89 95 30 ff ff ff 	mov    %rdx,-0xd0(%rbp)
+  10564c:	48 8d 5d 80          	lea    -0x80(%rbp),%rbx
+  105650:	4c 8b ad 30 ff ff ff 	mov    -0xd0(%rbp),%r13
+  105657:	49 8b d4             	mov    %r12,%rdx
+  10565a:	c4 c2 83 f6 d5       	mulx   %r13,%r15,%rdx
+  10565f:	4c 89 3b             	mov    %r15,(%rbx)
+  105662:	48 8b 5d 80          	mov    -0x80(%rbp),%rbx
+  105666:	48 33 d3             	xor    %rbx,%rdx
+  105669:	49 0f af d5          	imul   %r13,%rdx
+  10566d:	4b 89 14 c1          	mov    %rdx,(%r9,%r8,8)
+  105671:	4b 8b 1c c1          	mov    (%r9,%r8,8),%rbx
+  105675:	48 8b 57 68          	mov    0x68(%rdi),%rdx
+  105679:	4c 8d bd 78 ff ff ff 	lea    -0x88(%rbp),%r15
+  105680:	c4 e2 93 f6 d3       	mulx   %rbx,%r13,%rdx
+  105685:	4d 89 2f             	mov    %r13,(%r15)
+  105688:	48 8b 9d 78 ff ff ff 	mov    -0x88(%rbp),%rbx
+  10568f:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
+  105693:	4b 89 14 c3          	mov    %rdx,(%r11,%r8,8)
+  105697:	4c 8b 7f 70          	mov    0x70(%rdi),%r15
+  10569b:	4c 8d ad 70 ff ff ff 	lea    -0x90(%rbp),%r13
+  1056a2:	49 8b d7             	mov    %r15,%rdx
+  1056a5:	c4 e2 9b f6 d3       	mulx   %rbx,%r12,%rdx
+  1056aa:	4d 89 65 00          	mov    %r12,0x0(%r13)
+  1056ae:	48 8b 5d a0          	mov    -0x60(%rbp),%rbx
+  1056b2:	48 0f af 5f 28       	imul   0x28(%rdi),%rbx
+  1056b7:	48 03 d3             	add    %rbx,%rdx
+  1056ba:	4b 89 14 c2          	mov    %rdx,(%r10,%r8,8)
+  1056be:	48 8b 57 08          	mov    0x8(%rdi),%rdx
+  1056c2:	48 8b da             	mov    %rdx,%rbx
+  1056c5:	4b 03 1c c2          	add    (%r10,%r8,8),%rbx
+  1056c9:	0f 18 0b             	prefetcht0 (%rbx)
+  1056cc:	42 0f b6 14 32       	movzbl (%rdx,%r14,1),%edx
+  1056d1:	48 33 57 48          	xor    0x48(%rdi),%rdx
+  1056d5:	49 b8 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r8
+  1056dc:	c1 7c 51 
+  1056df:	49 0f af d0          	imul   %r8,%rdx
+  1056e3:	4c 8d 87 80 00 00 00 	lea    0x80(%rdi),%r8
+  1056ea:	4c 8b bd 50 ff ff ff 	mov    -0xb0(%rbp),%r15
+  1056f1:	49 33 d7             	xor    %r15,%rdx
+  1056f4:	49 0f af 50 08       	imul   0x8(%r8),%rdx
+  1056f9:	4d 8b 00             	mov    (%r8),%r8
+  1056fc:	48 8d 9d 68 ff ff ff 	lea    -0x98(%rbp),%rbx
+  105703:	c4 c2 83 f6 d0       	mulx   %r8,%r15,%rdx
+  105708:	4c 89 3b             	mov    %r15,(%rbx)
+  10570b:	4c 8b 6d a8          	mov    -0x58(%rbp),%r13
+  10570f:	4c 0f af 6f 18       	imul   0x18(%rdi),%r13
+  105714:	49 03 d5             	add    %r13,%rdx
+  105717:	85 c0                	test   %eax,%eax
+  105719:	74 1a                	je     105735 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x355>
+  10571b:	4c 8b 45 d0          	mov    -0x30(%rbp),%r8
+  10571f:	49 3b d0             	cmp    %r8,%rdx
+  105722:	0f 82 11 01 00 00    	jb     105839 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x459>
+  105728:	48 8b 5f 58          	mov    0x58(%rdi),%rbx
+  10572c:	41 2b d0             	sub    %r8d,%edx
+  10572f:	48 63 d2             	movslq %edx,%rdx
+  105732:	8b 14 93             	mov    (%rbx,%rdx,4),%edx
+  105735:	48 63 d9             	movslq %ecx,%rbx
+  105738:	4c 8b bd 40 ff ff ff 	mov    -0xc0(%rbp),%r15
+  10573f:	49 89 14 df          	mov    %rdx,(%r15,%rbx,8)
+  105743:	ff c1                	inc    %ecx
+  105745:	8b 5d b0             	mov    -0x50(%rbp),%ebx
+  105748:	3b cb                	cmp    %ebx,%ecx
+  10574a:	0f 8c e4 00 00 00    	jl     105834 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x454>
+  105750:	3b 8d 5c ff ff ff    	cmp    -0xa4(%rbp),%ecx
+  105756:	0f 8d a0 00 00 00    	jge    1057fc <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x41c>
+  10575c:	8b f1                	mov    %ecx,%esi
+  10575e:	c1 fe 1f             	sar    $0x1f,%esi
+  105761:	83 e6 1f             	and    $0x1f,%esi
+  105764:	03 f1                	add    %ecx,%esi
+  105766:	83 e6 e0             	and    $0xffffffe0,%esi
+  105769:	8b d9                	mov    %ecx,%ebx
+  10576b:	2b de                	sub    %esi,%ebx
+  10576d:	48 63 f3             	movslq %ebx,%rsi
+  105770:	49 8b 1c f1          	mov    (%r9,%rsi,8),%rbx
+  105774:	4d 8b 34 f2          	mov    (%r10,%rsi,8),%r14
+  105778:	49 8b 34 f3          	mov    (%r11,%rsi,8),%rsi
+  10577c:	4c 8b 6f 08          	mov    0x8(%rdi),%r13
+  105780:	47 0f b6 34 2e       	movzbl (%r14,%r13,1),%r14d
+  105785:	4c 33 77 48          	xor    0x48(%rdi),%r14
+  105789:	49 bd 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r13
+  105790:	c1 7c 51 
+  105793:	4d 0f af f5          	imul   %r13,%r14
+  105797:	4c 8d af 80 00 00 00 	lea    0x80(%rdi),%r13
+  10579e:	49 33 de             	xor    %r14,%rbx
+  1057a1:	49 0f af 5d 08       	imul   0x8(%r13),%rbx
+  1057a6:	4d 8b 75 00          	mov    0x0(%r13),%r14
+  1057aa:	4c 8d ad 60 ff ff ff 	lea    -0xa0(%rbp),%r13
+  1057b1:	48 8b d3             	mov    %rbx,%rdx
+  1057b4:	c4 c2 9b f6 d6       	mulx   %r14,%r12,%rdx
+  1057b9:	4d 89 65 00          	mov    %r12,0x0(%r13)
+  1057bd:	48 0f af 77 18       	imul   0x18(%rdi),%rsi
+  1057c2:	48 03 d6             	add    %rsi,%rdx
+  1057c5:	85 c0                	test   %eax,%eax
+  1057c7:	74 16                	je     1057df <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x3ff>
+  1057c9:	4c 8b 45 d0          	mov    -0x30(%rbp),%r8
+  1057cd:	49 3b d0             	cmp    %r8,%rdx
+  1057d0:	72 60                	jb     105832 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x452>
+  1057d2:	48 8b 77 58          	mov    0x58(%rdi),%rsi
+  1057d6:	41 2b d0             	sub    %r8d,%edx
+  1057d9:	48 63 d2             	movslq %edx,%rdx
+  1057dc:	8b 14 96             	mov    (%rsi,%rdx,4),%edx
+  1057df:	48 63 f1             	movslq %ecx,%rsi
+  1057e2:	49 89 14 f7          	mov    %rdx,(%r15,%rsi,8)
+  1057e6:	ff c1                	inc    %ecx
+  1057e8:	8b 95 5c ff ff ff    	mov    -0xa4(%rbp),%edx
+  1057ee:	3b ca                	cmp    %edx,%ecx
+  1057f0:	89 95 5c ff ff ff    	mov    %edx,-0xa4(%rbp)
+  1057f6:	0f 8c 60 ff ff ff    	jl     10575c <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x37c>
+  1057fc:	33 ff                	xor    %edi,%edi
+  1057fe:	48 89 7d b8          	mov    %rdi,-0x48(%rbp)
+  105802:	48 89 7d c0          	mov    %rdi,-0x40(%rbp)
+  105806:	48 89 7d c8          	mov    %rdi,-0x38(%rbp)
+  10580a:	48 8d 3d 6f de 0b 00 	lea    0xbde6f(%rip),%rdi        # 1c3680 <__security_cookie>
+  105811:	48 8b 3f             	mov    (%rdi),%rdi
+  105814:	48 39 bd 38 ff ff ff 	cmp    %rdi,-0xc8(%rbp)
+  10581b:	74 05                	je     105822 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x442>
+  10581d:	e8 6e 47 f0 ff       	call   9f90 <RhpFallbackFailFast>
+  105822:	90                   	nop
+  105823:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
+  105827:	5b                   	pop    %rbx
+  105828:	41 5c                	pop    %r12
+  10582a:	41 5d                	pop    %r13
+  10582c:	41 5e                	pop    %r14
+  10582e:	41 5f                	pop    %r15
+  105830:	5d                   	pop    %rbp
+  105831:	c3                   	ret
+  105832:	eb ab                	jmp    1057df <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x3ff>
+  105834:	e9 c1 fd ff ff       	jmp    1055fa <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x21a>
+  105839:	e9 f7 fe ff ff       	jmp    105735 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x355>
+  10583e:	4c 8b bd 40 ff ff ff 	mov    -0xc0(%rbp),%r15
+  105845:	e9 06 ff ff ff       	jmp    105750 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x370>
+  10584a:	e9 c9 fc ff ff       	jmp    105518 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x138>
+  10584f:	44 8b 7d b4          	mov    -0x4c(%rbp),%r15d
+  105853:	e9 57 fd ff ff       	jmp    1055af <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x1cf>
+  105858:	48 8d 3d a9 79 15 00 	lea    0x1579a9(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+  10585f:	e8 40 fd f5 ff       	call   655a4 <RhpNewFast>
+  105864:	48 8b d8             	mov    %rax,%rbx
+  105867:	48 8b fb             	mov    %rbx,%rdi
+  10586a:	48 8d 35 ef 48 14 00 	lea    0x1448ef(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+  105871:	e8 da 56 f8 ff       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+  105876:	48 8b fb             	mov    %rbx,%rdi
+  105879:	e8 90 ff f5 ff       	call   6580e <RhpThrowEx>
+  10587e:	cc                   	int3
+  10587f:	90                   	nop
+
+  109aae:	e8 8d b5 ff ff       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+  109ab3:	eb 14                	jmp    109ac9 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0xa9>
+  109ab5:	48 8b c8             	mov    %rax,%rcx
+  109ab8:	49 8b f6             	mov    %r14,%rsi
+  109abb:	41 8b d7             	mov    %r15d,%edx
+  109abe:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+  109ac4:	e8 17 b9 ff ff       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+  109ac9:	48 8b 7d c0          	mov    -0x40(%rbp),%rdi
+  109acd:	33 f6                	xor    %esi,%esi
+  109acf:	45 85 ff             	test   %r15d,%r15d
+  109ad2:	7e 5f                	jle    109b33 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x113>
+  109ad4:	8b c6                	mov    %esi,%eax
+  109ad6:	8b 0c c7             	mov    (%rdi,%rax,8),%ecx
+  109ad9:	48 8b 53 10          	mov    0x10(%rbx),%rdx
+  109add:	39 4a 08             	cmp    %ecx,0x8(%rdx)
+  109ae0:	76 39                	jbe    109b1b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0xfb>
+  109ae2:	3b 4a 08             	cmp    0x8(%rdx),%ecx
+  109ae5:	0f 83 fe 01 00 00    	jae    109ce9 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x2c9>
+  109aeb:	8b c9                	mov    %ecx,%ecx
+  109aed:	48 c1 e1 04          	shl    $0x4,%rcx
+  109af1:	48 8d 4c 0a 10       	lea    0x10(%rdx,%rcx,1),%rcx
+  109af6:	48 8b 53 18          	mov    0x18(%rbx),%rdx
+  109afa:	4d 8b 04 c6          	mov    (%r14,%rax,8),%r8
+  109afe:	4c 8b 09             	mov    (%rcx),%r9
+  109b01:	38 12                	cmp    %dl,(%rdx)
+  109b03:	4d 3b c1             	cmp    %r9,%r8
+  109b06:	75 13                	jne    109b1b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0xfb>
+  109b08:	41 3b f5             	cmp    %r13d,%esi
+  109b0b:	0f 83 d8 01 00 00    	jae    109ce9 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x2c9>
+  109b11:	48 8b 49 08          	mov    0x8(%rcx),%rcx
+  109b15:	49 89 0c c4          	mov    %rcx,(%r12,%rax,8)
+  109b19:	eb 11                	jmp    109b2c <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x10c>
+  109b1b:	41 3b f5             	cmp    %r13d,%esi
+  109b1e:	0f 83 c5 01 00 00    	jae    109ce9 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x2c9>
+  109b24:	48 8b 4b 20          	mov    0x20(%rbx),%rcx
+  109b28:	49 89 0c c4          	mov    %rcx,(%r12,%rax,8)
+  109b2c:	ff c6                	inc    %esi
+  109b2e:	41 3b f7             	cmp    %r15d,%esi
+  109b31:	7c a1                	jl     109ad4 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0xb4>
+  109b33:	48 8d 3d 46 9b 0b 00 	lea    0xb9b46(%rip),%rdi        # 1c3680 <__security_cookie>
+  109b3a:	48 8b 3f             	mov    (%rdi),%rdi
+  109b3d:	48 39 7d a8          	cmp    %rdi,-0x58(%rbp)
+  109b41:	74 05                	je     109b48 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x128>
+  109b43:	e8 48 04 f0 ff       	call   9f90 <RhpFallbackFailFast>
+  109b48:	90                   	nop
+  109b49:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
+  109b4d:	5b                   	pop    %rbx
+  109b4e:	41 5c                	pop    %r12
+  109b50:	41 5d                	pop    %r13
+  109b52:	41 5e                	pop    %r14
+  109b54:	41 5f                	pop    %r15
+  109b56:	5d                   	pop    %rbp
+  109b57:	c3                   	ret
+  109b58:	48 8d 3d 41 ec 14 00 	lea    0x14ec41(%rip),%rdi        # 2587a0 <__NONGCSTATICSS_P_CoreLib_System_Buffers_ArrayPool_1<UIntPtr>>
+  109b5f:	48 83 7f f8 00       	cmpq   $0x0,-0x8(%rdi)
+  109b64:	0f 85 75 01 00 00    	jne    109cdf <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x2bf>
+  109b6a:	48 8b 05 07 26 12 00 	mov    0x122607(%rip),%rax        # 22c178 <__GCSTATICSS_P_CoreLib_System_Buffers_ArrayPool_1<UIntPtr>>
+  109b71:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
+  109b75:	48 8b 78 08          	mov    0x8(%rax),%rdi
+  109b79:	41 8b f7             	mov    %r15d,%esi
+  109b7c:	39 3f                	cmp    %edi,(%rdi)
+  109b7e:	e8 1d 18 00 00       	call   10b3a0 <S_P_CoreLib_System_Buffers_SharedArrayPool_1<UIntPtr>__Rent>
+  109b83:	48 89 45 c8          	mov    %rax,-0x38(%rbp)
+  109b87:	48 85 c0             	test   %rax,%rax
+  109b8a:	75 11                	jne    109b9d <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x17d>
+  109b8c:	45 85 ff             	test   %r15d,%r15d
+  109b8f:	0f 85 d0 00 00 00    	jne    109c65 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x245>
+  109b95:	45 33 d2             	xor    %r10d,%r10d
+  109b98:	45 33 db             	xor    %r11d,%r11d
+  109b9b:	eb 15                	jmp    109bb2 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x192>
+  109b9d:	44 39 78 08          	cmp    %r15d,0x8(%rax)
+  109ba1:	0f 82 be 00 00 00    	jb     109c65 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x245>
+  109ba7:	4c 8d 50 10          	lea    0x10(%rax),%r10
+  109bab:	45 8b df             	mov    %r15d,%r11d
+  109bae:	48 8b 45 c8          	mov    -0x38(%rbp),%rax
+  109bb2:	4c 89 55 b8          	mov    %r10,-0x48(%rbp)
+  109bb6:	44 89 5d d4          	mov    %r11d,-0x2c(%rbp)
+  109bba:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
+  109bbe:	80 7f 55 00          	cmpb   $0x0,0x55(%rdi)
+  109bc2:	74 19                	je     109bdd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x1bd>
+  109bc4:	49 8b ca             	mov    %r10,%rcx
+  109bc7:	45 8b c3             	mov    %r11d,%r8d
+  109bca:	49 8b f6             	mov    %r14,%rsi
+  109bcd:	41 8b d7             	mov    %r15d,%edx
+  109bd0:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+  109bd6:	e8 65 b4 ff ff       	call   105040 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchSinglePart>
+  109bdb:	eb 17                	jmp    109bf4 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x1d4>
+  109bdd:	49 8b ca             	mov    %r10,%rcx
+  109be0:	45 8b c3             	mov    %r11d,%r8d
+  109be3:	49 8b f6             	mov    %r14,%rsi
+  109be6:	41 8b d7             	mov    %r15d,%edx
+  109be9:	41 b9 01 00 00 00    	mov    $0x1,%r9d
+  109bef:	e8 ec b7 ff ff       	call   1053e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>
+  109bf4:	48 8b 7d b8          	mov    -0x48(%rbp),%rdi
+  109bf8:	8b 75 d4             	mov    -0x2c(%rbp),%esi
+  109bfb:	49 8b d6             	mov    %r14,%rdx
+  109bfe:	41 8b c7             	mov    %r15d,%eax
+  109c01:	49 8b cc             	mov    %r12,%rcx
+  109c04:	45 8b c5             	mov    %r13d,%r8d
+  109c07:	45 33 c9             	xor    %r9d,%r9d
+  109c0a:	85 c0                	test   %eax,%eax
+  109c0c:	7e 6c                	jle    109c7a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x25a>
+  109c0e:	44 3b ce             	cmp    %esi,%r9d
+  109c11:	73 4d                	jae    109c60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x240>
+  109c13:	45 8b d1             	mov    %r9d,%r10d
+  109c16:	46 8b 1c d7          	mov    (%rdi,%r10,8),%r11d
+  109c1a:	4c 8b 7b 10          	mov    0x10(%rbx),%r15
+  109c1e:	45 39 5f 08          	cmp    %r11d,0x8(%r15)
+  109c22:	76 47                	jbe    109c6b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x24b>
+  109c24:	45 3b 5f 08          	cmp    0x8(%r15),%r11d
+  109c28:	73 36                	jae    109c60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x240>
+  109c2a:	45 8b db             	mov    %r11d,%r11d
+  109c2d:	49 c1 e3 04          	shl    $0x4,%r11
+  109c31:	4f 8d 5c 1f 10       	lea    0x10(%r15,%r11,1),%r11
+  109c36:	4c 8b 73 18          	mov    0x18(%rbx),%r14
+  109c3a:	4e 8b 2c d2          	mov    (%rdx,%r10,8),%r13
+  109c3e:	4d 8b 23             	mov    (%r11),%r12
+  109c41:	45 38 36             	cmp    %r14b,(%r14)
+  109c44:	4d 3b ec             	cmp    %r12,%r13
+  109c47:	75 22                	jne    109c6b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x24b>
+  109c49:	45 3b c8             	cmp    %r8d,%r9d
+  109c4c:	73 12                	jae    109c60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x240>
+  109c4e:	4d 8b 5b 08          	mov    0x8(%r11),%r11
+  109c52:	4e 89 1c d1          	mov    %r11,(%rcx,%r10,8)
+  109c56:	41 ff c1             	inc    %r9d
+  109c59:	44 3b c8             	cmp    %eax,%r9d
+  109c5c:	7c b0                	jl     109c0e <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x1ee>
+  109c5e:	eb 1a                	jmp    109c7a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x25a>
+  109c60:	e8 5b 12 fc ff       	call   caec0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
+  109c65:	e8 b6 8e f8 ff       	call   92b20 <S_P_CoreLib_System_ThrowHelper__ThrowArgumentOutOfRangeException>
+  109c6a:	cc                   	int3
+  109c6b:	45 3b c8             	cmp    %r8d,%r9d
+  109c6e:	73 f0                	jae    109c60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x240>
+  109c70:	4c 8b 5b 20          	mov    0x20(%rbx),%r11
+  109c74:	4e 89 1c d1          	mov    %r11,(%rcx,%r10,8)
+  109c78:	eb dc                	jmp    109c56 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x236>
+  109c7a:	4c 8b 7d b0          	mov    -0x50(%rbp),%r15
+  109c7e:	49 8b 7f 08          	mov    0x8(%r15),%rdi
+  109c82:	48 8b 75 c8          	mov    -0x38(%rbp),%rsi
+  109c86:	33 d2                	xor    %edx,%edx
+  109c88:	39 3f                	cmp    %edi,(%rdi)
+  109c8a:	e8 91 19 00 00       	call   10b620 <S_P_CoreLib_System_Buffers_SharedArrayPool_1<UIntPtr>__Return>
+  109c8f:	48 8d 3d ea 99 0b 00 	lea    0xb99ea(%rip),%rdi        # 1c3680 <__security_cookie>
+  109c96:	48 8b 3f             	mov    (%rdi),%rdi
+  109c99:	48 39 7d a8          	cmp    %rdi,-0x58(%rbp)
+  109c9d:	74 05                	je     109ca4 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x284>
+  109c9f:	e8 ec 02 f0 ff       	call   9f90 <RhpFallbackFailFast>
+  109ca4:	90                   	nop
+  109ca5:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
+  109ca9:	5b                   	pop    %rbx
+  109caa:	41 5c                	pop    %r12
+  109cac:	41 5d                	pop    %r13
+  109cae:	41 5e                	pop    %r14
+  109cb0:	41 5f                	pop    %r15
+  109cb2:	5d                   	pop    %rbp
+  109cb3:	c3                   	ret
+  109cb4:	e8 d7 11 fc ff       	call   cae90 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowOverflowException>
+  109cb9:	48 8d 3d 48 35 15 00 	lea    0x153548(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+  109cc0:	e8 df b8 f5 ff       	call   655a4 <RhpNewFast>
+  109cc5:	48 8b d8             	mov    %rax,%rbx
+  109cc8:	48 8b fb             	mov    %rbx,%rdi
+  109ccb:	48 8d 35 1e 04 14 00 	lea    0x14041e(%rip),%rsi        # 24a0f0 <__Str_Key_and_value_spans_must_have__E5F69F0C03A0FBD9E1FD3A9E1354D228FFEDD0EE3D99CA68EDD54E9F85DA3BA8>
+  109cd2:	e8 79 12 f8 ff       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+  109cd7:	48 8b fb             	mov    %rbx,%rdi
+  109cda:	e8 2f bb f5 ff       	call   6580e <RhpThrowEx>
+  109cdf:	e8 3e ee ef ff       	call   8b22 <__GetGCStaticBase_S_P_CoreLib_System_Buffers_ArrayPool_1<UIntPtr>>
+  109ce4:	e9 81 fe ff ff       	jmp    109b6a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x14a>
+  109ce9:	e8 d2 11 fc ff       	call   caec0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
+  109cee:	cc                   	int3
+  109cef:	55                   	push   %rbp
+  109cf0:	41 57                	push   %r15
+  109cf2:	41 56                	push   %r14
+  109cf4:	41 55                	push   %r13
+  109cf6:	41 54                	push   %r12
+  109cf8:	53                   	push   %rbx
+  109cf9:	50                   	push   %rax
+  109cfa:	48 8d 05 9f ea 14 00 	lea    0x14ea9f(%rip),%rax        # 2587a0 <__NONGCSTATICSS_P_CoreLib_System_Buffers_ArrayPool_1<UIntPtr>>
+  109d01:	48 83 78 f8 00       	cmpq   $0x0,-0x8(%rax)
+  109d06:	74 05                	je     109d0d <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Collections_PtrHashDictionary_5<UInt64__UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__TryGetValueStream+0x2ed>
+  109d08:	e8 15 ee ef ff       	call   8b22 <__GetGCStaticBase_S_P_CoreLib_System_Buffers_ArrayPool_1<UIntPtr>>
+  109d0d:	4c 8b 3d 64 24 12 00 	mov    0x122464(%rip),%r15        # 22c178 <__GCSTATICSS_P_CoreLib_System_Buffers_ArrayPool_1<UIntPtr>>
+  109d14:	49 8b 7f 08          	mov    0x8(%r15),%rdi
+  109d18:	48 8b 75 c8          	mov    -0x38(%rbp),%rsi
+  109d1c:	33 d2                	xor    %edx,%edx
+  109d1e:	39 3f                	cmp    %edi,(%rdi)
+  109d20:	e8 fb 18 00 00       	call   10b620 <S_P_CoreLib_System_Buffers_SharedArrayPool_1<UIntPtr>__Return>
+  109d25:	90                   	nop
+  109d26:	48 83 c4 08          	add    $0x8,%rsp
+  109d2a:	5b                   	pop    %rbx
+  109d2b:	41 5c                	pop    %r12
+  109d2d:	41 5d                	pop    %r13
+  109d2f:	41 5e                	pop    %r14
+  109d31:	41 5f                	pop    %r15
+  109d33:	5d                   	pop    %rbp
+  109d34:	c3                   	ret
+  109d35:	90                   	nop
+  109d36:	90                   	nop
+  109d37:	90                   	nop
+  109d38:	90                   	nop
+  109d39:	90                   	nop
+  109d3a:	90                   	nop
+  109d3b:	90                   	nop
+  109d3c:	90                   	nop
+  109d3d:	90                   	nop
+  109d3e:	90                   	nop
+  109d3f:	90                   	nop
+
+   774fc:	e8 ff 08 00 00       	call   77e00 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream>
+   77501:	e8 9a 0e 00 00       	call   783a0 <ASM_Analysis_AsmGeneration_Program__TestSingleLookups>
+   77506:	e8 f5 11 00 00       	call   78700 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern>
+   7750b:	e8 c0 13 00 00       	call   788d0 <ASM_Analysis_AsmGeneration_Program__TestDictionaryMethods>
+   77510:	48 8d 3d 89 e5 1c 00 	lea    0x1ce589(%rip),%rdi        # 245aa0 <__Str_Assembly_generation_complete__E694E220ABB5E659C8FE3A93D59496D8C08AFB825EDBB706847AAF14012E93FD>
+   77517:	e8 14 55 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   7751c:	48 8d 3d 9d ee 1c 00 	lea    0x1cee9d(%rip),%rdi        # 2463c0 <__Str_Check_output_for_JIT_generated_E88BF50A10FDFF15CB02EFCA372E5395BD12F2100779560FE4DB5574C46B7085>
+   77523:	e8 08 55 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   77528:	90                   	nop
+   77529:	48 81 c4 88 00 00 00 	add    $0x88,%rsp
+   77530:	5b                   	pop    %rbx
+   77531:	41 5c                	pop    %r12
+   77533:	41 5d                	pop    %r13
+   77535:	41 5e                	pop    %r14
+   77537:	41 5f                	pop    %r15
+   77539:	5d                   	pop    %rbp
+   7753a:	c3                   	ret
+   7753b:	e8 e0 b5 01 00       	call   92b20 <S_P_CoreLib_System_ThrowHelper__ThrowArgumentOutOfRangeException>
+   77540:	cc                   	int3
+   77541:	90                   	nop
+   77542:	90                   	nop
+   77543:	90                   	nop
+   77544:	90                   	nop
+   77545:	90                   	nop
+   77546:	90                   	nop
+   77547:	90                   	nop
+   77548:	90                   	nop
+   77549:	90                   	nop
+   7754a:	90                   	nop
+   7754b:	90                   	nop
+   7754c:	90                   	nop
+   7754d:	90                   	nop
+   7754e:	90                   	nop
+   7754f:	90                   	nop
+   77550:	90                   	nop
+   77551:	90                   	nop
+   77552:	90                   	nop
+   77553:	90                   	nop
+   77554:	90                   	nop
+   77555:	90                   	nop
+   77556:	90                   	nop
+   77557:	90                   	nop
+   77558:	90                   	nop
+   77559:	90                   	nop
+   7755a:	90                   	nop
+   7755b:	90                   	nop
+   7755c:	90                   	nop
+   7755d:	90                   	nop
+   7755e:	90                   	nop
+   7755f:	90                   	nop
+
+   77b1e:	e8 7d cc 08 00       	call   1047a0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream>
+   77b23:	33 db                	xor    %ebx,%ebx
+   77b25:	4d 85 ff             	test   %r15,%r15
+   77b28:	74 42                	je     77b6c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
+   77b2a:	41 83 7f 08 64       	cmpl   $0x64,0x8(%r15)
+   77b2f:	7c 3b                	jl     77b6c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
+   77b31:	48 8b 3d f0 3f 1b 00 	mov    0x1b3ff0(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b38:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b3c:	8b f3                	mov    %ebx,%esi
+   77b3e:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77b43:	39 3f                	cmp    %edi,(%rdi)
+   77b45:	e8 66 c7 08 00       	call   1042b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
+   77b4a:	48 8b 3d d7 3f 1b 00 	mov    0x1b3fd7(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b51:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b55:	8b f3                	mov    %ebx,%esi
+   77b57:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77b5c:	39 3f                	cmp    %edi,(%rdi)
+   77b5e:	e8 1d c9 08 00       	call   104480 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
+   77b63:	ff c3                	inc    %ebx
+   77b65:	83 fb 64             	cmp    $0x64,%ebx
+   77b68:	7c c7                	jl     77b31 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x5d1>
+   77b6a:	eb 43                	jmp    77baf <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x64f>
+   77b6c:	48 8b 3d b5 3f 1b 00 	mov    0x1b3fb5(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b73:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b77:	41 3b 5f 08          	cmp    0x8(%r15),%ebx
+   77b7b:	0f 83 a4 00 00 00    	jae    77c25 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x6c5>
+   77b81:	8b f3                	mov    %ebx,%esi
+   77b83:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77b88:	39 3f                	cmp    %edi,(%rdi)
+   77b8a:	e8 21 c7 08 00       	call   1042b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
+   77b8f:	48 8b 3d 92 3f 1b 00 	mov    0x1b3f92(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77b96:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
+   77b9a:	8b f3                	mov    %ebx,%esi
+   77b9c:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
+   77ba1:	39 3f                	cmp    %edi,(%rdi)
+   77ba3:	e8 d8 c8 08 00       	call   104480 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
+   77ba8:	ff c3                	inc    %ebx
+   77baa:	83 fb 64             	cmp    $0x64,%ebx
+   77bad:	7c bd                	jl     77b6c <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
+   77baf:	48 8d 3d 32 24 1d 00 	lea    0x1d2432(%rip),%rdi        # 249fe8 <__Str_JIT_warmup_complete__0DAE2BD7E8651565932C6EA373EC942BC13BA8E721DA0F4E914F424C749DD85D>
+   77bb6:	e8 75 4e 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   77bbb:	90                   	nop
+   77bbc:	48 81 c4 d8 00 00 00 	add    $0xd8,%rsp
+   77bc3:	5b                   	pop    %rbx
+   77bc4:	41 5c                	pop    %r12
+   77bc6:	41 5d                	pop    %r13
+   77bc8:	41 5e                	pop    %r14
+   77bca:	41 5f                	pop    %r15
+   77bcc:	5d                   	pop    %rbp
+   77bcd:	c3                   	ret
+   77bce:	bf 10 00 00 00       	mov    $0x10,%edi
+   77bd3:	e8 98 86 00 00       	call   80270 <System_Linq_System_Linq_ThrowHelper__ThrowArgumentNullException>
+   77bd8:	cc                   	int3
+   77bd9:	48 8d 3d 28 56 1e 00 	lea    0x1e5628(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+   77be0:	e8 bf d9 fe ff       	call   655a4 <RhpNewFast>
+   77be5:	48 8b d8             	mov    %rax,%rbx
+   77be8:	48 8b fb             	mov    %rbx,%rdi
+   77beb:	48 8d 35 6e 25 1d 00 	lea    0x1d256e(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+   77bf2:	e8 59 33 01 00       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+   77bf7:	48 8b fb             	mov    %rbx,%rdi
+   77bfa:	e8 0f dc fe ff       	call   6580e <RhpThrowEx>
+   77bff:	48 8d 3d 02 56 1e 00 	lea    0x1e5602(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+   77c06:	e8 99 d9 fe ff       	call   655a4 <RhpNewFast>
+   77c0b:	48 8b d8             	mov    %rax,%rbx
+   77c0e:	48 8b fb             	mov    %rbx,%rdi
+   77c11:	48 8d 35 48 25 1d 00 	lea    0x1d2548(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+   77c18:	e8 33 33 01 00       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+   77c1d:	48 8b fb             	mov    %rbx,%rdi
+   77c20:	e8 e9 db fe ff       	call   6580e <RhpThrowEx>
+   77c25:	e8 96 32 05 00       	call   caec0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
+   77c2a:	cc                   	int3
+   77c2b:	90                   	nop
+   77c2c:	90                   	nop
+   77c2d:	90                   	nop
+   77c2e:	90                   	nop
+   77c2f:	90                   	nop
+
+0000000000077e00 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream>:
+   77e00:	55                   	push   %rbp
+   77e01:	41 57                	push   %r15
+   77e03:	41 56                	push   %r14
+   77e05:	41 55                	push   %r13
+   77e07:	41 54                	push   %r12
+   77e09:	53                   	push   %rbx
+   77e0a:	48 81 ec d8 00 00 00 	sub    $0xd8,%rsp
+   77e11:	c5 f8 77             	vzeroupper
+   77e14:	48 8d ac 24 00 01 00 	lea    0x100(%rsp),%rbp
+   77e1b:	00 
+   77e1c:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+   77e21:	c5 79 7f 85 20 ff ff 	vmovdqa %xmm8,-0xe0(%rbp)
+   77e28:	ff 
+   77e29:	c5 79 7f 85 30 ff ff 	vmovdqa %xmm8,-0xd0(%rbp)
+   77e30:	ff 
+   77e31:	48 b8 70 ff ff ff ff 	movabs $0xffffffffffffff70,%rax
+   77e38:	ff ff ff 
+   77e3b:	c5 79 7f 44 05 d0    	vmovdqa %xmm8,-0x30(%rbp,%rax,1)
+   77e41:	c5 79 7f 44 05 e0    	vmovdqa %xmm8,-0x20(%rbp,%rax,1)
+   77e47:	c5 79 7f 44 05 f0    	vmovdqa %xmm8,-0x10(%rbp,%rax,1)
+   77e4d:	48 83 c0 30          	add    $0x30,%rax
+   77e51:	75 e8                	jne    77e3b <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3b>
+   77e53:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
+   77e57:	48 8d 3d 92 64 1d 00 	lea    0x1d6492(%rip),%rdi        # 24e2f0 <__Str_Testing_GetIndicesStream__no_p_3BADE5A8245CDE1F293826A4BEA915BC6A54827377AA32C6394D40F198A479BE>
+   77e5e:	e8 cd 4b 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   77e63:	48 8b 35 be 3c 1b 00 	mov    0x1b3cbe(%rip),%rsi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77e6a:	48 8b 5e 10          	mov    0x10(%rsi),%rbx
+   77e6e:	8b 73 08             	mov    0x8(%rbx),%esi
+   77e71:	48 8d 3d a8 d4 21 00 	lea    0x21d4a8(%rip),%rdi        # 295320 <_ZTV16__Array<UIntPtr>>
+   77e78:	e8 3d d8 fe ff       	call   656ba <RhpNewArray>
+   77e7d:	4c 8b f8             	mov    %rax,%r15
+   77e80:	48 8b 15 a1 3c 1b 00 	mov    0x1b3ca1(%rip),%rdx        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   77e87:	4c 8b 72 18          	mov    0x18(%rdx),%r14
+   77e8b:	48 85 db             	test   %rbx,%rbx
+   77e8e:	75 06                	jne    77e96 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x96>
+   77e90:	33 d2                	xor    %edx,%edx
+   77e92:	33 ff                	xor    %edi,%edi
+   77e94:	eb 07                	jmp    77e9d <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x9d>
+   77e96:	48 8d 53 10          	lea    0x10(%rbx),%rdx
+   77e9a:	8b 7b 08             	mov    0x8(%rbx),%edi
+   77e9d:	49 8d 77 10          	lea    0x10(%r15),%rsi
+   77ea1:	41 8b 47 08          	mov    0x8(%r15),%eax
+   77ea5:	41 80 7e 55 00       	cmpb   $0x0,0x55(%r14)
+   77eaa:	0f 84 bb 01 00 00    	je     7806b <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x26b>
+   77eb0:	3b f8                	cmp    %eax,%edi
+   77eb2:	0f 85 9a 04 00 00    	jne    78352 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x552>
+   77eb8:	41 0f b6 4e 54       	movzbl 0x54(%r14),%ecx
+   77ebd:	4d 8b 46 38          	mov    0x38(%r14),%r8
+   77ec1:	45 33 c9             	xor    %r9d,%r9d
+   77ec4:	85 ff                	test   %edi,%edi
+   77ec6:	4c 0f 45 ca          	cmovne %rdx,%r9
+   77eca:	4c 89 4d a8          	mov    %r9,-0x58(%rbp)
+   77ece:	33 d2                	xor    %edx,%edx
+   77ed0:	85 c0                	test   %eax,%eax
+   77ed2:	48 0f 45 d6          	cmovne %rsi,%rdx
+   77ed6:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
+   77eda:	48 8b f2             	mov    %rdx,%rsi
+   77edd:	85 c9                	test   %ecx,%ecx
+   77edf:	0f 84 c4 00 00 00    	je     77fa9 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x1a9>
+   77ee5:	33 c0                	xor    %eax,%eax
+   77ee7:	85 ff                	test   %edi,%edi
+   77ee9:	0f 8e 6d 01 00 00    	jle    7805c <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x25c>
+   77eef:	49 8d 9e 80 00 00 00 	lea    0x80(%r14),%rbx
+   77ef6:	48 63 d0             	movslq %eax,%rdx
+   77ef9:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
+   77efd:	49 33 56 48          	xor    0x48(%r14),%rdx
+   77f01:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77f08:	c1 7c 51 
+   77f0b:	4c 8d 55 98          	lea    -0x68(%rbp),%r10
+   77f0f:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
+   77f14:	4d 89 1a             	mov    %r11,(%r10)
+   77f17:	48 8b 4d 98          	mov    -0x68(%rbp),%rcx
+   77f1b:	48 33 d1             	xor    %rcx,%rdx
+   77f1e:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77f25:	c1 7c 51 
+   77f28:	48 0f af d1          	imul   %rcx,%rdx
+   77f2c:	48 89 95 18 ff ff ff 	mov    %rdx,-0xe8(%rbp)
+   77f33:	49 8b 4e 70          	mov    0x70(%r14),%rcx
+   77f37:	4c 8d 55 90          	lea    -0x70(%rbp),%r10
+   77f3b:	4c 8b 9d 18 ff ff ff 	mov    -0xe8(%rbp),%r11
+   77f42:	48 8b d1             	mov    %rcx,%rdx
+   77f45:	c4 c2 93 f6 d3       	mulx   %r11,%r13,%rdx
+   77f4a:	4d 89 2a             	mov    %r13,(%r10)
+   77f4d:	49 8b 4e 08          	mov    0x8(%r14),%rcx
+   77f51:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
+   77f55:	49 33 56 48          	xor    0x48(%r14),%rdx
+   77f59:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77f60:	c1 7c 51 
+   77f63:	48 0f af d1          	imul   %rcx,%rdx
+   77f67:	48 8b cb             	mov    %rbx,%rcx
+   77f6a:	49 33 d3             	xor    %r11,%rdx
+   77f6d:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
+   77f72:	48 8b 09             	mov    (%rcx),%rcx
+   77f75:	4c 8d 55 88          	lea    -0x78(%rbp),%r10
+   77f79:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
+   77f7e:	4d 89 1a             	mov    %r11,(%r10)
+   77f81:	49 3b d0             	cmp    %r8,%rdx
+   77f84:	72 0d                	jb     77f93 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x193>
+   77f86:	41 2b d0             	sub    %r8d,%edx
+   77f89:	49 8b 4e 58          	mov    0x58(%r14),%rcx
+   77f8d:	48 63 d2             	movslq %edx,%rdx
+   77f90:	8b 14 91             	mov    (%rcx,%rdx,4),%edx
+   77f93:	48 63 c8             	movslq %eax,%rcx
+   77f96:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
+   77f9a:	ff c0                	inc    %eax
+   77f9c:	3b c7                	cmp    %edi,%eax
+   77f9e:	0f 8c 52 ff ff ff    	jl     77ef6 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0xf6>
+   77fa4:	e9 b3 00 00 00       	jmp    7805c <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x25c>
+   77fa9:	33 c0                	xor    %eax,%eax
+   77fab:	85 ff                	test   %edi,%edi
+   77fad:	0f 8e a9 00 00 00    	jle    7805c <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x25c>
+   77fb3:	49 8d 9e 80 00 00 00 	lea    0x80(%r14),%rbx
+   77fba:	48 63 d0             	movslq %eax,%rdx
+   77fbd:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
+   77fc1:	49 33 56 48          	xor    0x48(%r14),%rdx
+   77fc5:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77fcc:	c1 7c 51 
+   77fcf:	4c 8d 45 80          	lea    -0x80(%rbp),%r8
+   77fd3:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
+   77fd8:	4d 89 10             	mov    %r10,(%r8)
+   77fdb:	48 8b 4d 80          	mov    -0x80(%rbp),%rcx
+   77fdf:	48 33 d1             	xor    %rcx,%rdx
+   77fe2:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   77fe9:	c1 7c 51 
+   77fec:	48 0f af d1          	imul   %rcx,%rdx
+   77ff0:	48 89 95 10 ff ff ff 	mov    %rdx,-0xf0(%rbp)
+   77ff7:	49 8b 4e 70          	mov    0x70(%r14),%rcx
+   77ffb:	4c 8d 85 78 ff ff ff 	lea    -0x88(%rbp),%r8
+   78002:	4c 8b 95 10 ff ff ff 	mov    -0xf0(%rbp),%r10
+   78009:	48 8b d1             	mov    %rcx,%rdx
+   7800c:	c4 c2 a3 f6 d2       	mulx   %r10,%r11,%rdx
+   78011:	4d 89 18             	mov    %r11,(%r8)
+   78014:	49 8b 4e 08          	mov    0x8(%r14),%rcx
+   78018:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
+   7801c:	49 33 56 48          	xor    0x48(%r14),%rdx
+   78020:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+   78027:	c1 7c 51 
+   7802a:	48 0f af d1          	imul   %rcx,%rdx
+   7802e:	48 8b cb             	mov    %rbx,%rcx
+   78031:	49 33 d2             	xor    %r10,%rdx
+   78034:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
+   78039:	48 8b 09             	mov    (%rcx),%rcx
+   7803c:	4c 8d 85 70 ff ff ff 	lea    -0x90(%rbp),%r8
+   78043:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
+   78048:	4d 89 10             	mov    %r10,(%r8)
+   7804b:	48 63 c8             	movslq %eax,%rcx
+   7804e:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
+   78052:	ff c0                	inc    %eax
+   78054:	3b c7                	cmp    %edi,%eax
+   78056:	0f 8c 5e ff ff ff    	jl     77fba <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x1ba>
+   7805c:	33 d2                	xor    %edx,%edx
+   7805e:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
+   78062:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
+   78066:	e9 a3 01 00 00       	jmp    7820e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x40e>
+   7806b:	44 8b ef             	mov    %edi,%r13d
+   7806e:	48 8b fe             	mov    %rsi,%rdi
+   78071:	8b f0                	mov    %eax,%esi
+   78073:	44 3b ee             	cmp    %esi,%r13d
+   78076:	0f 85 fc 02 00 00    	jne    78378 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x578>
+   7807c:	41 0f b6 46 54       	movzbl 0x54(%r14),%eax
+   78081:	4d 8b 66 38          	mov    0x38(%r14),%r12
+   78085:	33 c9                	xor    %ecx,%ecx
+   78087:	45 85 ed             	test   %r13d,%r13d
+   7808a:	48 0f 45 ca          	cmovne %rdx,%rcx
+   7808e:	48 89 8d 68 ff ff ff 	mov    %rcx,-0x98(%rbp)
+   78095:	48 8b d9             	mov    %rcx,%rbx
+   78098:	33 d2                	xor    %edx,%edx
+   7809a:	85 f6                	test   %esi,%esi
+   7809c:	48 0f 45 d7          	cmovne %rdi,%rdx
+   780a0:	48 89 95 60 ff ff ff 	mov    %rdx,-0xa0(%rbp)
+   780a7:	48 8b ca             	mov    %rdx,%rcx
+   780aa:	48 89 8d 58 ff ff ff 	mov    %rcx,-0xa8(%rbp)
+   780b1:	85 c0                	test   %eax,%eax
+   780b3:	0f 84 18 01 00 00    	je     781d1 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3d1>
+   780b9:	33 c0                	xor    %eax,%eax
+   780bb:	45 85 ed             	test   %r13d,%r13d
+   780be:	0f 8e 3a 01 00 00    	jle    781fe <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3fe>
+   780c4:	89 85 54 ff ff ff    	mov    %eax,-0xac(%rbp)
+   780ca:	48 63 d0             	movslq %eax,%rdx
+   780cd:	48 8b 14 d3          	mov    (%rbx,%rdx,8),%rdx
+   780d1:	49 33 56 48          	xor    0x48(%r14),%rdx
+   780d5:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+   780dc:	c1 7c 51 
+   780df:	48 8d b5 40 ff ff ff 	lea    -0xc0(%rbp),%rsi
+   780e6:	c4 62 bb f6 cf       	mulx   %rdi,%r8,%r9
+   780eb:	4c 89 06             	mov    %r8,(%rsi)
+   780ee:	4c 8b 85 40 ff ff ff 	mov    -0xc0(%rbp),%r8
+   780f5:	4d 33 c1             	xor    %r9,%r8
+   780f8:	4c 0f af c7          	imul   %rdi,%r8
+   780fc:	49 8b f8             	mov    %r8,%rdi
+   780ff:	48 89 bd 08 ff ff ff 	mov    %rdi,-0xf8(%rbp)
+   78106:	49 8d 56 78          	lea    0x78(%r14),%rdx
+   7810a:	48 8b 12             	mov    (%rdx),%rdx
+   7810d:	48 8d b5 38 ff ff ff 	lea    -0xc8(%rbp),%rsi
+   78114:	c4 e2 bb f6 d7       	mulx   %rdi,%r8,%rdx
+   78119:	4c 89 06             	mov    %r8,(%rsi)
+   7811c:	49 8b 76 08          	mov    0x8(%r14),%rsi
+   78120:	0f b6 14 16          	movzbl (%rsi,%rdx,1),%edx
+   78124:	48 89 95 48 ff ff ff 	mov    %rdx,-0xb8(%rbp)
+   7812b:	49 8d 7e 68          	lea    0x68(%r14),%rdi
+   7812f:	48 8b b5 08 ff ff ff 	mov    -0xf8(%rbp),%rsi
+   78136:	e8 f5 30 00 00       	call   7b230 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Computation_FastReduce__Reduce>
+   7813b:	49 0f af 46 18       	imul   0x18(%r14),%rax
+   78140:	48 89 85 30 ff ff ff 	mov    %rax,-0xd0(%rbp)
+   78147:	48 8b bd 48 ff ff ff 	mov    -0xb8(%rbp),%rdi
+   7814e:	49 33 7e 48          	xor    0x48(%r14),%rdi
+   78152:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
+   78159:	c1 7c 51 
+   7815c:	48 0f af fe          	imul   %rsi,%rdi
+   78160:	49 8d b6 80 00 00 00 	lea    0x80(%r14),%rsi
+   78167:	48 8b 95 08 ff ff ff 	mov    -0xf8(%rbp),%rdx
+   7816e:	48 33 fa             	xor    %rdx,%rdi
+   78171:	48 0f af 7e 08       	imul   0x8(%rsi),%rdi
+   78176:	48 8b 16             	mov    (%rsi),%rdx
+   78179:	33 f6                	xor    %esi,%esi
+   7817b:	33 c9                	xor    %ecx,%ecx
+   7817d:	e8 ae bf 01 00       	call   94130 <S_P_CoreLib_System_UInt128__op_Multiply>
+   78182:	48 8b f8             	mov    %rax,%rdi
+   78185:	48 8b f2             	mov    %rdx,%rsi
+   78188:	ba 40 00 00 00       	mov    $0x40,%edx
+   7818d:	e8 ee bf 01 00       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+   78192:	48 8b b5 30 ff ff ff 	mov    -0xd0(%rbp),%rsi
+   78199:	48 03 f0             	add    %rax,%rsi
+   7819c:	49 3b f4             	cmp    %r12,%rsi
+   7819f:	72 0d                	jb     781ae <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3ae>
+   781a1:	41 2b f4             	sub    %r12d,%esi
+   781a4:	49 8b 7e 58          	mov    0x58(%r14),%rdi
+   781a8:	48 63 f6             	movslq %esi,%rsi
+   781ab:	8b 34 b7             	mov    (%rdi,%rsi,4),%esi
+   781ae:	8b bd 54 ff ff ff    	mov    -0xac(%rbp),%edi
+   781b4:	48 63 c7             	movslq %edi,%rax
+   781b7:	48 8b 8d 58 ff ff ff 	mov    -0xa8(%rbp),%rcx
+   781be:	48 89 34 c1          	mov    %rsi,(%rcx,%rax,8)
+   781c2:	ff c7                	inc    %edi
+   781c4:	41 3b fd             	cmp    %r13d,%edi
+   781c7:	8b c7                	mov    %edi,%eax
+   781c9:	0f 8c f5 fe ff ff    	jl     780c4 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x2c4>
+   781cf:	eb 2d                	jmp    781fe <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3fe>
+   781d1:	45 33 e4             	xor    %r12d,%r12d
+   781d4:	45 85 ed             	test   %r13d,%r13d
+   781d7:	7e 25                	jle    781fe <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3fe>
+   781d9:	49 63 f4             	movslq %r12d,%rsi
+   781dc:	48 8b 34 f3          	mov    (%rbx,%rsi,8),%rsi
+   781e0:	49 8b fe             	mov    %r14,%rdi
+   781e3:	e8 f8 bd 08 00       	call   103fe0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>
+   781e8:	49 63 fc             	movslq %r12d,%rdi
+   781eb:	48 8b b5 58 ff ff ff 	mov    -0xa8(%rbp),%rsi
+   781f2:	48 89 04 fe          	mov    %rax,(%rsi,%rdi,8)
+   781f6:	41 ff c4             	inc    %r12d
+   781f9:	45 3b e5             	cmp    %r13d,%r12d
+   781fc:	7c db                	jl     781d9 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3d9>
+   781fe:	33 ff                	xor    %edi,%edi
+   78200:	48 89 bd 60 ff ff ff 	mov    %rdi,-0xa0(%rbp)
+   78207:	48 89 bd 68 ff ff ff 	mov    %rdi,-0x98(%rbp)
+   7820e:	48 8b 3d 13 39 1b 00 	mov    0x1b3913(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   78215:	48 8b 5f 18          	mov    0x18(%rdi),%rbx
+   78219:	48 8b 3d 08 39 1b 00 	mov    0x1b3908(%rip),%rdi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   78220:	48 8b 7f 10          	mov    0x10(%rdi),%rdi
+   78224:	48 85 ff             	test   %rdi,%rdi
+   78227:	75 08                	jne    78231 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x431>
+   78229:	45 33 f6             	xor    %r14d,%r14d
+   7822c:	45 33 ed             	xor    %r13d,%r13d
+   7822f:	eb 08                	jmp    78239 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x439>
+   78231:	4c 8d 77 10          	lea    0x10(%rdi),%r14
+   78235:	44 8b 6f 08          	mov    0x8(%rdi),%r13d
+   78239:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   7823d:	c5 fa 7f 85 20 ff ff 	vmovdqu %xmm0,-0xe0(%rbp)
+   78244:	ff 
+   78245:	48 8d bd 20 ff ff ff 	lea    -0xe0(%rbp),%rdi
+   7824c:	49 8b f7             	mov    %r15,%rsi
+   7824f:	e8 1c 30 09 00       	call   10b270 <S_P_CoreLib_System_Span_1<UIntPtr>___ctor>
+   78254:	48 8b 8d 20 ff ff ff 	mov    -0xe0(%rbp),%rcx
+   7825b:	44 8b 85 28 ff ff ff 	mov    -0xd8(%rbp),%r8d
+   78262:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
+   78266:	74 13                	je     7827b <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x47b>
+   78268:	49 8b f6             	mov    %r14,%rsi
+   7826b:	41 8b d5             	mov    %r13d,%edx
+   7826e:	48 8b fb             	mov    %rbx,%rdi
+   78271:	45 33 c9             	xor    %r9d,%r9d
+   78274:	e8 e7 c8 08 00       	call   104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart>
+   78279:	eb 11                	jmp    7828c <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x48c>
+   7827b:	49 8b f6             	mov    %r14,%rsi
+   7827e:	41 8b d5             	mov    %r13d,%edx
+   78281:	48 8b fb             	mov    %rbx,%rdi
+   78284:	45 33 c9             	xor    %r9d,%r9d
+   78287:	e8 f4 ca 08 00       	call   104d80 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart>
+   7828c:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
+   78290:	be 25 00 00 00       	mov    $0x25,%esi
+   78295:	ba 01 00 00 00       	mov    $0x1,%edx
+   7829a:	e8 61 8f 04 00       	call   c1200 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler___ctor>
+   7829f:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
+   782a3:	8b 75 c0             	mov    -0x40(%rbp),%esi
+   782a6:	e8 85 1e 08 00       	call   fa130 <S_P_CoreLib_System_Span_1<Char>__Slice>
+   782ab:	48 8b f0             	mov    %rax,%rsi
+   782ae:	48 8d 3d 63 9f 1c 00 	lea    0x1c9f63(%rip),%rdi        # 242218 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
+   782b5:	39 3f                	cmp    %edi,(%rdi)
+   782b7:	e8 04 c9 00 00       	call   84bc0 <String__TryCopyTo>
+   782bc:	85 c0                	test   %eax,%eax
+   782be:	74 0b                	je     782cb <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x4cb>
+   782c0:	8b 7d c0             	mov    -0x40(%rbp),%edi
+   782c3:	83 c7 0c             	add    $0xc,%edi
+   782c6:	89 7d c0             	mov    %edi,-0x40(%rbp)
+   782c9:	eb 10                	jmp    782db <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x4db>
+   782cb:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
+   782cf:	48 8d 35 42 9f 1c 00 	lea    0x1c9f42(%rip),%rsi        # 242218 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
+   782d6:	e8 05 91 04 00       	call   c13e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
+   782db:	48 8b 35 46 38 1b 00 	mov    0x1b3846(%rip),%rsi        # 22bb28 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
+   782e2:	48 8b 76 10          	mov    0x10(%rsi),%rsi
+   782e6:	8b 76 08             	mov    0x8(%rsi),%esi
+   782e9:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
+   782ed:	e8 6e b9 0b 00       	call   133c60 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__AppendFormatted<Int32>>
+   782f2:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
+   782f6:	8b 75 c0             	mov    -0x40(%rbp),%esi
+   782f9:	e8 32 1e 08 00       	call   fa130 <S_P_CoreLib_System_Span_1<Char>__Slice>
+   782fe:	48 8b f0             	mov    %rax,%rsi
+   78301:	48 8d 3d 50 a4 1c 00 	lea    0x1ca450(%rip),%rdi        # 242758 <__Str__keys_without_prefetching_D8A361755FCD551AE19C922C947806AAE44FC92E986D052C498A0E8B5AAA0C53>
+   78308:	39 3f                	cmp    %edi,(%rdi)
+   7830a:	e8 b1 c8 00 00       	call   84bc0 <String__TryCopyTo>
+   7830f:	85 c0                	test   %eax,%eax
+   78311:	74 0b                	je     7831e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x51e>
+   78313:	8b 7d c0             	mov    -0x40(%rbp),%edi
+   78316:	83 c7 19             	add    $0x19,%edi
+   78319:	89 7d c0             	mov    %edi,-0x40(%rbp)
+   7831c:	eb 10                	jmp    7832e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x52e>
+   7831e:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
+   78322:	48 8d 35 2f a4 1c 00 	lea    0x1ca42f(%rip),%rsi        # 242758 <__Str__keys_without_prefetching_D8A361755FCD551AE19C922C947806AAE44FC92E986D052C498A0E8B5AAA0C53>
+   78329:	e8 b2 90 04 00       	call   c13e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
+   7832e:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
+   78332:	e8 69 8f 04 00       	call   c12a0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__ToStringAndClear>
+   78337:	48 8b f8             	mov    %rax,%rdi
+   7833a:	e8 f1 46 00 00       	call   7ca30 <System_Console_System_Console__WriteLine_12>
+   7833f:	90                   	nop
+   78340:	48 81 c4 d8 00 00 00 	add    $0xd8,%rsp
+   78347:	5b                   	pop    %rbx
+   78348:	41 5c                	pop    %r12
+   7834a:	41 5d                	pop    %r13
+   7834c:	41 5e                	pop    %r14
+   7834e:	41 5f                	pop    %r15
+   78350:	5d                   	pop    %rbp
+   78351:	c3                   	ret
+   78352:	48 8d 3d af 4e 1e 00 	lea    0x1e4eaf(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+   78359:	e8 46 d2 fe ff       	call   655a4 <RhpNewFast>
+   7835e:	48 8b d8             	mov    %rax,%rbx
+   78361:	48 8b fb             	mov    %rbx,%rdi
+   78364:	48 8d 35 f5 1d 1d 00 	lea    0x1d1df5(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+   7836b:	e8 e0 2b 01 00       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+   78370:	48 8b fb             	mov    %rbx,%rdi
+   78373:	e8 96 d4 fe ff       	call   6580e <RhpThrowEx>
+   78378:	48 8d 3d 89 4e 1e 00 	lea    0x1e4e89(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+   7837f:	e8 20 d2 fe ff       	call   655a4 <RhpNewFast>
+   78384:	48 8b d8             	mov    %rax,%rbx
+   78387:	48 8b fb             	mov    %rbx,%rdi
+   7838a:	48 8d 35 cf 1d 1d 00 	lea    0x1d1dcf(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+   78391:	e8 ba 2b 01 00       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+   78396:	48 8b fb             	mov    %rbx,%rdi
+   78399:	e8 70 d4 fe ff       	call   6580e <RhpThrowEx>
+   7839e:	cc                   	int3
+   7839f:	90                   	nop
+
+00000000001047a0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream>:
+  1047a0:	55                   	push   %rbp
+  1047a1:	41 57                	push   %r15
+  1047a3:	41 56                	push   %r14
+  1047a5:	41 55                	push   %r13
+  1047a7:	41 54                	push   %r12
+  1047a9:	53                   	push   %rbx
+  1047aa:	48 81 ec 88 00 00 00 	sub    $0x88,%rsp
+  1047b1:	c5 f8 77             	vzeroupper
+  1047b4:	48 8d ac 24 b0 00 00 	lea    0xb0(%rsp),%rbp
+  1047bb:	00 
+  1047bc:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  1047c1:	48 b8 a0 ff ff ff ff 	movabs $0xffffffffffffffa0,%rax
+  1047c8:	ff ff ff 
+  1047cb:	c5 79 7f 44 05 d0    	vmovdqa %xmm8,-0x30(%rbp,%rax,1)
+  1047d1:	c5 79 7f 44 05 e0    	vmovdqa %xmm8,-0x20(%rbp,%rax,1)
+  1047d7:	c5 79 7f 44 05 f0    	vmovdqa %xmm8,-0x10(%rbp,%rax,1)
+  1047dd:	48 83 c0 30          	add    $0x30,%rax
+  1047e1:	75 e8                	jne    1047cb <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2b>
+  1047e3:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
+  1047e7:	48 8b df             	mov    %rdi,%rbx
+  1047ea:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
+  1047ee:	0f 84 2c 02 00 00    	je     104a20 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x280>
+  1047f4:	44 8b fa             	mov    %edx,%r15d
+  1047f7:	45 3b f8             	cmp    %r8d,%r15d
+  1047fa:	0f 85 12 03 00 00    	jne    104b12 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x372>
+  104800:	45 84 c9             	test   %r9b,%r9b
+  104803:	74 06                	je     10480b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x6b>
+  104805:	0f b6 53 54          	movzbl 0x54(%rbx),%edx
+  104809:	eb 02                	jmp    10480d <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x6d>
+  10480b:	33 d2                	xor    %edx,%edx
+  10480d:	4c 8b 73 38          	mov    0x38(%rbx),%r14
+  104811:	33 ff                	xor    %edi,%edi
+  104813:	45 85 ff             	test   %r15d,%r15d
+  104816:	48 0f 45 fe          	cmovne %rsi,%rdi
+  10481a:	48 89 7d d0          	mov    %rdi,-0x30(%rbp)
+  10481e:	4c 8b ef             	mov    %rdi,%r13
+  104821:	33 ff                	xor    %edi,%edi
+  104823:	45 85 c0             	test   %r8d,%r8d
+  104826:	48 0f 45 f9          	cmovne %rcx,%rdi
+  10482a:	48 89 7d c8          	mov    %rdi,-0x38(%rbp)
+  10482e:	4c 8b e7             	mov    %rdi,%r12
+  104831:	85 d2                	test   %edx,%edx
+  104833:	0f 84 dd 00 00 00    	je     104916 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x176>
+  104839:	33 c0                	xor    %eax,%eax
+  10483b:	45 85 ff             	test   %r15d,%r15d
+  10483e:	0f 8e c0 01 00 00    	jle    104a04 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x264>
+  104844:	89 45 c4             	mov    %eax,-0x3c(%rbp)
+  104847:	48 63 d0             	movslq %eax,%rdx
+  10484a:	49 8b 54 d5 00       	mov    0x0(%r13,%rdx,8),%rdx
+  10484f:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  104853:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  10485a:	c1 7c 51 
+  10485d:	48 8d 75 b8          	lea    -0x48(%rbp),%rsi
+  104861:	c4 e2 f3 f6 d7       	mulx   %rdi,%rcx,%rdx
+  104866:	48 89 0e             	mov    %rcx,(%rsi)
+  104869:	48 8b 7d b8          	mov    -0x48(%rbp),%rdi
+  10486d:	48 33 d7             	xor    %rdi,%rdx
+  104870:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  104877:	c1 7c 51 
+  10487a:	48 0f af d7          	imul   %rdi,%rdx
+  10487e:	48 89 95 60 ff ff ff 	mov    %rdx,-0xa0(%rbp)
+  104885:	48 8b 7b 70          	mov    0x70(%rbx),%rdi
+  104889:	48 8d 75 b0          	lea    -0x50(%rbp),%rsi
+  10488d:	48 8b 8d 60 ff ff ff 	mov    -0xa0(%rbp),%rcx
+  104894:	48 8b d7             	mov    %rdi,%rdx
+  104897:	c4 e2 bb f6 d1       	mulx   %rcx,%r8,%rdx
+  10489c:	4c 89 06             	mov    %r8,(%rsi)
+  10489f:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
+  1048a3:	0f b6 14 17          	movzbl (%rdi,%rdx,1),%edx
+  1048a7:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  1048ab:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  1048b2:	c1 7c 51 
+  1048b5:	48 0f af d7          	imul   %rdi,%rdx
+  1048b9:	48 8d bb 80 00 00 00 	lea    0x80(%rbx),%rdi
+  1048c0:	48 33 d1             	xor    %rcx,%rdx
+  1048c3:	48 0f af 57 08       	imul   0x8(%rdi),%rdx
+  1048c8:	48 8b 3f             	mov    (%rdi),%rdi
+  1048cb:	48 8d 75 a8          	lea    -0x58(%rbp),%rsi
+  1048cf:	c4 e2 f3 f6 ff       	mulx   %rdi,%rcx,%rdi
+  1048d4:	48 89 0e             	mov    %rcx,(%rsi)
+  1048d7:	48 8b f7             	mov    %rdi,%rsi
+  1048da:	48 8b 7d a8          	mov    -0x58(%rbp),%rdi
+  1048de:	ba 40 00 00 00       	mov    $0x40,%edx
+  1048e3:	e8 98 f8 f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1048e8:	49 3b c6             	cmp    %r14,%rax
+  1048eb:	72 0d                	jb     1048fa <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x15a>
+  1048ed:	41 2b c6             	sub    %r14d,%eax
+  1048f0:	48 8b 53 58          	mov    0x58(%rbx),%rdx
+  1048f4:	48 63 f8             	movslq %eax,%rdi
+  1048f7:	8b 04 ba             	mov    (%rdx,%rdi,4),%eax
+  1048fa:	8b 55 c4             	mov    -0x3c(%rbp),%edx
+  1048fd:	48 63 fa             	movslq %edx,%rdi
+  104900:	49 89 04 fc          	mov    %rax,(%r12,%rdi,8)
+  104904:	ff c2                	inc    %edx
+  104906:	41 3b d7             	cmp    %r15d,%edx
+  104909:	8b c2                	mov    %edx,%eax
+  10490b:	0f 8c 33 ff ff ff    	jl     104844 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0xa4>
+  104911:	e9 ee 00 00 00       	jmp    104a04 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x264>
+  104916:	45 33 f6             	xor    %r14d,%r14d
+  104919:	45 85 ff             	test   %r15d,%r15d
+  10491c:	0f 8e e2 00 00 00    	jle    104a04 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x264>
+  104922:	49 63 d6             	movslq %r14d,%rdx
+  104925:	49 8b 7c d5 00       	mov    0x0(%r13,%rdx,8),%rdi
+  10492a:	48 33 7b 48          	xor    0x48(%rbx),%rdi
+  10492e:	48 8d 55 a0          	lea    -0x60(%rbp),%rdx
+  104932:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
+  104939:	c1 7c 51 
+  10493c:	e8 9f f4 f7 ff       	call   83de0 <S_P_CoreLib_System_Math__BigMul_0>
+  104941:	48 8b f0             	mov    %rax,%rsi
+  104944:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+  104948:	c5 f8 11 45 90       	vmovups %xmm0,-0x70(%rbp)
+  10494d:	48 8d 7d 90          	lea    -0x70(%rbp),%rdi
+  104951:	48 8b 55 a0          	mov    -0x60(%rbp),%rdx
+  104955:	e8 a6 f7 f8 ff       	call   94100 <S_P_CoreLib_System_UInt128___ctor>
+  10495a:	48 8b 45 90          	mov    -0x70(%rbp),%rax
+  10495e:	48 89 85 58 ff ff ff 	mov    %rax,-0xa8(%rbp)
+  104965:	48 8b 75 98          	mov    -0x68(%rbp),%rsi
+  104969:	48 8b f8             	mov    %rax,%rdi
+  10496c:	ba 40 00 00 00       	mov    $0x40,%edx
+  104971:	e8 0a f8 f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104976:	48 8b 8d 58 ff ff ff 	mov    -0xa8(%rbp),%rcx
+  10497d:	48 33 c1             	xor    %rcx,%rax
+  104980:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
+  104987:	c1 7c 51 
+  10498a:	48 0f af c1          	imul   %rcx,%rax
+  10498e:	48 89 85 50 ff ff ff 	mov    %rax,-0xb0(%rbp)
+  104995:	48 8b fb             	mov    %rbx,%rdi
+  104998:	48 8b b5 50 ff ff ff 	mov    -0xb0(%rbp),%rsi
+  10499f:	e8 bc fc ff ff       	call   104660 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__BucketInPart>
+  1049a4:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
+  1049a8:	40 0f b6 3c 07       	rex movzbl (%rdi,%rax,1),%edi
+  1049ad:	48 33 7b 48          	xor    0x48(%rbx),%rdi
+  1049b1:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
+  1049b8:	c1 7c 51 
+  1049bb:	48 0f af fe          	imul   %rsi,%rdi
+  1049bf:	48 8d b3 80 00 00 00 	lea    0x80(%rbx),%rsi
+  1049c6:	48 8b 95 50 ff ff ff 	mov    -0xb0(%rbp),%rdx
+  1049cd:	48 33 fa             	xor    %rdx,%rdi
+  1049d0:	48 0f af 7e 08       	imul   0x8(%rsi),%rdi
+  1049d5:	48 8b 16             	mov    (%rsi),%rdx
+  1049d8:	33 f6                	xor    %esi,%esi
+  1049da:	33 c9                	xor    %ecx,%ecx
+  1049dc:	e8 4f f7 f8 ff       	call   94130 <S_P_CoreLib_System_UInt128__op_Multiply>
+  1049e1:	48 8b f8             	mov    %rax,%rdi
+  1049e4:	48 8b f2             	mov    %rdx,%rsi
+  1049e7:	ba 40 00 00 00       	mov    $0x40,%edx
+  1049ec:	e8 8f f7 f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1049f1:	49 63 fe             	movslq %r14d,%rdi
+  1049f4:	49 89 04 fc          	mov    %rax,(%r12,%rdi,8)
+  1049f8:	41 ff c6             	inc    %r14d
+  1049fb:	45 3b f7             	cmp    %r15d,%r14d
+  1049fe:	0f 8c 1e ff ff ff    	jl     104922 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x182>
+  104a04:	33 ff                	xor    %edi,%edi
+  104a06:	48 89 7d c8          	mov    %rdi,-0x38(%rbp)
+  104a0a:	48 89 7d d0          	mov    %rdi,-0x30(%rbp)
+  104a0e:	48 81 c4 88 00 00 00 	add    $0x88,%rsp
+  104a15:	5b                   	pop    %rbx
+  104a16:	41 5c                	pop    %r12
+  104a18:	41 5d                	pop    %r13
+  104a1a:	41 5e                	pop    %r14
+  104a1c:	41 5f                	pop    %r15
+  104a1e:	5d                   	pop    %rbp
+  104a1f:	c3                   	ret
+  104a20:	48 8b fe             	mov    %rsi,%rdi
+  104a23:	44 8b fa             	mov    %edx,%r15d
+  104a26:	48 89 4d 80          	mov    %rcx,-0x80(%rbp)
+  104a2a:	44 89 45 88          	mov    %r8d,-0x78(%rbp)
+  104a2e:	44 3b 7d 88          	cmp    -0x78(%rbp),%r15d
+  104a32:	0f 85 00 01 00 00    	jne    104b38 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x398>
+  104a38:	45 84 c9             	test   %r9b,%r9b
+  104a3b:	74 07                	je     104a44 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2a4>
+  104a3d:	44 0f b6 73 54       	movzbl 0x54(%rbx),%r14d
+  104a42:	eb 03                	jmp    104a47 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2a7>
+  104a44:	45 33 f6             	xor    %r14d,%r14d
+  104a47:	4c 8b 6b 38          	mov    0x38(%rbx),%r13
+  104a4b:	33 c0                	xor    %eax,%eax
+  104a4d:	45 85 ff             	test   %r15d,%r15d
+  104a50:	48 0f 45 c7          	cmovne %rdi,%rax
+  104a54:	48 89 85 78 ff ff ff 	mov    %rax,-0x88(%rbp)
+  104a5b:	4c 8b e0             	mov    %rax,%r12
+  104a5e:	48 8d 7d 80          	lea    -0x80(%rbp),%rdi
+  104a62:	e8 29 68 00 00       	call   10b290 <S_P_CoreLib_System_Span_1<UIntPtr>__GetPinnableReference>
+  104a67:	48 89 85 70 ff ff ff 	mov    %rax,-0x90(%rbp)
+  104a6e:	48 8b 85 70 ff ff ff 	mov    -0x90(%rbp),%rax
+  104a75:	48 89 85 68 ff ff ff 	mov    %rax,-0x98(%rbp)
+  104a7c:	45 85 f6             	test   %r14d,%r14d
+  104a7f:	74 41                	je     104ac2 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x322>
+  104a81:	45 33 f6             	xor    %r14d,%r14d
+  104a84:	45 85 ff             	test   %r15d,%r15d
+  104a87:	7e 67                	jle    104af0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x350>
+  104a89:	49 63 f6             	movslq %r14d,%rsi
+  104a8c:	49 8b 34 f4          	mov    (%r12,%rsi,8),%rsi
+  104a90:	48 8b fb             	mov    %rbx,%rdi
+  104a93:	e8 48 f5 ff ff       	call   103fe0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>
+  104a98:	49 3b c5             	cmp    %r13,%rax
+  104a9b:	72 0d                	jb     104aaa <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x30a>
+  104a9d:	41 2b c5             	sub    %r13d,%eax
+  104aa0:	48 8b 73 58          	mov    0x58(%rbx),%rsi
+  104aa4:	48 63 f8             	movslq %eax,%rdi
+  104aa7:	8b 04 be             	mov    (%rsi,%rdi,4),%eax
+  104aaa:	49 63 f6             	movslq %r14d,%rsi
+  104aad:	48 8b 8d 68 ff ff ff 	mov    -0x98(%rbp),%rcx
+  104ab4:	48 89 04 f1          	mov    %rax,(%rcx,%rsi,8)
+  104ab8:	41 ff c6             	inc    %r14d
+  104abb:	45 3b f7             	cmp    %r15d,%r14d
+  104abe:	7c c9                	jl     104a89 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2e9>
+  104ac0:	eb 2e                	jmp    104af0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x350>
+  104ac2:	45 33 f6             	xor    %r14d,%r14d
+  104ac5:	45 85 ff             	test   %r15d,%r15d
+  104ac8:	7e 26                	jle    104af0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x350>
+  104aca:	49 63 f6             	movslq %r14d,%rsi
+  104acd:	49 8b 34 f4          	mov    (%r12,%rsi,8),%rsi
+  104ad1:	48 8b fb             	mov    %rbx,%rdi
+  104ad4:	e8 07 f5 ff ff       	call   103fe0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>
+  104ad9:	49 63 fe             	movslq %r14d,%rdi
+  104adc:	4c 8b ad 68 ff ff ff 	mov    -0x98(%rbp),%r13
+  104ae3:	49 89 44 fd 00       	mov    %rax,0x0(%r13,%rdi,8)
+  104ae8:	41 ff c6             	inc    %r14d
+  104aeb:	45 3b f7             	cmp    %r15d,%r14d
+  104aee:	7c da                	jl     104aca <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x32a>
+  104af0:	33 ff                	xor    %edi,%edi
+  104af2:	48 89 bd 70 ff ff ff 	mov    %rdi,-0x90(%rbp)
+  104af9:	48 89 bd 78 ff ff ff 	mov    %rdi,-0x88(%rbp)
+  104b00:	48 81 c4 88 00 00 00 	add    $0x88,%rsp
+  104b07:	5b                   	pop    %rbx
+  104b08:	41 5c                	pop    %r12
+  104b0a:	41 5d                	pop    %r13
+  104b0c:	41 5e                	pop    %r14
+  104b0e:	41 5f                	pop    %r15
+  104b10:	5d                   	pop    %rbp
+  104b11:	c3                   	ret
+  104b12:	48 8d 3d ef 86 15 00 	lea    0x1586ef(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+  104b19:	e8 86 0a f6 ff       	call   655a4 <RhpNewFast>
+  104b1e:	48 8b d8             	mov    %rax,%rbx
+  104b21:	48 8b fb             	mov    %rbx,%rdi
+  104b24:	48 8d 35 35 56 14 00 	lea    0x145635(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+  104b2b:	e8 20 64 f8 ff       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+  104b30:	48 8b fb             	mov    %rbx,%rdi
+  104b33:	e8 d6 0c f6 ff       	call   6580e <RhpThrowEx>
+  104b38:	48 8d 3d c9 86 15 00 	lea    0x1586c9(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+  104b3f:	e8 60 0a f6 ff       	call   655a4 <RhpNewFast>
+  104b44:	48 8b d8             	mov    %rax,%rbx
+  104b47:	48 8b fb             	mov    %rbx,%rdi
+  104b4a:	48 8d 35 0f 56 14 00 	lea    0x14560f(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+  104b51:	e8 fa 63 f8 ff       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+  104b56:	48 8b fb             	mov    %rbx,%rdi
+  104b59:	e8 b0 0c f6 ff       	call   6580e <RhpThrowEx>
+  104b5e:	cc                   	int3
   104b5f:	90                   	nop
 
-0000000000104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart>:
+0000000000104b60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart>:
   104b60:	55                   	push   %rbp
   104b61:	41 57                	push   %r15
-  104b63:	41 56                	push   %r14
-  104b65:	41 55                	push   %r13
-  104b67:	41 54                	push   %r12
-  104b69:	53                   	push   %rbx
-  104b6a:	48 81 ec a8 01 00 00 	sub    $0x1a8,%rsp
-  104b71:	48 8d ac 24 d0 01 00 	lea    0x1d0(%rsp),%rbp
-  104b78:	00 
-  104b79:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-  104b7e:	c5 79 7f 45 a0       	vmovdqa %xmm8,-0x60(%rbp)
-  104b83:	c5 79 7f 45 b0       	vmovdqa %xmm8,-0x50(%rbp)
-  104b88:	33 c0                	xor    %eax,%eax
-  104b8a:	48 89 45 c0          	mov    %rax,-0x40(%rbp)
-  104b8e:	48 8b 05 7b 78 0b 00 	mov    0xb787b(%rip),%rax        # 1bc410 <__security_cookie>
-  104b95:	48 89 85 38 fe ff ff 	mov    %rax,-0x1c8(%rbp)
-  104b9c:	48 8b df             	mov    %rdi,%rbx
-  104b9f:	44 8b fa             	mov    %edx,%r15d
-  104ba2:	45 3b f8             	cmp    %r8d,%r15d
-  104ba5:	0f 85 3b 07 00 00    	jne    1052e6 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x786>
-  104bab:	45 84 c9             	test   %r9b,%r9b
-  104bae:	74 06                	je     104bb6 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x56>
-  104bb0:	0f b6 53 54          	movzbl 0x54(%rbx),%edx
-  104bb4:	eb 02                	jmp    104bb8 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x58>
-  104bb6:	33 d2                	xor    %edx,%edx
-  104bb8:	44 0f b6 f2          	movzbl %dl,%r14d
-  104bbc:	44 89 75 d4          	mov    %r14d,-0x2c(%rbp)
-  104bc0:	4c 8b 6b 38          	mov    0x38(%rbx),%r13
-  104bc4:	4c 89 6d c8          	mov    %r13,-0x38(%rbp)
-  104bc8:	85 24 24             	test   %esp,(%rsp)
-  104bcb:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
-  104bd2:	4c 8d 24 24          	lea    (%rsp),%r12
-  104bd6:	85 24 24             	test   %esp,(%rsp)
-  104bd9:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
-  104be0:	48 8d 04 24          	lea    (%rsp),%rax
-  104be4:	85 24 24             	test   %esp,(%rsp)
-  104be7:	48 81 ec 00 01 00 00 	sub    $0x100,%rsp
-  104bee:	4c 8d 04 24          	lea    (%rsp),%r8
-  104bf2:	4c 8b ce             	mov    %rsi,%r9
-  104bf5:	4c 89 8d 48 fe ff ff 	mov    %r9,-0x1b8(%rbp)
-  104bfc:	48 89 8d 40 fe ff ff 	mov    %rcx,-0x1c0(%rbp)
-  104c03:	4c 89 65 c0          	mov    %r12,-0x40(%rbp)
-  104c07:	48 89 45 b0          	mov    %rax,-0x50(%rbp)
-  104c0b:	48 89 45 b8          	mov    %rax,-0x48(%rbp)
-  104c0f:	4c 89 45 a0          	mov    %r8,-0x60(%rbp)
-  104c13:	4c 89 45 a8          	mov    %r8,-0x58(%rbp)
-  104c17:	41 8b d7             	mov    %r15d,%edx
-  104c1a:	41 ba 20 00 00 00    	mov    $0x20,%r10d
-  104c20:	83 fa 20             	cmp    $0x20,%edx
-  104c23:	44 89 bd 7c fe ff ff 	mov    %r15d,-0x184(%rbp)
-  104c2a:	45 0f 4c d7          	cmovl  %r15d,%r10d
-  104c2e:	44 89 55 9c          	mov    %r10d,-0x64(%rbp)
-  104c32:	45 8b da             	mov    %r10d,%r11d
-  104c35:	41 83 e3 fc          	and    $0xfffffffc,%r11d
-  104c39:	44 89 5d 98          	mov    %r11d,-0x68(%rbp)
-  104c3d:	33 ff                	xor    %edi,%edi
-  104c3f:	45 85 db             	test   %r11d,%r11d
-  104c42:	0f 8e 95 06 00 00    	jle    1052dd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x77d>
-  104c48:	48 63 f7             	movslq %edi,%rsi
-  104c4b:	49 8b 14 f1          	mov    (%r9,%rsi,8),%rdx
-  104c4f:	48 89 55 88          	mov    %rdx,-0x78(%rbp)
-  104c53:	44 8d 5f 01          	lea    0x1(%rdi),%r11d
-  104c57:	4d 63 db             	movslq %r11d,%r11
-  104c5a:	4f 8b 14 d9          	mov    (%r9,%r11,8),%r10
-  104c5e:	4c 89 55 80          	mov    %r10,-0x80(%rbp)
-  104c62:	44 8d 57 02          	lea    0x2(%rdi),%r10d
-  104c66:	4d 63 d2             	movslq %r10d,%r10
-  104c69:	4b 8b 14 d1          	mov    (%r9,%r10,8),%rdx
-  104c6d:	48 89 95 78 ff ff ff 	mov    %rdx,-0x88(%rbp)
-  104c74:	8d 57 03             	lea    0x3(%rdi),%edx
-  104c77:	48 63 d2             	movslq %edx,%rdx
-  104c7a:	48 89 95 50 fe ff ff 	mov    %rdx,-0x1b0(%rbp)
-  104c81:	4d 8b 2c d1          	mov    (%r9,%rdx,8),%r13
-  104c85:	4c 89 ad 70 ff ff ff 	mov    %r13,-0x90(%rbp)
-  104c8c:	4c 8b 6d 88          	mov    -0x78(%rbp),%r13
-  104c90:	4c 33 6b 48          	xor    0x48(%rbx),%r13
-  104c94:	4c 89 ad 58 fe ff ff 	mov    %r13,-0x1a8(%rbp)
-  104c9b:	49 bd 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r13
-  104ca2:	c1 7c 51 
-  104ca5:	4c 8d b5 d8 fe ff ff 	lea    -0x128(%rbp),%r14
-  104cac:	48 8b 95 58 fe ff ff 	mov    -0x1a8(%rbp),%rdx
-  104cb3:	c4 c2 f3 f6 d5       	mulx   %r13,%rcx,%rdx
-  104cb8:	49 89 0e             	mov    %rcx,(%r14)
-  104cbb:	48 8b 8d d8 fe ff ff 	mov    -0x128(%rbp),%rcx
-  104cc2:	48 33 d1             	xor    %rcx,%rdx
-  104cc5:	49 0f af d5          	imul   %r13,%rdx
-  104cc9:	49 89 14 f4          	mov    %rdx,(%r12,%rsi,8)
-  104ccd:	48 8b 55 80          	mov    -0x80(%rbp),%rdx
-  104cd1:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  104cd5:	48 8d 8d d0 fe ff ff 	lea    -0x130(%rbp),%rcx
-  104cdc:	c4 c2 8b f6 d5       	mulx   %r13,%r14,%rdx
-  104ce1:	4c 89 31             	mov    %r14,(%rcx)
-  104ce4:	48 8b 8d d0 fe ff ff 	mov    -0x130(%rbp),%rcx
-  104ceb:	48 33 d1             	xor    %rcx,%rdx
-  104cee:	49 0f af d5          	imul   %r13,%rdx
-  104cf2:	4b 89 14 dc          	mov    %rdx,(%r12,%r11,8)
-  104cf6:	48 8b 95 78 ff ff ff 	mov    -0x88(%rbp),%rdx
-  104cfd:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  104d01:	48 8d 8d c8 fe ff ff 	lea    -0x138(%rbp),%rcx
-  104d08:	c4 c2 8b f6 d5       	mulx   %r13,%r14,%rdx
-  104d0d:	4c 89 31             	mov    %r14,(%rcx)
-  104d10:	48 8b 8d c8 fe ff ff 	mov    -0x138(%rbp),%rcx
-  104d17:	48 33 d1             	xor    %rcx,%rdx
-  104d1a:	49 0f af d5          	imul   %r13,%rdx
-  104d1e:	4b 89 14 d4          	mov    %rdx,(%r12,%r10,8)
-  104d22:	4c 8b ad 70 ff ff ff 	mov    -0x90(%rbp),%r13
-  104d29:	49 8b d5             	mov    %r13,%rdx
-  104d2c:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  104d30:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-  104d37:	c1 7c 51 
-  104d3a:	4c 8d b5 c0 fe ff ff 	lea    -0x140(%rbp),%r14
-  104d41:	c4 e2 93 f6 d1       	mulx   %rcx,%r13,%rdx
-  104d46:	4d 89 2e             	mov    %r13,(%r14)
-  104d49:	48 8b 8d c0 fe ff ff 	mov    -0x140(%rbp),%rcx
-  104d50:	48 33 d1             	xor    %rcx,%rdx
-  104d53:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-  104d5a:	c1 7c 51 
-  104d5d:	48 0f af d1          	imul   %rcx,%rdx
-  104d61:	48 8b 8d 50 fe ff ff 	mov    -0x1b0(%rbp),%rcx
-  104d68:	49 89 14 cc          	mov    %rdx,(%r12,%rcx,8)
-  104d6c:	4d 8b 34 f4          	mov    (%r12,%rsi,8),%r14
-  104d70:	4f 8b 2c dc          	mov    (%r12,%r11,8),%r13
-  104d74:	4c 89 ad 68 ff ff ff 	mov    %r13,-0x98(%rbp)
-  104d7b:	4b 8b 14 d4          	mov    (%r12,%r10,8),%rdx
-  104d7f:	48 89 95 60 ff ff ff 	mov    %rdx,-0xa0(%rbp)
-  104d86:	4d 8b 2c cc          	mov    (%r12,%rcx,8),%r13
-  104d8a:	4c 89 ad 58 ff ff ff 	mov    %r13,-0xa8(%rbp)
-  104d91:	4c 8b 6b 68          	mov    0x68(%rbx),%r13
-  104d95:	48 8d 95 b8 fe ff ff 	lea    -0x148(%rbp),%rdx
-  104d9c:	48 89 95 30 fe ff ff 	mov    %rdx,-0x1d0(%rbp)
-  104da3:	4c 8b bd 30 fe ff ff 	mov    -0x1d0(%rbp),%r15
-  104daa:	49 8b d5             	mov    %r13,%rdx
-  104dad:	c4 c2 f3 f6 d6       	mulx   %r14,%rcx,%rdx
-  104db2:	49 89 0f             	mov    %rcx,(%r15)
-  104db5:	48 8b 8d b8 fe ff ff 	mov    -0x148(%rbp),%rcx
-  104dbc:	48 89 95 50 ff ff ff 	mov    %rdx,-0xb0(%rbp)
-  104dc3:	48 89 8d 48 ff ff ff 	mov    %rcx,-0xb8(%rbp)
-  104dca:	4c 8b 7b 68          	mov    0x68(%rbx),%r15
-  104dce:	4c 8d b5 b0 fe ff ff 	lea    -0x150(%rbp),%r14
-  104dd5:	4c 8b ad 68 ff ff ff 	mov    -0x98(%rbp),%r13
-  104ddc:	49 8b d7             	mov    %r15,%rdx
-  104ddf:	c4 c2 f3 f6 d5       	mulx   %r13,%rcx,%rdx
-  104de4:	49 89 0e             	mov    %rcx,(%r14)
-  104de7:	48 8b 8d b0 fe ff ff 	mov    -0x150(%rbp),%rcx
-  104dee:	48 89 95 40 ff ff ff 	mov    %rdx,-0xc0(%rbp)
-  104df5:	48 89 8d 38 ff ff ff 	mov    %rcx,-0xc8(%rbp)
-  104dfc:	4c 8b 7b 68          	mov    0x68(%rbx),%r15
-  104e00:	4c 8d b5 a8 fe ff ff 	lea    -0x158(%rbp),%r14
-  104e07:	4c 8b ad 60 ff ff ff 	mov    -0xa0(%rbp),%r13
-  104e0e:	49 8b d7             	mov    %r15,%rdx
-  104e11:	c4 c2 f3 f6 d5       	mulx   %r13,%rcx,%rdx
-  104e16:	49 89 0e             	mov    %rcx,(%r14)
-  104e19:	48 8b 8d a8 fe ff ff 	mov    -0x158(%rbp),%rcx
-  104e20:	48 89 95 30 ff ff ff 	mov    %rdx,-0xd0(%rbp)
-  104e27:	48 89 8d 28 ff ff ff 	mov    %rcx,-0xd8(%rbp)
-  104e2e:	4c 8b 7b 68          	mov    0x68(%rbx),%r15
-  104e32:	4c 8d b5 a0 fe ff ff 	lea    -0x160(%rbp),%r14
-  104e39:	4c 8b ad 58 ff ff ff 	mov    -0xa8(%rbp),%r13
-  104e40:	49 8b d7             	mov    %r15,%rdx
-  104e43:	c4 c2 f3 f6 d5       	mulx   %r13,%rcx,%rdx
-  104e48:	49 89 0e             	mov    %rcx,(%r14)
-  104e4b:	48 8b 8d a0 fe ff ff 	mov    -0x160(%rbp),%rcx
-  104e52:	48 89 95 20 ff ff ff 	mov    %rdx,-0xe0(%rbp)
-  104e59:	48 89 8d 18 ff ff ff 	mov    %rcx,-0xe8(%rbp)
-  104e60:	4c 8b bd 50 ff ff ff 	mov    -0xb0(%rbp),%r15
-  104e67:	4d 89 3c f0          	mov    %r15,(%r8,%rsi,8)
-  104e6b:	4c 8b b5 40 ff ff ff 	mov    -0xc0(%rbp),%r14
-  104e72:	4f 89 34 d8          	mov    %r14,(%r8,%r11,8)
-  104e76:	4c 8b ad 30 ff ff ff 	mov    -0xd0(%rbp),%r13
-  104e7d:	4f 89 2c d0          	mov    %r13,(%r8,%r10,8)
-  104e81:	4c 8b ad 50 fe ff ff 	mov    -0x1b0(%rbp),%r13
-  104e88:	4b 89 14 e8          	mov    %rdx,(%r8,%r13,8)
-  104e8c:	4c 8b 73 70          	mov    0x70(%rbx),%r14
-  104e90:	4c 8d bd 98 fe ff ff 	lea    -0x168(%rbp),%r15
-  104e97:	48 8b 8d 48 ff ff ff 	mov    -0xb8(%rbp),%rcx
-  104e9e:	49 8b d6             	mov    %r14,%rdx
-  104ea1:	c4 e2 93 f6 c9       	mulx   %rcx,%r13,%rcx
-  104ea6:	4d 89 2f             	mov    %r13,(%r15)
-  104ea9:	48 89 8d 10 ff ff ff 	mov    %rcx,-0xf0(%rbp)
-  104eb0:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  104eb4:	4c 8d bd 90 fe ff ff 	lea    -0x170(%rbp),%r15
-  104ebb:	4c 8b b5 38 ff ff ff 	mov    -0xc8(%rbp),%r14
-  104ec2:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
-  104ec7:	4d 89 2f             	mov    %r13,(%r15)
-  104eca:	48 89 95 08 ff ff ff 	mov    %rdx,-0xf8(%rbp)
-  104ed1:	4c 8b 7b 70          	mov    0x70(%rbx),%r15
-  104ed5:	4c 8d b5 88 fe ff ff 	lea    -0x178(%rbp),%r14
-  104edc:	4c 8b ad 28 ff ff ff 	mov    -0xd8(%rbp),%r13
-  104ee3:	49 8b d7             	mov    %r15,%rdx
-  104ee6:	c4 c2 f3 f6 d5       	mulx   %r13,%rcx,%rdx
-  104eeb:	49 89 0e             	mov    %rcx,(%r14)
-  104eee:	48 89 95 00 ff ff ff 	mov    %rdx,-0x100(%rbp)
-  104ef5:	48 8b 4b 70          	mov    0x70(%rbx),%rcx
-  104ef9:	4c 8d bd 80 fe ff ff 	lea    -0x180(%rbp),%r15
-  104f00:	4c 8b b5 18 ff ff ff 	mov    -0xe8(%rbp),%r14
-  104f07:	48 8b d1             	mov    %rcx,%rdx
-  104f0a:	c4 c2 93 f6 ce       	mulx   %r14,%r13,%rcx
-  104f0f:	4d 89 2f             	mov    %r13,(%r15)
-  104f12:	4c 8b bd 50 ff ff ff 	mov    -0xb0(%rbp),%r15
-  104f19:	4c 0f af 7b 28       	imul   0x28(%rbx),%r15
-  104f1e:	4c 03 bd 10 ff ff ff 	add    -0xf0(%rbp),%r15
-  104f25:	4c 89 3c f0          	mov    %r15,(%rax,%rsi,8)
-  104f29:	4c 8b b5 40 ff ff ff 	mov    -0xc0(%rbp),%r14
-  104f30:	4c 0f af 73 28       	imul   0x28(%rbx),%r14
-  104f35:	4c 03 b5 08 ff ff ff 	add    -0xf8(%rbp),%r14
-  104f3c:	4e 89 34 d8          	mov    %r14,(%rax,%r11,8)
-  104f40:	4c 8b ad 30 ff ff ff 	mov    -0xd0(%rbp),%r13
-  104f47:	4c 0f af 6b 28       	imul   0x28(%rbx),%r13
-  104f4c:	4c 03 ad 00 ff ff ff 	add    -0x100(%rbp),%r13
-  104f53:	4e 89 2c d0          	mov    %r13,(%rax,%r10,8)
-  104f57:	48 8b 95 20 ff ff ff 	mov    -0xe0(%rbp),%rdx
-  104f5e:	48 0f af 53 28       	imul   0x28(%rbx),%rdx
-  104f63:	48 03 ca             	add    %rdx,%rcx
-  104f66:	48 8b 95 50 fe ff ff 	mov    -0x1b0(%rbp),%rdx
-  104f6d:	48 89 0c d0          	mov    %rcx,(%rax,%rdx,8)
-  104f71:	48 8b 4b 08          	mov    0x8(%rbx),%rcx
-  104f75:	4c 8b f9             	mov    %rcx,%r15
-  104f78:	4c 03 3c f0          	add    (%rax,%rsi,8),%r15
-  104f7c:	41 0f 18 0f          	prefetcht0 (%r15)
-  104f80:	48 8b f1             	mov    %rcx,%rsi
-  104f83:	4a 03 34 d8          	add    (%rax,%r11,8),%rsi
-  104f87:	0f 18 0e             	prefetcht0 (%rsi)
-  104f8a:	48 8b f1             	mov    %rcx,%rsi
-  104f8d:	4a 03 34 d0          	add    (%rax,%r10,8),%rsi
-  104f91:	0f 18 0e             	prefetcht0 (%rsi)
-  104f94:	48 03 0c d0          	add    (%rax,%rdx,8),%rcx
-  104f98:	0f 18 09             	prefetcht0 (%rcx)
-  104f9b:	83 c7 04             	add    $0x4,%edi
-  104f9e:	44 8b 7d 98          	mov    -0x68(%rbp),%r15d
-  104fa2:	41 3b ff             	cmp    %r15d,%edi
-  104fa5:	0f 8c 25 03 00 00    	jl     1052d0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x770>
-  104fab:	44 8b 75 9c          	mov    -0x64(%rbp),%r14d
-  104faf:	45 3b fe             	cmp    %r14d,%r15d
-  104fb2:	0f 8d 0f 03 00 00    	jge    1052c7 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x767>
-  104fb8:	49 63 ff             	movslq %r15d,%rdi
-  104fbb:	49 8b 3c f9          	mov    (%r9,%rdi,8),%rdi
-  104fbf:	48 8b 73 48          	mov    0x48(%rbx),%rsi
-  104fc3:	e8 28 52 f7 ff       	call   7a1f0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__Hash>
-  104fc8:	49 63 ff             	movslq %r15d,%rdi
-  104fcb:	49 8d 3c fc          	lea    (%r12,%rdi,8),%rdi
-  104fcf:	48 89 07             	mov    %rax,(%rdi)
-  104fd2:	e8 09 52 f7 ff       	call   7a1e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_HashValue__High>
-  104fd7:	48 8b f0             	mov    %rax,%rsi
-  104fda:	48 8d 7b 68          	lea    0x68(%rbx),%rdi
-  104fde:	e8 5d 5f f7 ff       	call   7af40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Computation_FastReduce__ReduceWithRemainder>
-  104fe3:	4c 8b e8             	mov    %rax,%r13
-  104fe6:	48 8b f2             	mov    %rdx,%rsi
-  104fe9:	49 63 ff             	movslq %r15d,%rdi
-  104fec:	48 8b 45 a8          	mov    -0x58(%rbp),%rax
-  104ff0:	4c 89 2c f8          	mov    %r13,(%rax,%rdi,8)
-  104ff4:	48 8b fb             	mov    %rbx,%rdi
-  104ff7:	e8 24 ec ff ff       	call   103c20 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__BucketInPart>
-  104ffc:	4c 0f af 6b 28       	imul   0x28(%rbx),%r13
-  105001:	49 03 c5             	add    %r13,%rax
-  105004:	49 63 f7             	movslq %r15d,%rsi
-  105007:	4c 8b 6d b8          	mov    -0x48(%rbp),%r13
-  10500b:	49 89 44 f5 00       	mov    %rax,0x0(%r13,%rsi,8)
-  105010:	48 8b 73 08          	mov    0x8(%rbx),%rsi
-  105014:	49 63 ff             	movslq %r15d,%rdi
-  105017:	49 03 74 fd 00       	add    0x0(%r13,%rdi,8),%rsi
-  10501c:	0f 18 0e             	prefetcht0 (%rsi)
-  10501f:	41 ff c7             	inc    %r15d
-  105022:	45 3b fe             	cmp    %r14d,%r15d
-  105025:	0f 8c 90 02 00 00    	jl     1052bb <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x75b>
-  10502b:	41 83 fe 20          	cmp    $0x20,%r14d
-  10502f:	0f 8d 7d 02 00 00    	jge    1052b2 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x752>
-  105035:	49 63 f6             	movslq %r14d,%rsi
-  105038:	33 ff                	xor    %edi,%edi
-  10503a:	49 89 3c f4          	mov    %rdi,(%r12,%rsi,8)
-  10503e:	49 89 7c f5 00       	mov    %rdi,0x0(%r13,%rsi,8)
-  105043:	4c 8b 7d a8          	mov    -0x58(%rbp),%r15
-  105047:	49 89 3c f7          	mov    %rdi,(%r15,%rsi,8)
-  10504b:	41 ff c6             	inc    %r14d
-  10504e:	41 83 fe 20          	cmp    $0x20,%r14d
-  105052:	0f 8c 55 02 00 00    	jl     1052ad <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x74d>
-  105058:	45 33 f6             	xor    %r14d,%r14d
-  10505b:	8b 85 7c fe ff ff    	mov    -0x184(%rbp),%eax
-  105061:	8d 70 e0             	lea    -0x20(%rax),%esi
-  105064:	33 ff                	xor    %edi,%edi
-  105066:	e8 c5 ea f7 ff       	call   83b30 <S_P_CoreLib_System_Math__Max_3>
-  10506b:	89 45 94             	mov    %eax,-0x6c(%rbp)
-  10506e:	85 c0                	test   %eax,%eax
-  105070:	0f 8e 42 01 00 00    	jle    1051b8 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x658>
-  105076:	41 8b fe             	mov    %r14d,%edi
-  105079:	c1 ff 1f             	sar    $0x1f,%edi
-  10507c:	83 e7 1f             	and    $0x1f,%edi
-  10507f:	41 03 fe             	add    %r14d,%edi
-  105082:	83 e7 e0             	and    $0xffffffe0,%edi
-  105085:	41 8b ce             	mov    %r14d,%ecx
-  105088:	2b cf                	sub    %edi,%ecx
-  10508a:	89 8d fc fe ff ff    	mov    %ecx,-0x104(%rbp)
-  105090:	48 63 f9             	movslq %ecx,%rdi
-  105093:	49 8b 14 fc          	mov    (%r12,%rdi,8),%rdx
-  105097:	48 89 95 70 fe ff ff 	mov    %rdx,-0x190(%rbp)
-  10509e:	48 63 f9             	movslq %ecx,%rdi
-  1050a1:	4d 8b 44 fd 00       	mov    0x0(%r13,%rdi,8),%r8
-  1050a6:	4c 89 85 f0 fe ff ff 	mov    %r8,-0x110(%rbp)
-  1050ad:	48 63 f9             	movslq %ecx,%rdi
-  1050b0:	4d 8b 0c ff          	mov    (%r15,%rdi,8),%r9
-  1050b4:	4c 89 8d e8 fe ff ff 	mov    %r9,-0x118(%rbp)
-  1050bb:	41 8d 7e 20          	lea    0x20(%r14),%edi
-  1050bf:	48 63 ff             	movslq %edi,%rdi
-  1050c2:	4c 8b 95 48 fe ff ff 	mov    -0x1b8(%rbp),%r10
-  1050c9:	49 8b 3c fa          	mov    (%r10,%rdi,8),%rdi
-  1050cd:	48 8b 73 48          	mov    0x48(%rbx),%rsi
-  1050d1:	e8 1a 51 f7 ff       	call   7a1f0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__Hash>
-  1050d6:	48 63 bd fc fe ff ff 	movslq -0x104(%rbp),%rdi
-  1050dd:	49 8d 3c fc          	lea    (%r12,%rdi,8),%rdi
-  1050e1:	48 89 07             	mov    %rax,(%rdi)
-  1050e4:	e8 f7 50 f7 ff       	call   7a1e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_HashValue__High>
-  1050e9:	48 8b f0             	mov    %rax,%rsi
-  1050ec:	48 8d 7b 68          	lea    0x68(%rbx),%rdi
-  1050f0:	e8 4b 5e f7 ff       	call   7af40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Computation_FastReduce__ReduceWithRemainder>
-  1050f5:	48 89 85 60 fe ff ff 	mov    %rax,-0x1a0(%rbp)
-  1050fc:	48 8b f2             	mov    %rdx,%rsi
-  1050ff:	48 63 bd fc fe ff ff 	movslq -0x104(%rbp),%rdi
-  105106:	49 89 04 ff          	mov    %rax,(%r15,%rdi,8)
-  10510a:	48 8b fb             	mov    %rbx,%rdi
-  10510d:	e8 0e eb ff ff       	call   103c20 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__BucketInPart>
-  105112:	48 8b b5 60 fe ff ff 	mov    -0x1a0(%rbp),%rsi
-  105119:	48 0f af 73 28       	imul   0x28(%rbx),%rsi
-  10511e:	48 03 f0             	add    %rax,%rsi
-  105121:	8b bd fc fe ff ff    	mov    -0x104(%rbp),%edi
-  105127:	48 63 c7             	movslq %edi,%rax
-  10512a:	49 89 74 c5 00       	mov    %rsi,0x0(%r13,%rax,8)
-  10512f:	48 8b 73 08          	mov    0x8(%rbx),%rsi
-  105133:	48 63 ff             	movslq %edi,%rdi
-  105136:	48 8b c6             	mov    %rsi,%rax
-  105139:	49 03 44 fd 00       	add    0x0(%r13,%rdi,8),%rax
-  10513e:	0f 18 08             	prefetcht0 (%rax)
-  105141:	48 8b bd f0 fe ff ff 	mov    -0x110(%rbp),%rdi
-  105148:	40 0f b6 34 3e       	rex movzbl (%rsi,%rdi,1),%esi
-  10514d:	48 8b fb             	mov    %rbx,%rdi
-  105150:	e8 eb eb ff ff       	call   103d40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__HashPilot>
-  105155:	48 8b d0             	mov    %rax,%rdx
-  105158:	48 8b b5 70 fe ff ff 	mov    -0x190(%rbp),%rsi
-  10515f:	48 8b fb             	mov    %rbx,%rdi
-  105162:	e8 99 eb ff ff       	call   103d00 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__SlotInPartHp>
-  105167:	48 8b 95 e8 fe ff ff 	mov    -0x118(%rbp),%rdx
-  10516e:	48 0f af 53 18       	imul   0x18(%rbx),%rdx
-  105173:	48 03 d0             	add    %rax,%rdx
-  105176:	83 7d d4 00          	cmpl   $0x0,-0x2c(%rbp)
-  10517a:	74 1f                	je     10519b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x63b>
-  10517c:	48 8b 4d c8          	mov    -0x38(%rbp),%rcx
-  105180:	48 3b d1             	cmp    %rcx,%rdx
-  105183:	0f 82 1f 01 00 00    	jb     1052a8 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x748>
-  105189:	48 8b 7b 58          	mov    0x58(%rbx),%rdi
-  10518d:	48 8b 73 60          	mov    0x60(%rbx),%rsi
-  105191:	2b d1                	sub    %ecx,%edx
-  105193:	e8 88 4e f7 ff       	call   7a020 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage__Index>
-  105198:	48 8b d0             	mov    %rax,%rdx
-  10519b:	49 63 f6             	movslq %r14d,%rsi
-  10519e:	48 8b 8d 40 fe ff ff 	mov    -0x1c0(%rbp),%rcx
-  1051a5:	48 89 14 f1          	mov    %rdx,(%rcx,%rsi,8)
-  1051a9:	41 ff c6             	inc    %r14d
-  1051ac:	8b 75 94             	mov    -0x6c(%rbp),%esi
-  1051af:	44 3b f6             	cmp    %esi,%r14d
-  1051b2:	0f 8c be fe ff ff    	jl     105076 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x516>
-  1051b8:	44 3b b5 7c fe ff ff 	cmp    -0x184(%rbp),%r14d
-  1051bf:	0f 8d ab 00 00 00    	jge    105270 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x710>
-  1051c5:	41 8b f6             	mov    %r14d,%esi
-  1051c8:	c1 fe 1f             	sar    $0x1f,%esi
-  1051cb:	83 e6 1f             	and    $0x1f,%esi
-  1051ce:	41 03 f6             	add    %r14d,%esi
-  1051d1:	83 e6 e0             	and    $0xffffffe0,%esi
-  1051d4:	41 8b fe             	mov    %r14d,%edi
-  1051d7:	2b fe                	sub    %esi,%edi
-  1051d9:	48 63 f7             	movslq %edi,%rsi
-  1051dc:	4d 8b 04 f4          	mov    (%r12,%rsi,8),%r8
-  1051e0:	4c 89 85 68 fe ff ff 	mov    %r8,-0x198(%rbp)
-  1051e7:	49 8b 7c f5 00       	mov    0x0(%r13,%rsi,8),%rdi
-  1051ec:	4d 8b 0c f7          	mov    (%r15,%rsi,8),%r9
-  1051f0:	4c 89 8d e0 fe ff ff 	mov    %r9,-0x120(%rbp)
-  1051f7:	48 8b 73 08          	mov    0x8(%rbx),%rsi
-  1051fb:	40 0f b6 34 3e       	rex movzbl (%rsi,%rdi,1),%esi
-  105200:	48 8b fb             	mov    %rbx,%rdi
-  105203:	e8 38 eb ff ff       	call   103d40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__HashPilot>
-  105208:	48 8b d0             	mov    %rax,%rdx
-  10520b:	48 8b b5 68 fe ff ff 	mov    -0x198(%rbp),%rsi
-  105212:	48 8b fb             	mov    %rbx,%rdi
-  105215:	e8 e6 ea ff ff       	call   103d00 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__SlotInPartHp>
-  10521a:	48 8b 95 e0 fe ff ff 	mov    -0x120(%rbp),%rdx
-  105221:	48 0f af 53 18       	imul   0x18(%rbx),%rdx
-  105226:	48 03 d0             	add    %rax,%rdx
-  105229:	83 7d d4 00          	cmpl   $0x0,-0x2c(%rbp)
-  10522d:	74 1b                	je     10524a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x6ea>
-  10522f:	48 8b 4d c8          	mov    -0x38(%rbp),%rcx
-  105233:	48 3b d1             	cmp    %rcx,%rdx
-  105236:	72 6e                	jb     1052a6 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x746>
-  105238:	48 8b 7b 58          	mov    0x58(%rbx),%rdi
-  10523c:	48 8b 73 60          	mov    0x60(%rbx),%rsi
-  105240:	2b d1                	sub    %ecx,%edx
-  105242:	e8 d9 4d f7 ff       	call   7a020 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage__Index>
-  105247:	48 8b d0             	mov    %rax,%rdx
-  10524a:	49 63 fe             	movslq %r14d,%rdi
-  10524d:	48 8b 8d 40 fe ff ff 	mov    -0x1c0(%rbp),%rcx
-  105254:	48 89 14 f9          	mov    %rdx,(%rcx,%rdi,8)
-  105258:	41 ff c6             	inc    %r14d
-  10525b:	8b bd 7c fe ff ff    	mov    -0x184(%rbp),%edi
-  105261:	44 3b f7             	cmp    %edi,%r14d
-  105264:	89 bd 7c fe ff ff    	mov    %edi,-0x184(%rbp)
-  10526a:	0f 8c 55 ff ff ff    	jl     1051c5 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x665>
-  105270:	33 ff                	xor    %edi,%edi
-  105272:	48 89 7d a0          	mov    %rdi,-0x60(%rbp)
-  105276:	48 89 7d b0          	mov    %rdi,-0x50(%rbp)
-  10527a:	48 89 7d c0          	mov    %rdi,-0x40(%rbp)
-  10527e:	48 8d 3d 8b 71 0b 00 	lea    0xb718b(%rip),%rdi        # 1bc410 <__security_cookie>
-  105285:	48 8b 3f             	mov    (%rdi),%rdi
-  105288:	48 39 bd 38 fe ff ff 	cmp    %rdi,-0x1c8(%rbp)
-  10528f:	74 05                	je     105296 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x736>
-  105291:	e8 6a 4c f0 ff       	call   9f00 <RhpFallbackFailFast>
-  105296:	90                   	nop
-  105297:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
-  10529b:	5b                   	pop    %rbx
-  10529c:	41 5c                	pop    %r12
-  10529e:	41 5d                	pop    %r13
-  1052a0:	41 5e                	pop    %r14
-  1052a2:	41 5f                	pop    %r15
-  1052a4:	5d                   	pop    %rbp
-  1052a5:	c3                   	ret
-  1052a6:	eb a2                	jmp    10524a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x6ea>
-  1052a8:	e9 ee fe ff ff       	jmp    10519b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x63b>
-  1052ad:	e9 83 fd ff ff       	jmp    105035 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x4d5>
-  1052b2:	4c 8b 7d a8          	mov    -0x58(%rbp),%r15
-  1052b6:	e9 9d fd ff ff       	jmp    105058 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x4f8>
-  1052bb:	4c 8b 8d 48 fe ff ff 	mov    -0x1b8(%rbp),%r9
-  1052c2:	e9 f1 fc ff ff       	jmp    104fb8 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x458>
-  1052c7:	4c 8b 6d b8          	mov    -0x48(%rbp),%r13
-  1052cb:	e9 5b fd ff ff       	jmp    10502b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x4cb>
-  1052d0:	48 8b 45 b8          	mov    -0x48(%rbp),%rax
-  1052d4:	4c 8b 45 a8          	mov    -0x58(%rbp),%r8
-  1052d8:	e9 6b f9 ff ff       	jmp    104c48 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0xe8>
-  1052dd:	44 8b 7d 98          	mov    -0x68(%rbp),%r15d
-  1052e1:	e9 c5 fc ff ff       	jmp    104fab <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamPrefetchMultiPart+0x44b>
-  1052e6:	48 8d 3d eb ca 14 00 	lea    0x14caeb(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-  1052ed:	e8 22 02 f6 ff       	call   65514 <RhpNewFast>
-  1052f2:	48 8b d8             	mov    %rax,%rbx
-  1052f5:	48 8b fb             	mov    %rbx,%rdi
-  1052f8:	48 8d 35 c1 a1 13 00 	lea    0x13a1c1(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-  1052ff:	e8 6c 59 f8 ff       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-  105304:	48 8b fb             	mov    %rbx,%rdi
-  105307:	e8 72 04 f6 ff       	call   6577e <RhpThrowEx>
-  10530c:	cc                   	int3
-  10530d:	90                   	nop
-  10530e:	90                   	nop
-  10530f:	90                   	nop
-  105310:	90                   	nop
-  105311:	90                   	nop
-  105312:	90                   	nop
-  105313:	90                   	nop
-  105314:	90                   	nop
-  105315:	90                   	nop
-  105316:	90                   	nop
-  105317:	90                   	nop
-  105318:	90                   	nop
-  105319:	90                   	nop
-  10531a:	90                   	nop
-  10531b:	90                   	nop
-  10531c:	90                   	nop
-  10531d:	90                   	nop
-  10531e:	90                   	nop
-  10531f:	90                   	nop
+  104b63:	53                   	push   %rbx
+  104b64:	48 83 ec 60          	sub    $0x60,%rsp
+  104b68:	48 8d 6c 24 70       	lea    0x70(%rsp),%rbp
+  104b6d:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  104b72:	c5 79 7f 45 b0       	vmovdqa %xmm8,-0x50(%rbp)
+  104b77:	c5 79 7f 45 c0       	vmovdqa %xmm8,-0x40(%rbp)
+  104b7c:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
+  104b81:	c5 79 7f 45 e0       	vmovdqa %xmm8,-0x20(%rbp)
+  104b86:	41 3b d0             	cmp    %r8d,%edx
+  104b89:	0f 85 b9 01 00 00    	jne    104d48 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1e8>
+  104b8f:	45 84 c9             	test   %r9b,%r9b
+  104b92:	74 06                	je     104b9a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x3a>
+  104b94:	0f b6 47 54          	movzbl 0x54(%rdi),%eax
+  104b98:	eb 02                	jmp    104b9c <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x3c>
+  104b9a:	33 c0                	xor    %eax,%eax
+  104b9c:	4c 8b 4f 38          	mov    0x38(%rdi),%r9
+  104ba0:	45 33 d2             	xor    %r10d,%r10d
+  104ba3:	85 d2                	test   %edx,%edx
+  104ba5:	4c 0f 45 d6          	cmovne %rsi,%r10
+  104ba9:	4c 89 55 e8          	mov    %r10,-0x18(%rbp)
+  104bad:	49 8b f2             	mov    %r10,%rsi
+  104bb0:	45 33 d2             	xor    %r10d,%r10d
+  104bb3:	45 85 c0             	test   %r8d,%r8d
+  104bb6:	4c 0f 45 d1          	cmovne %rcx,%r10
+  104bba:	4c 89 55 e0          	mov    %r10,-0x20(%rbp)
+  104bbe:	49 8b ca             	mov    %r10,%rcx
+  104bc1:	85 c0                	test   %eax,%eax
+  104bc3:	0f 84 c2 00 00 00    	je     104c8b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x12b>
+  104bc9:	33 c0                	xor    %eax,%eax
+  104bcb:	89 55 ac             	mov    %edx,-0x54(%rbp)
+  104bce:	85 d2                	test   %edx,%edx
+  104bd0:	0f 8e 5f 01 00 00    	jle    104d35 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1d5>
+  104bd6:	4c 8d 87 80 00 00 00 	lea    0x80(%rdi),%r8
+  104bdd:	4c 63 d0             	movslq %eax,%r10
+  104be0:	4e 8b 14 d6          	mov    (%rsi,%r10,8),%r10
+  104be4:	4c 33 57 48          	xor    0x48(%rdi),%r10
+  104be8:	49 bb 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r11
+  104bef:	c1 7c 51 
+  104bf2:	48 8d 5d d8          	lea    -0x28(%rbp),%rbx
+  104bf6:	49 8b d2             	mov    %r10,%rdx
+  104bf9:	c4 c2 83 f6 d3       	mulx   %r11,%r15,%rdx
+  104bfe:	4c 89 3b             	mov    %r15,(%rbx)
+  104c01:	4c 8b 55 d8          	mov    -0x28(%rbp),%r10
+  104c05:	49 33 d2             	xor    %r10,%rdx
+  104c08:	49 0f af d3          	imul   %r11,%rdx
+  104c0c:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
+  104c10:	4c 8b 57 70          	mov    0x70(%rdi),%r10
+  104c14:	4c 8d 5d d0          	lea    -0x30(%rbp),%r11
+  104c18:	48 8b 5d a0          	mov    -0x60(%rbp),%rbx
+  104c1c:	49 8b d2             	mov    %r10,%rdx
+  104c1f:	c4 e2 83 f6 d3       	mulx   %rbx,%r15,%rdx
+  104c24:	4d 89 3b             	mov    %r15,(%r11)
+  104c27:	4c 8b 57 08          	mov    0x8(%rdi),%r10
+  104c2b:	41 0f b6 14 12       	movzbl (%r10,%rdx,1),%edx
+  104c30:	48 33 57 48          	xor    0x48(%rdi),%rdx
+  104c34:	49 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r10
+  104c3b:	c1 7c 51 
+  104c3e:	49 0f af d2          	imul   %r10,%rdx
+  104c42:	4d 8b d0             	mov    %r8,%r10
+  104c45:	48 33 d3             	xor    %rbx,%rdx
+  104c48:	49 0f af 52 08       	imul   0x8(%r10),%rdx
+  104c4d:	4d 8b 12             	mov    (%r10),%r10
+  104c50:	4c 8d 5d c8          	lea    -0x38(%rbp),%r11
+  104c54:	c4 c2 e3 f6 d2       	mulx   %r10,%rbx,%rdx
+  104c59:	49 89 1b             	mov    %rbx,(%r11)
+  104c5c:	49 3b d1             	cmp    %r9,%rdx
+  104c5f:	72 0e                	jb     104c6f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x10f>
+  104c61:	41 2b d1             	sub    %r9d,%edx
+  104c64:	4c 8b 57 58          	mov    0x58(%rdi),%r10
+  104c68:	48 63 d2             	movslq %edx,%rdx
+  104c6b:	41 8b 14 92          	mov    (%r10,%rdx,4),%edx
+  104c6f:	4c 63 d0             	movslq %eax,%r10
+  104c72:	4a 89 14 d1          	mov    %rdx,(%rcx,%r10,8)
+  104c76:	ff c0                	inc    %eax
+  104c78:	8b 55 ac             	mov    -0x54(%rbp),%edx
+  104c7b:	3b c2                	cmp    %edx,%eax
+  104c7d:	89 55 ac             	mov    %edx,-0x54(%rbp)
+  104c80:	0f 8c 57 ff ff ff    	jl     104bdd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x7d>
+  104c86:	e9 aa 00 00 00       	jmp    104d35 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1d5>
+  104c8b:	33 c0                	xor    %eax,%eax
+  104c8d:	89 55 ac             	mov    %edx,-0x54(%rbp)
+  104c90:	85 d2                	test   %edx,%edx
+  104c92:	0f 8e 9d 00 00 00    	jle    104d35 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1d5>
+  104c98:	4c 8d 87 80 00 00 00 	lea    0x80(%rdi),%r8
+  104c9f:	4c 63 c8             	movslq %eax,%r9
+  104ca2:	4e 8b 0c ce          	mov    (%rsi,%r9,8),%r9
+  104ca6:	4c 33 4f 48          	xor    0x48(%rdi),%r9
+  104caa:	49 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r10
+  104cb1:	c1 7c 51 
+  104cb4:	4c 8d 5d c0          	lea    -0x40(%rbp),%r11
+  104cb8:	49 8b d1             	mov    %r9,%rdx
+  104cbb:	c4 c2 e3 f6 d2       	mulx   %r10,%rbx,%rdx
+  104cc0:	49 89 1b             	mov    %rbx,(%r11)
+  104cc3:	4c 8b 4d c0          	mov    -0x40(%rbp),%r9
+  104cc7:	49 33 d1             	xor    %r9,%rdx
+  104cca:	49 0f af d2          	imul   %r10,%rdx
+  104cce:	48 89 55 98          	mov    %rdx,-0x68(%rbp)
+  104cd2:	4c 8b 4f 70          	mov    0x70(%rdi),%r9
+  104cd6:	4c 8d 55 b8          	lea    -0x48(%rbp),%r10
+  104cda:	4c 8b 5d 98          	mov    -0x68(%rbp),%r11
+  104cde:	49 8b d1             	mov    %r9,%rdx
+  104ce1:	c4 c2 e3 f6 d3       	mulx   %r11,%rbx,%rdx
+  104ce6:	49 89 1a             	mov    %rbx,(%r10)
+  104ce9:	4c 8b 4f 08          	mov    0x8(%rdi),%r9
+  104ced:	41 0f b6 14 11       	movzbl (%r9,%rdx,1),%edx
+  104cf2:	48 33 57 48          	xor    0x48(%rdi),%rdx
+  104cf6:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
+  104cfd:	c1 7c 51 
+  104d00:	49 0f af d1          	imul   %r9,%rdx
+  104d04:	4d 8b c8             	mov    %r8,%r9
+  104d07:	49 33 d3             	xor    %r11,%rdx
+  104d0a:	49 0f af 51 08       	imul   0x8(%r9),%rdx
+  104d0f:	4d 8b 09             	mov    (%r9),%r9
+  104d12:	4c 8d 55 b0          	lea    -0x50(%rbp),%r10
+  104d16:	c4 c2 a3 f6 d1       	mulx   %r9,%r11,%rdx
+  104d1b:	4d 89 1a             	mov    %r11,(%r10)
+  104d1e:	4c 63 c8             	movslq %eax,%r9
+  104d21:	4a 89 14 c9          	mov    %rdx,(%rcx,%r9,8)
+  104d25:	ff c0                	inc    %eax
+  104d27:	8b 55 ac             	mov    -0x54(%rbp),%edx
+  104d2a:	3b c2                	cmp    %edx,%eax
+  104d2c:	89 55 ac             	mov    %edx,-0x54(%rbp)
+  104d2f:	0f 8c 6a ff ff ff    	jl     104c9f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x13f>
+  104d35:	33 ff                	xor    %edi,%edi
+  104d37:	48 89 7d e0          	mov    %rdi,-0x20(%rbp)
+  104d3b:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+  104d3f:	48 83 c4 60          	add    $0x60,%rsp
+  104d43:	5b                   	pop    %rbx
+  104d44:	41 5f                	pop    %r15
+  104d46:	5d                   	pop    %rbp
+  104d47:	c3                   	ret
+  104d48:	48 8d 3d b9 84 15 00 	lea    0x1584b9(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+  104d4f:	e8 50 08 f6 ff       	call   655a4 <RhpNewFast>
+  104d54:	48 8b d8             	mov    %rax,%rbx
+  104d57:	48 8b fb             	mov    %rbx,%rdi
+  104d5a:	48 8d 35 ff 53 14 00 	lea    0x1453ff(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+  104d61:	e8 ea 61 f8 ff       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+  104d66:	48 8b fb             	mov    %rbx,%rdi
+  104d69:	e8 a0 0a f6 ff       	call   6580e <RhpThrowEx>
+  104d6e:	cc                   	int3
+  104d6f:	90                   	nop
+  104d70:	90                   	nop
+  104d71:	90                   	nop
+  104d72:	90                   	nop
+  104d73:	90                   	nop
+  104d74:	90                   	nop
+  104d75:	90                   	nop
+  104d76:	90                   	nop
+  104d77:	90                   	nop
+  104d78:	90                   	nop
+  104d79:	90                   	nop
+  104d7a:	90                   	nop
+  104d7b:	90                   	nop
+  104d7c:	90                   	nop
+  104d7d:	90                   	nop
+  104d7e:	90                   	nop
+  104d7f:	90                   	nop
 
-   77389:	e8 f2 08 00 00       	call   77c80 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream>
-   7738e:	e8 8d 0e 00 00       	call   78220 <ASM_Analysis_AsmGeneration_Program__TestSingleLookups>
-   77393:	e8 e8 11 00 00       	call   78580 <ASM_Analysis_AsmGeneration_Program__TestSpecificPrefetchPattern>
-   77398:	48 8d 3d d1 3a 1c 00 	lea    0x1c3ad1(%rip),%rdi        # 23ae70 <__Str_Assembly_generation_complete__E694E220ABB5E659C8FE3A93D59496D8C08AFB825EDBB706847AAF14012E93FD>
-   7739f:	e8 ac 53 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   773a4:	48 8d 3d e5 43 1c 00 	lea    0x1c43e5(%rip),%rdi        # 23b790 <__Str_Check_output_for_JIT_generated_E88BF50A10FDFF15CB02EFCA372E5395BD12F2100779560FE4DB5574C46B7085>
-   773ab:	e8 a0 53 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   773b0:	90                   	nop
-   773b1:	48 83 c4 60          	add    $0x60,%rsp
-   773b5:	5b                   	pop    %rbx
-   773b6:	41 5d                	pop    %r13
-   773b8:	41 5e                	pop    %r14
-   773ba:	41 5f                	pop    %r15
-   773bc:	5d                   	pop    %rbp
-   773bd:	c3                   	ret
-   773be:	e8 7d b4 01 00       	call   92840 <S_P_CoreLib_System_ThrowHelper__ThrowArgumentOutOfRangeException>
-   773c3:	cc                   	int3
-   773c4:	90                   	nop
-   773c5:	90                   	nop
-   773c6:	90                   	nop
-   773c7:	90                   	nop
-   773c8:	90                   	nop
-   773c9:	90                   	nop
-   773ca:	90                   	nop
-   773cb:	90                   	nop
-   773cc:	90                   	nop
-   773cd:	90                   	nop
-   773ce:	90                   	nop
-   773cf:	90                   	nop
-   773d0:	90                   	nop
-   773d1:	90                   	nop
-   773d2:	90                   	nop
-   773d3:	90                   	nop
-   773d4:	90                   	nop
-   773d5:	90                   	nop
-   773d6:	90                   	nop
-   773d7:	90                   	nop
-   773d8:	90                   	nop
-   773d9:	90                   	nop
-   773da:	90                   	nop
-   773db:	90                   	nop
-   773dc:	90                   	nop
-   773dd:	90                   	nop
-   773de:	90                   	nop
-   773df:	90                   	nop
+0000000000104d80 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart>:
+  104d80:	55                   	push   %rbp
+  104d81:	41 57                	push   %r15
+  104d83:	41 56                	push   %r14
+  104d85:	41 55                	push   %r13
+  104d87:	53                   	push   %rbx
+  104d88:	48 81 ec 80 00 00 00 	sub    $0x80,%rsp
+  104d8f:	48 8d ac 24 a0 00 00 	lea    0xa0(%rsp),%rbp
+  104d96:	00 
+  104d97:	33 c0                	xor    %eax,%eax
+  104d99:	48 89 85 78 ff ff ff 	mov    %rax,-0x88(%rbp)
+  104da0:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  104da5:	48 b8 a0 ff ff ff ff 	movabs $0xffffffffffffffa0,%rax
+  104dac:	ff ff ff 
+  104daf:	c5 79 7f 44 05 e0    	vmovdqa %xmm8,-0x20(%rbp,%rax,1)
+  104db5:	c5 79 7f 44 05 f0    	vmovdqa %xmm8,-0x10(%rbp,%rax,1)
+  104dbb:	c5 79 7f 04 28       	vmovdqa %xmm8,(%rax,%rbp,1)
+  104dc0:	48 83 c0 30          	add    $0x30,%rax
+  104dc4:	75 e9                	jne    104daf <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x2f>
+  104dc6:	41 3b d0             	cmp    %r8d,%edx
+  104dc9:	0f 85 48 02 00 00    	jne    105017 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x297>
+  104dcf:	45 84 c9             	test   %r9b,%r9b
+  104dd2:	74 06                	je     104dda <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x5a>
+  104dd4:	0f b6 47 54          	movzbl 0x54(%rdi),%eax
+  104dd8:	eb 02                	jmp    104ddc <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x5c>
+  104dda:	33 c0                	xor    %eax,%eax
+  104ddc:	4c 8b 4f 38          	mov    0x38(%rdi),%r9
+  104de0:	45 33 d2             	xor    %r10d,%r10d
+  104de3:	85 d2                	test   %edx,%edx
+  104de5:	4c 0f 45 d6          	cmovne %rsi,%r10
+  104de9:	4c 89 55 d8          	mov    %r10,-0x28(%rbp)
+  104ded:	49 8b f2             	mov    %r10,%rsi
+  104df0:	45 33 d2             	xor    %r10d,%r10d
+  104df3:	45 85 c0             	test   %r8d,%r8d
+  104df6:	4c 0f 45 d1          	cmovne %rcx,%r10
+  104dfa:	4c 89 55 d0          	mov    %r10,-0x30(%rbp)
+  104dfe:	49 8b ca             	mov    %r10,%rcx
+  104e01:	85 c0                	test   %eax,%eax
+  104e03:	0f 84 09 01 00 00    	je     104f12 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x192>
+  104e09:	33 c0                	xor    %eax,%eax
+  104e0b:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
+  104e11:	85 d2                	test   %edx,%edx
+  104e13:	0f 8e e4 01 00 00    	jle    104ffd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x27d>
+  104e19:	4c 8d 47 78          	lea    0x78(%rdi),%r8
+  104e1d:	4c 8d 57 68          	lea    0x68(%rdi),%r10
+  104e21:	4c 8d 9f 80 00 00 00 	lea    0x80(%rdi),%r11
+  104e28:	48 63 d8             	movslq %eax,%rbx
+  104e2b:	48 8b 1c de          	mov    (%rsi,%rbx,8),%rbx
+  104e2f:	48 33 5f 48          	xor    0x48(%rdi),%rbx
+  104e33:	49 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r15
+  104e3a:	c1 7c 51 
+  104e3d:	4c 8d 75 c0          	lea    -0x40(%rbp),%r14
+  104e41:	48 8b d3             	mov    %rbx,%rdx
+  104e44:	c4 c2 93 f6 d7       	mulx   %r15,%r13,%rdx
+  104e49:	4d 89 2e             	mov    %r13,(%r14)
+  104e4c:	48 8b 5d c0          	mov    -0x40(%rbp),%rbx
+  104e50:	48 33 d3             	xor    %rbx,%rdx
+  104e53:	49 0f af d7          	imul   %r15,%rdx
+  104e57:	48 89 95 68 ff ff ff 	mov    %rdx,-0x98(%rbp)
+  104e5e:	49 8b d8             	mov    %r8,%rbx
+  104e61:	48 8b 1b             	mov    (%rbx),%rbx
+  104e64:	4c 8d 7d b8          	lea    -0x48(%rbp),%r15
+  104e68:	4c 8b b5 68 ff ff ff 	mov    -0x98(%rbp),%r14
+  104e6f:	48 8b d3             	mov    %rbx,%rdx
+  104e72:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
+  104e77:	4d 89 2f             	mov    %r13,(%r15)
+  104e7a:	48 8b 5f 08          	mov    0x8(%rdi),%rbx
+  104e7e:	0f b6 14 13          	movzbl (%rbx,%rdx,1),%edx
+  104e82:	48 89 55 c8          	mov    %rdx,-0x38(%rbp)
+  104e86:	49 8b da             	mov    %r10,%rbx
+  104e89:	48 8b 1b             	mov    (%rbx),%rbx
+  104e8c:	4c 8d 7d a8          	lea    -0x58(%rbp),%r15
+  104e90:	48 8b d3             	mov    %rbx,%rdx
+  104e93:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
+  104e98:	4d 89 2f             	mov    %r13,(%r15)
+  104e9b:	48 0f af 57 18       	imul   0x18(%rdi),%rdx
+  104ea0:	48 89 55 b0          	mov    %rdx,-0x50(%rbp)
+  104ea4:	48 8b 5d c8          	mov    -0x38(%rbp),%rbx
+  104ea8:	48 33 5f 48          	xor    0x48(%rdi),%rbx
+  104eac:	49 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r15
+  104eb3:	c1 7c 51 
+  104eb6:	49 0f af df          	imul   %r15,%rbx
+  104eba:	4d 8b fb             	mov    %r11,%r15
+  104ebd:	49 33 de             	xor    %r14,%rbx
+  104ec0:	49 0f af 5f 08       	imul   0x8(%r15),%rbx
+  104ec5:	4d 8b 3f             	mov    (%r15),%r15
+  104ec8:	4c 8d 75 a0          	lea    -0x60(%rbp),%r14
+  104ecc:	48 8b d3             	mov    %rbx,%rdx
+  104ecf:	c4 c2 93 f6 d7       	mulx   %r15,%r13,%rdx
+  104ed4:	4d 89 2e             	mov    %r13,(%r14)
+  104ed7:	48 8b 5d b0          	mov    -0x50(%rbp),%rbx
+  104edb:	48 03 d3             	add    %rbx,%rdx
+  104ede:	49 3b d1             	cmp    %r9,%rdx
+  104ee1:	72 0d                	jb     104ef0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x170>
+  104ee3:	41 2b d1             	sub    %r9d,%edx
+  104ee6:	48 8b 5f 58          	mov    0x58(%rdi),%rbx
+  104eea:	48 63 d2             	movslq %edx,%rdx
+  104eed:	8b 14 93             	mov    (%rbx,%rdx,4),%edx
+  104ef0:	48 63 d8             	movslq %eax,%rbx
+  104ef3:	48 89 14 d9          	mov    %rdx,(%rcx,%rbx,8)
+  104ef7:	ff c0                	inc    %eax
+  104ef9:	8b 95 74 ff ff ff    	mov    -0x8c(%rbp),%edx
+  104eff:	3b c2                	cmp    %edx,%eax
+  104f01:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
+  104f07:	0f 8c 1b ff ff ff    	jl     104e28 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0xa8>
+  104f0d:	e9 eb 00 00 00       	jmp    104ffd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x27d>
+  104f12:	33 c0                	xor    %eax,%eax
+  104f14:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
+  104f1a:	85 d2                	test   %edx,%edx
+  104f1c:	0f 8e db 00 00 00    	jle    104ffd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x27d>
+  104f22:	4c 8d 47 78          	lea    0x78(%rdi),%r8
+  104f26:	4c 8d 57 68          	lea    0x68(%rdi),%r10
+  104f2a:	4c 8d 9f 80 00 00 00 	lea    0x80(%rdi),%r11
+  104f31:	4c 63 c8             	movslq %eax,%r9
+  104f34:	4e 8b 0c ce          	mov    (%rsi,%r9,8),%r9
+  104f38:	4c 33 4f 48          	xor    0x48(%rdi),%r9
+  104f3c:	48 bb 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rbx
+  104f43:	c1 7c 51 
+  104f46:	4c 8d 7d 90          	lea    -0x70(%rbp),%r15
+  104f4a:	49 8b d1             	mov    %r9,%rdx
+  104f4d:	c4 e2 8b f6 d3       	mulx   %rbx,%r14,%rdx
+  104f52:	4d 89 37             	mov    %r14,(%r15)
+  104f55:	4c 8b 4d 90          	mov    -0x70(%rbp),%r9
+  104f59:	49 33 d1             	xor    %r9,%rdx
+  104f5c:	48 0f af d3          	imul   %rbx,%rdx
+  104f60:	48 89 95 60 ff ff ff 	mov    %rdx,-0xa0(%rbp)
+  104f67:	4d 8b c8             	mov    %r8,%r9
+  104f6a:	4d 8b 09             	mov    (%r9),%r9
+  104f6d:	48 8d 5d 88          	lea    -0x78(%rbp),%rbx
+  104f71:	4c 8b bd 60 ff ff ff 	mov    -0xa0(%rbp),%r15
+  104f78:	49 8b d1             	mov    %r9,%rdx
+  104f7b:	c4 c2 8b f6 d7       	mulx   %r15,%r14,%rdx
+  104f80:	4c 89 33             	mov    %r14,(%rbx)
+  104f83:	4c 8b 4f 08          	mov    0x8(%rdi),%r9
+  104f87:	41 0f b6 14 11       	movzbl (%r9,%rdx,1),%edx
+  104f8c:	48 89 55 98          	mov    %rdx,-0x68(%rbp)
+  104f90:	4d 8b ca             	mov    %r10,%r9
+  104f93:	4d 8b 09             	mov    (%r9),%r9
+  104f96:	48 8d 5d 80          	lea    -0x80(%rbp),%rbx
+  104f9a:	49 8b d1             	mov    %r9,%rdx
+  104f9d:	c4 42 8b f6 cf       	mulx   %r15,%r14,%r9
+  104fa2:	4c 89 33             	mov    %r14,(%rbx)
+  104fa5:	4c 0f af 4f 18       	imul   0x18(%rdi),%r9
+  104faa:	48 8b 55 98          	mov    -0x68(%rbp),%rdx
+  104fae:	48 33 57 48          	xor    0x48(%rdi),%rdx
+  104fb2:	48 bb 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rbx
+  104fb9:	c1 7c 51 
+  104fbc:	48 0f af d3          	imul   %rbx,%rdx
+  104fc0:	49 8b db             	mov    %r11,%rbx
+  104fc3:	49 33 d7             	xor    %r15,%rdx
+  104fc6:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
+  104fcb:	48 8b 1b             	mov    (%rbx),%rbx
+  104fce:	4c 8d bd 78 ff ff ff 	lea    -0x88(%rbp),%r15
+  104fd5:	c4 e2 8b f6 d3       	mulx   %rbx,%r14,%rdx
+  104fda:	4d 89 37             	mov    %r14,(%r15)
+  104fdd:	49 03 d1             	add    %r9,%rdx
+  104fe0:	4c 63 c8             	movslq %eax,%r9
+  104fe3:	4a 89 14 c9          	mov    %rdx,(%rcx,%r9,8)
+  104fe7:	ff c0                	inc    %eax
+  104fe9:	8b 95 74 ff ff ff    	mov    -0x8c(%rbp),%edx
+  104fef:	3b c2                	cmp    %edx,%eax
+  104ff1:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
+  104ff7:	0f 8c 34 ff ff ff    	jl     104f31 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x1b1>
+  104ffd:	33 ff                	xor    %edi,%edi
+  104fff:	48 89 7d d0          	mov    %rdi,-0x30(%rbp)
+  105003:	48 89 7d d8          	mov    %rdi,-0x28(%rbp)
+  105007:	48 81 c4 80 00 00 00 	add    $0x80,%rsp
+  10500e:	5b                   	pop    %rbx
+  10500f:	41 5d                	pop    %r13
+  105011:	41 5e                	pop    %r14
+  105013:	41 5f                	pop    %r15
+  105015:	5d                   	pop    %rbp
+  105016:	c3                   	ret
+  105017:	48 8d 3d ea 81 15 00 	lea    0x1581ea(%rip),%rdi        # 25d208 <_ZTV36S_P_CoreLib_System_ArgumentException>
+  10501e:	e8 81 05 f6 ff       	call   655a4 <RhpNewFast>
+  105023:	48 8b d8             	mov    %rax,%rbx
+  105026:	48 8b fb             	mov    %rbx,%rdi
+  105029:	48 8d 35 30 51 14 00 	lea    0x145130(%rip),%rsi        # 24a160 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
+  105030:	e8 1b 5f f8 ff       	call   8af50 <S_P_CoreLib_System_ArgumentException___ctor_0>
+  105035:	48 8b fb             	mov    %rbx,%rdi
+  105038:	e8 d1 07 f6 ff       	call   6580e <RhpThrowEx>
+  10503d:	cc                   	int3
+  10503e:	90                   	nop
+  10503f:	90                   	nop
 
-   7799e:	e8 bd c3 08 00       	call   103d60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream>
-   779a3:	33 db                	xor    %ebx,%ebx
-   779a5:	4d 85 ff             	test   %r15,%r15
-   779a8:	74 42                	je     779ec <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
-   779aa:	41 83 7f 08 64       	cmpl   $0x64,0x8(%r15)
-   779af:	7c 3b                	jl     779ec <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
-   779b1:	48 8b 3d 18 a1 1a 00 	mov    0x1aa118(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   779b8:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   779bc:	8b f3                	mov    %ebx,%esi
-   779be:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   779c3:	39 3f                	cmp    %edi,(%rdi)
-   779c5:	e8 a6 be 08 00       	call   103870 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
-   779ca:	48 8b 3d ff a0 1a 00 	mov    0x1aa0ff(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   779d1:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   779d5:	8b f3                	mov    %ebx,%esi
-   779d7:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   779dc:	39 3f                	cmp    %edi,(%rdi)
-   779de:	e8 5d c0 08 00       	call   103a40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
-   779e3:	ff c3                	inc    %ebx
-   779e5:	83 fb 64             	cmp    $0x64,%ebx
-   779e8:	7c c7                	jl     779b1 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x5d1>
-   779ea:	eb 43                	jmp    77a2f <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x64f>
-   779ec:	48 8b 3d dd a0 1a 00 	mov    0x1aa0dd(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   779f3:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   779f7:	41 3b 5f 08          	cmp    0x8(%r15),%ebx
-   779fb:	0f 83 a4 00 00 00    	jae    77aa5 <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x6c5>
-   77a01:	8b f3                	mov    %ebx,%esi
-   77a03:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   77a08:	39 3f                	cmp    %edi,(%rdi)
-   77a0a:	e8 61 be 08 00       	call   103870 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>
-   77a0f:	48 8b 3d ba a0 1a 00 	mov    0x1aa0ba(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   77a16:	48 8b 7f 18          	mov    0x18(%rdi),%rdi
-   77a1a:	8b f3                	mov    %ebx,%esi
-   77a1c:	49 8b 74 f7 10       	mov    0x10(%r15,%rsi,8),%rsi
-   77a21:	39 3f                	cmp    %edi,(%rdi)
-   77a23:	e8 18 c0 08 00       	call   103a40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>
-   77a28:	ff c3                	inc    %ebx
-   77a2a:	83 fb 64             	cmp    $0x64,%ebx
-   77a2d:	7c bd                	jl     779ec <ASM_Analysis_AsmGeneration_Program__WarmupMethods+0x60c>
-   77a2f:	48 8d 3d 82 79 1c 00 	lea    0x1c7982(%rip),%rdi        # 23f3b8 <__Str_JIT_warmup_complete__0DAE2BD7E8651565932C6EA373EC942BC13BA8E721DA0F4E914F424C749DD85D>
-   77a36:	e8 15 4d 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   77a3b:	90                   	nop
-   77a3c:	48 81 c4 d8 00 00 00 	add    $0xd8,%rsp
-   77a43:	5b                   	pop    %rbx
-   77a44:	41 5c                	pop    %r12
-   77a46:	41 5d                	pop    %r13
-   77a48:	41 5e                	pop    %r14
-   77a4a:	41 5f                	pop    %r15
-   77a4c:	5d                   	pop    %rbp
-   77a4d:	c3                   	ret
-   77a4e:	bf 10 00 00 00       	mov    $0x10,%edi
-   77a53:	e8 38 85 00 00       	call   7ff90 <System_Linq_System_Linq_ThrowHelper__ThrowArgumentNullException>
-   77a58:	cc                   	int3
-   77a59:	48 8d 3d 78 a3 1d 00 	lea    0x1da378(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-   77a60:	e8 af da fe ff       	call   65514 <RhpNewFast>
-   77a65:	48 8b d8             	mov    %rax,%rbx
-   77a68:	48 8b fb             	mov    %rbx,%rdi
-   77a6b:	48 8d 35 4e 7a 1c 00 	lea    0x1c7a4e(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-   77a72:	e8 f9 31 01 00       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-   77a77:	48 8b fb             	mov    %rbx,%rdi
-   77a7a:	e8 ff dc fe ff       	call   6577e <RhpThrowEx>
-   77a7f:	48 8d 3d 52 a3 1d 00 	lea    0x1da352(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-   77a86:	e8 89 da fe ff       	call   65514 <RhpNewFast>
-   77a8b:	48 8b d8             	mov    %rax,%rbx
-   77a8e:	48 8b fb             	mov    %rbx,%rdi
-   77a91:	48 8d 35 28 7a 1c 00 	lea    0x1c7a28(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-   77a98:	e8 d3 31 01 00       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-   77a9d:	48 8b fb             	mov    %rbx,%rdi
-   77aa0:	e8 d9 dc fe ff       	call   6577e <RhpThrowEx>
-   77aa5:	e8 16 31 05 00       	call   cabc0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
-   77aaa:	cc                   	int3
-   77aab:	90                   	nop
-   77aac:	90                   	nop
-   77aad:	90                   	nop
-   77aae:	90                   	nop
-   77aaf:	90                   	nop
+0000000000098bc0 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds>:
+   98bc0:	55                   	push   %rbp
+   98bc1:	48 8b ec             	mov    %rsp,%rbp
+   98bc4:	8b c6                	mov    %esi,%eax
+   98bc6:	33 c9                	xor    %ecx,%ecx
+   98bc8:	c6 02 00             	movb   $0x0,(%rdx)
+   98bcb:	8b 77 08             	mov    0x8(%rdi),%esi
+   98bce:	3b f0                	cmp    %eax,%esi
+   98bd0:	7e 74                	jle    98c46 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x86>
+   98bd2:	3b c6                	cmp    %esi,%eax
+   98bd4:	73 77                	jae    98c4d <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x8d>
+   98bd6:	44 8b c0             	mov    %eax,%r8d
+   98bd9:	46 0f b7 44 47 0c    	movzwl 0xc(%rdi,%r8,2),%r8d
+   98bdf:	41 83 f8 48          	cmp    $0x48,%r8d
+   98be3:	77 14                	ja     98bf9 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x39>
+   98be5:	41 83 f8 20          	cmp    $0x20,%r8d
+   98be9:	74 4c                	je     98c37 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x77>
+   98beb:	41 83 f8 27          	cmp    $0x27,%r8d
+   98bef:	74 2a                	je     98c1b <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x5b>
+   98bf1:	41 83 f8 48          	cmp    $0x48,%r8d
+   98bf5:	74 45                	je     98c3c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
+   98bf7:	eb 47                	jmp    98c40 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
+   98bf9:	41 83 f8 68          	cmp    $0x68,%r8d
+   98bfd:	77 0e                	ja     98c0d <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x4d>
+   98bff:	41 83 f8 5c          	cmp    $0x5c,%r8d
+   98c03:	74 20                	je     98c25 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x65>
+   98c05:	41 83 f8 68          	cmp    $0x68,%r8d
+   98c09:	74 31                	je     98c3c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
+   98c0b:	eb 33                	jmp    98c40 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
+   98c0d:	41 83 f8 6d          	cmp    $0x6d,%r8d
+   98c11:	74 29                	je     98c3c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
+   98c13:	41 83 f8 74          	cmp    $0x74,%r8d
+   98c17:	74 23                	je     98c3c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
+   98c19:	eb 25                	jmp    98c40 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
+   98c1b:	85 c9                	test   %ecx,%ecx
+   98c1d:	0f 94 c1             	sete   %cl
+   98c20:	0f b6 c9             	movzbl %cl,%ecx
+   98c23:	eb 1b                	jmp    98c40 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
+   98c25:	ff c0                	inc    %eax
+   98c27:	3b c6                	cmp    %esi,%eax
+   98c29:	73 22                	jae    98c4d <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x8d>
+   98c2b:	44 8b c0             	mov    %eax,%r8d
+   98c2e:	66 42 83 7c 47 0c 20 	cmpw   $0x20,0xc(%rdi,%r8,2)
+   98c35:	75 09                	jne    98c40 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
+   98c37:	c6 02 01             	movb   $0x1,(%rdx)
+   98c3a:	eb 04                	jmp    98c40 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
+   98c3c:	85 c9                	test   %ecx,%ecx
+   98c3e:	74 0b                	je     98c4b <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x8b>
+   98c40:	ff c0                	inc    %eax
+   98c42:	3b f0                	cmp    %eax,%esi
+   98c44:	7f 8c                	jg     98bd2 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x12>
+   98c46:	c6 02 00             	movb   $0x0,(%rdx)
+   98c49:	5d                   	pop    %rbp
+   98c4a:	c3                   	ret
+   98c4b:	5d                   	pop    %rbp
+   98c4c:	c3                   	ret
+   98c4d:	e8 6e 22 03 00       	call   caec0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
+   98c52:	cc                   	int3
+   98c53:	90                   	nop
+   98c54:	90                   	nop
+   98c55:	90                   	nop
+   98c56:	90                   	nop
+   98c57:	90                   	nop
+   98c58:	90                   	nop
+   98c59:	90                   	nop
+   98c5a:	90                   	nop
+   98c5b:	90                   	nop
+   98c5c:	90                   	nop
+   98c5d:	90                   	nop
+   98c5e:	90                   	nop
+   98c5f:	90                   	nop
 
-0000000000077c80 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream>:
-   77c80:	55                   	push   %rbp
-   77c81:	41 57                	push   %r15
-   77c83:	41 56                	push   %r14
-   77c85:	41 55                	push   %r13
-   77c87:	41 54                	push   %r12
-   77c89:	53                   	push   %rbx
-   77c8a:	48 81 ec d8 00 00 00 	sub    $0xd8,%rsp
-   77c91:	c5 f8 77             	vzeroupper
-   77c94:	48 8d ac 24 00 01 00 	lea    0x100(%rsp),%rbp
-   77c9b:	00 
-   77c9c:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-   77ca1:	c5 79 7f 85 20 ff ff 	vmovdqa %xmm8,-0xe0(%rbp)
-   77ca8:	ff 
-   77ca9:	c5 79 7f 85 30 ff ff 	vmovdqa %xmm8,-0xd0(%rbp)
-   77cb0:	ff 
-   77cb1:	48 b8 70 ff ff ff ff 	movabs $0xffffffffffffff70,%rax
-   77cb8:	ff ff ff 
-   77cbb:	c5 79 7f 44 05 d0    	vmovdqa %xmm8,-0x30(%rbp,%rax,1)
-   77cc1:	c5 79 7f 44 05 e0    	vmovdqa %xmm8,-0x20(%rbp,%rax,1)
-   77cc7:	c5 79 7f 44 05 f0    	vmovdqa %xmm8,-0x10(%rbp,%rax,1)
-   77ccd:	48 83 c0 30          	add    $0x30,%rax
-   77cd1:	75 e8                	jne    77cbb <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3b>
-   77cd3:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
-   77cd7:	48 8d 3d 12 b9 1c 00 	lea    0x1cb912(%rip),%rdi        # 2435f0 <__Str_Testing_GetIndicesStream__no_p_3BADE5A8245CDE1F293826A4BEA915BC6A54827377AA32C6394D40F198A479BE>
-   77cde:	e8 6d 4a 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   77ce3:	48 8b 35 e6 9d 1a 00 	mov    0x1a9de6(%rip),%rsi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   77cea:	48 8b 5e 10          	mov    0x10(%rsi),%rbx
-   77cee:	8b 73 08             	mov    0x8(%rbx),%esi
-   77cf1:	48 8d 3d 58 13 21 00 	lea    0x211358(%rip),%rdi        # 289050 <_ZTV16__Array<UIntPtr>>
-   77cf8:	e8 2d d9 fe ff       	call   6562a <RhpNewArray>
-   77cfd:	4c 8b f8             	mov    %rax,%r15
-   77d00:	48 8b 15 c9 9d 1a 00 	mov    0x1a9dc9(%rip),%rdx        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   77d07:	4c 8b 72 18          	mov    0x18(%rdx),%r14
-   77d0b:	48 85 db             	test   %rbx,%rbx
-   77d0e:	75 06                	jne    77d16 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x96>
-   77d10:	33 d2                	xor    %edx,%edx
-   77d12:	33 ff                	xor    %edi,%edi
-   77d14:	eb 07                	jmp    77d1d <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x9d>
-   77d16:	48 8d 53 10          	lea    0x10(%rbx),%rdx
-   77d1a:	8b 7b 08             	mov    0x8(%rbx),%edi
-   77d1d:	49 8d 77 10          	lea    0x10(%r15),%rsi
-   77d21:	41 8b 47 08          	mov    0x8(%r15),%eax
-   77d25:	41 80 7e 55 00       	cmpb   $0x0,0x55(%r14)
-   77d2a:	0f 84 bb 01 00 00    	je     77eeb <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x26b>
-   77d30:	3b f8                	cmp    %eax,%edi
-   77d32:	0f 85 9a 04 00 00    	jne    781d2 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x552>
-   77d38:	41 0f b6 4e 54       	movzbl 0x54(%r14),%ecx
-   77d3d:	4d 8b 46 38          	mov    0x38(%r14),%r8
-   77d41:	45 33 c9             	xor    %r9d,%r9d
-   77d44:	85 ff                	test   %edi,%edi
-   77d46:	4c 0f 45 ca          	cmovne %rdx,%r9
-   77d4a:	4c 89 4d a8          	mov    %r9,-0x58(%rbp)
-   77d4e:	33 d2                	xor    %edx,%edx
-   77d50:	85 c0                	test   %eax,%eax
-   77d52:	48 0f 45 d6          	cmovne %rsi,%rdx
-   77d56:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
-   77d5a:	48 8b f2             	mov    %rdx,%rsi
-   77d5d:	85 c9                	test   %ecx,%ecx
-   77d5f:	0f 84 c4 00 00 00    	je     77e29 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x1a9>
-   77d65:	33 c0                	xor    %eax,%eax
-   77d67:	85 ff                	test   %edi,%edi
-   77d69:	0f 8e 6d 01 00 00    	jle    77edc <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x25c>
-   77d6f:	49 8d 9e 80 00 00 00 	lea    0x80(%r14),%rbx
-   77d76:	48 63 d0             	movslq %eax,%rdx
-   77d79:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
-   77d7d:	49 33 56 48          	xor    0x48(%r14),%rdx
-   77d81:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77d88:	c1 7c 51 
-   77d8b:	4c 8d 55 98          	lea    -0x68(%rbp),%r10
-   77d8f:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
-   77d94:	4d 89 1a             	mov    %r11,(%r10)
-   77d97:	48 8b 4d 98          	mov    -0x68(%rbp),%rcx
-   77d9b:	48 33 d1             	xor    %rcx,%rdx
-   77d9e:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77da5:	c1 7c 51 
-   77da8:	48 0f af d1          	imul   %rcx,%rdx
-   77dac:	48 89 95 18 ff ff ff 	mov    %rdx,-0xe8(%rbp)
-   77db3:	49 8b 4e 70          	mov    0x70(%r14),%rcx
-   77db7:	4c 8d 55 90          	lea    -0x70(%rbp),%r10
-   77dbb:	4c 8b 9d 18 ff ff ff 	mov    -0xe8(%rbp),%r11
-   77dc2:	48 8b d1             	mov    %rcx,%rdx
-   77dc5:	c4 c2 93 f6 d3       	mulx   %r11,%r13,%rdx
-   77dca:	4d 89 2a             	mov    %r13,(%r10)
-   77dcd:	49 8b 4e 08          	mov    0x8(%r14),%rcx
-   77dd1:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
-   77dd5:	49 33 56 48          	xor    0x48(%r14),%rdx
-   77dd9:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77de0:	c1 7c 51 
-   77de3:	48 0f af d1          	imul   %rcx,%rdx
-   77de7:	48 8b cb             	mov    %rbx,%rcx
-   77dea:	49 33 d3             	xor    %r11,%rdx
-   77ded:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
-   77df2:	48 8b 09             	mov    (%rcx),%rcx
-   77df5:	4c 8d 55 88          	lea    -0x78(%rbp),%r10
-   77df9:	c4 e2 a3 f6 d1       	mulx   %rcx,%r11,%rdx
-   77dfe:	4d 89 1a             	mov    %r11,(%r10)
-   77e01:	49 3b d0             	cmp    %r8,%rdx
-   77e04:	72 0d                	jb     77e13 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x193>
-   77e06:	41 2b d0             	sub    %r8d,%edx
-   77e09:	49 8b 4e 58          	mov    0x58(%r14),%rcx
-   77e0d:	48 63 d2             	movslq %edx,%rdx
-   77e10:	8b 14 91             	mov    (%rcx,%rdx,4),%edx
-   77e13:	48 63 c8             	movslq %eax,%rcx
-   77e16:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
-   77e1a:	ff c0                	inc    %eax
-   77e1c:	3b c7                	cmp    %edi,%eax
-   77e1e:	0f 8c 52 ff ff ff    	jl     77d76 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0xf6>
-   77e24:	e9 b3 00 00 00       	jmp    77edc <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x25c>
-   77e29:	33 c0                	xor    %eax,%eax
-   77e2b:	85 ff                	test   %edi,%edi
-   77e2d:	0f 8e a9 00 00 00    	jle    77edc <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x25c>
-   77e33:	49 8d 9e 80 00 00 00 	lea    0x80(%r14),%rbx
-   77e3a:	48 63 d0             	movslq %eax,%rdx
-   77e3d:	49 8b 14 d1          	mov    (%r9,%rdx,8),%rdx
-   77e41:	49 33 56 48          	xor    0x48(%r14),%rdx
-   77e45:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77e4c:	c1 7c 51 
-   77e4f:	4c 8d 45 80          	lea    -0x80(%rbp),%r8
-   77e53:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
-   77e58:	4d 89 10             	mov    %r10,(%r8)
-   77e5b:	48 8b 4d 80          	mov    -0x80(%rbp),%rcx
-   77e5f:	48 33 d1             	xor    %rcx,%rdx
-   77e62:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77e69:	c1 7c 51 
-   77e6c:	48 0f af d1          	imul   %rcx,%rdx
-   77e70:	48 89 95 10 ff ff ff 	mov    %rdx,-0xf0(%rbp)
-   77e77:	49 8b 4e 70          	mov    0x70(%r14),%rcx
-   77e7b:	4c 8d 85 78 ff ff ff 	lea    -0x88(%rbp),%r8
-   77e82:	4c 8b 95 10 ff ff ff 	mov    -0xf0(%rbp),%r10
-   77e89:	48 8b d1             	mov    %rcx,%rdx
-   77e8c:	c4 c2 a3 f6 d2       	mulx   %r10,%r11,%rdx
-   77e91:	4d 89 18             	mov    %r11,(%r8)
-   77e94:	49 8b 4e 08          	mov    0x8(%r14),%rcx
-   77e98:	0f b6 14 11          	movzbl (%rcx,%rdx,1),%edx
-   77e9c:	49 33 56 48          	xor    0x48(%r14),%rdx
-   77ea0:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-   77ea7:	c1 7c 51 
-   77eaa:	48 0f af d1          	imul   %rcx,%rdx
-   77eae:	48 8b cb             	mov    %rbx,%rcx
-   77eb1:	49 33 d2             	xor    %r10,%rdx
-   77eb4:	48 0f af 51 08       	imul   0x8(%rcx),%rdx
-   77eb9:	48 8b 09             	mov    (%rcx),%rcx
-   77ebc:	4c 8d 85 70 ff ff ff 	lea    -0x90(%rbp),%r8
-   77ec3:	c4 e2 ab f6 d1       	mulx   %rcx,%r10,%rdx
-   77ec8:	4d 89 10             	mov    %r10,(%r8)
-   77ecb:	48 63 c8             	movslq %eax,%rcx
-   77ece:	48 89 14 ce          	mov    %rdx,(%rsi,%rcx,8)
-   77ed2:	ff c0                	inc    %eax
-   77ed4:	3b c7                	cmp    %edi,%eax
-   77ed6:	0f 8c 5e ff ff ff    	jl     77e3a <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x1ba>
-   77edc:	33 d2                	xor    %edx,%edx
-   77ede:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
-   77ee2:	48 89 55 a8          	mov    %rdx,-0x58(%rbp)
-   77ee6:	e9 a3 01 00 00       	jmp    7808e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x40e>
-   77eeb:	44 8b ef             	mov    %edi,%r13d
-   77eee:	48 8b fe             	mov    %rsi,%rdi
-   77ef1:	8b f0                	mov    %eax,%esi
-   77ef3:	44 3b ee             	cmp    %esi,%r13d
-   77ef6:	0f 85 fc 02 00 00    	jne    781f8 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x578>
-   77efc:	41 0f b6 46 54       	movzbl 0x54(%r14),%eax
-   77f01:	4d 8b 66 38          	mov    0x38(%r14),%r12
-   77f05:	33 c9                	xor    %ecx,%ecx
-   77f07:	45 85 ed             	test   %r13d,%r13d
-   77f0a:	48 0f 45 ca          	cmovne %rdx,%rcx
-   77f0e:	48 89 8d 68 ff ff ff 	mov    %rcx,-0x98(%rbp)
-   77f15:	48 8b d9             	mov    %rcx,%rbx
-   77f18:	33 d2                	xor    %edx,%edx
-   77f1a:	85 f6                	test   %esi,%esi
-   77f1c:	48 0f 45 d7          	cmovne %rdi,%rdx
-   77f20:	48 89 95 60 ff ff ff 	mov    %rdx,-0xa0(%rbp)
-   77f27:	48 8b ca             	mov    %rdx,%rcx
-   77f2a:	48 89 8d 58 ff ff ff 	mov    %rcx,-0xa8(%rbp)
-   77f31:	85 c0                	test   %eax,%eax
-   77f33:	0f 84 18 01 00 00    	je     78051 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3d1>
-   77f39:	33 c0                	xor    %eax,%eax
-   77f3b:	45 85 ed             	test   %r13d,%r13d
-   77f3e:	0f 8e 3a 01 00 00    	jle    7807e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3fe>
-   77f44:	89 85 54 ff ff ff    	mov    %eax,-0xac(%rbp)
-   77f4a:	48 63 d0             	movslq %eax,%rdx
-   77f4d:	48 8b 14 d3          	mov    (%rbx,%rdx,8),%rdx
-   77f51:	49 33 56 48          	xor    0x48(%r14),%rdx
-   77f55:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-   77f5c:	c1 7c 51 
-   77f5f:	48 8d b5 40 ff ff ff 	lea    -0xc0(%rbp),%rsi
-   77f66:	c4 62 bb f6 cf       	mulx   %rdi,%r8,%r9
-   77f6b:	4c 89 06             	mov    %r8,(%rsi)
-   77f6e:	4c 8b 85 40 ff ff ff 	mov    -0xc0(%rbp),%r8
-   77f75:	4d 33 c1             	xor    %r9,%r8
-   77f78:	4c 0f af c7          	imul   %rdi,%r8
-   77f7c:	49 8b f8             	mov    %r8,%rdi
-   77f7f:	48 89 bd 08 ff ff ff 	mov    %rdi,-0xf8(%rbp)
-   77f86:	49 8d 56 78          	lea    0x78(%r14),%rdx
-   77f8a:	48 8b 12             	mov    (%rdx),%rdx
-   77f8d:	48 8d b5 38 ff ff ff 	lea    -0xc8(%rbp),%rsi
-   77f94:	c4 e2 bb f6 d7       	mulx   %rdi,%r8,%rdx
-   77f99:	4c 89 06             	mov    %r8,(%rsi)
-   77f9c:	49 8b 76 08          	mov    0x8(%r14),%rsi
-   77fa0:	0f b6 14 16          	movzbl (%rsi,%rdx,1),%edx
-   77fa4:	48 89 95 48 ff ff ff 	mov    %rdx,-0xb8(%rbp)
-   77fab:	49 8d 7e 68          	lea    0x68(%r14),%rdi
-   77faf:	48 8b b5 08 ff ff ff 	mov    -0xf8(%rbp),%rsi
-   77fb6:	e8 55 2f 00 00       	call   7af10 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Computation_FastReduce__Reduce>
-   77fbb:	49 0f af 46 18       	imul   0x18(%r14),%rax
-   77fc0:	48 89 85 30 ff ff ff 	mov    %rax,-0xd0(%rbp)
-   77fc7:	48 8b bd 48 ff ff ff 	mov    -0xb8(%rbp),%rdi
-   77fce:	49 33 7e 48          	xor    0x48(%r14),%rdi
-   77fd2:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
-   77fd9:	c1 7c 51 
-   77fdc:	48 0f af fe          	imul   %rsi,%rdi
-   77fe0:	49 8d b6 80 00 00 00 	lea    0x80(%r14),%rsi
-   77fe7:	48 8b 95 08 ff ff ff 	mov    -0xf8(%rbp),%rdx
-   77fee:	48 33 fa             	xor    %rdx,%rdi
-   77ff1:	48 0f af 7e 08       	imul   0x8(%rsi),%rdi
-   77ff6:	48 8b 16             	mov    (%rsi),%rdx
-   77ff9:	33 f6                	xor    %esi,%esi
-   77ffb:	33 c9                	xor    %ecx,%ecx
-   77ffd:	e8 3e be 01 00       	call   93e40 <S_P_CoreLib_System_UInt128__op_Multiply>
-   78002:	48 8b f8             	mov    %rax,%rdi
-   78005:	48 8b f2             	mov    %rdx,%rsi
-   78008:	ba 40 00 00 00       	mov    $0x40,%edx
-   7800d:	e8 6e be 01 00       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-   78012:	48 8b b5 30 ff ff ff 	mov    -0xd0(%rbp),%rsi
-   78019:	48 03 f0             	add    %rax,%rsi
-   7801c:	49 3b f4             	cmp    %r12,%rsi
-   7801f:	72 0d                	jb     7802e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3ae>
-   78021:	41 2b f4             	sub    %r12d,%esi
-   78024:	49 8b 7e 58          	mov    0x58(%r14),%rdi
-   78028:	48 63 f6             	movslq %esi,%rsi
-   7802b:	8b 34 b7             	mov    (%rdi,%rsi,4),%esi
-   7802e:	8b bd 54 ff ff ff    	mov    -0xac(%rbp),%edi
-   78034:	48 63 c7             	movslq %edi,%rax
-   78037:	48 8b 8d 58 ff ff ff 	mov    -0xa8(%rbp),%rcx
-   7803e:	48 89 34 c1          	mov    %rsi,(%rcx,%rax,8)
-   78042:	ff c7                	inc    %edi
-   78044:	41 3b fd             	cmp    %r13d,%edi
-   78047:	8b c7                	mov    %edi,%eax
-   78049:	0f 8c f5 fe ff ff    	jl     77f44 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x2c4>
-   7804f:	eb 2d                	jmp    7807e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3fe>
-   78051:	45 33 e4             	xor    %r12d,%r12d
-   78054:	45 85 ed             	test   %r13d,%r13d
-   78057:	7e 25                	jle    7807e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3fe>
-   78059:	49 63 f4             	movslq %r12d,%rsi
-   7805c:	48 8b 34 f3          	mov    (%rbx,%rsi,8),%rsi
-   78060:	49 8b fe             	mov    %r14,%rdi
-   78063:	e8 28 b6 08 00       	call   103690 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>
-   78068:	49 63 fc             	movslq %r12d,%rdi
-   7806b:	48 8b b5 58 ff ff ff 	mov    -0xa8(%rbp),%rsi
-   78072:	48 89 04 fe          	mov    %rax,(%rsi,%rdi,8)
-   78076:	41 ff c4             	inc    %r12d
-   78079:	45 3b e5             	cmp    %r13d,%r12d
-   7807c:	7c db                	jl     78059 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x3d9>
-   7807e:	33 ff                	xor    %edi,%edi
-   78080:	48 89 bd 60 ff ff ff 	mov    %rdi,-0xa0(%rbp)
-   78087:	48 89 bd 68 ff ff ff 	mov    %rdi,-0x98(%rbp)
-   7808e:	48 8b 3d 3b 9a 1a 00 	mov    0x1a9a3b(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   78095:	48 8b 5f 18          	mov    0x18(%rdi),%rbx
-   78099:	48 8b 3d 30 9a 1a 00 	mov    0x1a9a30(%rip),%rdi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   780a0:	48 8b 7f 10          	mov    0x10(%rdi),%rdi
-   780a4:	48 85 ff             	test   %rdi,%rdi
-   780a7:	75 08                	jne    780b1 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x431>
-   780a9:	45 33 f6             	xor    %r14d,%r14d
-   780ac:	45 33 ed             	xor    %r13d,%r13d
-   780af:	eb 08                	jmp    780b9 <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x439>
-   780b1:	4c 8d 77 10          	lea    0x10(%rdi),%r14
-   780b5:	44 8b 6f 08          	mov    0x8(%rdi),%r13d
-   780b9:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
-   780bd:	c5 fa 7f 85 20 ff ff 	vmovdqu %xmm0,-0xe0(%rbp)
-   780c4:	ff 
-   780c5:	48 8d bd 20 ff ff ff 	lea    -0xe0(%rbp),%rdi
-   780cc:	49 8b f7             	mov    %r15,%rsi
-   780cf:	e8 fc 03 09 00       	call   1084d0 <S_P_CoreLib_System_Span_1<UIntPtr>___ctor>
-   780d4:	48 8b 8d 20 ff ff ff 	mov    -0xe0(%rbp),%rcx
-   780db:	44 8b 85 28 ff ff ff 	mov    -0xd8(%rbp),%r8d
-   780e2:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
-   780e6:	74 13                	je     780fb <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x47b>
-   780e8:	49 8b f6             	mov    %r14,%rsi
-   780eb:	41 8b d5             	mov    %r13d,%edx
-   780ee:	48 8b fb             	mov    %rbx,%rdi
-   780f1:	45 33 c9             	xor    %r9d,%r9d
-   780f4:	e8 27 c0 08 00       	call   104120 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart>
-   780f9:	eb 11                	jmp    7810c <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x48c>
-   780fb:	49 8b f6             	mov    %r14,%rsi
-   780fe:	41 8b d5             	mov    %r13d,%edx
-   78101:	48 8b fb             	mov    %rbx,%rdi
-   78104:	45 33 c9             	xor    %r9d,%r9d
-   78107:	e8 34 c2 08 00       	call   104340 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart>
-   7810c:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
-   78110:	be 25 00 00 00       	mov    $0x25,%esi
-   78115:	ba 01 00 00 00       	mov    $0x1,%edx
-   7811a:	e8 e1 8d 04 00       	call   c0f00 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler___ctor>
-   7811f:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
-   78123:	8b 75 c0             	mov    -0x40(%rbp),%esi
-   78126:	e8 05 1d 08 00       	call   f9e30 <S_P_CoreLib_System_Span_1<Char>__Slice>
-   7812b:	48 8b f0             	mov    %rax,%rsi
-   7812e:	48 8d 3d 2b f5 1b 00 	lea    0x1bf52b(%rip),%rdi        # 237660 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
-   78135:	39 3f                	cmp    %edi,(%rdi)
-   78137:	e8 a4 c7 00 00       	call   848e0 <String__TryCopyTo>
-   7813c:	85 c0                	test   %eax,%eax
-   7813e:	74 0b                	je     7814b <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x4cb>
-   78140:	8b 7d c0             	mov    -0x40(%rbp),%edi
-   78143:	83 c7 0c             	add    $0xc,%edi
-   78146:	89 7d c0             	mov    %edi,-0x40(%rbp)
-   78149:	eb 10                	jmp    7815b <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x4db>
-   7814b:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
-   7814f:	48 8d 35 0a f5 1b 00 	lea    0x1bf50a(%rip),%rsi        # 237660 <__Str___Processed__B0BC990A94906B16D341A9E9AC86F812F54FD5B8FC75277F26E80FA20B646174>
-   78156:	e8 85 8f 04 00       	call   c10e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
-   7815b:	48 8b 35 6e 99 1a 00 	mov    0x1a996e(%rip),%rsi        # 221ad0 <__GCSTATICSASM_Analysis_AsmGeneration_Program>
-   78162:	48 8b 76 10          	mov    0x10(%rsi),%rsi
-   78166:	8b 76 08             	mov    0x8(%rsi),%esi
-   78169:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
-   7816d:	e8 6e 7a 0b 00       	call   12fbe0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__AppendFormatted<Int32>>
-   78172:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
-   78176:	8b 75 c0             	mov    -0x40(%rbp),%esi
-   78179:	e8 b2 1c 08 00       	call   f9e30 <S_P_CoreLib_System_Span_1<Char>__Slice>
-   7817e:	48 8b f0             	mov    %rax,%rsi
-   78181:	48 8d 3d a0 f9 1b 00 	lea    0x1bf9a0(%rip),%rdi        # 237b28 <__Str__keys_without_prefetching_D8A361755FCD551AE19C922C947806AAE44FC92E986D052C498A0E8B5AAA0C53>
-   78188:	39 3f                	cmp    %edi,(%rdi)
-   7818a:	e8 51 c7 00 00       	call   848e0 <String__TryCopyTo>
-   7818f:	85 c0                	test   %eax,%eax
-   78191:	74 0b                	je     7819e <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x51e>
-   78193:	8b 7d c0             	mov    -0x40(%rbp),%edi
-   78196:	83 c7 19             	add    $0x19,%edi
-   78199:	89 7d c0             	mov    %edi,-0x40(%rbp)
-   7819c:	eb 10                	jmp    781ae <ASM_Analysis_AsmGeneration_Program__TestGetIndicesStream+0x52e>
-   7819e:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
-   781a2:	48 8d 35 7f f9 1b 00 	lea    0x1bf97f(%rip),%rsi        # 237b28 <__Str__keys_without_prefetching_D8A361755FCD551AE19C922C947806AAE44FC92E986D052C498A0E8B5AAA0C53>
-   781a9:	e8 32 8f 04 00       	call   c10e0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__GrowThenCopyString>
-   781ae:	48 8d 7d b0          	lea    -0x50(%rbp),%rdi
-   781b2:	e8 e9 8d 04 00       	call   c0fa0 <S_P_CoreLib_System_Runtime_CompilerServices_DefaultInterpolatedStringHandler__ToStringAndClear>
-   781b7:	48 8b f8             	mov    %rax,%rdi
-   781ba:	e8 91 45 00 00       	call   7c750 <System_Console_System_Console__WriteLine_12>
-   781bf:	90                   	nop
-   781c0:	48 81 c4 d8 00 00 00 	add    $0xd8,%rsp
-   781c7:	5b                   	pop    %rbx
-   781c8:	41 5c                	pop    %r12
-   781ca:	41 5d                	pop    %r13
-   781cc:	41 5e                	pop    %r14
-   781ce:	41 5f                	pop    %r15
-   781d0:	5d                   	pop    %rbp
-   781d1:	c3                   	ret
-   781d2:	48 8d 3d ff 9b 1d 00 	lea    0x1d9bff(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-   781d9:	e8 36 d3 fe ff       	call   65514 <RhpNewFast>
-   781de:	48 8b d8             	mov    %rax,%rbx
-   781e1:	48 8b fb             	mov    %rbx,%rdi
-   781e4:	48 8d 35 d5 72 1c 00 	lea    0x1c72d5(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-   781eb:	e8 80 2a 01 00       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-   781f0:	48 8b fb             	mov    %rbx,%rdi
-   781f3:	e8 86 d5 fe ff       	call   6577e <RhpThrowEx>
-   781f8:	48 8d 3d d9 9b 1d 00 	lea    0x1d9bd9(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-   781ff:	e8 10 d3 fe ff       	call   65514 <RhpNewFast>
-   78204:	48 8b d8             	mov    %rax,%rbx
-   78207:	48 8b fb             	mov    %rbx,%rdi
-   7820a:	48 8d 35 af 72 1c 00 	lea    0x1c72af(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-   78211:	e8 5a 2a 01 00       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-   78216:	48 8b fb             	mov    %rbx,%rdi
-   78219:	e8 60 d5 fe ff       	call   6577e <RhpThrowEx>
-   7821e:	cc                   	int3
-   7821f:	90                   	nop
-
-0000000000103d60 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream>:
-  103d60:	55                   	push   %rbp
-  103d61:	41 57                	push   %r15
-  103d63:	41 56                	push   %r14
-  103d65:	41 55                	push   %r13
-  103d67:	41 54                	push   %r12
-  103d69:	53                   	push   %rbx
-  103d6a:	48 81 ec 88 00 00 00 	sub    $0x88,%rsp
-  103d71:	c5 f8 77             	vzeroupper
-  103d74:	48 8d ac 24 b0 00 00 	lea    0xb0(%rsp),%rbp
-  103d7b:	00 
-  103d7c:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-  103d81:	48 b8 a0 ff ff ff ff 	movabs $0xffffffffffffffa0,%rax
-  103d88:	ff ff ff 
-  103d8b:	c5 79 7f 44 05 d0    	vmovdqa %xmm8,-0x30(%rbp,%rax,1)
-  103d91:	c5 79 7f 44 05 e0    	vmovdqa %xmm8,-0x20(%rbp,%rax,1)
-  103d97:	c5 79 7f 44 05 f0    	vmovdqa %xmm8,-0x10(%rbp,%rax,1)
-  103d9d:	48 83 c0 30          	add    $0x30,%rax
-  103da1:	75 e8                	jne    103d8b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2b>
-  103da3:	48 89 45 d0          	mov    %rax,-0x30(%rbp)
-  103da7:	48 8b df             	mov    %rdi,%rbx
-  103daa:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
-  103dae:	0f 84 2c 02 00 00    	je     103fe0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x280>
-  103db4:	44 8b fa             	mov    %edx,%r15d
-  103db7:	45 3b f8             	cmp    %r8d,%r15d
-  103dba:	0f 85 12 03 00 00    	jne    1040d2 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x372>
-  103dc0:	45 84 c9             	test   %r9b,%r9b
-  103dc3:	74 06                	je     103dcb <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x6b>
-  103dc5:	0f b6 53 54          	movzbl 0x54(%rbx),%edx
-  103dc9:	eb 02                	jmp    103dcd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x6d>
-  103dcb:	33 d2                	xor    %edx,%edx
-  103dcd:	4c 8b 73 38          	mov    0x38(%rbx),%r14
-  103dd1:	33 ff                	xor    %edi,%edi
-  103dd3:	45 85 ff             	test   %r15d,%r15d
-  103dd6:	48 0f 45 fe          	cmovne %rsi,%rdi
-  103dda:	48 89 7d d0          	mov    %rdi,-0x30(%rbp)
-  103dde:	4c 8b ef             	mov    %rdi,%r13
-  103de1:	33 ff                	xor    %edi,%edi
-  103de3:	45 85 c0             	test   %r8d,%r8d
-  103de6:	48 0f 45 f9          	cmovne %rcx,%rdi
-  103dea:	48 89 7d c8          	mov    %rdi,-0x38(%rbp)
-  103dee:	4c 8b e7             	mov    %rdi,%r12
-  103df1:	85 d2                	test   %edx,%edx
-  103df3:	0f 84 dd 00 00 00    	je     103ed6 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x176>
-  103df9:	33 c0                	xor    %eax,%eax
-  103dfb:	45 85 ff             	test   %r15d,%r15d
-  103dfe:	0f 8e c0 01 00 00    	jle    103fc4 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x264>
-  103e04:	89 45 c4             	mov    %eax,-0x3c(%rbp)
-  103e07:	48 63 d0             	movslq %eax,%rdx
-  103e0a:	49 8b 54 d5 00       	mov    0x0(%r13,%rdx,8),%rdx
-  103e0f:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  103e13:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  103e1a:	c1 7c 51 
-  103e1d:	48 8d 75 b8          	lea    -0x48(%rbp),%rsi
-  103e21:	c4 e2 f3 f6 d7       	mulx   %rdi,%rcx,%rdx
-  103e26:	48 89 0e             	mov    %rcx,(%rsi)
-  103e29:	48 8b 7d b8          	mov    -0x48(%rbp),%rdi
-  103e2d:	48 33 d7             	xor    %rdi,%rdx
-  103e30:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  103e37:	c1 7c 51 
-  103e3a:	48 0f af d7          	imul   %rdi,%rdx
-  103e3e:	48 89 95 60 ff ff ff 	mov    %rdx,-0xa0(%rbp)
-  103e45:	48 8b 7b 70          	mov    0x70(%rbx),%rdi
-  103e49:	48 8d 75 b0          	lea    -0x50(%rbp),%rsi
-  103e4d:	48 8b 8d 60 ff ff ff 	mov    -0xa0(%rbp),%rcx
-  103e54:	48 8b d7             	mov    %rdi,%rdx
-  103e57:	c4 e2 bb f6 d1       	mulx   %rcx,%r8,%rdx
-  103e5c:	4c 89 06             	mov    %r8,(%rsi)
-  103e5f:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
-  103e63:	0f b6 14 17          	movzbl (%rdi,%rdx,1),%edx
-  103e67:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  103e6b:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  103e72:	c1 7c 51 
-  103e75:	48 0f af d7          	imul   %rdi,%rdx
-  103e79:	48 8d bb 80 00 00 00 	lea    0x80(%rbx),%rdi
-  103e80:	48 33 d1             	xor    %rcx,%rdx
-  103e83:	48 0f af 57 08       	imul   0x8(%rdi),%rdx
-  103e88:	48 8b 3f             	mov    (%rdi),%rdi
-  103e8b:	48 8d 75 a8          	lea    -0x58(%rbp),%rsi
-  103e8f:	c4 e2 f3 f6 ff       	mulx   %rdi,%rcx,%rdi
-  103e94:	48 89 0e             	mov    %rcx,(%rsi)
-  103e97:	48 8b f7             	mov    %rdi,%rsi
-  103e9a:	48 8b 7d a8          	mov    -0x58(%rbp),%rdi
-  103e9e:	ba 40 00 00 00       	mov    $0x40,%edx
-  103ea3:	e8 d8 ff f8 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103ea8:	49 3b c6             	cmp    %r14,%rax
-  103eab:	72 0d                	jb     103eba <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x15a>
-  103ead:	41 2b c6             	sub    %r14d,%eax
-  103eb0:	48 8b 53 58          	mov    0x58(%rbx),%rdx
-  103eb4:	48 63 f8             	movslq %eax,%rdi
-  103eb7:	8b 04 ba             	mov    (%rdx,%rdi,4),%eax
-  103eba:	8b 55 c4             	mov    -0x3c(%rbp),%edx
-  103ebd:	48 63 fa             	movslq %edx,%rdi
-  103ec0:	49 89 04 fc          	mov    %rax,(%r12,%rdi,8)
-  103ec4:	ff c2                	inc    %edx
-  103ec6:	41 3b d7             	cmp    %r15d,%edx
-  103ec9:	8b c2                	mov    %edx,%eax
-  103ecb:	0f 8c 33 ff ff ff    	jl     103e04 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0xa4>
-  103ed1:	e9 ee 00 00 00       	jmp    103fc4 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x264>
-  103ed6:	45 33 f6             	xor    %r14d,%r14d
-  103ed9:	45 85 ff             	test   %r15d,%r15d
-  103edc:	0f 8e e2 00 00 00    	jle    103fc4 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x264>
-  103ee2:	49 63 d6             	movslq %r14d,%rdx
-  103ee5:	49 8b 7c d5 00       	mov    0x0(%r13,%rdx,8),%rdi
-  103eea:	48 33 7b 48          	xor    0x48(%rbx),%rdi
-  103eee:	48 8d 55 a0          	lea    -0x60(%rbp),%rdx
-  103ef2:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
-  103ef9:	c1 7c 51 
-  103efc:	e8 ff fb f7 ff       	call   83b00 <S_P_CoreLib_System_Math__BigMul_0>
-  103f01:	48 8b f0             	mov    %rax,%rsi
-  103f04:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
-  103f08:	c5 f8 11 45 90       	vmovups %xmm0,-0x70(%rbp)
-  103f0d:	48 8d 7d 90          	lea    -0x70(%rbp),%rdi
-  103f11:	48 8b 55 a0          	mov    -0x60(%rbp),%rdx
-  103f15:	e8 06 ff f8 ff       	call   93e20 <S_P_CoreLib_System_UInt128___ctor>
-  103f1a:	48 8b 45 90          	mov    -0x70(%rbp),%rax
-  103f1e:	48 89 85 58 ff ff ff 	mov    %rax,-0xa8(%rbp)
-  103f25:	48 8b 75 98          	mov    -0x68(%rbp),%rsi
-  103f29:	48 8b f8             	mov    %rax,%rdi
-  103f2c:	ba 40 00 00 00       	mov    $0x40,%edx
-  103f31:	e8 4a ff f8 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103f36:	48 8b 8d 58 ff ff ff 	mov    -0xa8(%rbp),%rcx
-  103f3d:	48 33 c1             	xor    %rcx,%rax
-  103f40:	48 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rcx
-  103f47:	c1 7c 51 
-  103f4a:	48 0f af c1          	imul   %rcx,%rax
-  103f4e:	48 89 85 50 ff ff ff 	mov    %rax,-0xb0(%rbp)
-  103f55:	48 8b fb             	mov    %rbx,%rdi
-  103f58:	48 8b b5 50 ff ff ff 	mov    -0xb0(%rbp),%rsi
-  103f5f:	e8 bc fc ff ff       	call   103c20 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__BucketInPart>
-  103f64:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
-  103f68:	40 0f b6 3c 07       	rex movzbl (%rdi,%rax,1),%edi
-  103f6d:	48 33 7b 48          	xor    0x48(%rbx),%rdi
-  103f71:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
-  103f78:	c1 7c 51 
-  103f7b:	48 0f af fe          	imul   %rsi,%rdi
-  103f7f:	48 8d b3 80 00 00 00 	lea    0x80(%rbx),%rsi
-  103f86:	48 8b 95 50 ff ff ff 	mov    -0xb0(%rbp),%rdx
-  103f8d:	48 33 fa             	xor    %rdx,%rdi
-  103f90:	48 0f af 7e 08       	imul   0x8(%rsi),%rdi
-  103f95:	48 8b 16             	mov    (%rsi),%rdx
-  103f98:	33 f6                	xor    %esi,%esi
-  103f9a:	33 c9                	xor    %ecx,%ecx
-  103f9c:	e8 9f fe f8 ff       	call   93e40 <S_P_CoreLib_System_UInt128__op_Multiply>
-  103fa1:	48 8b f8             	mov    %rax,%rdi
-  103fa4:	48 8b f2             	mov    %rdx,%rsi
-  103fa7:	ba 40 00 00 00       	mov    $0x40,%edx
-  103fac:	e8 cf fe f8 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103fb1:	49 63 fe             	movslq %r14d,%rdi
-  103fb4:	49 89 04 fc          	mov    %rax,(%r12,%rdi,8)
-  103fb8:	41 ff c6             	inc    %r14d
-  103fbb:	45 3b f7             	cmp    %r15d,%r14d
-  103fbe:	0f 8c 1e ff ff ff    	jl     103ee2 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x182>
-  103fc4:	33 ff                	xor    %edi,%edi
-  103fc6:	48 89 7d c8          	mov    %rdi,-0x38(%rbp)
-  103fca:	48 89 7d d0          	mov    %rdi,-0x30(%rbp)
-  103fce:	48 81 c4 88 00 00 00 	add    $0x88,%rsp
-  103fd5:	5b                   	pop    %rbx
-  103fd6:	41 5c                	pop    %r12
-  103fd8:	41 5d                	pop    %r13
-  103fda:	41 5e                	pop    %r14
-  103fdc:	41 5f                	pop    %r15
-  103fde:	5d                   	pop    %rbp
-  103fdf:	c3                   	ret
-  103fe0:	48 8b fe             	mov    %rsi,%rdi
-  103fe3:	44 8b fa             	mov    %edx,%r15d
-  103fe6:	48 89 4d 80          	mov    %rcx,-0x80(%rbp)
-  103fea:	44 89 45 88          	mov    %r8d,-0x78(%rbp)
-  103fee:	44 3b 7d 88          	cmp    -0x78(%rbp),%r15d
-  103ff2:	0f 85 00 01 00 00    	jne    1040f8 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x398>
-  103ff8:	45 84 c9             	test   %r9b,%r9b
-  103ffb:	74 07                	je     104004 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2a4>
-  103ffd:	44 0f b6 73 54       	movzbl 0x54(%rbx),%r14d
-  104002:	eb 03                	jmp    104007 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2a7>
-  104004:	45 33 f6             	xor    %r14d,%r14d
-  104007:	4c 8b 6b 38          	mov    0x38(%rbx),%r13
-  10400b:	33 c0                	xor    %eax,%eax
-  10400d:	45 85 ff             	test   %r15d,%r15d
-  104010:	48 0f 45 c7          	cmovne %rdi,%rax
-  104014:	48 89 85 78 ff ff ff 	mov    %rax,-0x88(%rbp)
-  10401b:	4c 8b e0             	mov    %rax,%r12
-  10401e:	48 8d 7d 80          	lea    -0x80(%rbp),%rdi
-  104022:	e8 c9 44 00 00       	call   1084f0 <S_P_CoreLib_System_Span_1<UIntPtr>__GetPinnableReference>
-  104027:	48 89 85 70 ff ff ff 	mov    %rax,-0x90(%rbp)
-  10402e:	48 8b 85 70 ff ff ff 	mov    -0x90(%rbp),%rax
-  104035:	48 89 85 68 ff ff ff 	mov    %rax,-0x98(%rbp)
-  10403c:	45 85 f6             	test   %r14d,%r14d
-  10403f:	74 41                	je     104082 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x322>
-  104041:	45 33 f6             	xor    %r14d,%r14d
-  104044:	45 85 ff             	test   %r15d,%r15d
-  104047:	7e 67                	jle    1040b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x350>
-  104049:	49 63 f6             	movslq %r14d,%rsi
-  10404c:	49 8b 34 f4          	mov    (%r12,%rsi,8),%rsi
-  104050:	48 8b fb             	mov    %rbx,%rdi
-  104053:	e8 38 f6 ff ff       	call   103690 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>
-  104058:	49 3b c5             	cmp    %r13,%rax
-  10405b:	72 0d                	jb     10406a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x30a>
-  10405d:	41 2b c5             	sub    %r13d,%eax
-  104060:	48 8b 73 58          	mov    0x58(%rbx),%rsi
-  104064:	48 63 f8             	movslq %eax,%rdi
-  104067:	8b 04 be             	mov    (%rsi,%rdi,4),%eax
-  10406a:	49 63 f6             	movslq %r14d,%rsi
-  10406d:	48 8b 8d 68 ff ff ff 	mov    -0x98(%rbp),%rcx
-  104074:	48 89 04 f1          	mov    %rax,(%rcx,%rsi,8)
-  104078:	41 ff c6             	inc    %r14d
-  10407b:	45 3b f7             	cmp    %r15d,%r14d
-  10407e:	7c c9                	jl     104049 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x2e9>
-  104080:	eb 2e                	jmp    1040b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x350>
-  104082:	45 33 f6             	xor    %r14d,%r14d
-  104085:	45 85 ff             	test   %r15d,%r15d
-  104088:	7e 26                	jle    1040b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x350>
-  10408a:	49 63 f6             	movslq %r14d,%rsi
-  10408d:	49 8b 34 f4          	mov    (%r12,%rsi,8),%rsi
-  104091:	48 8b fb             	mov    %rbx,%rdi
-  104094:	e8 f7 f5 ff ff       	call   103690 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>
-  104099:	49 63 fe             	movslq %r14d,%rdi
-  10409c:	4c 8b ad 68 ff ff ff 	mov    -0x98(%rbp),%r13
-  1040a3:	49 89 44 fd 00       	mov    %rax,0x0(%r13,%rdi,8)
-  1040a8:	41 ff c6             	inc    %r14d
-  1040ab:	45 3b f7             	cmp    %r15d,%r14d
-  1040ae:	7c da                	jl     10408a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStream+0x32a>
-  1040b0:	33 ff                	xor    %edi,%edi
-  1040b2:	48 89 bd 70 ff ff ff 	mov    %rdi,-0x90(%rbp)
-  1040b9:	48 89 bd 78 ff ff ff 	mov    %rdi,-0x88(%rbp)
-  1040c0:	48 81 c4 88 00 00 00 	add    $0x88,%rsp
-  1040c7:	5b                   	pop    %rbx
-  1040c8:	41 5c                	pop    %r12
-  1040ca:	41 5d                	pop    %r13
-  1040cc:	41 5e                	pop    %r14
-  1040ce:	41 5f                	pop    %r15
-  1040d0:	5d                   	pop    %rbp
-  1040d1:	c3                   	ret
-  1040d2:	48 8d 3d ff dc 14 00 	lea    0x14dcff(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-  1040d9:	e8 36 14 f6 ff       	call   65514 <RhpNewFast>
-  1040de:	48 8b d8             	mov    %rax,%rbx
-  1040e1:	48 8b fb             	mov    %rbx,%rdi
-  1040e4:	48 8d 35 d5 b3 13 00 	lea    0x13b3d5(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-  1040eb:	e8 80 6b f8 ff       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-  1040f0:	48 8b fb             	mov    %rbx,%rdi
-  1040f3:	e8 86 16 f6 ff       	call   6577e <RhpThrowEx>
-  1040f8:	48 8d 3d d9 dc 14 00 	lea    0x14dcd9(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-  1040ff:	e8 10 14 f6 ff       	call   65514 <RhpNewFast>
-  104104:	48 8b d8             	mov    %rax,%rbx
-  104107:	48 8b fb             	mov    %rbx,%rdi
-  10410a:	48 8d 35 af b3 13 00 	lea    0x13b3af(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-  104111:	e8 5a 6b f8 ff       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-  104116:	48 8b fb             	mov    %rbx,%rdi
-  104119:	e8 60 16 f6 ff       	call   6577e <RhpThrowEx>
-  10411e:	cc                   	int3
-  10411f:	90                   	nop
-
-0000000000104120 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart>:
-  104120:	55                   	push   %rbp
-  104121:	41 57                	push   %r15
-  104123:	53                   	push   %rbx
-  104124:	48 83 ec 60          	sub    $0x60,%rsp
-  104128:	48 8d 6c 24 70       	lea    0x70(%rsp),%rbp
-  10412d:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-  104132:	c5 79 7f 45 b0       	vmovdqa %xmm8,-0x50(%rbp)
-  104137:	c5 79 7f 45 c0       	vmovdqa %xmm8,-0x40(%rbp)
-  10413c:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
-  104141:	c5 79 7f 45 e0       	vmovdqa %xmm8,-0x20(%rbp)
-  104146:	41 3b d0             	cmp    %r8d,%edx
-  104149:	0f 85 b9 01 00 00    	jne    104308 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1e8>
-  10414f:	45 84 c9             	test   %r9b,%r9b
-  104152:	74 06                	je     10415a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x3a>
-  104154:	0f b6 47 54          	movzbl 0x54(%rdi),%eax
-  104158:	eb 02                	jmp    10415c <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x3c>
-  10415a:	33 c0                	xor    %eax,%eax
-  10415c:	4c 8b 4f 38          	mov    0x38(%rdi),%r9
-  104160:	45 33 d2             	xor    %r10d,%r10d
-  104163:	85 d2                	test   %edx,%edx
-  104165:	4c 0f 45 d6          	cmovne %rsi,%r10
-  104169:	4c 89 55 e8          	mov    %r10,-0x18(%rbp)
-  10416d:	49 8b f2             	mov    %r10,%rsi
-  104170:	45 33 d2             	xor    %r10d,%r10d
-  104173:	45 85 c0             	test   %r8d,%r8d
-  104176:	4c 0f 45 d1          	cmovne %rcx,%r10
-  10417a:	4c 89 55 e0          	mov    %r10,-0x20(%rbp)
-  10417e:	49 8b ca             	mov    %r10,%rcx
-  104181:	85 c0                	test   %eax,%eax
-  104183:	0f 84 c2 00 00 00    	je     10424b <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x12b>
-  104189:	33 c0                	xor    %eax,%eax
-  10418b:	89 55 ac             	mov    %edx,-0x54(%rbp)
-  10418e:	85 d2                	test   %edx,%edx
-  104190:	0f 8e 5f 01 00 00    	jle    1042f5 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1d5>
-  104196:	4c 8d 87 80 00 00 00 	lea    0x80(%rdi),%r8
-  10419d:	4c 63 d0             	movslq %eax,%r10
-  1041a0:	4e 8b 14 d6          	mov    (%rsi,%r10,8),%r10
-  1041a4:	4c 33 57 48          	xor    0x48(%rdi),%r10
-  1041a8:	49 bb 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r11
-  1041af:	c1 7c 51 
-  1041b2:	48 8d 5d d8          	lea    -0x28(%rbp),%rbx
-  1041b6:	49 8b d2             	mov    %r10,%rdx
-  1041b9:	c4 c2 83 f6 d3       	mulx   %r11,%r15,%rdx
-  1041be:	4c 89 3b             	mov    %r15,(%rbx)
-  1041c1:	4c 8b 55 d8          	mov    -0x28(%rbp),%r10
-  1041c5:	49 33 d2             	xor    %r10,%rdx
-  1041c8:	49 0f af d3          	imul   %r11,%rdx
-  1041cc:	48 89 55 a0          	mov    %rdx,-0x60(%rbp)
-  1041d0:	4c 8b 57 70          	mov    0x70(%rdi),%r10
-  1041d4:	4c 8d 5d d0          	lea    -0x30(%rbp),%r11
-  1041d8:	48 8b 5d a0          	mov    -0x60(%rbp),%rbx
-  1041dc:	49 8b d2             	mov    %r10,%rdx
-  1041df:	c4 e2 83 f6 d3       	mulx   %rbx,%r15,%rdx
-  1041e4:	4d 89 3b             	mov    %r15,(%r11)
-  1041e7:	4c 8b 57 08          	mov    0x8(%rdi),%r10
-  1041eb:	41 0f b6 14 12       	movzbl (%r10,%rdx,1),%edx
-  1041f0:	48 33 57 48          	xor    0x48(%rdi),%rdx
-  1041f4:	49 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r10
-  1041fb:	c1 7c 51 
-  1041fe:	49 0f af d2          	imul   %r10,%rdx
-  104202:	4d 8b d0             	mov    %r8,%r10
-  104205:	48 33 d3             	xor    %rbx,%rdx
-  104208:	49 0f af 52 08       	imul   0x8(%r10),%rdx
-  10420d:	4d 8b 12             	mov    (%r10),%r10
-  104210:	4c 8d 5d c8          	lea    -0x38(%rbp),%r11
-  104214:	c4 c2 e3 f6 d2       	mulx   %r10,%rbx,%rdx
-  104219:	49 89 1b             	mov    %rbx,(%r11)
-  10421c:	49 3b d1             	cmp    %r9,%rdx
-  10421f:	72 0e                	jb     10422f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x10f>
-  104221:	41 2b d1             	sub    %r9d,%edx
-  104224:	4c 8b 57 58          	mov    0x58(%rdi),%r10
-  104228:	48 63 d2             	movslq %edx,%rdx
-  10422b:	41 8b 14 92          	mov    (%r10,%rdx,4),%edx
-  10422f:	4c 63 d0             	movslq %eax,%r10
-  104232:	4a 89 14 d1          	mov    %rdx,(%rcx,%r10,8)
-  104236:	ff c0                	inc    %eax
-  104238:	8b 55 ac             	mov    -0x54(%rbp),%edx
-  10423b:	3b c2                	cmp    %edx,%eax
-  10423d:	89 55 ac             	mov    %edx,-0x54(%rbp)
-  104240:	0f 8c 57 ff ff ff    	jl     10419d <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x7d>
-  104246:	e9 aa 00 00 00       	jmp    1042f5 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1d5>
-  10424b:	33 c0                	xor    %eax,%eax
-  10424d:	89 55 ac             	mov    %edx,-0x54(%rbp)
-  104250:	85 d2                	test   %edx,%edx
-  104252:	0f 8e 9d 00 00 00    	jle    1042f5 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x1d5>
-  104258:	4c 8d 87 80 00 00 00 	lea    0x80(%rdi),%r8
-  10425f:	4c 63 c8             	movslq %eax,%r9
-  104262:	4e 8b 0c ce          	mov    (%rsi,%r9,8),%r9
-  104266:	4c 33 4f 48          	xor    0x48(%rdi),%r9
-  10426a:	49 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r10
-  104271:	c1 7c 51 
-  104274:	4c 8d 5d c0          	lea    -0x40(%rbp),%r11
-  104278:	49 8b d1             	mov    %r9,%rdx
-  10427b:	c4 c2 e3 f6 d2       	mulx   %r10,%rbx,%rdx
-  104280:	49 89 1b             	mov    %rbx,(%r11)
-  104283:	4c 8b 4d c0          	mov    -0x40(%rbp),%r9
-  104287:	49 33 d1             	xor    %r9,%rdx
-  10428a:	49 0f af d2          	imul   %r10,%rdx
-  10428e:	48 89 55 98          	mov    %rdx,-0x68(%rbp)
-  104292:	4c 8b 4f 70          	mov    0x70(%rdi),%r9
-  104296:	4c 8d 55 b8          	lea    -0x48(%rbp),%r10
-  10429a:	4c 8b 5d 98          	mov    -0x68(%rbp),%r11
-  10429e:	49 8b d1             	mov    %r9,%rdx
-  1042a1:	c4 c2 e3 f6 d3       	mulx   %r11,%rbx,%rdx
-  1042a6:	49 89 1a             	mov    %rbx,(%r10)
-  1042a9:	4c 8b 4f 08          	mov    0x8(%rdi),%r9
-  1042ad:	41 0f b6 14 11       	movzbl (%r9,%rdx,1),%edx
-  1042b2:	48 33 57 48          	xor    0x48(%rdi),%rdx
-  1042b6:	49 b9 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r9
-  1042bd:	c1 7c 51 
-  1042c0:	49 0f af d1          	imul   %r9,%rdx
-  1042c4:	4d 8b c8             	mov    %r8,%r9
-  1042c7:	49 33 d3             	xor    %r11,%rdx
-  1042ca:	49 0f af 51 08       	imul   0x8(%r9),%rdx
-  1042cf:	4d 8b 09             	mov    (%r9),%r9
-  1042d2:	4c 8d 55 b0          	lea    -0x50(%rbp),%r10
-  1042d6:	c4 c2 a3 f6 d1       	mulx   %r9,%r11,%rdx
-  1042db:	4d 89 1a             	mov    %r11,(%r10)
-  1042de:	4c 63 c8             	movslq %eax,%r9
-  1042e1:	4a 89 14 c9          	mov    %rdx,(%rcx,%r9,8)
-  1042e5:	ff c0                	inc    %eax
-  1042e7:	8b 55 ac             	mov    -0x54(%rbp),%edx
-  1042ea:	3b c2                	cmp    %edx,%eax
-  1042ec:	89 55 ac             	mov    %edx,-0x54(%rbp)
-  1042ef:	0f 8c 6a ff ff ff    	jl     10425f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamSinglePart+0x13f>
-  1042f5:	33 ff                	xor    %edi,%edi
-  1042f7:	48 89 7d e0          	mov    %rdi,-0x20(%rbp)
-  1042fb:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
-  1042ff:	48 83 c4 60          	add    $0x60,%rsp
-  104303:	5b                   	pop    %rbx
-  104304:	41 5f                	pop    %r15
-  104306:	5d                   	pop    %rbp
-  104307:	c3                   	ret
-  104308:	48 8d 3d c9 da 14 00 	lea    0x14dac9(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-  10430f:	e8 00 12 f6 ff       	call   65514 <RhpNewFast>
-  104314:	48 8b d8             	mov    %rax,%rbx
-  104317:	48 8b fb             	mov    %rbx,%rdi
-  10431a:	48 8d 35 9f b1 13 00 	lea    0x13b19f(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-  104321:	e8 4a 69 f8 ff       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-  104326:	48 8b fb             	mov    %rbx,%rdi
-  104329:	e8 50 14 f6 ff       	call   6577e <RhpThrowEx>
-  10432e:	cc                   	int3
-  10432f:	90                   	nop
-  104330:	90                   	nop
-  104331:	90                   	nop
-  104332:	90                   	nop
-  104333:	90                   	nop
-  104334:	90                   	nop
-  104335:	90                   	nop
-  104336:	90                   	nop
-  104337:	90                   	nop
-  104338:	90                   	nop
-  104339:	90                   	nop
-  10433a:	90                   	nop
-  10433b:	90                   	nop
-  10433c:	90                   	nop
-  10433d:	90                   	nop
-  10433e:	90                   	nop
-  10433f:	90                   	nop
-
-0000000000104340 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart>:
-  104340:	55                   	push   %rbp
-  104341:	41 57                	push   %r15
-  104343:	41 56                	push   %r14
-  104345:	41 55                	push   %r13
-  104347:	53                   	push   %rbx
-  104348:	48 81 ec 80 00 00 00 	sub    $0x80,%rsp
-  10434f:	48 8d ac 24 a0 00 00 	lea    0xa0(%rsp),%rbp
-  104356:	00 
-  104357:	33 c0                	xor    %eax,%eax
-  104359:	48 89 85 78 ff ff ff 	mov    %rax,-0x88(%rbp)
-  104360:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-  104365:	48 b8 a0 ff ff ff ff 	movabs $0xffffffffffffffa0,%rax
-  10436c:	ff ff ff 
-  10436f:	c5 79 7f 44 05 e0    	vmovdqa %xmm8,-0x20(%rbp,%rax,1)
-  104375:	c5 79 7f 44 05 f0    	vmovdqa %xmm8,-0x10(%rbp,%rax,1)
-  10437b:	c5 79 7f 04 28       	vmovdqa %xmm8,(%rax,%rbp,1)
-  104380:	48 83 c0 30          	add    $0x30,%rax
-  104384:	75 e9                	jne    10436f <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x2f>
-  104386:	41 3b d0             	cmp    %r8d,%edx
-  104389:	0f 85 48 02 00 00    	jne    1045d7 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x297>
-  10438f:	45 84 c9             	test   %r9b,%r9b
-  104392:	74 06                	je     10439a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x5a>
-  104394:	0f b6 47 54          	movzbl 0x54(%rdi),%eax
-  104398:	eb 02                	jmp    10439c <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x5c>
-  10439a:	33 c0                	xor    %eax,%eax
-  10439c:	4c 8b 4f 38          	mov    0x38(%rdi),%r9
-  1043a0:	45 33 d2             	xor    %r10d,%r10d
-  1043a3:	85 d2                	test   %edx,%edx
-  1043a5:	4c 0f 45 d6          	cmovne %rsi,%r10
-  1043a9:	4c 89 55 d8          	mov    %r10,-0x28(%rbp)
-  1043ad:	49 8b f2             	mov    %r10,%rsi
-  1043b0:	45 33 d2             	xor    %r10d,%r10d
-  1043b3:	45 85 c0             	test   %r8d,%r8d
-  1043b6:	4c 0f 45 d1          	cmovne %rcx,%r10
-  1043ba:	4c 89 55 d0          	mov    %r10,-0x30(%rbp)
-  1043be:	49 8b ca             	mov    %r10,%rcx
-  1043c1:	85 c0                	test   %eax,%eax
-  1043c3:	0f 84 09 01 00 00    	je     1044d2 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x192>
-  1043c9:	33 c0                	xor    %eax,%eax
-  1043cb:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
-  1043d1:	85 d2                	test   %edx,%edx
-  1043d3:	0f 8e e4 01 00 00    	jle    1045bd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x27d>
-  1043d9:	4c 8d 47 78          	lea    0x78(%rdi),%r8
-  1043dd:	4c 8d 57 68          	lea    0x68(%rdi),%r10
-  1043e1:	4c 8d 9f 80 00 00 00 	lea    0x80(%rdi),%r11
-  1043e8:	48 63 d8             	movslq %eax,%rbx
-  1043eb:	48 8b 1c de          	mov    (%rsi,%rbx,8),%rbx
-  1043ef:	48 33 5f 48          	xor    0x48(%rdi),%rbx
-  1043f3:	49 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r15
-  1043fa:	c1 7c 51 
-  1043fd:	4c 8d 75 c0          	lea    -0x40(%rbp),%r14
-  104401:	48 8b d3             	mov    %rbx,%rdx
-  104404:	c4 c2 93 f6 d7       	mulx   %r15,%r13,%rdx
-  104409:	4d 89 2e             	mov    %r13,(%r14)
-  10440c:	48 8b 5d c0          	mov    -0x40(%rbp),%rbx
-  104410:	48 33 d3             	xor    %rbx,%rdx
-  104413:	49 0f af d7          	imul   %r15,%rdx
-  104417:	48 89 95 68 ff ff ff 	mov    %rdx,-0x98(%rbp)
-  10441e:	49 8b d8             	mov    %r8,%rbx
-  104421:	48 8b 1b             	mov    (%rbx),%rbx
-  104424:	4c 8d 7d b8          	lea    -0x48(%rbp),%r15
-  104428:	4c 8b b5 68 ff ff ff 	mov    -0x98(%rbp),%r14
-  10442f:	48 8b d3             	mov    %rbx,%rdx
-  104432:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
-  104437:	4d 89 2f             	mov    %r13,(%r15)
-  10443a:	48 8b 5f 08          	mov    0x8(%rdi),%rbx
-  10443e:	0f b6 14 13          	movzbl (%rbx,%rdx,1),%edx
-  104442:	48 89 55 c8          	mov    %rdx,-0x38(%rbp)
-  104446:	49 8b da             	mov    %r10,%rbx
-  104449:	48 8b 1b             	mov    (%rbx),%rbx
-  10444c:	4c 8d 7d a8          	lea    -0x58(%rbp),%r15
-  104450:	48 8b d3             	mov    %rbx,%rdx
-  104453:	c4 c2 93 f6 d6       	mulx   %r14,%r13,%rdx
-  104458:	4d 89 2f             	mov    %r13,(%r15)
-  10445b:	48 0f af 57 18       	imul   0x18(%rdi),%rdx
-  104460:	48 89 55 b0          	mov    %rdx,-0x50(%rbp)
-  104464:	48 8b 5d c8          	mov    -0x38(%rbp),%rbx
-  104468:	48 33 5f 48          	xor    0x48(%rdi),%rbx
-  10446c:	49 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r15
-  104473:	c1 7c 51 
-  104476:	49 0f af df          	imul   %r15,%rbx
-  10447a:	4d 8b fb             	mov    %r11,%r15
-  10447d:	49 33 de             	xor    %r14,%rbx
-  104480:	49 0f af 5f 08       	imul   0x8(%r15),%rbx
-  104485:	4d 8b 3f             	mov    (%r15),%r15
-  104488:	4c 8d 75 a0          	lea    -0x60(%rbp),%r14
-  10448c:	48 8b d3             	mov    %rbx,%rdx
-  10448f:	c4 c2 93 f6 d7       	mulx   %r15,%r13,%rdx
-  104494:	4d 89 2e             	mov    %r13,(%r14)
-  104497:	48 8b 5d b0          	mov    -0x50(%rbp),%rbx
-  10449b:	48 03 d3             	add    %rbx,%rdx
-  10449e:	49 3b d1             	cmp    %r9,%rdx
-  1044a1:	72 0d                	jb     1044b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x170>
-  1044a3:	41 2b d1             	sub    %r9d,%edx
-  1044a6:	48 8b 5f 58          	mov    0x58(%rdi),%rbx
-  1044aa:	48 63 d2             	movslq %edx,%rdx
-  1044ad:	8b 14 93             	mov    (%rbx,%rdx,4),%edx
-  1044b0:	48 63 d8             	movslq %eax,%rbx
-  1044b3:	48 89 14 d9          	mov    %rdx,(%rcx,%rbx,8)
-  1044b7:	ff c0                	inc    %eax
-  1044b9:	8b 95 74 ff ff ff    	mov    -0x8c(%rbp),%edx
-  1044bf:	3b c2                	cmp    %edx,%eax
-  1044c1:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
-  1044c7:	0f 8c 1b ff ff ff    	jl     1043e8 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0xa8>
-  1044cd:	e9 eb 00 00 00       	jmp    1045bd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x27d>
-  1044d2:	33 c0                	xor    %eax,%eax
-  1044d4:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
-  1044da:	85 d2                	test   %edx,%edx
-  1044dc:	0f 8e db 00 00 00    	jle    1045bd <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x27d>
-  1044e2:	4c 8d 47 78          	lea    0x78(%rdi),%r8
-  1044e6:	4c 8d 57 68          	lea    0x68(%rdi),%r10
-  1044ea:	4c 8d 9f 80 00 00 00 	lea    0x80(%rdi),%r11
-  1044f1:	4c 63 c8             	movslq %eax,%r9
-  1044f4:	4e 8b 0c ce          	mov    (%rsi,%r9,8),%r9
-  1044f8:	4c 33 4f 48          	xor    0x48(%rdi),%r9
-  1044fc:	48 bb 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rbx
-  104503:	c1 7c 51 
-  104506:	4c 8d 7d 90          	lea    -0x70(%rbp),%r15
-  10450a:	49 8b d1             	mov    %r9,%rdx
-  10450d:	c4 e2 8b f6 d3       	mulx   %rbx,%r14,%rdx
-  104512:	4d 89 37             	mov    %r14,(%r15)
-  104515:	4c 8b 4d 90          	mov    -0x70(%rbp),%r9
-  104519:	49 33 d1             	xor    %r9,%rdx
-  10451c:	48 0f af d3          	imul   %rbx,%rdx
-  104520:	48 89 95 60 ff ff ff 	mov    %rdx,-0xa0(%rbp)
-  104527:	4d 8b c8             	mov    %r8,%r9
-  10452a:	4d 8b 09             	mov    (%r9),%r9
-  10452d:	48 8d 5d 88          	lea    -0x78(%rbp),%rbx
-  104531:	4c 8b bd 60 ff ff ff 	mov    -0xa0(%rbp),%r15
-  104538:	49 8b d1             	mov    %r9,%rdx
-  10453b:	c4 c2 8b f6 d7       	mulx   %r15,%r14,%rdx
-  104540:	4c 89 33             	mov    %r14,(%rbx)
-  104543:	4c 8b 4f 08          	mov    0x8(%rdi),%r9
-  104547:	41 0f b6 14 11       	movzbl (%r9,%rdx,1),%edx
-  10454c:	48 89 55 98          	mov    %rdx,-0x68(%rbp)
-  104550:	4d 8b ca             	mov    %r10,%r9
-  104553:	4d 8b 09             	mov    (%r9),%r9
-  104556:	48 8d 5d 80          	lea    -0x80(%rbp),%rbx
-  10455a:	49 8b d1             	mov    %r9,%rdx
-  10455d:	c4 42 8b f6 cf       	mulx   %r15,%r14,%r9
-  104562:	4c 89 33             	mov    %r14,(%rbx)
-  104565:	4c 0f af 4f 18       	imul   0x18(%rdi),%r9
-  10456a:	48 8b 55 98          	mov    -0x68(%rbp),%rdx
-  10456e:	48 33 57 48          	xor    0x48(%rdi),%rdx
-  104572:	48 bb 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rbx
-  104579:	c1 7c 51 
-  10457c:	48 0f af d3          	imul   %rbx,%rdx
-  104580:	49 8b db             	mov    %r11,%rbx
-  104583:	49 33 d7             	xor    %r15,%rdx
-  104586:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
-  10458b:	48 8b 1b             	mov    (%rbx),%rbx
-  10458e:	4c 8d bd 78 ff ff ff 	lea    -0x88(%rbp),%r15
-  104595:	c4 e2 8b f6 d3       	mulx   %rbx,%r14,%rdx
-  10459a:	4d 89 37             	mov    %r14,(%r15)
-  10459d:	49 03 d1             	add    %r9,%rdx
-  1045a0:	4c 63 c8             	movslq %eax,%r9
-  1045a3:	4a 89 14 c9          	mov    %rdx,(%rcx,%r9,8)
-  1045a7:	ff c0                	inc    %eax
-  1045a9:	8b 95 74 ff ff ff    	mov    -0x8c(%rbp),%edx
-  1045af:	3b c2                	cmp    %edx,%eax
-  1045b1:	89 95 74 ff ff ff    	mov    %edx,-0x8c(%rbp)
-  1045b7:	0f 8c 34 ff ff ff    	jl     1044f1 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndicesStreamMultiPart+0x1b1>
-  1045bd:	33 ff                	xor    %edi,%edi
-  1045bf:	48 89 7d d0          	mov    %rdi,-0x30(%rbp)
-  1045c3:	48 89 7d d8          	mov    %rdi,-0x28(%rbp)
-  1045c7:	48 81 c4 80 00 00 00 	add    $0x80,%rsp
-  1045ce:	5b                   	pop    %rbx
-  1045cf:	41 5d                	pop    %r13
-  1045d1:	41 5e                	pop    %r14
-  1045d3:	41 5f                	pop    %r15
-  1045d5:	5d                   	pop    %rbp
-  1045d6:	c3                   	ret
-  1045d7:	48 8d 3d fa d7 14 00 	lea    0x14d7fa(%rip),%rdi        # 251dd8 <_ZTV36S_P_CoreLib_System_ArgumentException>
-  1045de:	e8 31 0f f6 ff       	call   65514 <RhpNewFast>
-  1045e3:	48 8b d8             	mov    %rax,%rbx
-  1045e6:	48 8b fb             	mov    %rbx,%rdi
-  1045e9:	48 8d 35 d0 ae 13 00 	lea    0x13aed0(%rip),%rsi        # 23f4c0 <__Str_Keys_and_results_spans_must_ha_43F6D6A820163A8026071BC2C47B83B192082E1BDB91BCE90ED312AAEBF76ECC>
-  1045f0:	e8 7b 66 f8 ff       	call   8ac70 <S_P_CoreLib_System_ArgumentException___ctor_0>
-  1045f5:	48 8b fb             	mov    %rbx,%rdi
-  1045f8:	e8 81 11 f6 ff       	call   6577e <RhpThrowEx>
-  1045fd:	cc                   	int3
-  1045fe:	90                   	nop
-  1045ff:	90                   	nop
-
-00000000000988c0 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds>:
-   988c0:	55                   	push   %rbp
-   988c1:	48 8b ec             	mov    %rsp,%rbp
-   988c4:	8b c6                	mov    %esi,%eax
-   988c6:	33 c9                	xor    %ecx,%ecx
-   988c8:	c6 02 00             	movb   $0x0,(%rdx)
-   988cb:	8b 77 08             	mov    0x8(%rdi),%esi
-   988ce:	3b f0                	cmp    %eax,%esi
-   988d0:	7e 74                	jle    98946 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x86>
-   988d2:	3b c6                	cmp    %esi,%eax
-   988d4:	73 77                	jae    9894d <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x8d>
-   988d6:	44 8b c0             	mov    %eax,%r8d
-   988d9:	46 0f b7 44 47 0c    	movzwl 0xc(%rdi,%r8,2),%r8d
-   988df:	41 83 f8 48          	cmp    $0x48,%r8d
-   988e3:	77 14                	ja     988f9 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x39>
-   988e5:	41 83 f8 20          	cmp    $0x20,%r8d
-   988e9:	74 4c                	je     98937 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x77>
-   988eb:	41 83 f8 27          	cmp    $0x27,%r8d
-   988ef:	74 2a                	je     9891b <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x5b>
-   988f1:	41 83 f8 48          	cmp    $0x48,%r8d
-   988f5:	74 45                	je     9893c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
-   988f7:	eb 47                	jmp    98940 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
-   988f9:	41 83 f8 68          	cmp    $0x68,%r8d
-   988fd:	77 0e                	ja     9890d <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x4d>
-   988ff:	41 83 f8 5c          	cmp    $0x5c,%r8d
-   98903:	74 20                	je     98925 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x65>
-   98905:	41 83 f8 68          	cmp    $0x68,%r8d
-   98909:	74 31                	je     9893c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
-   9890b:	eb 33                	jmp    98940 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
-   9890d:	41 83 f8 6d          	cmp    $0x6d,%r8d
-   98911:	74 29                	je     9893c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
-   98913:	41 83 f8 74          	cmp    $0x74,%r8d
-   98917:	74 23                	je     9893c <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x7c>
-   98919:	eb 25                	jmp    98940 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
-   9891b:	85 c9                	test   %ecx,%ecx
-   9891d:	0f 94 c1             	sete   %cl
-   98920:	0f b6 c9             	movzbl %cl,%ecx
-   98923:	eb 1b                	jmp    98940 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
-   98925:	ff c0                	inc    %eax
-   98927:	3b c6                	cmp    %esi,%eax
-   98929:	73 22                	jae    9894d <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x8d>
-   9892b:	44 8b c0             	mov    %eax,%r8d
-   9892e:	66 42 83 7c 47 0c 20 	cmpw   $0x20,0xc(%rdi,%r8,2)
-   98935:	75 09                	jne    98940 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
-   98937:	c6 02 01             	movb   $0x1,(%rdx)
-   9893a:	eb 04                	jmp    98940 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x80>
-   9893c:	85 c9                	test   %ecx,%ecx
-   9893e:	74 0b                	je     9894b <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x8b>
-   98940:	ff c0                	inc    %eax
-   98942:	3b f0                	cmp    %eax,%esi
-   98944:	7f 8c                	jg     988d2 <S_P_CoreLib_System_Globalization_CultureData__GetIndexOfNextTokenAfterSeconds+0x12>
-   98946:	c6 02 00             	movb   $0x0,(%rdx)
-   98949:	5d                   	pop    %rbp
-   9894a:	c3                   	ret
-   9894b:	5d                   	pop    %rbp
-   9894c:	c3                   	ret
-   9894d:	e8 6e 22 03 00       	call   cabc0 <S_P_CoreLib_Internal_Runtime_CompilerHelpers_ThrowHelpers__ThrowIndexOutOfRangeException>
-   98952:	cc                   	int3
-   98953:	90                   	nop
-   98954:	90                   	nop
-   98955:	90                   	nop
-   98956:	90                   	nop
-   98957:	90                   	nop
-   98958:	90                   	nop
-   98959:	90                   	nop
-   9895a:	90                   	nop
-   9895b:	90                   	nop
-   9895c:	90                   	nop
-   9895d:	90                   	nop
-   9895e:	90                   	nop
-   9895f:	90                   	nop
-
-0000000000098960 <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek>:
-   98960:	55                   	push   %rbp
-   98961:	53                   	push   %rbx
-   98962:	50                   	push   %rax
-   98963:	48 8d 6c 24 10       	lea    0x10(%rsp),%rbp
-   98968:	48 8b df             	mov    %rdi,%rbx
-   9896b:	83 bb 98 01 00 00 ff 	cmpl   $0xffffffff,0x198(%rbx)
-   98972:	75 2e                	jne    989a2 <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek+0x42>
-   98974:	48 8d 3d 05 4f 1b 00 	lea    0x1b4f05(%rip),%rdi        # 24d880 <__NONGCSTATICSS_P_CoreLib_System_Globalization_GlobalizationMode_Settings>
-   9897b:	48 83 7f f8 00       	cmpq   $0x0,-0x8(%rdi)
-   98980:	75 2d                	jne    989af <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek+0x4f>
-   98982:	33 ff                	xor    %edi,%edi
-   98984:	89 7d f0             	mov    %edi,-0x10(%rbp)
-   98987:	48 8b 7b 10          	mov    0x10(%rbx),%rdi
-   9898b:	48 8d 55 f0          	lea    -0x10(%rbp),%rdx
-   9898f:	be 0c 10 00 00       	mov    $0x100c,%esi
-   98994:	e8 57 39 03 00       	call   cc2f0 <S_P_CoreLib_Interop_Globalization__GetLocaleInfoInt>
-   98999:	8b 45 f0             	mov    -0x10(%rbp),%eax
-   9899c:	89 83 98 01 00 00    	mov    %eax,0x198(%rbx)
-   989a2:	8b 83 98 01 00 00    	mov    0x198(%rbx),%eax
-   989a8:	48 83 c4 08          	add    $0x8,%rsp
-   989ac:	5b                   	pop    %rbx
-   989ad:	5d                   	pop    %rbp
-   989ae:	c3                   	ret
-   989af:	e8 06 f7 f6 ff       	call   80ba <__GetNonGCStaticBase_S_P_CoreLib_System_Globalization_GlobalizationMode_Settings>
-   989b4:	eb cc                	jmp    98982 <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek+0x22>
-   989b6:	90                   	nop
-   989b7:	90                   	nop
-   989b8:	90                   	nop
+0000000000098c60 <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek>:
+   98c60:	55                   	push   %rbp
+   98c61:	53                   	push   %rbx
+   98c62:	50                   	push   %rax
+   98c63:	48 8d 6c 24 10       	lea    0x10(%rsp),%rbp
+   98c68:	48 8b df             	mov    %rdi,%rbx
+   98c6b:	83 bb 98 01 00 00 ff 	cmpl   $0xffffffff,0x198(%rbx)
+   98c72:	75 2e                	jne    98ca2 <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek+0x42>
+   98c74:	48 8d 3d bd f9 1b 00 	lea    0x1bf9bd(%rip),%rdi        # 258638 <__NONGCSTATICSS_P_CoreLib_System_Globalization_GlobalizationMode_Settings>
+   98c7b:	48 83 7f f8 00       	cmpq   $0x0,-0x8(%rdi)
+   98c80:	75 2d                	jne    98caf <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek+0x4f>
+   98c82:	33 ff                	xor    %edi,%edi
+   98c84:	89 7d f0             	mov    %edi,-0x10(%rbp)
+   98c87:	48 8b 7b 10          	mov    0x10(%rbx),%rdi
+   98c8b:	48 8d 55 f0          	lea    -0x10(%rbp),%rdx
+   98c8f:	be 0c 10 00 00       	mov    $0x100c,%esi
+   98c94:	e8 57 39 03 00       	call   cc5f0 <S_P_CoreLib_Interop_Globalization__GetLocaleInfoInt>
+   98c99:	8b 45 f0             	mov    -0x10(%rbp),%eax
+   98c9c:	89 83 98 01 00 00    	mov    %eax,0x198(%rbx)
+   98ca2:	8b 83 98 01 00 00    	mov    0x198(%rbx),%eax
+   98ca8:	48 83 c4 08          	add    $0x8,%rsp
+   98cac:	5b                   	pop    %rbx
+   98cad:	5d                   	pop    %rbp
+   98cae:	c3                   	ret
+   98caf:	e8 06 f4 f6 ff       	call   80ba <__GetNonGCStaticBase_S_P_CoreLib_System_Globalization_GlobalizationMode_Settings>
+   98cb4:	eb cc                	jmp    98c82 <S_P_CoreLib_System_Globalization_CultureData__get_FirstDayOfWeek+0x22>
+   98cb6:	90                   	nop
+   98cb7:	90                   	nop
+   98cb8:	90                   	nop
 --
-00000000000ac9c0 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector>:
-   ac9c0:	55                   	push   %rbp
-   ac9c1:	c5 f8 77             	vzeroupper
-   ac9c4:	48 8b ec             	mov    %rsp,%rbp
-   ac9c7:	48 8b c7             	mov    %rdi,%rax
-   ac9ca:	48 81 fe 80 00 00 00 	cmp    $0x80,%rsi
-   ac9d1:	72 5a                	jb     aca2d <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x6d>
-   ac9d3:	62 f1 7c 48 10 00    	vmovups (%rax),%zmm0
-   ac9d9:	62 f2 7e 48 29 c8    	vpmovb2m %zmm0,%k1
-   ac9df:	c4 e1 fb 93 c9       	kmovq  %k1,%rcx
-   ac9e4:	0f 1f 00             	nopl   (%rax)
-   ac9e7:	48 85 c9             	test   %rcx,%rcx
-   ac9ea:	0f 85 d7 00 00 00    	jne    acac7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
-   ac9f0:	48 8d 4c 30 c0       	lea    -0x40(%rax,%rsi,1),%rcx
-   ac9f5:	48 8d 78 40          	lea    0x40(%rax),%rdi
-   ac9f9:	48 83 e7 c0          	and    $0xffffffffffffffc0,%rdi
-   ac9fd:	62 f1 7d 48 6f 07    	vmovdqa32 (%rdi),%zmm0
-   aca03:	62 f2 7e 48 29 c8    	vpmovb2m %zmm0,%k1
-   aca09:	c4 e1 fb 93 d1       	kmovq  %k1,%rdx
-   aca0e:	0f 1f 00             	nopl   (%rax)
-   aca11:	48 85 d2             	test   %rdx,%rdx
-   aca14:	75 09                	jne    aca1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
-   aca16:	48 83 c7 40          	add    $0x40,%rdi
-   aca1a:	48 3b f9             	cmp    %rcx,%rdi
-   aca1d:	76 de                	jbe    ac9fd <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x3d>
-   aca1f:	48 2b f7             	sub    %rdi,%rsi
-   aca22:	48 03 f0             	add    %rax,%rsi
-   aca25:	e9 9d 00 00 00       	jmp    acac7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
-   aca2a:	0f 1f 00             	nopl   (%rax)
-   aca2d:	48 83 fe 40          	cmp    $0x40,%rsi
-   aca31:	72 34                	jb     aca67 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xa7>
-   aca33:	c5 fc 10 00          	vmovups (%rax),%ymm0
-   aca37:	c5 fd d7 c8          	vpmovmskb %ymm0,%ecx
-   aca3b:	85 c9                	test   %ecx,%ecx
-   aca3d:	0f 85 84 00 00 00    	jne    acac7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
-   aca43:	48 8d 4c 30 e0       	lea    -0x20(%rax,%rsi,1),%rcx
-   aca48:	48 8d 78 20          	lea    0x20(%rax),%rdi
-   aca4c:	48 83 e7 e0          	and    $0xffffffffffffffe0,%rdi
-   aca50:	c5 fd 6f 07          	vmovdqa (%rdi),%ymm0
-   aca54:	c5 fd d7 d0          	vpmovmskb %ymm0,%edx
-   aca58:	85 d2                	test   %edx,%edx
-   aca5a:	75 c3                	jne    aca1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
-   aca5c:	48 83 c7 20          	add    $0x20,%rdi
-   aca60:	48 3b f9             	cmp    %rcx,%rdi
-   aca63:	76 eb                	jbe    aca50 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x90>
-   aca65:	eb b8                	jmp    aca1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
-   aca67:	48 83 fe 20          	cmp    $0x20,%rsi
-   aca6b:	72 5a                	jb     acac7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
-   aca6d:	c5 f8 10 05 eb 7c 0d 	vmovups 0xd7ceb(%rip),%xmm0        # 184760 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector>
-   aca74:	00 
-   aca75:	c4 e2 79 17 00       	vptest (%rax),%xmm0
-   aca7a:	75 4b                	jne    acac7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
-   aca7c:	48 8d 4c 30 f0       	lea    -0x10(%rax,%rsi,1),%rcx
-   aca81:	48 8d 78 10          	lea    0x10(%rax),%rdi
-   aca85:	48 83 e7 f0          	and    $0xfffffffffffffff0,%rdi
-   aca89:	c4 e2 79 17 07       	vptest (%rdi),%xmm0
-   aca8e:	75 8f                	jne    aca1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
-   aca90:	48 83 c7 10          	add    $0x10,%rdi
-   aca94:	48 3b f9             	cmp    %rcx,%rdi
-   aca97:	76 f0                	jbe    aca89 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xc9>
-   aca99:	eb 84                	jmp    aca1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
-   aca9b:	8b 0f                	mov    (%rdi),%ecx
-   aca9d:	8b 57 04             	mov    0x4(%rdi),%edx
-   acaa0:	44 8b c1             	mov    %ecx,%r8d
-   acaa3:	44 0b c2             	or     %edx,%r8d
-   acaa6:	41 f7 c0 80 80 80 80 	test   $0x80808080,%r8d
-   acaad:	74 10                	je     acabf <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xff>
-   acaaf:	f7 c1 80 80 80 80    	test   $0x80808080,%ecx
-   acab5:	75 5e                	jne    acb15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
-   acab7:	8b ca                	mov    %edx,%ecx
-   acab9:	48 83 c7 04          	add    $0x4,%rdi
-   acabd:	eb 56                	jmp    acb15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
-   acabf:	48 83 c7 08          	add    $0x8,%rdi
-   acac3:	48 83 c6 f8          	add    $0xfffffffffffffff8,%rsi
-   acac7:	48 83 fe 08          	cmp    $0x8,%rsi
-   acacb:	73 ce                	jae    aca9b <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xdb>
-   acacd:	40 f6 c6 04          	test   $0x4,%sil
-   acad1:	74 0e                	je     acae1 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x121>
-   acad3:	8b 0f                	mov    (%rdi),%ecx
-   acad5:	f7 c1 80 80 80 80    	test   $0x80808080,%ecx
-   acadb:	75 38                	jne    acb15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
-   acadd:	48 83 c7 04          	add    $0x4,%rdi
-   acae1:	40 f6 c6 02          	test   $0x2,%sil
-   acae5:	74 0f                	je     acaf6 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x136>
-   acae7:	0f b7 0f             	movzwl (%rdi),%ecx
-   acaea:	f7 c1 80 80 80 80    	test   $0x80808080,%ecx
-   acaf0:	75 23                	jne    acb15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
-   acaf2:	48 83 c7 02          	add    $0x2,%rdi
-   acaf6:	40 f6 c6 01          	test   $0x1,%sil
-   acafa:	74 0b                	je     acb07 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x147>
-   acafc:	48 8d 4f 01          	lea    0x1(%rdi),%rcx
-   acb00:	80 3f 00             	cmpb   $0x0,(%rdi)
-   acb03:	48 0f 4d f9          	cmovge %rcx,%rdi
-   acb07:	48 8b cf             	mov    %rdi,%rcx
-   acb0a:	48 2b c8             	sub    %rax,%rcx
-   acb0d:	48 8b c1             	mov    %rcx,%rax
-   acb10:	c5 f8 77             	vzeroupper
-   acb13:	5d                   	pop    %rbp
-   acb14:	c3                   	ret
-   acb15:	81 e1 80 80 80 80    	and    $0x80808080,%ecx
-   acb1b:	f3 0f bc c9          	tzcnt  %ecx,%ecx
+00000000000accc0 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector>:
+   accc0:	55                   	push   %rbp
+   accc1:	c5 f8 77             	vzeroupper
+   accc4:	48 8b ec             	mov    %rsp,%rbp
+   accc7:	48 8b c7             	mov    %rdi,%rax
+   accca:	48 81 fe 80 00 00 00 	cmp    $0x80,%rsi
+   accd1:	72 5a                	jb     acd2d <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x6d>
+   accd3:	62 f1 7c 48 10 00    	vmovups (%rax),%zmm0
+   accd9:	62 f2 7e 48 29 c8    	vpmovb2m %zmm0,%k1
+   accdf:	c4 e1 fb 93 c9       	kmovq  %k1,%rcx
+   acce4:	0f 1f 00             	nopl   (%rax)
+   acce7:	48 85 c9             	test   %rcx,%rcx
+   accea:	0f 85 d7 00 00 00    	jne    acdc7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
+   accf0:	48 8d 4c 30 c0       	lea    -0x40(%rax,%rsi,1),%rcx
+   accf5:	48 8d 78 40          	lea    0x40(%rax),%rdi
+   accf9:	48 83 e7 c0          	and    $0xffffffffffffffc0,%rdi
+   accfd:	62 f1 7d 48 6f 07    	vmovdqa32 (%rdi),%zmm0
+   acd03:	62 f2 7e 48 29 c8    	vpmovb2m %zmm0,%k1
+   acd09:	c4 e1 fb 93 d1       	kmovq  %k1,%rdx
+   acd0e:	0f 1f 00             	nopl   (%rax)
+   acd11:	48 85 d2             	test   %rdx,%rdx
+   acd14:	75 09                	jne    acd1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
+   acd16:	48 83 c7 40          	add    $0x40,%rdi
+   acd1a:	48 3b f9             	cmp    %rcx,%rdi
+   acd1d:	76 de                	jbe    accfd <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x3d>
+   acd1f:	48 2b f7             	sub    %rdi,%rsi
+   acd22:	48 03 f0             	add    %rax,%rsi
+   acd25:	e9 9d 00 00 00       	jmp    acdc7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
+   acd2a:	0f 1f 00             	nopl   (%rax)
+   acd2d:	48 83 fe 40          	cmp    $0x40,%rsi
+   acd31:	72 34                	jb     acd67 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xa7>
+   acd33:	c5 fc 10 00          	vmovups (%rax),%ymm0
+   acd37:	c5 fd d7 c8          	vpmovmskb %ymm0,%ecx
+   acd3b:	85 c9                	test   %ecx,%ecx
+   acd3d:	0f 85 84 00 00 00    	jne    acdc7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
+   acd43:	48 8d 4c 30 e0       	lea    -0x20(%rax,%rsi,1),%rcx
+   acd48:	48 8d 78 20          	lea    0x20(%rax),%rdi
+   acd4c:	48 83 e7 e0          	and    $0xffffffffffffffe0,%rdi
+   acd50:	c5 fd 6f 07          	vmovdqa (%rdi),%ymm0
+   acd54:	c5 fd d7 d0          	vpmovmskb %ymm0,%edx
+   acd58:	85 d2                	test   %edx,%edx
+   acd5a:	75 c3                	jne    acd1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
+   acd5c:	48 83 c7 20          	add    $0x20,%rdi
+   acd60:	48 3b f9             	cmp    %rcx,%rdi
+   acd63:	76 eb                	jbe    acd50 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x90>
+   acd65:	eb b8                	jmp    acd1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
+   acd67:	48 83 fe 20          	cmp    $0x20,%rsi
+   acd6b:	72 5a                	jb     acdc7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
+   acd6d:	c5 f8 10 05 2b dd 0d 	vmovups 0xddd2b(%rip),%xmm0        # 18aaa0 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector>
+   acd74:	00 
+   acd75:	c4 e2 79 17 00       	vptest (%rax),%xmm0
+   acd7a:	75 4b                	jne    acdc7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x107>
+   acd7c:	48 8d 4c 30 f0       	lea    -0x10(%rax,%rsi,1),%rcx
+   acd81:	48 8d 78 10          	lea    0x10(%rax),%rdi
+   acd85:	48 83 e7 f0          	and    $0xfffffffffffffff0,%rdi
+   acd89:	c4 e2 79 17 07       	vptest (%rdi),%xmm0
+   acd8e:	75 8f                	jne    acd1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
+   acd90:	48 83 c7 10          	add    $0x10,%rdi
+   acd94:	48 3b f9             	cmp    %rcx,%rdi
+   acd97:	76 f0                	jbe    acd89 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xc9>
+   acd99:	eb 84                	jmp    acd1f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x5f>
+   acd9b:	8b 0f                	mov    (%rdi),%ecx
+   acd9d:	8b 57 04             	mov    0x4(%rdi),%edx
+   acda0:	44 8b c1             	mov    %ecx,%r8d
+   acda3:	44 0b c2             	or     %edx,%r8d
+   acda6:	41 f7 c0 80 80 80 80 	test   $0x80808080,%r8d
+   acdad:	74 10                	je     acdbf <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xff>
+   acdaf:	f7 c1 80 80 80 80    	test   $0x80808080,%ecx
+   acdb5:	75 5e                	jne    ace15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
+   acdb7:	8b ca                	mov    %edx,%ecx
+   acdb9:	48 83 c7 04          	add    $0x4,%rdi
+   acdbd:	eb 56                	jmp    ace15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
+   acdbf:	48 83 c7 08          	add    $0x8,%rdi
+   acdc3:	48 83 c6 f8          	add    $0xfffffffffffffff8,%rsi
+   acdc7:	48 83 fe 08          	cmp    $0x8,%rsi
+   acdcb:	73 ce                	jae    acd9b <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0xdb>
+   acdcd:	40 f6 c6 04          	test   $0x4,%sil
+   acdd1:	74 0e                	je     acde1 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x121>
+   acdd3:	8b 0f                	mov    (%rdi),%ecx
+   acdd5:	f7 c1 80 80 80 80    	test   $0x80808080,%ecx
+   acddb:	75 38                	jne    ace15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
+   acddd:	48 83 c7 04          	add    $0x4,%rdi
+   acde1:	40 f6 c6 02          	test   $0x2,%sil
+   acde5:	74 0f                	je     acdf6 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x136>
+   acde7:	0f b7 0f             	movzwl (%rdi),%ecx
+   acdea:	f7 c1 80 80 80 80    	test   $0x80808080,%ecx
+   acdf0:	75 23                	jne    ace15 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x155>
+   acdf2:	48 83 c7 02          	add    $0x2,%rdi
+   acdf6:	40 f6 c6 01          	test   $0x1,%sil
+   acdfa:	74 0b                	je     ace07 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiByte_Vector+0x147>
+   acdfc:	48 8d 4f 01          	lea    0x1(%rdi),%rcx
+   ace00:	80 3f 00             	cmpb   $0x0,(%rdi)
+   ace03:	48 0f 4d f9          	cmovge %rcx,%rdi
+   ace07:	48 8b cf             	mov    %rdi,%rcx
+   ace0a:	48 2b c8             	sub    %rax,%rcx
+   ace0d:	48 8b c1             	mov    %rcx,%rax
+   ace10:	c5 f8 77             	vzeroupper
+   ace13:	5d                   	pop    %rbp
+   ace14:	c3                   	ret
+   ace15:	81 e1 80 80 80 80    	and    $0x80808080,%ecx
+   ace1b:	f3 0f bc c9          	tzcnt  %ecx,%ecx
 --
-00000000000acb40 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>:
-   acb40:	55                   	push   %rbp
-   acb41:	c5 f8 77             	vzeroupper
-   acb44:	48 8b ec             	mov    %rsp,%rbp
-   acb47:	48 8b cf             	mov    %rdi,%rcx
-   acb4a:	48 83 fe 40          	cmp    $0x40,%rsi
-   acb4e:	72 57                	jb     acba7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x67>
-   acb50:	62 f1 7c 48 10 05 26 	vmovups 0xd7c26(%rip),%zmm0        # 184780 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>
-   acb57:	7c 0d 00 
-   acb5a:	62 f2 fd 48 26 09    	vptestmw (%rcx),%zmm0,%k1
-   acb60:	c4 e1 f9 98 c9       	kortestd %k1,%k1
-   acb65:	0f 1f 00             	nopl   (%rax)
-   acb68:	0f 85 d1 00 00 00    	jne    acc3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
-   acb6e:	48 8d 44 71 c0       	lea    -0x40(%rcx,%rsi,2),%rax
-   acb73:	48 8d 79 40          	lea    0x40(%rcx),%rdi
-   acb77:	48 83 e7 c0          	and    $0xffffffffffffffc0,%rdi
-   acb7b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
-   acb80:	62 f2 fd 48 26 0f    	vptestmw (%rdi),%zmm0,%k1
-   acb86:	c4 e1 f9 98 c9       	kortestd %k1,%k1
-   acb8b:	75 09                	jne    acb96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
-   acb8d:	48 83 c7 40          	add    $0x40,%rdi
-   acb91:	48 3b f8             	cmp    %rax,%rdi
-   acb94:	76 ea                	jbe    acb80 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x40>
-   acb96:	48 8b c7             	mov    %rdi,%rax
-   acb99:	48 2b c1             	sub    %rcx,%rax
-   acb9c:	48 d1 e8             	shr    $1,%rax
-   acb9f:	48 2b f0             	sub    %rax,%rsi
-   acba2:	e9 98 00 00 00       	jmp    acc3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
-   acba7:	48 83 fe 20          	cmp    $0x20,%rsi
-   acbab:	72 32                	jb     acbdf <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x9f>
-   acbad:	c5 fc 10 05 cb 7b 0d 	vmovups 0xd7bcb(%rip),%ymm0        # 184780 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>
-   acbb4:	00 
-   acbb5:	c4 e2 7d 17 01       	vptest (%rcx),%ymm0
-   acbba:	0f 85 7f 00 00 00    	jne    acc3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
-   acbc0:	48 8d 44 71 e0       	lea    -0x20(%rcx,%rsi,2),%rax
-   acbc5:	48 8d 79 20          	lea    0x20(%rcx),%rdi
-   acbc9:	48 83 e7 e0          	and    $0xffffffffffffffe0,%rdi
-   acbcd:	c4 e2 7d 17 07       	vptest (%rdi),%ymm0
-   acbd2:	75 c2                	jne    acb96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
-   acbd4:	48 83 c7 20          	add    $0x20,%rdi
-   acbd8:	48 3b f8             	cmp    %rax,%rdi
-   acbdb:	76 f0                	jbe    acbcd <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x8d>
-   acbdd:	eb b7                	jmp    acb96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
-   acbdf:	48 83 fe 10          	cmp    $0x10,%rsi
-   acbe3:	72 5a                	jb     acc3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
-   acbe5:	c5 f8 10 05 93 7b 0d 	vmovups 0xd7b93(%rip),%xmm0        # 184780 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>
-   acbec:	00 
-   acbed:	c4 e2 79 17 01       	vptest (%rcx),%xmm0
-   acbf2:	75 4b                	jne    acc3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
-   acbf4:	48 8d 44 71 f0       	lea    -0x10(%rcx,%rsi,2),%rax
-   acbf9:	48 8d 79 10          	lea    0x10(%rcx),%rdi
-   acbfd:	48 83 e7 f0          	and    $0xfffffffffffffff0,%rdi
-   acc01:	c4 e2 79 17 07       	vptest (%rdi),%xmm0
-   acc06:	75 8e                	jne    acb96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
-   acc08:	48 83 c7 10          	add    $0x10,%rdi
-   acc0c:	48 3b f8             	cmp    %rax,%rdi
-   acc0f:	76 f0                	jbe    acc01 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xc1>
-   acc11:	eb 83                	jmp    acb96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
-   acc13:	8b 17                	mov    (%rdi),%edx
-   acc15:	8b 47 04             	mov    0x4(%rdi),%eax
-   acc18:	44 8b c2             	mov    %edx,%r8d
-   acc1b:	44 0b c0             	or     %eax,%r8d
-   acc1e:	41 f7 c0 80 ff 80 ff 	test   $0xff80ff80,%r8d
-   acc25:	74 10                	je     acc37 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xf7>
-   acc27:	f7 c2 80 ff 80 ff    	test   $0xff80ff80,%edx
-   acc2d:	75 48                	jne    acc77 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x137>
-   acc2f:	8b d0                	mov    %eax,%edx
-   acc31:	48 83 c7 04          	add    $0x4,%rdi
-   acc35:	eb 40                	jmp    acc77 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x137>
-   acc37:	48 83 c7 08          	add    $0x8,%rdi
-   acc3b:	48 83 c6 fc          	add    $0xfffffffffffffffc,%rsi
-   acc3f:	48 83 fe 04          	cmp    $0x4,%rsi
-   acc43:	73 ce                	jae    acc13 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xd3>
-   acc45:	40 f6 c6 02          	test   $0x2,%sil
-   acc49:	74 0e                	je     acc59 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x119>
-   acc4b:	8b 17                	mov    (%rdi),%edx
-   acc4d:	f7 c2 80 ff 80 ff    	test   $0xff80ff80,%edx
-   acc53:	75 22                	jne    acc77 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x137>
-   acc55:	48 83 c7 04          	add    $0x4,%rdi
-   acc59:	40 f6 c6 01          	test   $0x1,%sil
-   acc5d:	74 0a                	je     acc69 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x129>
-   acc5f:	66 83 3f 7f          	cmpw   $0x7f,(%rdi)
-   acc63:	77 04                	ja     acc69 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x129>
-   acc65:	48 83 c7 02          	add    $0x2,%rdi
-   acc69:	48 8b c7             	mov    %rdi,%rax
-   acc6c:	48 2b c1             	sub    %rcx,%rax
-   acc6f:	48 d1 e8             	shr    $1,%rax
-   acc72:	c5 f8 77             	vzeroupper
-   acc75:	5d                   	pop    %rbp
-   acc76:	c3                   	ret
-   acc77:	f7 c2 80 ff 00 00    	test   $0xff80,%edx
-   acc7d:	74 e6                	je     acc65 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x125>
-   acc7f:	eb e8                	jmp    acc69 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x129>
-   acc81:	90                   	nop
-   acc82:	90                   	nop
-   acc83:	90                   	nop
-   acc84:	90                   	nop
-   acc85:	90                   	nop
-   acc86:	90                   	nop
-   acc87:	90                   	nop
-   acc88:	90                   	nop
+00000000000ace40 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>:
+   ace40:	55                   	push   %rbp
+   ace41:	c5 f8 77             	vzeroupper
+   ace44:	48 8b ec             	mov    %rsp,%rbp
+   ace47:	48 8b cf             	mov    %rdi,%rcx
+   ace4a:	48 83 fe 40          	cmp    $0x40,%rsi
+   ace4e:	72 57                	jb     acea7 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x67>
+   ace50:	62 f1 7c 48 10 05 66 	vmovups 0xddc66(%rip),%zmm0        # 18aac0 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>
+   ace57:	dc 0d 00 
+   ace5a:	62 f2 fd 48 26 09    	vptestmw (%rcx),%zmm0,%k1
+   ace60:	c4 e1 f9 98 c9       	kortestd %k1,%k1
+   ace65:	0f 1f 00             	nopl   (%rax)
+   ace68:	0f 85 d1 00 00 00    	jne    acf3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
+   ace6e:	48 8d 44 71 c0       	lea    -0x40(%rcx,%rsi,2),%rax
+   ace73:	48 8d 79 40          	lea    0x40(%rcx),%rdi
+   ace77:	48 83 e7 c0          	and    $0xffffffffffffffc0,%rdi
+   ace7b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+   ace80:	62 f2 fd 48 26 0f    	vptestmw (%rdi),%zmm0,%k1
+   ace86:	c4 e1 f9 98 c9       	kortestd %k1,%k1
+   ace8b:	75 09                	jne    ace96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
+   ace8d:	48 83 c7 40          	add    $0x40,%rdi
+   ace91:	48 3b f8             	cmp    %rax,%rdi
+   ace94:	76 ea                	jbe    ace80 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x40>
+   ace96:	48 8b c7             	mov    %rdi,%rax
+   ace99:	48 2b c1             	sub    %rcx,%rax
+   ace9c:	48 d1 e8             	shr    $1,%rax
+   ace9f:	48 2b f0             	sub    %rax,%rsi
+   acea2:	e9 98 00 00 00       	jmp    acf3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
+   acea7:	48 83 fe 20          	cmp    $0x20,%rsi
+   aceab:	72 32                	jb     acedf <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x9f>
+   acead:	c5 fc 10 05 0b dc 0d 	vmovups 0xddc0b(%rip),%ymm0        # 18aac0 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>
+   aceb4:	00 
+   aceb5:	c4 e2 7d 17 01       	vptest (%rcx),%ymm0
+   aceba:	0f 85 7f 00 00 00    	jne    acf3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
+   acec0:	48 8d 44 71 e0       	lea    -0x20(%rcx,%rsi,2),%rax
+   acec5:	48 8d 79 20          	lea    0x20(%rcx),%rdi
+   acec9:	48 83 e7 e0          	and    $0xffffffffffffffe0,%rdi
+   acecd:	c4 e2 7d 17 07       	vptest (%rdi),%ymm0
+   aced2:	75 c2                	jne    ace96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
+   aced4:	48 83 c7 20          	add    $0x20,%rdi
+   aced8:	48 3b f8             	cmp    %rax,%rdi
+   acedb:	76 f0                	jbe    acecd <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x8d>
+   acedd:	eb b7                	jmp    ace96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
+   acedf:	48 83 fe 10          	cmp    $0x10,%rsi
+   acee3:	72 5a                	jb     acf3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
+   acee5:	c5 f8 10 05 d3 db 0d 	vmovups 0xddbd3(%rip),%xmm0        # 18aac0 <__readonlydata_S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector>
+   aceec:	00 
+   aceed:	c4 e2 79 17 01       	vptest (%rcx),%xmm0
+   acef2:	75 4b                	jne    acf3f <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xff>
+   acef4:	48 8d 44 71 f0       	lea    -0x10(%rcx,%rsi,2),%rax
+   acef9:	48 8d 79 10          	lea    0x10(%rcx),%rdi
+   acefd:	48 83 e7 f0          	and    $0xfffffffffffffff0,%rdi
+   acf01:	c4 e2 79 17 07       	vptest (%rdi),%xmm0
+   acf06:	75 8e                	jne    ace96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
+   acf08:	48 83 c7 10          	add    $0x10,%rdi
+   acf0c:	48 3b f8             	cmp    %rax,%rdi
+   acf0f:	76 f0                	jbe    acf01 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xc1>
+   acf11:	eb 83                	jmp    ace96 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x56>
+   acf13:	8b 17                	mov    (%rdi),%edx
+   acf15:	8b 47 04             	mov    0x4(%rdi),%eax
+   acf18:	44 8b c2             	mov    %edx,%r8d
+   acf1b:	44 0b c0             	or     %eax,%r8d
+   acf1e:	41 f7 c0 80 ff 80 ff 	test   $0xff80ff80,%r8d
+   acf25:	74 10                	je     acf37 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xf7>
+   acf27:	f7 c2 80 ff 80 ff    	test   $0xff80ff80,%edx
+   acf2d:	75 48                	jne    acf77 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x137>
+   acf2f:	8b d0                	mov    %eax,%edx
+   acf31:	48 83 c7 04          	add    $0x4,%rdi
+   acf35:	eb 40                	jmp    acf77 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x137>
+   acf37:	48 83 c7 08          	add    $0x8,%rdi
+   acf3b:	48 83 c6 fc          	add    $0xfffffffffffffffc,%rsi
+   acf3f:	48 83 fe 04          	cmp    $0x4,%rsi
+   acf43:	73 ce                	jae    acf13 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0xd3>
+   acf45:	40 f6 c6 02          	test   $0x2,%sil
+   acf49:	74 0e                	je     acf59 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x119>
+   acf4b:	8b 17                	mov    (%rdi),%edx
+   acf4d:	f7 c2 80 ff 80 ff    	test   $0xff80ff80,%edx
+   acf53:	75 22                	jne    acf77 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x137>
+   acf55:	48 83 c7 04          	add    $0x4,%rdi
+   acf59:	40 f6 c6 01          	test   $0x1,%sil
+   acf5d:	74 0a                	je     acf69 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x129>
+   acf5f:	66 83 3f 7f          	cmpw   $0x7f,(%rdi)
+   acf63:	77 04                	ja     acf69 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x129>
+   acf65:	48 83 c7 02          	add    $0x2,%rdi
+   acf69:	48 8b c7             	mov    %rdi,%rax
+   acf6c:	48 2b c1             	sub    %rcx,%rax
+   acf6f:	48 d1 e8             	shr    $1,%rax
+   acf72:	c5 f8 77             	vzeroupper
+   acf75:	5d                   	pop    %rbp
+   acf76:	c3                   	ret
+   acf77:	f7 c2 80 ff 00 00    	test   $0xff80,%edx
+   acf7d:	74 e6                	je     acf65 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x125>
+   acf7f:	eb e8                	jmp    acf69 <S_P_CoreLib_System_Text_Ascii__GetIndexOfFirstNonAsciiChar_Vector+0x129>
+   acf81:	90                   	nop
+   acf82:	90                   	nop
+   acf83:	90                   	nop
+   acf84:	90                   	nop
+   acf85:	90                   	nop
+   acf86:	90                   	nop
+   acf87:	90                   	nop
+   acf88:	90                   	nop
 --
-00000000000b2ae0 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>:
-   b2ae0:	55                   	push   %rbp
-   b2ae1:	41 57                	push   %r15
-   b2ae3:	53                   	push   %rbx
-   b2ae4:	c5 f8 77             	vzeroupper
-   b2ae7:	48 8d 6c 24 10       	lea    0x10(%rsp),%rbp
-   b2aec:	48 8b df             	mov    %rdi,%rbx
-   b2aef:	48 85 f6             	test   %rsi,%rsi
-   b2af2:	75 07                	jne    b2afb <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x1b>
-   b2af4:	33 c0                	xor    %eax,%eax
-   b2af6:	5b                   	pop    %rbx
-   b2af7:	41 5f                	pop    %r15
-   b2af9:	5d                   	pop    %rbp
-   b2afa:	c3                   	ret
-   b2afb:	4c 8b fb             	mov    %rbx,%r15
-   b2afe:	48 83 fe 08          	cmp    $0x8,%rsi
-   b2b02:	0f 82 0b 01 00 00    	jb     b2c13 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x133>
-   b2b08:	c5 f8 10 05 30 1d 0d 	vmovups 0xd1d30(%rip),%xmm0        # 184840 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
-   b2b0f:	00 
-   b2b10:	c4 c1 78 10 0f       	vmovups (%r15),%xmm1
-   b2b15:	c5 f1 dd 0d 33 1d 0d 	vpaddusw 0xd1d33(%rip),%xmm1,%xmm1        # 184850 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x10>
-   b2b1c:	00 
-   b2b1d:	c5 f9 d7 f9          	vpmovmskb %xmm1,%edi
-   b2b21:	f7 c7 aa aa 00 00    	test   $0xaaaa,%edi
-   b2b27:	0f 85 c2 00 00 00    	jne    b2bef <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x10f>
-   b2b2d:	48 03 f6             	add    %rsi,%rsi
-   b2b30:	48 83 fe 20          	cmp    $0x20,%rsi
-   b2b34:	72 5c                	jb     b2b92 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xb2>
-   b2b36:	49 8d 5f 10          	lea    0x10(%r15),%rbx
-   b2b3a:	48 83 e3 f0          	and    $0xfffffffffffffff0,%rbx
-   b2b3e:	49 03 f7             	add    %r15,%rsi
-   b2b41:	48 2b f3             	sub    %rbx,%rsi
-   b2b44:	48 83 fe 20          	cmp    $0x20,%rsi
-   b2b48:	72 33                	jb     b2b7d <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x9d>
-   b2b4a:	48 8d 04 33          	lea    (%rbx,%rsi,1),%rax
-   b2b4e:	48 83 e8 20          	sub    $0x20,%rax
-   b2b52:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
-   b2b59:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
-   b2b60:	c5 f9 6f 0b          	vmovdqa (%rbx),%xmm1
-   b2b64:	c5 f9 6f 53 10       	vmovdqa 0x10(%rbx),%xmm2
-   b2b69:	c5 f1 eb da          	vpor   %xmm2,%xmm1,%xmm3
-   b2b6d:	c4 e2 79 17 d8       	vptest %xmm0,%xmm3
-   b2b72:	75 5c                	jne    b2bd0 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xf0>
-   b2b74:	48 83 c3 20          	add    $0x20,%rbx
-   b2b78:	48 3b d8             	cmp    %rax,%rbx
-   b2b7b:	76 e3                	jbe    b2b60 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x80>
-   b2b7d:	40 f6 c6 10          	test   $0x10,%sil
-   b2b81:	74 13                	je     b2b96 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xb6>
-   b2b83:	c5 f9 6f 0b          	vmovdqa (%rbx),%xmm1
-   b2b87:	c4 e2 79 17 0d b0 1c 	vptest 0xd1cb0(%rip),%xmm1        # 184840 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
-   b2b8e:	0d 00 
-   b2b90:	75 51                	jne    b2be3 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x103>
-   b2b92:	48 83 c3 10          	add    $0x10,%rbx
-   b2b96:	40 0f b6 c6          	movzbl %sil,%eax
-   b2b9a:	a8 0f                	test   $0xf,%al
-   b2b9c:	74 24                	je     b2bc2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
-   b2b9e:	48 8b c6             	mov    %rsi,%rax
-   b2ba1:	48 83 e0 0f          	and    $0xf,%rax
-   b2ba5:	48 03 c3             	add    %rbx,%rax
-   b2ba8:	48 8b d8             	mov    %rax,%rbx
-   b2bab:	48 83 eb 10          	sub    $0x10,%rbx
-   b2baf:	c5 f8 10 0b          	vmovups (%rbx),%xmm1
-   b2bb3:	c4 e2 79 17 0d 84 1c 	vptest 0xd1c84(%rip),%xmm1        # 184840 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
-   b2bba:	0d 00 
-   b2bbc:	75 25                	jne    b2be3 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x103>
-   b2bbe:	48 83 c3 10          	add    $0x10,%rbx
-   b2bc2:	48 8b c3             	mov    %rbx,%rax
-   b2bc5:	49 2b c7             	sub    %r15,%rax
-   b2bc8:	48 d1 e8             	shr    $1,%rax
-   b2bcb:	5b                   	pop    %rbx
-   b2bcc:	41 5f                	pop    %r15
-   b2bce:	5d                   	pop    %rbp
-   b2bcf:	c3                   	ret
-   b2bd0:	c4 e2 79 17 0d 67 1c 	vptest 0xd1c67(%rip),%xmm1        # 184840 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
-   b2bd7:	0d 00 
-   b2bd9:	75 08                	jne    b2be3 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x103>
-   b2bdb:	48 83 c3 10          	add    $0x10,%rbx
-   b2bdf:	c5 f8 28 ca          	vmovaps %xmm2,%xmm1
-   b2be3:	c5 f1 dd 05 65 1c 0d 	vpaddusw 0xd1c65(%rip),%xmm1,%xmm0        # 184850 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x10>
-   b2bea:	00 
-   b2beb:	c5 f9 d7 f8          	vpmovmskb %xmm0,%edi
-   b2bef:	81 e7 aa aa 00 00    	and    $0xaaaa,%edi
-   b2bf5:	33 f6                	xor    %esi,%esi
-   b2bf7:	f3 0f bc f7          	tzcnt  %edi,%esi
-   b2bfb:	8b fe                	mov    %esi,%edi
-   b2bfd:	48 8d 5c 3b ff       	lea    -0x1(%rbx,%rdi,1),%rbx
-   b2c02:	eb be                	jmp    b2bc2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
-   b2c04:	e8 37 03 00 00       	call   b2f40 <S_P_CoreLib_System_Text_Latin1Utility__FirstCharInUInt32IsLatin1>
-   b2c09:	85 c0                	test   %eax,%eax
-   b2c0b:	74 b5                	je     b2bc2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
-   b2c0d:	48 83 c3 02          	add    $0x2,%rbx
-   b2c11:	eb af                	jmp    b2bc2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
-   b2c13:	40 f6 c6 04          	test   $0x4,%sil
-   b2c17:	74 2a                	je     b2c43 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x163>
-   b2c19:	49 8b 3f             	mov    (%r15),%rdi
-   b2c1c:	48 b8 00 ff 00 ff 00 	movabs $0xff00ff00ff00ff00,%rax
-   b2c23:	ff 00 ff 
-   b2c26:	48 23 f8             	and    %rax,%rdi
-   b2c29:	74 14                	je     b2c3f <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x15f>
-   b2c2b:	33 db                	xor    %ebx,%ebx
-   b2c2d:	f3 48 0f bc df       	tzcnt  %rdi,%rbx
+00000000000b2de0 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>:
+   b2de0:	55                   	push   %rbp
+   b2de1:	41 57                	push   %r15
+   b2de3:	53                   	push   %rbx
+   b2de4:	c5 f8 77             	vzeroupper
+   b2de7:	48 8d 6c 24 10       	lea    0x10(%rsp),%rbp
+   b2dec:	48 8b df             	mov    %rdi,%rbx
+   b2def:	48 85 f6             	test   %rsi,%rsi
+   b2df2:	75 07                	jne    b2dfb <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x1b>
+   b2df4:	33 c0                	xor    %eax,%eax
+   b2df6:	5b                   	pop    %rbx
+   b2df7:	41 5f                	pop    %r15
+   b2df9:	5d                   	pop    %rbp
+   b2dfa:	c3                   	ret
+   b2dfb:	4c 8b fb             	mov    %rbx,%r15
+   b2dfe:	48 83 fe 08          	cmp    $0x8,%rsi
+   b2e02:	0f 82 0b 01 00 00    	jb     b2f13 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x133>
+   b2e08:	c5 f8 10 05 70 7d 0d 	vmovups 0xd7d70(%rip),%xmm0        # 18ab80 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
+   b2e0f:	00 
+   b2e10:	c4 c1 78 10 0f       	vmovups (%r15),%xmm1
+   b2e15:	c5 f1 dd 0d 73 7d 0d 	vpaddusw 0xd7d73(%rip),%xmm1,%xmm1        # 18ab90 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x10>
+   b2e1c:	00 
+   b2e1d:	c5 f9 d7 f9          	vpmovmskb %xmm1,%edi
+   b2e21:	f7 c7 aa aa 00 00    	test   $0xaaaa,%edi
+   b2e27:	0f 85 c2 00 00 00    	jne    b2eef <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x10f>
+   b2e2d:	48 03 f6             	add    %rsi,%rsi
+   b2e30:	48 83 fe 20          	cmp    $0x20,%rsi
+   b2e34:	72 5c                	jb     b2e92 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xb2>
+   b2e36:	49 8d 5f 10          	lea    0x10(%r15),%rbx
+   b2e3a:	48 83 e3 f0          	and    $0xfffffffffffffff0,%rbx
+   b2e3e:	49 03 f7             	add    %r15,%rsi
+   b2e41:	48 2b f3             	sub    %rbx,%rsi
+   b2e44:	48 83 fe 20          	cmp    $0x20,%rsi
+   b2e48:	72 33                	jb     b2e7d <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x9d>
+   b2e4a:	48 8d 04 33          	lea    (%rbx,%rsi,1),%rax
+   b2e4e:	48 83 e8 20          	sub    $0x20,%rax
+   b2e52:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+   b2e59:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+   b2e60:	c5 f9 6f 0b          	vmovdqa (%rbx),%xmm1
+   b2e64:	c5 f9 6f 53 10       	vmovdqa 0x10(%rbx),%xmm2
+   b2e69:	c5 f1 eb da          	vpor   %xmm2,%xmm1,%xmm3
+   b2e6d:	c4 e2 79 17 d8       	vptest %xmm0,%xmm3
+   b2e72:	75 5c                	jne    b2ed0 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xf0>
+   b2e74:	48 83 c3 20          	add    $0x20,%rbx
+   b2e78:	48 3b d8             	cmp    %rax,%rbx
+   b2e7b:	76 e3                	jbe    b2e60 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x80>
+   b2e7d:	40 f6 c6 10          	test   $0x10,%sil
+   b2e81:	74 13                	je     b2e96 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xb6>
+   b2e83:	c5 f9 6f 0b          	vmovdqa (%rbx),%xmm1
+   b2e87:	c4 e2 79 17 0d f0 7c 	vptest 0xd7cf0(%rip),%xmm1        # 18ab80 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
+   b2e8e:	0d 00 
+   b2e90:	75 51                	jne    b2ee3 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x103>
+   b2e92:	48 83 c3 10          	add    $0x10,%rbx
+   b2e96:	40 0f b6 c6          	movzbl %sil,%eax
+   b2e9a:	a8 0f                	test   $0xf,%al
+   b2e9c:	74 24                	je     b2ec2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
+   b2e9e:	48 8b c6             	mov    %rsi,%rax
+   b2ea1:	48 83 e0 0f          	and    $0xf,%rax
+   b2ea5:	48 03 c3             	add    %rbx,%rax
+   b2ea8:	48 8b d8             	mov    %rax,%rbx
+   b2eab:	48 83 eb 10          	sub    $0x10,%rbx
+   b2eaf:	c5 f8 10 0b          	vmovups (%rbx),%xmm1
+   b2eb3:	c4 e2 79 17 0d c4 7c 	vptest 0xd7cc4(%rip),%xmm1        # 18ab80 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
+   b2eba:	0d 00 
+   b2ebc:	75 25                	jne    b2ee3 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x103>
+   b2ebe:	48 83 c3 10          	add    $0x10,%rbx
+   b2ec2:	48 8b c3             	mov    %rbx,%rax
+   b2ec5:	49 2b c7             	sub    %r15,%rax
+   b2ec8:	48 d1 e8             	shr    $1,%rax
+   b2ecb:	5b                   	pop    %rbx
+   b2ecc:	41 5f                	pop    %r15
+   b2ece:	5d                   	pop    %rbp
+   b2ecf:	c3                   	ret
+   b2ed0:	c4 e2 79 17 0d a7 7c 	vptest 0xd7ca7(%rip),%xmm1        # 18ab80 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2>
+   b2ed7:	0d 00 
+   b2ed9:	75 08                	jne    b2ee3 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x103>
+   b2edb:	48 83 c3 10          	add    $0x10,%rbx
+   b2edf:	c5 f8 28 ca          	vmovaps %xmm2,%xmm1
+   b2ee3:	c5 f1 dd 05 a5 7c 0d 	vpaddusw 0xd7ca5(%rip),%xmm1,%xmm0        # 18ab90 <__readonlydata_S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x10>
+   b2eea:	00 
+   b2eeb:	c5 f9 d7 f8          	vpmovmskb %xmm0,%edi
+   b2eef:	81 e7 aa aa 00 00    	and    $0xaaaa,%edi
+   b2ef5:	33 f6                	xor    %esi,%esi
+   b2ef7:	f3 0f bc f7          	tzcnt  %edi,%esi
+   b2efb:	8b fe                	mov    %esi,%edi
+   b2efd:	48 8d 5c 3b ff       	lea    -0x1(%rbx,%rdi,1),%rbx
+   b2f02:	eb be                	jmp    b2ec2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
+   b2f04:	e8 37 03 00 00       	call   b3240 <S_P_CoreLib_System_Text_Latin1Utility__FirstCharInUInt32IsLatin1>
+   b2f09:	85 c0                	test   %eax,%eax
+   b2f0b:	74 b5                	je     b2ec2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
+   b2f0d:	48 83 c3 02          	add    $0x2,%rbx
+   b2f11:	eb af                	jmp    b2ec2 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0xe2>
+   b2f13:	40 f6 c6 04          	test   $0x4,%sil
+   b2f17:	74 2a                	je     b2f43 <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x163>
+   b2f19:	49 8b 3f             	mov    (%r15),%rdi
+   b2f1c:	48 b8 00 ff 00 ff 00 	movabs $0xff00ff00ff00ff00,%rax
+   b2f23:	ff 00 ff 
+   b2f26:	48 23 f8             	and    %rax,%rdi
+   b2f29:	74 14                	je     b2f3f <S_P_CoreLib_System_Text_Latin1Utility__GetIndexOfFirstNonLatin1Char_Sse2+0x15f>
+   b2f2b:	33 db                	xor    %ebx,%ebx
+   b2f2d:	f3 48 0f bc df       	tzcnt  %rdi,%rbx
 --
-0000000000103690 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>:
-  103690:	55                   	push   %rbp
-  103691:	41 57                	push   %r15
-  103693:	41 56                	push   %r14
-  103695:	41 55                	push   %r13
-  103697:	53                   	push   %rbx
-  103698:	48 83 ec 20          	sub    $0x20,%rsp
-  10369c:	48 8d 6c 24 40       	lea    0x40(%rsp),%rbp
-  1036a1:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-  1036a6:	c5 79 7f 45 c0       	vmovdqa %xmm8,-0x40(%rbp)
-  1036ab:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
-  1036b0:	48 8b df             	mov    %rdi,%rbx
-  1036b3:	48 8b d6             	mov    %rsi,%rdx
-  1036b6:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  1036ba:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  1036c1:	c1 7c 51 
-  1036c4:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
-  1036c8:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
-  1036cd:	48 89 06             	mov    %rax,(%rsi)
-  1036d0:	48 8b f7             	mov    %rdi,%rsi
-  1036d3:	4c 8b 7d d8          	mov    -0x28(%rbp),%r15
-  1036d7:	49 8b ff             	mov    %r15,%rdi
-  1036da:	ba 40 00 00 00       	mov    $0x40,%edx
-  1036df:	e8 9c 07 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  1036e4:	4c 33 f8             	xor    %rax,%r15
-  1036e7:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
-  1036ee:	c1 7c 51 
-  1036f1:	4d 0f af fe          	imul   %r14,%r15
-  1036f5:	48 8d 53 78          	lea    0x78(%rbx),%rdx
-  1036f9:	48 8b 12             	mov    (%rdx),%rdx
-  1036fc:	48 8d 7d d0          	lea    -0x30(%rbp),%rdi
-  103700:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
-  103705:	48 89 37             	mov    %rsi,(%rdi)
-  103708:	48 8b f2             	mov    %rdx,%rsi
-  10370b:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
-  10370f:	ba 40 00 00 00       	mov    $0x40,%edx
-  103714:	e8 67 07 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103719:	48 8b 53 08          	mov    0x8(%rbx),%rdx
-  10371d:	44 0f b6 34 02       	movzbl (%rdx,%rax,1),%r14d
-  103722:	48 8d 53 68          	lea    0x68(%rbx),%rdx
-  103726:	48 8b 12             	mov    (%rdx),%rdx
-  103729:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
-  10372d:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
-  103732:	48 89 37             	mov    %rsi,(%rdi)
-  103735:	48 8b f2             	mov    %rdx,%rsi
-  103738:	48 8b 7d c8          	mov    -0x38(%rbp),%rdi
-  10373c:	ba 40 00 00 00       	mov    $0x40,%edx
-  103741:	e8 3a 07 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103746:	4c 8b e8             	mov    %rax,%r13
-  103749:	4c 0f af 6b 18       	imul   0x18(%rbx),%r13
-  10374e:	4c 33 73 48          	xor    0x48(%rbx),%r14
-  103752:	48 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdx
-  103759:	c1 7c 51 
-  10375c:	49 0f af d6          	imul   %r14,%rdx
-  103760:	48 81 c3 80 00 00 00 	add    $0x80,%rbx
-  103767:	49 33 d7             	xor    %r15,%rdx
-  10376a:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
-  10376f:	48 8b 3b             	mov    (%rbx),%rdi
-  103772:	48 8d 75 c0          	lea    -0x40(%rbp),%rsi
-  103776:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
-  10377b:	48 89 06             	mov    %rax,(%rsi)
-  10377e:	48 8b f7             	mov    %rdi,%rsi
-  103781:	48 8b 7d c0          	mov    -0x40(%rbp),%rdi
-  103785:	ba 40 00 00 00       	mov    $0x40,%edx
-  10378a:	e8 f1 06 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  10378f:	49 03 c5             	add    %r13,%rax
-  103792:	48 83 c4 20          	add    $0x20,%rsp
-  103796:	5b                   	pop    %rbx
-  103797:	41 5d                	pop    %r13
-  103799:	41 5e                	pop    %r14
-  10379b:	41 5f                	pop    %r15
-  10379d:	5d                   	pop    %rbp
-  10379e:	c3                   	ret
-  10379f:	90                   	nop
+0000000000103fe0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapMultiPart>:
+  103fe0:	55                   	push   %rbp
+  103fe1:	41 57                	push   %r15
+  103fe3:	41 56                	push   %r14
+  103fe5:	41 55                	push   %r13
+  103fe7:	53                   	push   %rbx
+  103fe8:	48 83 ec 20          	sub    $0x20,%rsp
+  103fec:	48 8d 6c 24 40       	lea    0x40(%rsp),%rbp
+  103ff1:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  103ff6:	c5 79 7f 45 c0       	vmovdqa %xmm8,-0x40(%rbp)
+  103ffb:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
+  104000:	48 8b df             	mov    %rdi,%rbx
+  104003:	48 8b d6             	mov    %rsi,%rdx
+  104006:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  10400a:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  104011:	c1 7c 51 
+  104014:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
+  104018:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  10401d:	48 89 06             	mov    %rax,(%rsi)
+  104020:	48 8b f7             	mov    %rdi,%rsi
+  104023:	4c 8b 7d d8          	mov    -0x28(%rbp),%r15
+  104027:	49 8b ff             	mov    %r15,%rdi
+  10402a:	ba 40 00 00 00       	mov    $0x40,%edx
+  10402f:	e8 4c 01 f9 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104034:	4c 33 f8             	xor    %rax,%r15
+  104037:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
+  10403e:	c1 7c 51 
+  104041:	4d 0f af fe          	imul   %r14,%r15
+  104045:	48 8d 53 78          	lea    0x78(%rbx),%rdx
+  104049:	48 8b 12             	mov    (%rdx),%rdx
+  10404c:	48 8d 7d d0          	lea    -0x30(%rbp),%rdi
+  104050:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+  104055:	48 89 37             	mov    %rsi,(%rdi)
+  104058:	48 8b f2             	mov    %rdx,%rsi
+  10405b:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
+  10405f:	ba 40 00 00 00       	mov    $0x40,%edx
+  104064:	e8 17 01 f9 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104069:	48 8b 53 08          	mov    0x8(%rbx),%rdx
+  10406d:	44 0f b6 34 02       	movzbl (%rdx,%rax,1),%r14d
+  104072:	48 8d 53 68          	lea    0x68(%rbx),%rdx
+  104076:	48 8b 12             	mov    (%rdx),%rdx
+  104079:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
+  10407d:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+  104082:	48 89 37             	mov    %rsi,(%rdi)
+  104085:	48 8b f2             	mov    %rdx,%rsi
+  104088:	48 8b 7d c8          	mov    -0x38(%rbp),%rdi
+  10408c:	ba 40 00 00 00       	mov    $0x40,%edx
+  104091:	e8 ea 00 f9 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104096:	4c 8b e8             	mov    %rax,%r13
+  104099:	4c 0f af 6b 18       	imul   0x18(%rbx),%r13
+  10409e:	4c 33 73 48          	xor    0x48(%rbx),%r14
+  1040a2:	48 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdx
+  1040a9:	c1 7c 51 
+  1040ac:	49 0f af d6          	imul   %r14,%rdx
+  1040b0:	48 81 c3 80 00 00 00 	add    $0x80,%rbx
+  1040b7:	49 33 d7             	xor    %r15,%rdx
+  1040ba:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
+  1040bf:	48 8b 3b             	mov    (%rbx),%rdi
+  1040c2:	48 8d 75 c0          	lea    -0x40(%rbp),%rsi
+  1040c6:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  1040cb:	48 89 06             	mov    %rax,(%rsi)
+  1040ce:	48 8b f7             	mov    %rdi,%rsi
+  1040d1:	48 8b 7d c0          	mov    -0x40(%rbp),%rdi
+  1040d5:	ba 40 00 00 00       	mov    $0x40,%edx
+  1040da:	e8 a1 00 f9 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1040df:	49 03 c5             	add    %r13,%rax
+  1040e2:	48 83 c4 20          	add    $0x20,%rsp
+  1040e6:	5b                   	pop    %rbx
+  1040e7:	41 5d                	pop    %r13
+  1040e9:	41 5e                	pop    %r14
+  1040eb:	41 5f                	pop    %r15
+  1040ed:	5d                   	pop    %rbp
+  1040ee:	c3                   	ret
+  1040ef:	90                   	nop
 
-00000000001037a0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapSinglePart>:
-  1037a0:	55                   	push   %rbp
-  1037a1:	41 57                	push   %r15
-  1037a3:	41 56                	push   %r14
-  1037a5:	53                   	push   %rbx
-  1037a6:	48 83 ec 18          	sub    $0x18,%rsp
-  1037aa:	48 8d 6c 24 30       	lea    0x30(%rsp),%rbp
-  1037af:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
-  1037b4:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
-  1037b9:	33 c0                	xor    %eax,%eax
-  1037bb:	48 89 45 e0          	mov    %rax,-0x20(%rbp)
-  1037bf:	48 8b df             	mov    %rdi,%rbx
-  1037c2:	48 8b d6             	mov    %rsi,%rdx
-  1037c5:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  1037c9:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  1037d0:	c1 7c 51 
-  1037d3:	48 8d 75 e0          	lea    -0x20(%rbp),%rsi
-  1037d7:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
-  1037dc:	48 89 06             	mov    %rax,(%rsi)
-  1037df:	48 8b f7             	mov    %rdi,%rsi
-  1037e2:	4c 8b 7d e0          	mov    -0x20(%rbp),%r15
-  1037e6:	49 8b ff             	mov    %r15,%rdi
-  1037e9:	ba 40 00 00 00       	mov    $0x40,%edx
-  1037ee:	e8 8d 06 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  1037f3:	4c 33 f8             	xor    %rax,%r15
-  1037f6:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
-  1037fd:	c1 7c 51 
-  103800:	4d 0f af fe          	imul   %r14,%r15
-  103804:	48 8b 53 70          	mov    0x70(%rbx),%rdx
-  103808:	48 8d 7d d8          	lea    -0x28(%rbp),%rdi
-  10380c:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
-  103811:	48 89 37             	mov    %rsi,(%rdi)
-  103814:	48 8b f2             	mov    %rdx,%rsi
-  103817:	48 8b 7d d8          	mov    -0x28(%rbp),%rdi
-  10381b:	ba 40 00 00 00       	mov    $0x40,%edx
-  103820:	e8 5b 06 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103825:	48 8b 53 08          	mov    0x8(%rbx),%rdx
-  103829:	0f b6 14 02          	movzbl (%rdx,%rax,1),%edx
-  10382d:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  103831:	49 0f af d6          	imul   %r14,%rdx
-  103835:	48 81 c3 80 00 00 00 	add    $0x80,%rbx
-  10383c:	49 33 d7             	xor    %r15,%rdx
-  10383f:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
-  103844:	48 8b 3b             	mov    (%rbx),%rdi
-  103847:	48 8d 75 d0          	lea    -0x30(%rbp),%rsi
-  10384b:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
-  103850:	48 89 06             	mov    %rax,(%rsi)
-  103853:	48 8b f7             	mov    %rdi,%rsi
-  103856:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
-  10385a:	ba 40 00 00 00       	mov    $0x40,%edx
-  10385f:	e8 1c 06 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103864:	90                   	nop
-  103865:	48 83 c4 18          	add    $0x18,%rsp
-  103869:	5b                   	pop    %rbx
-  10386a:	41 5e                	pop    %r14
-  10386c:	41 5f                	pop    %r15
-  10386e:	5d                   	pop    %rbp
-  10386f:	c3                   	ret
+00000000001040f0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexSinglePart>:
+  1040f0:	55                   	push   %rbp
+  1040f1:	41 57                	push   %r15
+  1040f3:	41 56                	push   %r14
+  1040f5:	53                   	push   %rbx
+  1040f6:	48 83 ec 18          	sub    $0x18,%rsp
+  1040fa:	48 8d 6c 24 30       	lea    0x30(%rsp),%rbp
+  1040ff:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  104104:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
+  104109:	33 c0                	xor    %eax,%eax
+  10410b:	48 89 45 e0          	mov    %rax,-0x20(%rbp)
+  10410f:	48 8b df             	mov    %rdi,%rbx
+  104112:	48 8b d6             	mov    %rsi,%rdx
+  104115:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  104119:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  104120:	c1 7c 51 
+  104123:	48 8d 75 e0          	lea    -0x20(%rbp),%rsi
+  104127:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  10412c:	48 89 06             	mov    %rax,(%rsi)
+  10412f:	48 8b f7             	mov    %rdi,%rsi
+  104132:	4c 8b 7d e0          	mov    -0x20(%rbp),%r15
+  104136:	49 8b ff             	mov    %r15,%rdi
+  104139:	ba 40 00 00 00       	mov    $0x40,%edx
+  10413e:	e8 3d 00 f9 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104143:	4c 33 f8             	xor    %rax,%r15
+  104146:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
+  10414d:	c1 7c 51 
+  104150:	4d 0f af fe          	imul   %r14,%r15
+  104154:	48 8b 53 70          	mov    0x70(%rbx),%rdx
+  104158:	48 8d 7d d8          	lea    -0x28(%rbp),%rdi
+  10415c:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+  104161:	48 89 37             	mov    %rsi,(%rdi)
+  104164:	48 8b f2             	mov    %rdx,%rsi
+  104167:	48 8b 7d d8          	mov    -0x28(%rbp),%rdi
+  10416b:	ba 40 00 00 00       	mov    $0x40,%edx
+  104170:	e8 0b 00 f9 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104175:	48 8b 53 08          	mov    0x8(%rbx),%rdx
+  104179:	0f b6 14 02          	movzbl (%rdx,%rax,1),%edx
+  10417d:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  104181:	49 0f af d6          	imul   %r14,%rdx
+  104185:	48 8d bb 80 00 00 00 	lea    0x80(%rbx),%rdi
+  10418c:	49 33 d7             	xor    %r15,%rdx
+  10418f:	48 0f af 57 08       	imul   0x8(%rdi),%rdx
+  104194:	48 8b 3f             	mov    (%rdi),%rdi
+  104197:	48 8d 75 d0          	lea    -0x30(%rbp),%rsi
+  10419b:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  1041a0:	48 89 06             	mov    %rax,(%rsi)
+  1041a3:	48 8b f7             	mov    %rdi,%rsi
+  1041a6:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
+  1041aa:	ba 40 00 00 00       	mov    $0x40,%edx
+  1041af:	e8 cc ff f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1041b4:	48 3b 43 38          	cmp    0x38(%rbx),%rax
+  1041b8:	72 17                	jb     1041d1 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexSinglePart+0xe1>
+  1041ba:	48 8b 4b 58          	mov    0x58(%rbx),%rcx
+  1041be:	2b 43 38             	sub    0x38(%rbx),%eax
+  1041c1:	48 98                	cltq
+  1041c3:	8b 04 81             	mov    (%rcx,%rax,4),%eax
+  1041c6:	48 83 c4 18          	add    $0x18,%rsp
+  1041ca:	5b                   	pop    %rbx
+  1041cb:	41 5e                	pop    %r14
+  1041cd:	41 5f                	pop    %r15
+  1041cf:	5d                   	pop    %rbp
+  1041d0:	c3                   	ret
+  1041d1:	48 83 c4 18          	add    $0x18,%rsp
+  1041d5:	5b                   	pop    %rbx
+  1041d6:	41 5e                	pop    %r14
+  1041d8:	41 5f                	pop    %r15
+  1041da:	5d                   	pop    %rbp
+  1041db:	c3                   	ret
+  1041dc:	90                   	nop
+  1041dd:	90                   	nop
+  1041de:	90                   	nop
+  1041df:	90                   	nop
 
-0000000000103870 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>:
-  103870:	55                   	push   %rbp
-  103871:	41 57                	push   %r15
-  103873:	41 56                	push   %r14
-  103875:	41 55                	push   %r13
-  103877:	53                   	push   %rbx
-  103878:	48 83 ec 30          	sub    $0x30,%rsp
-  10387c:	48 8d 6c 24 50       	lea    0x50(%rsp),%rbp
-  103881:	48 8b df             	mov    %rdi,%rbx
-  103884:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
-  103888:	0f 85 fe 00 00 00    	jne    10398c <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex+0x11c>
-  10388e:	48 8b d6             	mov    %rsi,%rdx
-  103891:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  103895:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  10389c:	c1 7c 51 
-  10389f:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
-  1038a3:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
-  1038a8:	48 89 06             	mov    %rax,(%rsi)
-  1038ab:	48 8b f7             	mov    %rdi,%rsi
-  1038ae:	4c 8b 7d d8          	mov    -0x28(%rbp),%r15
-  1038b2:	49 8b ff             	mov    %r15,%rdi
-  1038b5:	ba 40 00 00 00       	mov    $0x40,%edx
-  1038ba:	e8 c1 05 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  1038bf:	4c 33 f8             	xor    %rax,%r15
-  1038c2:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
-  1038c9:	c1 7c 51 
-  1038cc:	4d 0f af fe          	imul   %r14,%r15
-  1038d0:	48 8d 53 78          	lea    0x78(%rbx),%rdx
-  1038d4:	48 8b 12             	mov    (%rdx),%rdx
-  1038d7:	48 8d 7d d0          	lea    -0x30(%rbp),%rdi
-  1038db:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
-  1038e0:	48 89 37             	mov    %rsi,(%rdi)
-  1038e3:	48 8b f2             	mov    %rdx,%rsi
-  1038e6:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
-  1038ea:	ba 40 00 00 00       	mov    $0x40,%edx
-  1038ef:	e8 8c 05 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  1038f4:	48 8b 53 08          	mov    0x8(%rbx),%rdx
-  1038f8:	44 0f b6 34 02       	movzbl (%rdx,%rax,1),%r14d
-  1038fd:	48 8d 53 68          	lea    0x68(%rbx),%rdx
-  103901:	48 8b 12             	mov    (%rdx),%rdx
-  103904:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
-  103908:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+00000000001041e0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemapSinglePart>:
+  1041e0:	55                   	push   %rbp
+  1041e1:	41 57                	push   %r15
+  1041e3:	41 56                	push   %r14
+  1041e5:	53                   	push   %rbx
+  1041e6:	48 83 ec 18          	sub    $0x18,%rsp
+  1041ea:	48 8d 6c 24 30       	lea    0x30(%rsp),%rbp
+  1041ef:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+  1041f4:	c5 79 7f 45 d0       	vmovdqa %xmm8,-0x30(%rbp)
+  1041f9:	33 c0                	xor    %eax,%eax
+  1041fb:	48 89 45 e0          	mov    %rax,-0x20(%rbp)
+  1041ff:	48 8b df             	mov    %rdi,%rbx
+  104202:	48 8b d6             	mov    %rsi,%rdx
+  104205:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  104209:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  104210:	c1 7c 51 
+  104213:	48 8d 75 e0          	lea    -0x20(%rbp),%rsi
+  104217:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  10421c:	48 89 06             	mov    %rax,(%rsi)
+  10421f:	48 8b f7             	mov    %rdi,%rsi
+  104222:	4c 8b 7d e0          	mov    -0x20(%rbp),%r15
+  104226:	49 8b ff             	mov    %r15,%rdi
+  104229:	ba 40 00 00 00       	mov    $0x40,%edx
+  10422e:	e8 4d ff f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104233:	4c 33 f8             	xor    %rax,%r15
+  104236:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
+  10423d:	c1 7c 51 
+  104240:	4d 0f af fe          	imul   %r14,%r15
+  104244:	48 8b 53 70          	mov    0x70(%rbx),%rdx
+  104248:	48 8d 7d d8          	lea    -0x28(%rbp),%rdi
+  10424c:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+  104251:	48 89 37             	mov    %rsi,(%rdi)
+  104254:	48 8b f2             	mov    %rdx,%rsi
+  104257:	48 8b 7d d8          	mov    -0x28(%rbp),%rdi
+  10425b:	ba 40 00 00 00       	mov    $0x40,%edx
+  104260:	e8 1b ff f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104265:	48 8b 53 08          	mov    0x8(%rbx),%rdx
+  104269:	0f b6 14 02          	movzbl (%rdx,%rax,1),%edx
+  10426d:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  104271:	49 0f af d6          	imul   %r14,%rdx
+  104275:	48 81 c3 80 00 00 00 	add    $0x80,%rbx
+  10427c:	49 33 d7             	xor    %r15,%rdx
+  10427f:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
+  104284:	48 8b 3b             	mov    (%rbx),%rdi
+  104287:	48 8d 75 d0          	lea    -0x30(%rbp),%rsi
+  10428b:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  104290:	48 89 06             	mov    %rax,(%rsi)
+  104293:	48 8b f7             	mov    %rdi,%rsi
+  104296:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
+  10429a:	ba 40 00 00 00       	mov    $0x40,%edx
+  10429f:	e8 dc fe f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1042a4:	90                   	nop
+  1042a5:	48 83 c4 18          	add    $0x18,%rsp
+  1042a9:	5b                   	pop    %rbx
+  1042aa:	41 5e                	pop    %r14
+  1042ac:	41 5f                	pop    %r15
+  1042ae:	5d                   	pop    %rbp
+  1042af:	c3                   	ret
+
+00000000001042b0 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex>:
+  1042b0:	55                   	push   %rbp
+  1042b1:	41 57                	push   %r15
+  1042b3:	41 56                	push   %r14
+  1042b5:	41 55                	push   %r13
+  1042b7:	53                   	push   %rbx
+  1042b8:	48 83 ec 30          	sub    $0x30,%rsp
+  1042bc:	48 8d 6c 24 50       	lea    0x50(%rsp),%rbp
+  1042c1:	48 8b df             	mov    %rdi,%rbx
+  1042c4:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
+  1042c8:	0f 85 fe 00 00 00    	jne    1043cc <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndex+0x11c>
+  1042ce:	48 8b d6             	mov    %rsi,%rdx
+  1042d1:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  1042d5:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  1042dc:	c1 7c 51 
+  1042df:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
+  1042e3:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  1042e8:	48 89 06             	mov    %rax,(%rsi)
+  1042eb:	48 8b f7             	mov    %rdi,%rsi
+  1042ee:	4c 8b 7d d8          	mov    -0x28(%rbp),%r15
+  1042f2:	49 8b ff             	mov    %r15,%rdi
+  1042f5:	ba 40 00 00 00       	mov    $0x40,%edx
+  1042fa:	e8 81 fe f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1042ff:	4c 33 f8             	xor    %rax,%r15
+  104302:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
+  104309:	c1 7c 51 
+  10430c:	4d 0f af fe          	imul   %r14,%r15
+  104310:	48 8d 53 78          	lea    0x78(%rbx),%rdx
+  104314:	48 8b 12             	mov    (%rdx),%rdx
+  104317:	48 8d 7d d0          	lea    -0x30(%rbp),%rdi
+  10431b:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+  104320:	48 89 37             	mov    %rsi,(%rdi)
+  104323:	48 8b f2             	mov    %rdx,%rsi
+  104326:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
+  10432a:	ba 40 00 00 00       	mov    $0x40,%edx
+  10432f:	e8 4c fe f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104334:	48 8b 53 08          	mov    0x8(%rbx),%rdx
+  104338:	44 0f b6 34 02       	movzbl (%rdx,%rax,1),%r14d
+  10433d:	48 8d 53 68          	lea    0x68(%rbx),%rdx
+  104341:	48 8b 12             	mov    (%rdx),%rdx
+  104344:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
+  104348:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
 --
-0000000000103a40 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>:
-  103a40:	55                   	push   %rbp
-  103a41:	41 57                	push   %r15
-  103a43:	41 56                	push   %r14
-  103a45:	41 55                	push   %r13
-  103a47:	53                   	push   %rbx
-  103a48:	48 83 ec 30          	sub    $0x30,%rsp
-  103a4c:	48 8d 6c 24 50       	lea    0x50(%rsp),%rbp
-  103a51:	48 8b df             	mov    %rdi,%rbx
-  103a54:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
-  103a58:	0f 85 ec 00 00 00    	jne    103b4a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap+0x10a>
-  103a5e:	48 8b d6             	mov    %rsi,%rdx
-  103a61:	48 33 53 48          	xor    0x48(%rbx),%rdx
-  103a65:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
-  103a6c:	c1 7c 51 
-  103a6f:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
-  103a73:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
-  103a78:	48 89 06             	mov    %rax,(%rsi)
-  103a7b:	48 8b f7             	mov    %rdi,%rsi
-  103a7e:	4c 8b 7d d8          	mov    -0x28(%rbp),%r15
-  103a82:	49 8b ff             	mov    %r15,%rdi
-  103a85:	ba 40 00 00 00       	mov    $0x40,%edx
-  103a8a:	e8 f1 03 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103a8f:	4c 33 f8             	xor    %rax,%r15
-  103a92:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
-  103a99:	c1 7c 51 
-  103a9c:	4d 0f af fe          	imul   %r14,%r15
-  103aa0:	48 8d 53 78          	lea    0x78(%rbx),%rdx
-  103aa4:	48 8b 12             	mov    (%rdx),%rdx
-  103aa7:	48 8d 7d d0          	lea    -0x30(%rbp),%rdi
-  103aab:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
-  103ab0:	48 89 37             	mov    %rsi,(%rdi)
-  103ab3:	48 8b f2             	mov    %rdx,%rsi
-  103ab6:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
-  103aba:	ba 40 00 00 00       	mov    $0x40,%edx
-  103abf:	e8 bc 03 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103ac4:	48 8b 53 08          	mov    0x8(%rbx),%rdx
-  103ac8:	44 0f b6 34 02       	movzbl (%rdx,%rax,1),%r14d
-  103acd:	48 8d 53 68          	lea    0x68(%rbx),%rdx
-  103ad1:	48 8b 12             	mov    (%rdx),%rdx
-  103ad4:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
-  103ad8:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
-  103add:	48 89 37             	mov    %rsi,(%rdi)
-  103ae0:	48 8b f2             	mov    %rdx,%rsi
-  103ae3:	48 8b 7d c8          	mov    -0x38(%rbp),%rdi
-  103ae7:	ba 40 00 00 00       	mov    $0x40,%edx
-  103aec:	e8 8f 03 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103af1:	4c 8b e8             	mov    %rax,%r13
-  103af4:	4c 0f af 6b 18       	imul   0x18(%rbx),%r13
-  103af9:	4c 33 73 48          	xor    0x48(%rbx),%r14
-  103afd:	48 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdx
-  103b04:	c1 7c 51 
-  103b07:	49 0f af d6          	imul   %r14,%rdx
-  103b0b:	48 81 c3 80 00 00 00 	add    $0x80,%rbx
-  103b12:	49 33 d7             	xor    %r15,%rdx
-  103b15:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
-  103b1a:	48 8b 3b             	mov    (%rbx),%rdi
-  103b1d:	48 8d 75 c0          	lea    -0x40(%rbp),%rsi
-  103b21:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
-  103b26:	48 89 06             	mov    %rax,(%rsi)
-  103b29:	48 8b f7             	mov    %rdi,%rsi
-  103b2c:	48 8b 7d c0          	mov    -0x40(%rbp),%rdi
-  103b30:	ba 40 00 00 00       	mov    $0x40,%edx
-  103b35:	e8 46 03 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103b3a:	49 03 c5             	add    %r13,%rax
-  103b3d:	48 83 c4 30          	add    $0x30,%rsp
-  103b41:	5b                   	pop    %rbx
-  103b42:	41 5d                	pop    %r13
-  103b44:	41 5e                	pop    %r14
-  103b46:	41 5f                	pop    %r15
-  103b48:	5d                   	pop    %rbp
-  103b49:	c3                   	ret
-  103b4a:	48 8b fe             	mov    %rsi,%rdi
-  103b4d:	48 33 7b 48          	xor    0x48(%rbx),%rdi
-  103b51:	48 8d 55 b8          	lea    -0x48(%rbp),%rdx
-  103b55:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
-  103b5c:	c1 7c 51 
-  103b5f:	e8 9c ff f7 ff       	call   83b00 <S_P_CoreLib_System_Math__BigMul_0>
-  103b64:	48 8b f0             	mov    %rax,%rsi
-  103b67:	4c 8b 7d b8          	mov    -0x48(%rbp),%r15
-  103b6b:	49 8b ff             	mov    %r15,%rdi
-  103b6e:	ba 40 00 00 00       	mov    $0x40,%edx
-  103b73:	e8 08 03 f9 ff       	call   93e80 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
-  103b78:	4c 33 f8             	xor    %rax,%r15
-  103b7b:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
-  103b82:	c1 7c 51 
-  103b85:	4d 0f af fe          	imul   %r14,%r15
-  103b89:	48 8b fb             	mov    %rbx,%rdi
-  103b8c:	49 8b f7             	mov    %r15,%rsi
-  103b8f:	e8 8c 00 00 00       	call   103c20 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__BucketInPart>
-  103b94:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
-  103b98:	40 0f b6 3c 07       	rex movzbl (%rdi,%rax,1),%edi
-  103b9d:	48 33 7b 48          	xor    0x48(%rbx),%rdi
-  103ba1:	49 0f af fe          	imul   %r14,%rdi
-  103ba5:	48 8d b3 80 00 00 00 	lea    0x80(%rbx),%rsi
-  103bac:	49 33 ff             	xor    %r15,%rdi
-  103baf:	48 0f af 7e 08       	imul   0x8(%rsi),%rdi
-  103bb4:	48 8b 16             	mov    (%rsi),%rdx
-  103bb7:	33 f6                	xor    %esi,%esi
-  103bb9:	33 c9                	xor    %ecx,%ecx
-  103bbb:	e8 80 02 f9 ff       	call   93e40 <S_P_CoreLib_System_UInt128__op_Multiply>
+0000000000104480 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap>:
+  104480:	55                   	push   %rbp
+  104481:	41 57                	push   %r15
+  104483:	41 56                	push   %r14
+  104485:	41 55                	push   %r13
+  104487:	53                   	push   %rbx
+  104488:	48 83 ec 30          	sub    $0x30,%rsp
+  10448c:	48 8d 6c 24 50       	lea    0x50(%rsp),%rbp
+  104491:	48 8b df             	mov    %rdi,%rbx
+  104494:	80 7b 55 00          	cmpb   $0x0,0x55(%rbx)
+  104498:	0f 85 ec 00 00 00    	jne    10458a <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__GetIndexNoRemap+0x10a>
+  10449e:	48 8b d6             	mov    %rsi,%rdx
+  1044a1:	48 33 53 48          	xor    0x48(%rbx),%rdx
+  1044a5:	48 bf 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdi
+  1044ac:	c1 7c 51 
+  1044af:	48 8d 75 d8          	lea    -0x28(%rbp),%rsi
+  1044b3:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  1044b8:	48 89 06             	mov    %rax,(%rsi)
+  1044bb:	48 8b f7             	mov    %rdi,%rsi
+  1044be:	4c 8b 7d d8          	mov    -0x28(%rbp),%r15
+  1044c2:	49 8b ff             	mov    %r15,%rdi
+  1044c5:	ba 40 00 00 00       	mov    $0x40,%edx
+  1044ca:	e8 b1 fc f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1044cf:	4c 33 f8             	xor    %rax,%r15
+  1044d2:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
+  1044d9:	c1 7c 51 
+  1044dc:	4d 0f af fe          	imul   %r14,%r15
+  1044e0:	48 8d 53 78          	lea    0x78(%rbx),%rdx
+  1044e4:	48 8b 12             	mov    (%rdx),%rdx
+  1044e7:	48 8d 7d d0          	lea    -0x30(%rbp),%rdi
+  1044eb:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+  1044f0:	48 89 37             	mov    %rsi,(%rdi)
+  1044f3:	48 8b f2             	mov    %rdx,%rsi
+  1044f6:	48 8b 7d d0          	mov    -0x30(%rbp),%rdi
+  1044fa:	ba 40 00 00 00       	mov    $0x40,%edx
+  1044ff:	e8 7c fc f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104504:	48 8b 53 08          	mov    0x8(%rbx),%rdx
+  104508:	44 0f b6 34 02       	movzbl (%rdx,%rax,1),%r14d
+  10450d:	48 8d 53 68          	lea    0x68(%rbx),%rdx
+  104511:	48 8b 12             	mov    (%rdx),%rdx
+  104514:	48 8d 7d c8          	lea    -0x38(%rbp),%rdi
+  104518:	c4 c2 cb f6 d7       	mulx   %r15,%rsi,%rdx
+  10451d:	48 89 37             	mov    %rsi,(%rdi)
+  104520:	48 8b f2             	mov    %rdx,%rsi
+  104523:	48 8b 7d c8          	mov    -0x38(%rbp),%rdi
+  104527:	ba 40 00 00 00       	mov    $0x40,%edx
+  10452c:	e8 4f fc f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  104531:	4c 8b e8             	mov    %rax,%r13
+  104534:	4c 0f af 6b 18       	imul   0x18(%rbx),%r13
+  104539:	4c 33 73 48          	xor    0x48(%rbx),%r14
+  10453d:	48 ba 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rdx
+  104544:	c1 7c 51 
+  104547:	49 0f af d6          	imul   %r14,%rdx
+  10454b:	48 81 c3 80 00 00 00 	add    $0x80,%rbx
+  104552:	49 33 d7             	xor    %r15,%rdx
+  104555:	48 0f af 53 08       	imul   0x8(%rbx),%rdx
+  10455a:	48 8b 3b             	mov    (%rbx),%rdi
+  10455d:	48 8d 75 c0          	lea    -0x40(%rbp),%rsi
+  104561:	c4 e2 fb f6 ff       	mulx   %rdi,%rax,%rdi
+  104566:	48 89 06             	mov    %rax,(%rsi)
+  104569:	48 8b f7             	mov    %rdi,%rsi
+  10456c:	48 8b 7d c0          	mov    -0x40(%rbp),%rdi
+  104570:	ba 40 00 00 00       	mov    $0x40,%edx
+  104575:	e8 06 fc f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  10457a:	49 03 c5             	add    %r13,%rax
+  10457d:	48 83 c4 30          	add    $0x30,%rsp
+  104581:	5b                   	pop    %rbx
+  104582:	41 5d                	pop    %r13
+  104584:	41 5e                	pop    %r14
+  104586:	41 5f                	pop    %r15
+  104588:	5d                   	pop    %rbp
+  104589:	c3                   	ret
+  10458a:	48 8b fe             	mov    %rsi,%rdi
+  10458d:	48 33 7b 48          	xor    0x48(%rbx),%rdi
+  104591:	48 8d 55 b8          	lea    -0x48(%rbp),%rdx
+  104595:	48 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%rsi
+  10459c:	c1 7c 51 
+  10459f:	e8 3c f8 f7 ff       	call   83de0 <S_P_CoreLib_System_Math__BigMul_0>
+  1045a4:	48 8b f0             	mov    %rax,%rsi
+  1045a7:	4c 8b 7d b8          	mov    -0x48(%rbp),%r15
+  1045ab:	49 8b ff             	mov    %r15,%rdi
+  1045ae:	ba 40 00 00 00       	mov    $0x40,%edx
+  1045b3:	e8 c8 fb f8 ff       	call   94180 <S_P_CoreLib_System_UInt128__op_UnsignedRightShift>
+  1045b8:	4c 33 f8             	xor    %rax,%r15
+  1045bb:	49 be 95 0a 22 27 b7 	movabs $0x517cc1b727220a95,%r14
+  1045c2:	c1 7c 51 
+  1045c5:	4d 0f af fe          	imul   %r14,%r15
+  1045c9:	48 8b fb             	mov    %rbx,%rdi
+  1045cc:	49 8b f7             	mov    %r15,%rsi
+  1045cf:	e8 8c 00 00 00       	call   104660 <PtrHash_CSharp_Port_PtrHash_CSharp_Port_Core_PtrHash_4<UInt64__PtrHash_CSharp_Port_PtrHash_CSharp_Port_KeyHashers_StrongerIntHasher__PtrHash_CSharp_Port_PtrHash_CSharp_Port_BucketFunctions_Linear__PtrHash_CSharp_Port_PtrHash_CSharp_Port_Storage_UInt32VectorRemappingStorage>__BucketInPart>
+  1045d4:	48 8b 7b 08          	mov    0x8(%rbx),%rdi
+  1045d8:	40 0f b6 3c 07       	rex movzbl (%rdi,%rax,1),%edi
+  1045dd:	48 33 7b 48          	xor    0x48(%rbx),%rdi
+  1045e1:	49 0f af fe          	imul   %r14,%rdi
+  1045e5:	48 8d b3 80 00 00 00 	lea    0x80(%rbx),%rsi
+  1045ec:	49 33 ff             	xor    %r15,%rdi
+  1045ef:	48 0f af 7e 08       	imul   0x8(%rsi),%rdi
+  1045f4:	48 8b 16             	mov    (%rsi),%rdx
+  1045f7:	33 f6                	xor    %esi,%esi
+  1045f9:	33 c9                	xor    %ecx,%ecx
+  1045fb:	e8 30 fb f8 ff       	call   94130 <S_P_CoreLib_System_UInt128__op_Multiply>

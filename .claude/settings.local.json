@@ -57,7 +57,12 @@
       "Bash(bash:*)",
       "Bash(DOTNET_EnableAVX512F=0 dotnet build PtrHash.CSharp.Port/)",
       "Bash(./scripts/simple_comparison.sh:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(rustc:*)",
+      "Bash(cargo --version)",
+      "Bash(./scripts/generate_jit_asm.sh:*)",
+      "Bash(./scripts/generate_dictionary_jit_asm.sh:*)",
+      "Bash(export:*)"
     ],
     "deny": []
   }

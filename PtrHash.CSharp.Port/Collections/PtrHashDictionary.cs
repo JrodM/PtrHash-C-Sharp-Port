@@ -55,7 +55,16 @@ namespace PtrHash.CSharp.Port.Collections
             _sentinel = notFoundSentinel;
             _keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             
-            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(keys, parameters ?? PtrHashParams.DefaultFast);
+            // Use single-part mode for optimal point lookup performance (based on benchmarks)
+            var optimizedParams = parameters ?? new PtrHashParams
+            {
+                Alpha = 0.99,
+                Lambda = 3.0,
+                Minimal = true,
+                SinglePart = true,  // Single-part mode for fastest point lookups
+                StorageType = RemappingStorageType.VecU32
+            };
+            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(keys, optimizedParams);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;
 
@@ -243,6 +252,57 @@ namespace PtrHash.CSharp.Port.Collections
             }
         }
 
+        /// <summary>
+        /// Optimal batch lookup combining fast individual PtrHash point lookups with batched KeyValuePair processing
+        /// Based on benchmarks: individual GetIndex calls are fastest, combined with batched array access
+        /// </summary>
+        /// <param name="keys">Keys to look up</param>
+        /// <param name="values">Output array for values (must be same length as keys)</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void TryGetValueStreamOptimal(
+            ReadOnlySpan<TKey> keys,
+            Span<TValue> values)
+        {
+            if (keys.Length != values.Length)
+                throw new ArgumentException("Key and value spans must have the same length");
+            
+            const int MAX_STACK_SIZE = 4096;
+            
+            if (keys.Length <= MAX_STACK_SIZE)
+            {
+                // Phase 1: Individual point lookups (fastest for PtrHash based on benchmarks)
+                Span<nuint> indices = stackalloc nuint[keys.Length];
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    indices[i] = _ptrHash.GetIndex(keys[i]);  // Individual calls - no prefetch overhead
+                }
+                
+                // Phase 2: Batched KeyValuePair processing (optimal cache access pattern)
+                ProcessIndices(keys, indices, values);
+            }
+            else
+            {
+                // Large datasets: use ArrayPool
+                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
+                try
+                {
+                    var indicesSpan = indices.AsSpan(0, keys.Length);
+                    
+                    // Phase 1: Individual point lookups
+                    for (int i = 0; i < keys.Length; i++)
+                    {
+                        indicesSpan[i] = _ptrHash.GetIndex(keys[i]);
+                    }
+                    
+                    // Phase 2: Batched KeyValuePair processing
+                    ProcessIndices(keys, indicesSpan, values);
+                }
+                finally
+                {
+                    ArrayPool<nuint>.Shared.Return(indices);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets information about the underlying PtrHash structure
