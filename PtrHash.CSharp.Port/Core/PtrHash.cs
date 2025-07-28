@@ -618,8 +618,42 @@ namespace PtrHash.CSharp.Port.Core
             {
                 var hashBuffer = hashArray.AsSpan(0, keys.Length);
 
-                // First, hash all keys and partition them by parts
-                var partStarts = SortPartsByHashes(keys, seed, hashBuffer);
+                // First, hash all keys 
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    hashBuffer[i] = THasher.Hash(keys[i], seed);
+                }
+
+                // Sort by hash for part assignment
+                hashBuffer.Sort();
+
+                // Check for duplicate hashes - if found, return false to retry with different seed
+                for (int i = 1; i < hashBuffer.Length; i++)
+                {
+                    if (hashBuffer[i - 1].Full() == hashBuffer[i].Full())
+                    {
+                        return false; // Duplicate hashes found, retry needed
+                    }
+                }
+
+                // Locate part boundaries in sorted hash array using binary search
+                var partStarts = new uint[_parts + 1];
+                partStarts[0] = 0;
+
+                for (nuint part = 1; part <= _parts; part++)
+                {
+                    // Binary search for first hash belonging to this part
+                    int left = 0, right = hashBuffer.Length;
+                    while (left < right)
+                    {
+                        int mid = (left + right) / 2;
+                        if (GetPart(hashBuffer[mid]) < part)
+                            left = mid + 1;
+                        else
+                            right = mid;
+                    }
+                    partStarts[part] = (uint)left;
+                }
 
                 // Process parts in parallel
                 var parallelOptions = new ParallelOptions
@@ -627,13 +661,12 @@ namespace PtrHash.CSharp.Port.Core
                     MaxDegreeOfParallelism = MaxParallelism
                 };
 
-                var success = true;
-                var lockObject = new object();
+                var success = 1L; // 1 = true, 0 = false for Interlocked
                 var partStatsList = new BucketStats[_parts];
 
                 Parallel.For(0, (int)_parts, parallelOptions, part =>
                 {
-                    if (!success) return; // Early exit if another thread failed
+                    if (Interlocked.Read(ref success) == 0) return; // Early exit if another thread failed
 
                     var partStart = (int)partStarts[part];
                     var partEnd = (int)partStarts[part + 1];
@@ -647,10 +680,7 @@ namespace PtrHash.CSharp.Port.Core
                     // Build this part using hash-evict algorithm
                     if (!BuildPart(part, partHashes, partPilots, taken, out var partStats))
                     {
-                        lock (lockObject)
-                        {
-                            success = false;
-                        }
+                        Interlocked.Exchange(ref success, 0L); // Atomically set to false
                     }
                     else
                     {
@@ -658,7 +688,7 @@ namespace PtrHash.CSharp.Port.Core
                     }
                 });
 
-                if (!success)
+                if (success == 0L)
                 {
                     stats = null;
                     return false;
@@ -695,50 +725,6 @@ namespace PtrHash.CSharp.Port.Core
             return value > 0 && (value & (value - 1)) == 0;
         }
 
-        // Hash all keys and partition by parts
-        // Caller provides the array to make ownership clear
-        private uint[] SortPartsByHashes(ReadOnlySpan<TKey> keys, ulong seed, Span<HashValue> hashBuffer)
-        {
-            // Hash all keys using seed, then sort for duplicate detection
-            for (int i = 0; i < keys.Length; i++)
-            {
-                hashBuffer[i] = THasher.Hash(keys[i], seed);
-            }
-
-            // Sort by hash - use built-in IntroSort
-            hashBuffer.Sort();
-
-            // O(n) duplicate detection on sorted hashes - indicates duplicate keys
-            for (int i = 1; i < hashBuffer.Length; i++)
-            {
-                if (hashBuffer[i - 1].Full() == hashBuffer[i].Full())
-                {
-                    // Found duplicate hash - this means duplicate keys
-                    throw new PtrHashException($"Duplicate hash found. This usually indicates duplicate keys in the input.");
-                }
-            }
-
-            // Locate part boundaries in sorted hash array using binary search
-            var partStarts = new uint[_parts + 1];
-            partStarts[0] = 0;
-
-            for (nuint part = 1; part <= _parts; part++)
-            {
-                // Binary search for first hash belonging to this part
-                int left = 0, right = hashBuffer.Length;
-                while (left < right)
-                {
-                    int mid = (left + right) / 2;
-                    if (GetPart(hashBuffer[mid]) < part)
-                        left = mid + 1;
-                    else
-                        right = mid;
-                }
-                partStarts[part] = (uint)left;
-            }
-
-            return partStarts;
-        }
 
         // Build a single part using hash-evict algorithm
         private bool BuildPart(int part, ReadOnlySpan<HashValue> partHashes, Span<byte> partPilots, PartitionedBitVec taken, out BucketStats partStats)
