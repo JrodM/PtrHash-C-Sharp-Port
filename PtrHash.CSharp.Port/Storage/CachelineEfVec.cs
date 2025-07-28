@@ -186,7 +186,7 @@ namespace PtrHash.CSharp.Port.Storage
         public static string Name => "CacheLineEF";
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(CachelineEfVec self, nuint index) => self._ef[index / CachelineEf.L].Index((int)(index % CachelineEf.L));
+        public static nuint Index(CachelineEfVec self, nuint index) => (nuint)self._ef[index / CachelineEf.L].Index((int)(index % CachelineEf.L));
         
         
         public static int GetSizeInBytes(CachelineEfVec self)

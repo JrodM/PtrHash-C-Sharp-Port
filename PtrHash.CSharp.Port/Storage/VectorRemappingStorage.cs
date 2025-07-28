@@ -52,9 +52,9 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(UInt64VectorRemappingStorage self, nuint index)
+        public static nuint Index(UInt64VectorRemappingStorage self, nuint index)
         {
-            return self._values[index];
+            return (nuint)self._values[index];
         }
 
 
@@ -126,9 +126,9 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(UInt32VectorRemappingStorage self, nuint index)
+        public static nuint Index(UInt32VectorRemappingStorage self, nuint index)
         {
-            return self._values[index];
+            return (nuint)self._values[index];
         }
 
 
@@ -199,9 +199,9 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(UShort16VectorRemappingStorage self, nuint index)
+        public static nuint Index(UShort16VectorRemappingStorage self, nuint index)
         {
-            return self._values[index];
+            return (nuint)self._values[index];
         }
 
 
@@ -264,9 +264,9 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Index(Byte8VectorRemappingStorage self, nuint index)
+        public static nuint Index(Byte8VectorRemappingStorage self, nuint index)
         {
-            return self._values[index];
+            return (nuint)self._values[index];
         }
 
 

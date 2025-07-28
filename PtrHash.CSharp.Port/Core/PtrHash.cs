@@ -119,7 +119,7 @@ namespace PtrHash.CSharp.Port.Core
                     // Formula of Vigna, eps-cost-sharding: https://arxiv.org/abs/2503.18397
                     // (1-alpha)/2, so that on average we still have some room to play with.
                     var eps = (1.0 - parameters.Alpha) / 2.0;
-                    var x = (double)_numKeys * eps * eps / 2.0;
+                    var x = _numKeys * eps * eps / 2.0;
                     var targetParts = x / Math.Log(x);
 
                     // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly (Section 3.1 formula)
@@ -129,7 +129,7 @@ namespace PtrHash.CSharp.Port.Core
 
                     var keysPerPart = _numKeys / _parts;
                     partsPerShard = _parts / (nuint)shards; // Recalculate after adjustment
-                    var slotsPerPart = (nuint)((double)keysPerPart / parameters.Alpha);
+                    var slotsPerPart = (nuint)(keysPerPart / parameters.Alpha);
 
                     // Avoid powers of two, since then %S does not depend on all bits
                     if (IsPowerOfTwo((int)slotsPerPart))
@@ -140,13 +140,13 @@ namespace PtrHash.CSharp.Port.Core
                     _slotsPerPart = slotsPerPart;
                     _slotsTotal = _parts * _slotsPerPart;
                     // Add a few extra buckets to avoid collisions for small n.
-                    _bucketsPerPart = (nuint)Math.Ceiling((double)keysPerPart / parameters.Lambda) + 3;
+                    _bucketsPerPart = (nuint)Math.Ceiling(keysPerPart / parameters.Lambda) + 3;
                     _bucketsTotal = _parts * _bucketsPerPart;
                 }
 
                 // Allocate unmanaged memory for pilots
-                var pilotsPtr = (byte*)System.Runtime.InteropServices.NativeMemory.AlignedAlloc((nuint)_bucketsTotal, 64);
-                System.Runtime.InteropServices.NativeMemory.Clear(pilotsPtr, (nuint)_bucketsTotal);
+                var pilotsPtr = (byte*)NativeMemory.AlignedAlloc(_bucketsTotal, 64);
+                NativeMemory.Clear(pilotsPtr, _bucketsTotal);
                 _pilots = pilotsPtr;
 
                 // Will allocate remap storage later if minimal=true
@@ -176,7 +176,7 @@ namespace PtrHash.CSharp.Port.Core
                 var pilotBits = (ulong)(_bucketsTotal * 8);
                 var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
                 var totalBits = pilotBits + remapBits;
-                _bitsPerKey = (double)totalBits / (double)_numKeys;
+                _bitsPerKey = totalBits / (double)_numKeys;
 
                 DebugConstruction($"PtrHash constructed with seed: {_seed}");
                 DebugConstruction($"Parts: {_parts}, Slots per part: {_slotsPerPart}, Buckets per part: {_bucketsPerPart}");
@@ -189,7 +189,7 @@ namespace PtrHash.CSharp.Port.Core
                 // Clean up if construction failed
                 if (_pilots != null)
                 {
-                    System.Runtime.InteropServices.NativeMemory.AlignedFree(_pilots);
+                    NativeMemory.AlignedFree(_pilots);
                 }
                 _remapStorage.Dispose();
                 throw;
@@ -209,7 +209,7 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexMultiPart(TKey key)
         {
             var slot = GetIndexNoRemapMultiPart(key);
-            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, slot - _numKeys);
+            return slot < _numKeys ? slot : TRemappingStorage.Index(_remapStorage, slot - _numKeys);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -234,7 +234,7 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexSinglePart(TKey key)
         {
             var slot = GetIndexNoRemapSinglePart(key);
-            return slot < _numKeys ? slot : (nuint)TRemappingStorage.Index(_remapStorage, slot - _numKeys);
+            return slot < _numKeys ? slot : TRemappingStorage.Index(_remapStorage, slot - _numKeys);
         }
 
         /// <summary>
@@ -403,7 +403,7 @@ namespace PtrHash.CSharp.Port.Core
                 if (typeof(TMinimal) == typeof(UseMinimal) && slot >= numKeys)
                 {
                     var remapIndex = slot - numKeys;
-                    slot = (nuint)TRemappingStorage.Index(_remapStorage, remapIndex);
+                    slot = TRemappingStorage.Index(_remapStorage, remapIndex);
                 }
 
                 Unsafe.Add(ref resultsRef, i) = slot;
@@ -519,7 +519,7 @@ namespace PtrHash.CSharp.Port.Core
                         // JIT will optimize this branch away if useMinimal is false
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage, slot - numKeys);
+                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -540,7 +540,7 @@ namespace PtrHash.CSharp.Port.Core
                         // JIT will optimize this branch away if useMinimal is false
                         if (useMinimal && slot >= numKeys)
                         {
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage, slot - numKeys);
+                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
                         }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
@@ -705,7 +705,7 @@ namespace PtrHash.CSharp.Port.Core
                 hashBuffer[i] = THasher.Hash(keys[i], seed);
             }
 
-            // Sort by hash - use built-in IntroSort (zero allocations, optimal performance)
+            // Sort by hash - use built-in IntroSort
             hashBuffer.Sort();
 
             // O(n) duplicate detection on sorted hashes - indicates duplicate keys
@@ -1307,12 +1307,12 @@ namespace PtrHash.CSharp.Port.Core
 
         private static nuint CalculateNumBuckets(nuint numKeys, double lambda)
         {
-            return (nuint)Math.Ceiling((double)numKeys / lambda);
+            return (nuint)Math.Ceiling(numKeys / lambda);
         }
 
         private static nuint CalculateNumSlots(nuint numKeys, double alpha)
         {
-            return (nuint)Math.Ceiling((double)numKeys / alpha);
+            return (nuint)Math.Ceiling(numKeys / alpha);
         }
 
         private static nuint CalculateSlotsPerBucket(double lambda)

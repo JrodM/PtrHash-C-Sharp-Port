@@ -16,7 +16,7 @@ namespace PtrHash.CSharp.Port.Storage
         /// This replaces both the instance Index() and static IndexStatic() methods.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static abstract ulong Index(TSelf self, nuint index);
+        static abstract nuint Index(TSelf self, nuint index);
 
 
         /// <summary>
