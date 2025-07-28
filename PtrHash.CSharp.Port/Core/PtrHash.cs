@@ -386,27 +386,26 @@ namespace PtrHash.CSharp.Port.Core
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             var numKeys = _numKeys;
-            unsafe
+            
+            ref TKey keysRef = ref MemoryMarshal.GetReference(keys);
+            ref nuint resultsRef = ref MemoryMarshal.GetReference(results);
+            
+            for (int i = 0; i < keys.Length; i++)
             {
-                fixed (TKey* keysPtr = keys)
-                fixed (nuint* resultsPtr = results)
+                ref TKey key = ref Unsafe.Add(ref keysRef, i);
+                
+                // Type checks resolved at compile-time per specialization
+                var slot = typeof(TPart) == typeof(SinglePart) 
+                    ? GetIndexNoRemapSinglePart(key)
+                    : GetIndexNoRemapMultiPart(key);
+
+                if (typeof(TMinimal) == typeof(UseMinimal) && slot >= numKeys)
                 {
-                    for (int i = 0; i < keys.Length; i++)
-                    {
-                        // Type checks resolved at compile-time per specialization
-                        var slot = typeof(TPart) == typeof(SinglePart) 
-                            ? GetIndexNoRemapSinglePart(keysPtr[i])
-                            : GetIndexNoRemapMultiPart(keysPtr[i]);
-
-                        if (typeof(TMinimal) == typeof(UseMinimal) && slot >= numKeys)
-                        {
-                            var remapIndex = (int)(slot - numKeys);
-                            slot = (nuint)TRemappingStorage.Index(_remapStorage, remapIndex);
-                        }
-
-                        resultsPtr[i] = slot;
-                    }
+                    var remapIndex = (int)(slot - numKeys);
+                    slot = (nuint)TRemappingStorage.Index(_remapStorage, remapIndex);
                 }
+
+                Unsafe.Add(ref resultsRef, i) = slot;
             }
         }
 
