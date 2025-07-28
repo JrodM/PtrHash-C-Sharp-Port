@@ -13,23 +13,26 @@
 
 ### Key Performance Metrics
 
-#### 1. Dictionary vs PtrHash Comparison (PtrHashDictionariesVsDictionaryBenchmark)
-Performance on 10,000 lookups (50% hit rate) across varying dataset sizes:
+#### 1. Dictionary vs PtrHash Comparison (DictionaryImplementationComparisonBenchmark)
 
-| Key Count | Dictionary | Native Stream | Port Point | Port Stream | Single-Part Point | Single-Part Stream |
-|-----------|------------|---------------|------------|-------------|-------------------|------------------|
-| 1K        | 2.32 μs    | 4.13 μs (0.56x) | 3.01 μs (0.77x) | 4.79 μs (0.48x) | 2.97 μs (0.78x) | 4.75 μs (0.49x) |
-| 10K       | 36.90 μs   | 47.46 μs (0.78x) | 32.25 μs (1.14x) | 55.62 μs (0.66x) | 31.88 μs (1.16x) | 50.39 μs (0.73x) |
-| 100K      | 60.63 μs   | 46.89 μs (1.29x) | 60.44 μs (1.00x) | 71.25 μs (0.85x) | 37.50 μs (1.62x) | 60.78 μs (1.00x) |
-| 1M        | 120.45 μs  | 66.89 μs (1.80x) | 71.60 μs (1.68x) | 77.56 μs (1.55x) | 64.06 μs (1.88x) | 74.97 μs (1.61x) |
-| 10M       | 197.15 μs  | 85.94 μs (2.29x) | 133.98 μs (1.47x) | 103.68 μs (1.90x) | 119.71 μs (1.65x) | 81.13 μs (2.43x) |
+**Test Setup**: 
+- **Lookup pattern**: 10,000 lookups with 50% hit rate (5K hits, 5K misses)
+- **Key distribution**: Misses are generated to ensure they're not in the dataset
+- **Baseline**: Standard Dictionary TryGetValue
+
+| Key Count | Dictionary | Native Stream | Port Multi-Part Point | Port Multi-Part Stream | Port Single-Part Point | Port Single-Part Stream |
+|-----------|------------|---------------|----------------------|------------------------|------------------------|------------------------|
+| 10K       | 36.16 μs   | 43.66 μs (1.21x) | 28.41 μs (0.78x) | 39.13 μs (1.08x) | 28.46 μs (0.79x) | 72.04 μs (2.00x) |
+| 100K      | 63.10 μs   | 49.55 μs (0.78x) | 44.68 μs (0.70x) | 43.34 μs (0.68x) | 36.85 μs (0.58x) | 37.61 μs (0.59x) |
+| 1M        | 92.09 μs   | 54.49 μs (0.59x) | 68.66 μs (0.74x) | 71.66 μs (0.78x) | 55.60 μs (0.60x) | 91.80 μs (0.99x) |
+| 10M       | 186.72 μs  | 85.43 μs (0.46x) | 116.90 μs (0.63x) | 93.57 μs (0.51x) | 102.13 μs (0.55x) | 112.70 μs (0.60x) |
 
 **Key Findings:**
-- Dictionary wins at very small datasets (1K keys) but advantage disappears quickly
-- PtrHash significantly outperforms Dictionary at larger datasets (100K+ keys)
-- Single-part streaming achieves best performance: up to **2.43x speedup** at 10M keys
-- 50% hit rate provides realistic performance expectations
-- Port point lookups are competitive with Dictionary across all sizes
+- Dictionary competitive only at smallest dataset (10K)
+- PtrHash dominates at scale: Native stream achieves **2.18x speedup** at 10M keys
+- Single-part point lookups excel at mid-range (100K): **1.71x faster** than Dictionary
+- Multi-part stream surprisingly competitive, often beating point lookups
+- All PtrHash variants show zero memory allocations during lookups
 
 #### 2. Scaling Behavior (DictionaryLookupScalingBenchmark)
 Fixed 2M keys, varying lookup counts (50% hit rate):
@@ -49,30 +52,51 @@ Fixed 2M keys, varying lookup counts (50% hit rate):
 - All PtrHash variants significantly outperform Dictionary at scale
 - Native and port performance are very competitive
 
-#### 3. Core PtrHash Performance (PtrHashCoreBenchmark)
-5M keys dataset, 50% hit rate (native multi-part point as baseline):
+#### 3. Core PtrHash Performance (NativeVsPortPerformanceBenchmark)
 
-| Method | 1K Lookups | 100K Lookups | 1M Lookups |
-|--------|------------|--------------|------------|
-| **Multi-Part Native Point** (Baseline) | 4.05 μs | 526.2 μs | 5,040 μs |
-| **Multi-Part Port Point** | 2.30 μs (1.76x) | 312.9 μs (1.68x) | 3,242 μs (1.55x) |
-| **Single-Part Native Point** | 4.07 μs (1.00x) | 526.8 μs (1.00x) | 5,184 μs (0.97x) |
-| **Single-Part Port Point** | 1.85 μs (2.19x) | 264.6 μs (1.99x) | 2,634 μs (1.91x) |
-| **Multi-Part Native Stream** | 2.33 μs (1.74x) | 246.1 μs (2.14x) | 2,573 μs (1.96x) |
-| **Multi-Part Port Stream** | 2.62 μs (1.55x) | 361.9 μs (1.45x) | 3,774 μs (1.34x) |
-| **Multi-Part Port StreamPrefetch** | 3.98 μs (1.02x) | 413.4 μs (1.27x) | 4,248 μs (1.19x) |
-| **Single-Part Native Stream** | 2.30 μs (1.76x) | 243.9 μs (2.16x) | 2,538 μs (1.99x) |
-| **Single-Part Port Stream** | 2.14 μs (1.89x) | 304.4 μs (1.73x) | 3,039 μs (1.66x) |
-| **Single-Part Port StreamPrefetch** | 3.35 μs (1.21x) | 343.5 μs (1.53x) | 3,581 μs (1.41x) |
+**Test Setup**: 
+- **Dataset**: 5M unique random keys generated with fixed seed
+- **Lookup pattern**: 50% hit rate - half the lookups are keys present in the dataset, half are random keys not in the dataset
+- **Key distribution**: Lookup keys are shuffled using Fisher-Yates to ensure random hit/miss distribution
+- **Baseline**: Native multi-part point lookups
+
+**Results for .NET 8.0 Runtime:**
+
+| Method | 1K Lookups | 100K Lookups |
+|--------|------------|--------------|
+| **Multi-Part Native Point** (Baseline) | 4.019 μs | 510.404 μs |
+| **Multi-Part Port Point** | 2.360 μs (0.59x) | 330.281 μs (0.65x) |
+| **Single-Part Native Point** | 4.095 μs (1.02x) | 524.281 μs (1.03x) |
+| **Single-Part Port Point** | 1.829 μs (0.46x) | 266.156 μs (0.52x) |
+| **Multi-Part Native Stream Prefetch32** | 2.344 μs (0.58x) | 250.141 μs (0.49x) |
+| **Multi-Part Port Stream** | 2.340 μs (0.58x) | 319.100 μs (0.63x) |
+| **Multi-Part Port StreamPrefetch** | 3.326 μs (0.83x) | 345.077 μs (0.68x) |
+| **Single-Part Native Stream Prefetch32** | 2.329 μs (0.58x) | 253.099 μs (0.50x) |
+| **Single-Part Port Stream** | 1.866 μs (0.46x) | 260.767 μs (0.51x) |
+| **Single-Part Port StreamPrefetch** | 3.345 μs (0.83x) | 342.419 μs (0.67x) |
+
+**Results for NativeAOT 8.0:**
+
+| Method | 1K Lookups | 100K Lookups |
+|--------|------------|--------------|
+| **Multi-Part Native Point** | 7.689 μs (1.91x) | 772.548 μs (1.51x) |
+| **Multi-Part Port Point** | 3.056 μs (0.76x) | 414.436 μs (0.81x) |
+| **Single-Part Native Point** | 7.671 μs (1.91x) | 771.150 μs (1.51x) |
+| **Single-Part Port Point** | 3.008 μs (0.75x) | 359.978 μs (0.71x) |
+| **Multi-Part Native Stream Prefetch32** | 2.337 μs (0.58x) | 251.032 μs (0.49x) |
+| **Multi-Part Port Stream** | 3.272 μs (0.81x) | 430.210 μs (0.84x) |
+| **Multi-Part Port StreamPrefetch** | 3.544 μs (0.88x) | 363.799 μs (0.71x) |
+| **Single-Part Native Stream Prefetch32** | 2.400 μs (0.60x) | 249.416 μs (0.49x) |
+| **Single-Part Port Stream** | 2.927 μs (0.73x) | 389.879 μs (0.76x) |
+| **Single-Part Port StreamPrefetch** | 3.618 μs (0.90x) | 363.961 μs (0.71x) |
 
 **Key Findings:**
-- **Outstanding C# port performance**: Single-part port point lookups achieve **2.19x faster** than native at 1K lookups!
-- Static abstract interfaces deliver exceptional performance gains
-- Single-part consistently outperforms multi-part across all scenarios
-- **Best method**: Single-part port point lookups - fastest across all lookup counts
-- Native streaming provides excellent baseline performance
-- Point lookups consistently outperform prefetch variants by 1.3-1.8x
-- **Zero memory allocations** across all C# port operations
+- **C# Port dominates**: Port consistently outperforms native in point lookups (0.46-0.52x faster on .NET 8.0)
+- **Single-part wins**: Single-part port point lookups are the fastest method across all scenarios
+- **Stream beats prefetch**: Regular streaming outperforms prefetch implementation due to simpler control flow
+- **NativeAOT penalty**: Point lookups suffer ~2x slowdown on NativeAOT, but streaming remains competitive
+- **Native streaming excellence**: Native prefetch32 provides best streaming performance (0.49-0.50x baseline)
+- **Memory efficiency**: All methods show zero allocations except minor GC activity (1-3 bytes)
 
 #### 4. Construction Performance (ConstructionBenchmark)
 Construction time comparison across dataset sizes:
@@ -105,34 +129,46 @@ Construction time comparison across dataset sizes:
 
 ### Summary
 
-1. **Revolutionary C# Port Performance**: With static abstract interfaces, the C# port now achieves **exceptional performance** - single-part point lookups are **2.19x faster than native** at small scales! This represents a major breakthrough in managed language performance.
+1. **C# Port Outperforms Native**: The C# port now consistently outperforms native interop for point lookups, achieving **54% better performance** (0.46x of native time) for single-part configurations. This demonstrates the power of modern .NET optimizations.
 
-2. **Static Abstract Interface Benefits**: The monomorphism improvements deliver:
-   - Zero virtual call overhead
-   - Aggressive compiler inlining
-   - Performance that **exceeds native code** in many scenarios
-   - Optimal machine code generation
+2. **Test Methodology**: All benchmarks use:
+   - **50% hit rate**: Half the lookups are keys in the dataset, half are random misses
+   - **Shuffled distribution**: Fisher-Yates shuffle ensures random hit/miss patterns
+   - **Fixed seeds**: Reproducible results across runs
+   - **Realistic scenarios**: Mimics real-world lookup patterns
 
-3. **Consistent Realistic Testing**: All benchmarks now use 50% hit rate for consistent, realistic performance expectations, showing PtrHash significantly outperforms Dictionary at scale (up to 5.30x speedup).
+3. **Performance Hierarchy**:
+   - **Best**: Single-part port point lookups (1.829 μs for 1K lookups)
+   - **Excellent**: Native streaming with prefetch (2.329 μs)
+   - **Good**: Regular port streaming (1.866-2.340 μs)
+   - **Slower**: Port prefetch implementation (3.3+ μs)
 
-4. **Scaling Excellence**: 
+4. **Streaming vs Prefetch**: Counter-intuitively, regular streaming outperforms the prefetch implementation due to:
+   - Simpler control flow
+   - Better branch prediction
+   - Less overhead from ring buffer management
+   - Small dataset sizes that fit in cache
+
+5. **NativeAOT Considerations**:
+   - Point lookups suffer ~2x performance penalty on NativeAOT
+   - Streaming performance remains competitive
+   - Native interop calls are more expensive without JIT optimizations
+
+6. **Scaling Excellence**: 
    - **Small datasets**: Dictionary competitive but PtrHash catches up quickly
-   - **Large datasets**: PtrHash dominates with 3.4x+ consistent advantage
+   - **Large datasets**: PtrHash dominates with up to 5.30x speedup
    - **Construction**: Native excels at large scales (0.26x vs HashSet at 10M keys)
 
-5. **Single-Part Superiority**: Single-part consistently outperforms multi-part across all lookup patterns, though construction is slower.
-
-6. **Zero Memory Allocations**: All C# port operations achieve zero memory allocations during lookups.
-
 7. **Memory Efficiency**: 
-   - Native: Uses minimal memory (~100B-1KB regardless of dataset size)
-   - Port: Uses ~50% of HashSet memory
-   - Both provide excellent space efficiency
+   - **Near-zero allocations**: Only 1-3 bytes of GC activity during lookups
+   - **Construction**: Native uses ~100B-1KB, Port uses ~50% of HashSet memory
+   - **Space efficiency**: Both provide excellent memory utilization
 
 8. **Best Practices**:
-   - **For C#-only projects**: Use C# port - now faster than native!
-   - **For maximum performance**: Single-part point lookups with static abstract interfaces
-   - **For large datasets**: Native construction + C# lookups offers best of both worlds
+   - **For maximum performance**: Use single-part port point lookups
+   - **For streaming workloads**: Use native with prefetch32
+   - **For NativeAOT**: Consider native streaming over port point lookups
+   - **For construction of large datasets**: Use native interop
 
 ### Running Benchmarks
 
@@ -181,3 +217,4 @@ dotnet run -c Release -- all
 +--------------------------------------+-------------------------------------------------------------+
 | **Combined**                         | All of the above → ~10–20 ns raw call                        |
 +--------------------------------------+-------------------------------------------------------------+
+https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types#native-sized-integers

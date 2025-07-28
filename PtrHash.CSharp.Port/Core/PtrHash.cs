@@ -35,7 +35,7 @@ namespace PtrHash.CSharp.Port.Core
     /// 
     /// Current limitations compared to full paper implementation:
     /// - No external-memory construction (sharding for >10^10 keys)
-    /// - No CacheLineEF remapping compression
+    /// - CacheLineEF remapping compression exists but isn't well tested.
     /// </summary>
     /// <typeparam name="TKey">Type of keys</typeparam>
     /// <typeparam name="THasher">Hash function implementation</typeparam>
@@ -412,7 +412,7 @@ namespace PtrHash.CSharp.Port.Core
 
         // Prefetch-enabled streaming - matches Rust's index_stream implementation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStreamPrefetch(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
+        public void GetIndicesStreamPrefetch(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true, int prefetchDistance = 32)
         {
             // Fall back to regular streaming if SSE2 prefetch not supported
             if (!Sse2.IsSupported)
@@ -425,38 +425,37 @@ namespace PtrHash.CSharp.Port.Core
             if (_isSinglePart)
             {
                 if (minimal)
-                    GetIndicesStreamPrefetchCore<SinglePart, UseMinimal>(keys, results);
+                    GetIndicesStreamPrefetchCore<SinglePart, UseMinimal>(keys, results, prefetchDistance);
                 else
-                    GetIndicesStreamPrefetchCore<SinglePart, NoMinimal>(keys, results);
+                    GetIndicesStreamPrefetchCore<SinglePart, NoMinimal>(keys, results, prefetchDistance);
             }
             else
             {
                 if (minimal)
-                    GetIndicesStreamPrefetchCore<MultiPart, UseMinimal>(keys, results);
+                    GetIndicesStreamPrefetchCore<MultiPart, UseMinimal>(keys, results, prefetchDistance);
                 else
-                    GetIndicesStreamPrefetchCore<MultiPart, NoMinimal>(keys, results);
+                    GetIndicesStreamPrefetchCore<MultiPart, NoMinimal>(keys, results, prefetchDistance);
             }
         }
 
         // Monomorphic core method - like Rust's fold() with const generics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void GetIndicesStreamPrefetchCore<TPart, TMinimal>(ReadOnlySpan<TKey> keys, Span<nuint> results)
+        private void GetIndicesStreamPrefetchCore<TPart, TMinimal>(ReadOnlySpan<TKey> keys, Span<nuint> results, int prefetchDistance)
             where TPart : struct, IPartConstant
             where TMinimal : struct, IBoolConstant
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            const int PREFETCH_DISTANCE = 64; // Match Rust's B parameter
+            
             // These will be compile-time constants due to generic specialization
             var isSinglePart = default(TPart).IsSinglePart;
             var useMinimal = default(TMinimal).Value;
             var numKeys = _numKeys;
 
-            // Ring buffers for prefetching - match Rust exactly
-            // Rust always allocates both buffers regardless of single/multi-part
-            Span<HashValue> nextHashes = stackalloc HashValue[PREFETCH_DISTANCE];
-            Span<ulong> nextBuckets = stackalloc ulong[PREFETCH_DISTANCE];
+            // Ring buffers for prefetching
+            Span<HashValue> nextHashes = stackalloc HashValue[prefetchDistance];
+            Span<ulong> nextBuckets = stackalloc ulong[prefetchDistance];
 
             ref var keysRef = ref MemoryMarshal.GetReference(keys);
             ref var resultsRef = ref MemoryMarshal.GetReference(results);
@@ -467,85 +466,54 @@ namespace PtrHash.CSharp.Port.Core
                 fixed (HashValue* hashBufPtr = &MemoryMarshal.GetReference(nextHashes))
                 fixed (ulong* bucketBufPtr = &MemoryMarshal.GetReference(nextBuckets))
                 {
-                    // Initialize and prefetch first batch
-                    int remaining = Math.Min(PREFETCH_DISTANCE, keys.Length);
-                    for (int i = 0; i < remaining; i++)
+                    // Initialize and prefetch first batch - match Rust's initialization loop
+                    int leftover = prefetchDistance;
+                    for (int i = 0; i < prefetchDistance; i++)
                     {
-                        var key = Unsafe.Add(ref keysRef, i);
-                        hashBufPtr[i] = THasher.Hash(key, _seed);
-
-                        // Calculate bucket - this matches Rust's bucket() method
-                        if (isSinglePart)
+                        HashValue hash;
+                        if (i < keys.Length)
                         {
-                            bucketBufPtr[i] = BucketInPart(hashBufPtr[i].High());
+                            var key = Unsafe.Add(ref keysRef, i);
+                            hash = THasher.Hash(key, _seed);
+                            leftover--;
                         }
                         else
                         {
-                            var high = hashBufPtr[i].High();
-                            var (part, remainder) = _remParts.ReduceWithRemainder(high);
-                            var bucketInPart = BucketInPart(remainder);
-                            bucketBufPtr[i] = part * (ulong)_bucketsPerPart + bucketInPart;
+                            hash = default; // unwrap_or_default() like Rust
                         }
+                        
+                        hashBufPtr[i] = hash;
+
+                        // Calculate bucket - this matches Rust's bucket() method
+                        bucketBufPtr[i] = Bucket(hashBufPtr[i]);
 
                         // Prefetch pilot data
                         Sse.Prefetch0(_pilots + bucketBufPtr[i]);
                     }
 
-                    // Fill remainder with defaults
-                    for (int i = remaining; i < PREFETCH_DISTANCE; i++)
-                    {
-                        hashBufPtr[i] = default;
-                        bucketBufPtr[i] = 0;
-                        // No part buffer needed - Rust doesn't store parts
-                    }
-
                     // Process main loop with prefetch pipeline
                     int processed = 0;
-                    int mainLoopEnd = Math.Max(0, keys.Length - PREFETCH_DISTANCE);
+                    int mainLoopEnd = Math.Max(0, keys.Length - prefetchDistance);
 
                     while (processed < mainLoopEnd)
                     {
-                        int idx = processed % PREFETCH_DISTANCE;
+                        int idx = processed % prefetchDistance;
                         var currentHash = hashBufPtr[idx];
                         var currentBucket = bucketBufPtr[idx];
 
                         // Prefetch next key while processing current
-                        var nextKey = Unsafe.Add(ref keysRef, processed + PREFETCH_DISTANCE);
+                        var nextKey = Unsafe.Add(ref keysRef, processed + prefetchDistance);
                         hashBufPtr[idx] = THasher.Hash(nextKey, _seed);
 
                         // Calculate bucket for next iteration - matches Rust's bucket() method
-                        if (isSinglePart)
-                        {
-                            bucketBufPtr[idx] = BucketInPart(hashBufPtr[idx].High());
-                        }
-                        else
-                        {
-                            var high = hashBufPtr[idx].High();
-                            var (part, remainder) = _remParts.ReduceWithRemainder(high);
-                            var bucketInPart = BucketInPart(remainder);
-                            bucketBufPtr[idx] = part * (ulong)_bucketsPerPart + bucketInPart;
-                        }
+                        bucketBufPtr[idx] = Bucket(hashBufPtr[idx]);
 
                         // Prefetch pilot data for next iteration
                         Sse.Prefetch0(_pilots + bucketBufPtr[idx]);
 
                         // Process current key with prefetched data
                         var pilot = _pilots[currentBucket];
-                        var hp = HashPilot(pilot);
-                        
-                        // Calculate slot - matches Rust's slot() method
-                        nuint slot;
-                        if (isSinglePart)
-                        {
-                            slot = SlotInPartHp(currentHash, hp);
-                        }
-                        else
-                        {
-                            // Recalculate part from hash (like Rust does)
-                            var part = _remParts.Reduce(currentHash.High());
-                            var slotInPart = SlotInPartHp(currentHash, hp);
-                            slot = (nuint)(part * (ulong)_slotsPerPart) + slotInPart;
-                        }
+                        var slot = Slot(currentHash, pilot);
 
                         // JIT will optimize this branch away if useMinimal is false
                         if (useMinimal && slot >= numKeys)
@@ -557,28 +525,16 @@ namespace PtrHash.CSharp.Port.Core
                         processed++;
                     }
 
-                    // Process remaining prefetched items (matches Rust's leftover loop)
-                    while (processed < keys.Length)
+                    // for _ in 0..B - self.leftover
+                    int leftoverCount = prefetchDistance - leftover;
+                    for (int i = 0; i < leftoverCount; i++)
                     {
-                        int idx = processed % PREFETCH_DISTANCE;
+                        int idx = processed % prefetchDistance;
                         var currentHash = hashBufPtr[idx];
                         var currentBucket = bucketBufPtr[idx];
 
                         var pilot = _pilots[currentBucket];
-                        var hp = HashPilot(pilot);
-                        
-                        nuint slot;
-                        if (isSinglePart)
-                        {
-                            slot = SlotInPartHp(currentHash, hp);
-                        }
-                        else
-                        {
-                            // Recalculate part from hash (like Rust does)
-                            var part = _remParts.Reduce(currentHash.High());
-                            var slotInPart = SlotInPartHp(currentHash, hp);
-                            slot = (nuint)(part * (ulong)_slotsPerPart) + slotInPart;
-                        }
+                        var slot = Slot(currentHash, pilot);
 
                         // JIT will optimize this branch away if useMinimal is false
                         if (useMinimal && slot >= numKeys)
@@ -653,7 +609,7 @@ namespace PtrHash.CSharp.Port.Core
             // Seed already assigned in ComputePilots before calling this method
 
             // Reset pilots
-            System.Runtime.InteropServices.NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
+            NativeMemory.Clear(_pilots, (nuint)_bucketsTotal);
 
             // Rent array for hashing
             var hashArray = ArrayPool<HashValue>.Shared.Rent(keys.Length);
@@ -1287,9 +1243,6 @@ namespace PtrHash.CSharp.Port.Core
 
         private bool TryRemapFreeSlots(PartitionedBitVec taken)
         {
-            // Efficient implementation of remap_free_slots algorithm using IterZeros() (Section 3.2)
-            // This eliminates the O(n²) nested loop issue by only processing actual zero bits
-            // Assert: count of free slots should equal slots_total - n
             var freeSlotCount = taken.CountZeros();
             if (freeSlotCount != _slotsTotal - _numKeys)
             {

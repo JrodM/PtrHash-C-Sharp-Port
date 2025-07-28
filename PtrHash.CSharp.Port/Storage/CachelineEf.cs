@@ -5,6 +5,9 @@ using PtrHash.CSharp.Port.Construction;
 
 namespace PtrHash.CSharp.Port.Storage
 {
+
+    //TODO: WARNING THIS IS NOT WELL TESTED. If you plan on using this, you should test more thoroughly. 
+    
     /// <summary>
     /// A single cacheline that holds 44 Elias-Fano encoded 40-bit values in a range of size 256*84=21504.
     /// Aligned to 64 bytes to ensure it fits in a single cache line.
