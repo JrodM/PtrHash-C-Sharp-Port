@@ -16,9 +16,10 @@ namespace PtrHash.CSharp.Port.Tests
             var values = new ulong[] { 100, 200, 300, 400, 500 };
 
             // Act
-            var cacheline = CachelineEf.TryNew(values);
+            var success = CachelineEf.TryNew(values, out var cacheline);
 
             // Assert
+            Assert.IsTrue(success, "CachelineEf creation should succeed");
             for (int i = 0; i < values.Length; i++)
             {
                 Assert.AreEqual(values[i], cacheline.Index(i), $"Value at index {i} should match");
@@ -37,9 +38,10 @@ namespace PtrHash.CSharp.Port.Tests
             }
 
             // Act
-            var cacheline = CachelineEf.TryNew(values);
+            var success = CachelineEf.TryNew(values, out var cacheline);
 
             // Assert
+            Assert.IsTrue(success, "CachelineEf creation should succeed");
             for (int i = 0; i < values.Length; i++)
             {
                 Assert.AreEqual(values[i], cacheline.Index(i), $"Value at index {i} should match");
@@ -53,10 +55,10 @@ namespace PtrHash.CSharp.Port.Tests
             var values = new ulong[] { 100, 100000000 }; // Very large gap
 
             // Act
-            var result = CachelineEf.TryNew(values);
+            var success = CachelineEf.TryNew(values, out var result);
 
             // Assert
-            Assert.IsNull(result, "Should return null for values spanning too large a range");
+            Assert.IsFalse(success, "Should return false for values spanning too large a range");
         }
 
         [TestMethod]
@@ -70,7 +72,8 @@ namespace PtrHash.CSharp.Port.Tests
             }
 
             // Act
-            var vec = CachelineEfVec.TryNew(values);
+            var success = CachelineEfVec.TryNew(values, out var vec);
+            Assert.IsTrue(success, "CachelineEfVec creation should succeed");
 
             // Assert
             Assert.AreEqual(100, vec.Count);
@@ -85,7 +88,8 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var values = new ulong[] { 100, 200, 300, 400, 500 };
-            var vec = CachelineEfVec.TryNew(values);
+            var success = CachelineEfVec.TryNew(values, out var vec);
+            Assert.IsTrue(success, "CachelineEfVec creation should succeed");
 
             // Act & Assert
             Assert.IsTrue(vec.IsReadOnly);
@@ -101,23 +105,11 @@ namespace PtrHash.CSharp.Port.Tests
         }
 
         [TestMethod]
-        public void CachelineEfVec_Prefetch_DoesNotThrow()
-        {
-            // Arrange
-            var values = new ulong[] { 100, 200, 300, 400, 500 };
-            var vec = CachelineEfVec.TryNew(values);
-
-            // Act & Assert - should not throw
-            vec.Prefetch(0);
-            vec.Prefetch(2);
-            vec.Prefetch(4);
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
         public void CachelineEfVec_Add_ThrowsNotSupported()
         {
-            var vec = CachelineEfVec.TryNew(new ulong[] { 100, 200 });
+            var success = CachelineEfVec.TryNew(new ulong[] { 100, 200 }, out var vec);
+            Assert.IsTrue(success);
             vec.Add(300);
         }
 
@@ -125,7 +117,8 @@ namespace PtrHash.CSharp.Port.Tests
         [ExpectedException(typeof(NotSupportedException))]
         public void CachelineEfVec_Remove_ThrowsNotSupported()
         {
-            var vec = CachelineEfVec.TryNew(new ulong[] { 100, 200 });
+            var success = CachelineEfVec.TryNew(new ulong[] { 100, 200 }, out var vec);
+            Assert.IsTrue(success);
             vec.Remove(100);
         }
     }

@@ -47,7 +47,7 @@ namespace PtrHash.CSharp.Port.Core
         
         /// <summary>
         /// Most compact parameters: 2.1 bits/key, maximum compression
-        /// Uses EliasFano storage
+        /// Uses CacheLineEF storage
         /// </summary>
         public static PtrHashParams DefaultCompact => new()
         {
@@ -55,7 +55,7 @@ namespace PtrHash.CSharp.Port.Core
             Lambda = 3.5,
             Minimal = true,
             SinglePart = false,
-            StorageType = RemappingStorageType.EliasFano
+            StorageType = RemappingStorageType.CacheLineEF
         };
     }
 
@@ -87,9 +87,9 @@ namespace PtrHash.CSharp.Port.Core
         
         
         /// <summary>
-        /// EliasFano - Standard Elias-Fano compressed encoding, maximum compression
+        /// CacheLineEF - Standard Elias-Fano compressed encoding, maximum compression
         /// </summary>
-        EliasFano,
+        CacheLineEF,
     }
 
     /// <summary>

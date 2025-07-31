@@ -143,28 +143,28 @@ namespace PtrHash.CSharp.Port.Tests.Construction
         }
 
         [TestMethod]
-        public void GetUnchecked_WorksWithoutBoundsCheck()
+        public void Get_WorksWithValidIndices()
         {
             using var bitVec = new BitVec(64);
             
             bitVec.Set(10, true);
             bitVec.Set(20, true);
             
-            // GetUnchecked doesn't throw on valid indices
-            Assert.IsTrue(bitVec.GetUnchecked(10));
-            Assert.IsTrue(bitVec.GetUnchecked(20));
-            Assert.IsFalse(bitVec.GetUnchecked(15));
+            // Get works on valid indices
+            Assert.IsTrue(bitVec.Get(10));
+            Assert.IsTrue(bitVec.Get(20));
+            Assert.IsFalse(bitVec.Get(15));
         }
 
         [TestMethod]
-        public void SetUnchecked_WorksWithoutBoundsCheck()
+        public void Set_WorksWithValidIndices()
         {
             using var bitVec = new BitVec(64);
             
-            // SetUnchecked doesn't throw on valid indices
-            bitVec.SetUnchecked(10, true);
-            bitVec.SetUnchecked(20, true);
-            bitVec.SetUnchecked(30, false);
+            // Set works on valid indices
+            bitVec.Set(10, true);
+            bitVec.Set(20, true);
+            bitVec.Set(30, false);
             
             Assert.IsTrue(bitVec.Get(10));
             Assert.IsTrue(bitVec.Get(20));

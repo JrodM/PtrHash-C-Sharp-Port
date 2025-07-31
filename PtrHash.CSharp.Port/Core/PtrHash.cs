@@ -496,29 +496,28 @@ namespace PtrHash.CSharp.Port.Core
                     while (processed < mainLoopEnd)
                     {
                         int idx = processed % prefetchDistance;
+
+                        // Prefetch the next key and pilot first to overlap memory latency
+                        var nextKey = Unsafe.Add(ref keysRef, processed + prefetchDistance);
+                        var nextHash = THasher.Hash(nextKey, _seed);
+                        var nextBucket = Bucket(nextHash);
+                        Sse.Prefetch0(_pilots + nextBucket);
+
+                        // Process the current key using previously prefetched data
                         var currentHash = hashBufPtr[idx];
                         var currentBucket = bucketBufPtr[idx];
-
-                        // Prefetch next key while processing current
-                        var nextKey = Unsafe.Add(ref keysRef, processed + prefetchDistance);
-                        hashBufPtr[idx] = THasher.Hash(nextKey, _seed);
-
-                        bucketBufPtr[idx] = Bucket(hashBufPtr[idx]);
-
-                        // Prefetch pilot data for next iteration
-                        Sse.Prefetch0(_pilots + bucketBufPtr[idx]);
-
-                        // Process current key with prefetched data
                         var pilot = _pilots[currentBucket];
                         var slot = Slot(currentHash, pilot);
 
-                        // JIT will optimize this branch away if useMinimal is false
                         if (useMinimal && slot >= numKeys)
-                        {
                             slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
-                        }
 
                         Unsafe.Add(ref resultsRef, processed) = slot;
+
+                        // Update the ring buffer with the next key and bucket
+                        hashBufPtr[idx] = nextHash;
+                        bucketBufPtr[idx] = nextBucket;
+
                         processed++;
                     }
 
