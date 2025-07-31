@@ -199,8 +199,13 @@ public static class PtrHashTestHelpers
         // Test 4: Test streaming interface matches individual lookups for both minimal and non-minimal
         var streamMinimal = new nuint[keys.Length];
         var streamNoRemap = new nuint[keys.Length];
+        var streamPrefetchMinimal = new nuint[keys.Length];
+        var streamPrefetchNoRemap = new nuint[keys.Length];
+        
         ptrhash.GetIndicesStream(keys, streamMinimal, minimal: true);
         ptrhash.GetIndicesStream(keys, streamNoRemap, minimal: false);
+        ptrhash.GetIndicesStreamPrefetch(keys, streamPrefetchMinimal, minimal: true);
+        ptrhash.GetIndicesStreamPrefetch(keys, streamPrefetchNoRemap, minimal: false);
         
         for (int i = 0; i < keys.Length; i++)
         {
@@ -211,6 +216,10 @@ public static class PtrHashTestHelpers
                 $"Config {configName}: Stream minimal {streamMinimal[i]} != individual minimal {individualMinimal} for key {keys[i]}");
             Assert.AreEqual(individualNoRemap, streamNoRemap[i], 
                 $"Config {configName}: Stream NoRemap {streamNoRemap[i]} != individual NoRemap {individualNoRemap} for key {keys[i]}");
+            Assert.AreEqual(individualMinimal, streamPrefetchMinimal[i], 
+                $"Config {configName}: StreamPrefetch minimal {streamPrefetchMinimal[i]} != individual minimal {individualMinimal} for key {keys[i]}");
+            Assert.AreEqual(individualNoRemap, streamPrefetchNoRemap[i], 
+                $"Config {configName}: StreamPrefetch NoRemap {streamPrefetchNoRemap[i]} != individual NoRemap {individualNoRemap} for key {keys[i]}");
         }
     }
 
