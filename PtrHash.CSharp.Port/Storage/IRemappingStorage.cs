@@ -26,9 +26,10 @@ namespace PtrHash.CSharp.Port.Storage
 
         /// <summary>
         /// Try to create a new instance from the given values.
-        /// Throws if the values cannot be efficiently represented.
+        /// Returns false if values cannot be efficiently represented (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
         /// </summary>
-        static abstract TSelf TryNew(ReadOnlySpan<ulong> values);
+        static abstract bool TryNew(ReadOnlySpan<ulong> values, out TSelf result);
 
         /// <summary>
         /// Human-readable name of this storage type.

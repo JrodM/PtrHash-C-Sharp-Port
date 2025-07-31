@@ -69,27 +69,6 @@ namespace PtrHash.CSharp.Port.Construction
                 _bits[wordIndex] &= ~mask;
         }
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe bool GetUnchecked(nuint index)
-        {
-            var wordIndex = index >> LOG2_BITS_PER_WORD;
-            var bitIndex = (int)(index & (BITS_PER_WORD - 1));
-            return (_bits[wordIndex] & (1UL << bitIndex)) != 0;
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void SetUnchecked(nuint index, bool value)
-        {
-            var wordIndex = index >> LOG2_BITS_PER_WORD;
-            var bitIndex = (int)(index & (BITS_PER_WORD - 1));
-            var mask = 1UL << bitIndex;
-            
-            if (value)
-                _bits[wordIndex] |= mask;
-            else
-                _bits[wordIndex] &= ~mask;
-        }
-        
         public nuint CountOnes()
         {
             nuint count = 0;

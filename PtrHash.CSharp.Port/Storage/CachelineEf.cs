@@ -39,9 +39,10 @@ namespace PtrHash.CSharp.Port.Storage
 
         /// <summary>
         /// Try to construct a new CachelineEf for the given sorted values.
-        /// Returns null if values span too large a range or are invalid.
+        /// Returns false if values span too large a range (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
         /// </summary>
-        public static CachelineEf? TryNew(ReadOnlySpan<ulong> values)
+        public static bool TryNew(ReadOnlySpan<ulong> values, out CachelineEf result)
         {
             if (values.Length == 0)
                 throw new ArgumentException("List of values must not be empty");
@@ -51,9 +52,12 @@ namespace PtrHash.CSharp.Port.Storage
 
             var l = values.Length;
             
-            // Check if range is too large
+            // Return false for compression limitation - allows retry with different seed
             if (values[l - 1] - values[0] > 256UL * (128 - L))
-                return null;
+            {
+                result = default;
+                return false;
+            }
 
             // Check if values exceed 40-bit limit
             if (values[l - 1] >= (1UL << 40))
@@ -63,7 +67,7 @@ namespace PtrHash.CSharp.Port.Storage
             if (offset > uint.MaxValue)
                 throw new ArgumentException("vals[0] does not fit in 40 bits");
 
-            var result = new CachelineEf();
+            result = new CachelineEf();
             result._reducedOffset = (uint)offset;
             result._highBoundaries0 = 0;
             result._highBoundaries1 = 0;
@@ -95,16 +99,7 @@ namespace PtrHash.CSharp.Port.Storage
                     result._highBoundaries1 |= 1UL << (int)(idx - 64);
             }
 
-            return result;
-        }
-
-        /// <summary>
-        /// Construct a new CachelineEf for the given sorted values.
-        /// Throws if values are invalid or span too large a range.
-        /// </summary>
-        public static CachelineEf New(ReadOnlySpan<ulong> values)
-        {
-            return TryNew(values) ?? throw new ArgumentException("Values are too sparse!");
+            return true;
         }
 
         /// <summary>
@@ -123,27 +118,6 @@ namespace PtrHash.CSharp.Port.Storage
             else
             {
                 onePos = 64 + SelectInWord(_highBoundaries1, idx - (int)p);
-            }
-
-            return 256UL * _reducedOffset + 256UL * (ulong)(onePos - idx) + _lowBits[idx];
-        }
-
-        /// <summary>
-        /// Get the value at the given index without bounds checking.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly ulong IndexUnchecked(int idx)
-        {
-            var p = System.Numerics.BitOperations.PopCount(_highBoundaries0);
-            int onePos;
-            
-            if (idx < p)
-            {
-                onePos = SelectInWord(_highBoundaries0, idx);
-            }
-            else
-            {
-                onePos = 64 + SelectInWord(_highBoundaries1, idx - p);
             }
 
             return 256UL * _reducedOffset + 256UL * (ulong)(onePos - idx) + _lowBits[idx];

@@ -5,7 +5,7 @@ namespace PtrHash.CSharp.Port.Core
 {
     /// <summary>
     /// Parameters for PtrHash construction with bucket function support
-    /// Matches Rust PtrHashParams struct
+    /// PtrHashParams struct
     /// </summary>
     public readonly struct PtrHashParams
     {
@@ -15,14 +15,13 @@ namespace PtrHash.CSharp.Port.Core
         public bool SinglePart { get; init; }
         
         /// <summary>
-        /// Remapping storage type selector - matches Rust's F generic parameter
+        /// Remapping storage type selector
         /// Controls space/speed tradeoff for remapping table
         /// </summary>
         public RemappingStorageType StorageType { get; init; }
 
         /// <summary>
         /// Default fast parameters: 3.0 bits/key, optimized for query speed
-        /// Uses Vec&lt;u32&gt; storage (matches Rust default)
         /// </summary>
         public static PtrHashParams DefaultFast => new()
         {
@@ -48,7 +47,7 @@ namespace PtrHash.CSharp.Port.Core
         
         /// <summary>
         /// Most compact parameters: 2.1 bits/key, maximum compression
-        /// Uses EliasFano storage (matches Rust compact config)
+        /// Uses EliasFano storage
         /// </summary>
         public static PtrHashParams DefaultCompact => new()
         {
@@ -77,7 +76,7 @@ namespace PtrHash.CSharp.Port.Core
         VecU16,
         
         /// <summary>
-        /// Vec&lt;u32&gt; - 32-bit values, Rust default, good balance
+        /// Vec&lt;u32&gt; - 32-bit values, default.
         /// </summary>
         VecU32,
         
@@ -91,12 +90,6 @@ namespace PtrHash.CSharp.Port.Core
         /// EliasFano - Standard Elias-Fano compressed encoding, maximum compression
         /// </summary>
         EliasFano,
-        
-        /// <summary>
-        /// Auto - Automatically select optimal storage based on data characteristics
-        /// Uses RemappingStorageFactory.CreateOptimal() 
-        /// </summary>
-        Auto
     }
 
     /// <summary>

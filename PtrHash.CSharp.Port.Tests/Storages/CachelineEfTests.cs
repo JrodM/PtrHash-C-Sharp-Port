@@ -16,7 +16,7 @@ namespace PtrHash.CSharp.Port.Tests
             var values = new ulong[] { 100, 200, 300, 400, 500 };
 
             // Act
-            var cacheline = CachelineEf.New(values);
+            var cacheline = CachelineEf.TryNew(values);
 
             // Assert
             for (int i = 0; i < values.Length; i++)
@@ -37,7 +37,7 @@ namespace PtrHash.CSharp.Port.Tests
             }
 
             // Act
-            var cacheline = CachelineEf.New(values);
+            var cacheline = CachelineEf.TryNew(values);
 
             // Assert
             for (int i = 0; i < values.Length; i++)
@@ -70,7 +70,7 @@ namespace PtrHash.CSharp.Port.Tests
             }
 
             // Act
-            var vec = CachelineEfVec.New(values);
+            var vec = CachelineEfVec.TryNew(values);
 
             // Assert
             Assert.AreEqual(100, vec.Count);
@@ -85,7 +85,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var values = new ulong[] { 100, 200, 300, 400, 500 };
-            var vec = CachelineEfVec.New(values);
+            var vec = CachelineEfVec.TryNew(values);
 
             // Act & Assert
             Assert.IsTrue(vec.IsReadOnly);
@@ -105,7 +105,7 @@ namespace PtrHash.CSharp.Port.Tests
         {
             // Arrange
             var values = new ulong[] { 100, 200, 300, 400, 500 };
-            var vec = CachelineEfVec.New(values);
+            var vec = CachelineEfVec.TryNew(values);
 
             // Act & Assert - should not throw
             vec.Prefetch(0);
@@ -117,7 +117,7 @@ namespace PtrHash.CSharp.Port.Tests
         [ExpectedException(typeof(NotSupportedException))]
         public void CachelineEfVec_Add_ThrowsNotSupported()
         {
-            var vec = CachelineEfVec.New(new ulong[] { 100, 200 });
+            var vec = CachelineEfVec.TryNew(new ulong[] { 100, 200 });
             vec.Add(300);
         }
 
@@ -125,7 +125,7 @@ namespace PtrHash.CSharp.Port.Tests
         [ExpectedException(typeof(NotSupportedException))]
         public void CachelineEfVec_Remove_ThrowsNotSupported()
         {
-            var vec = CachelineEfVec.New(new ulong[] { 100, 200 });
+            var vec = CachelineEfVec.TryNew(new ulong[] { 100, 200 });
             vec.Remove(100);
         }
     }

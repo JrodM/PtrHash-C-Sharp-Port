@@ -23,10 +23,11 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         /// <summary>
-        /// Create a new UInt64VectorRemappingStorage from the given values.
-        /// Throws if allocation fails.
+        /// Try to create a new UInt64VectorRemappingStorage from the given values.
+        /// Returns false if allocation fails (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
         /// </summary>
-        public static UInt64VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
+        public static bool TryNew(ReadOnlySpan<ulong> values, out UInt64VectorRemappingStorage result)
         {
             var length = values.Length;
             var byteSize = length * sizeof(ulong);
@@ -41,13 +42,15 @@ namespace PtrHash.CSharp.Port.Storage
                     ptr[i] = values[i];
                 }
                 
-                return new UInt64VectorRemappingStorage(ptr, length);
+                result = new UInt64VectorRemappingStorage(ptr, length);
+                return true;
             }
             catch
             {
                 if (memory != null)
                     NativeMemory.AlignedFree(memory);
-                throw;
+                result = default;
+                return false;
             }
         }
 
@@ -91,15 +94,19 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         /// <summary>
-        /// Create a new UInt32VectorRemappingStorage from the given values.
-        /// Throws if any value exceeds uint.MaxValue.
+        /// Try to create a new UInt32VectorRemappingStorage from the given values.
+        /// Returns false if any value exceeds uint.MaxValue (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
         /// </summary>
-        public static UInt32VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
+        public static bool TryNew(ReadOnlySpan<ulong> values, out UInt32VectorRemappingStorage result)
         {
             for (int i = 0; i < values.Length; i++)
             {
                 if (values[i] > uint.MaxValue)
-                    throw new ArgumentException($"Value {values[i]} exceeds uint.MaxValue");
+                {
+                    result = default;
+                    return false;
+                }
             }
 
             var length = values.Length;
@@ -115,13 +122,15 @@ namespace PtrHash.CSharp.Port.Storage
                     ptr[i] = (uint)values[i];
                 }
                 
-                return new UInt32VectorRemappingStorage(ptr, length);
+                result = new UInt32VectorRemappingStorage(ptr, length);
+                return true;
             }
             catch
             {
                 if (memory != null)
                     NativeMemory.AlignedFree(memory);
-                throw;
+                result = default;
+                return false;
             }
         }
 
@@ -165,15 +174,19 @@ namespace PtrHash.CSharp.Port.Storage
         }
 
         /// <summary>
-        /// Create a new UShort16VectorRemappingStorage from the given values.
-        /// Throws if any value exceeds ushort.MaxValue.
+        /// Try to create a new UShort16VectorRemappingStorage from the given values.
+        /// Returns false if any value exceeds ushort.MaxValue (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
         /// </summary>
-        public static UShort16VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
+        public static bool TryNew(ReadOnlySpan<ulong> values, out UShort16VectorRemappingStorage result)
         {
             for (int i = 0; i < values.Length; i++)
             {
                 if (values[i] > ushort.MaxValue)
-                    throw new ArgumentException($"Value {values[i]} exceeds ushort.MaxValue");
+                {
+                    result = default;
+                    return false;
+                }
             }
 
             var length = values.Length;
@@ -188,13 +201,15 @@ namespace PtrHash.CSharp.Port.Storage
                     ptr[i] = (ushort)values[i];
                 }
                 
-                return new UShort16VectorRemappingStorage(ptr, length);
+                result = new UShort16VectorRemappingStorage(ptr, length);
+                return true;
             }
             catch
             {
                 if (memory != null)
                     NativeMemory.AlignedFree(memory);
-                throw;
+                result = default;
+                return false;
             }
         }
 
@@ -237,7 +252,12 @@ namespace PtrHash.CSharp.Port.Storage
             _length = length;
         }
 
-        public static Byte8VectorRemappingStorage TryNew(ReadOnlySpan<ulong> values)
+        /// <summary>
+        /// Try to create a new Byte8VectorRemappingStorage from the given values.
+        /// Returns false if any value exceeds byte.MaxValue (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
+        /// </summary>
+        public static bool TryNew(ReadOnlySpan<ulong> values, out Byte8VectorRemappingStorage result)
         {
             var length = values.Length;
             var byteSize = length * sizeof(byte);
@@ -249,17 +269,24 @@ namespace PtrHash.CSharp.Port.Storage
                 for (int i = 0; i < length; i++)
                 {
                     if (values[i] > byte.MaxValue)
-                        throw new ArgumentException($"Value {values[i]} exceeds byte.MaxValue");
+                    {
+                        if (memory != null)
+                            NativeMemory.AlignedFree(memory);
+                        result = default;
+                        return false;
+                    }
                     ptr[i] = (byte)values[i];
                 }
                 
-                return new Byte8VectorRemappingStorage(ptr, length);
+                result = new Byte8VectorRemappingStorage(ptr, length);
+                return true;
             }
             catch
             {
                 if (memory != null)
                     NativeMemory.AlignedFree(memory);
-                throw;
+                result = default;
+                return false;
             }
         }
 

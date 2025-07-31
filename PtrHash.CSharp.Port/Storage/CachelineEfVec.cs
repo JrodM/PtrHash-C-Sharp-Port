@@ -11,20 +11,10 @@ namespace PtrHash.CSharp.Port.Storage
     /// Provides efficient storage and lookup for sorted 40-bit values using
     /// Elias-Fano encoding with cacheline alignment.
     /// </summary>
-    public readonly unsafe struct CachelineEfVec : IList<ulong>, IReadOnlyList<ulong>, IDisposable, IRemappingStorage<CachelineEfVec>
+    public readonly unsafe struct CachelineEfVec : IReadOnlyList<ulong>, IDisposable, IRemappingStorage<CachelineEfVec>
     {
         private readonly CachelineEf[] _ef;
         private readonly int _length;
-
-
-        /// <summary>
-        /// Construct a new CachelineEfVec for the given sorted values.
-        /// Throws if any cacheline would span too large a range.
-        /// </summary>
-        public static CachelineEfVec New(ReadOnlySpan<ulong> values)
-        {
-            return TryNew(values);
-        }
 
         private CachelineEfVec(CachelineEf[] ef, int length)
         {
@@ -64,42 +54,7 @@ namespace PtrHash.CSharp.Port.Storage
         {
             return _ef[index / CachelineEf.L].Index(index % CachelineEf.L);
         }
-
-        /// <summary>
-        /// Get the value at the specified index without bounds checking.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong IndexUnchecked(int index)
-        {
-            return _ef[index / CachelineEf.L].IndexUnchecked(index % CachelineEf.L);
-        }
-
-        /// <summary>
-        /// Prefetch the cacheline containing the given element.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Prefetch(int index)
-        {
-            var cachelineIndex = index / CachelineEf.L;
-            if ((uint)cachelineIndex < (uint)_ef.Length)
-            {
-                PrefetchCacheline(cachelineIndex);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void PrefetchCacheline(int cachelineIndex)
-        {
-            // Prefetch the cacheline into L1 cache
-            fixed (CachelineEf* ptr = &_ef[cachelineIndex])
-            {
-                if (Sse.IsSupported)
-                {
-                    Sse.Prefetch0(ptr);
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Get the size of the underlying data structure in bytes.
         /// </summary>
@@ -158,8 +113,12 @@ namespace PtrHash.CSharp.Port.Storage
             // Nothing to dispose for struct - CachelineEf structs handle their own cleanup
         }
 
-        // IRemappingStorage implementation
-        public static CachelineEfVec TryNew(ReadOnlySpan<ulong> values)
+        /// <summary>
+        /// Try to construct a new CachelineEfVec for the given sorted values.
+        /// Returns false if any cacheline would span too large a range (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
+        /// </summary>
+        public static bool TryNew(ReadOnlySpan<ulong> values, out CachelineEfVec result)
         {
             if (values.Length == 0)
                 throw new ArgumentException("Values cannot be empty");
@@ -173,14 +132,16 @@ namespace PtrHash.CSharp.Port.Storage
                 var end = Math.Min(start + CachelineEf.L, values.Length);
                 var chunk = values.Slice(start, end - start);
                 
-                var cacheline = CachelineEf.TryNew(chunk);
-                if (cacheline == null)
-                    throw new ArgumentException($"Cacheline {i} spans too large a range");
-                    
-                ef[i] = cacheline.Value;
+                if (!CachelineEf.TryNew(chunk, out var cacheline))
+                {
+                    result = default;
+                    return false;
+                }
+                ef[i] = cacheline;
             }
 
-            return new CachelineEfVec(ef, values.Length);
+            result = new CachelineEfVec(ef, values.Length);
+            return true;
         }
 
         public static string Name => "CacheLineEF";
