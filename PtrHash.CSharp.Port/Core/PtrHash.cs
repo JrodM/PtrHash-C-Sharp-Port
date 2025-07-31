@@ -672,7 +672,7 @@ namespace PtrHash.CSharp.Port.Core
                     {
                         Interlocked.Exchange(ref success, 0L); // Atomically set to false
                     }
-                    else if (DEBUG_CONSTRUCTION)
+                    else if (partStatsList != null)
                     {
                         partStatsList[part] = partStats;
                     }
@@ -686,7 +686,7 @@ namespace PtrHash.CSharp.Port.Core
                 }
 
                 // Aggregate statistics from all parts
-                if (DEBUG_CONSTRUCTION)
+                if (partStatsList != null)
                 {
                     stats = new BucketStats();
                     foreach (var partStats in partStatsList)
@@ -718,11 +718,11 @@ namespace PtrHash.CSharp.Port.Core
             // Initialize statistics collection
             partStats = new BucketStats();
 
-            // Sort buckets within this part
+            // Sort buckets within this part - use pooled arrays
             var (sortedHashes, bucketStarts, bucketOrder) = SortBucketsInPart(part, partHashes);
 
             // Use the sorted hashes from here on - this is critical for deterministic ordering
-            var hashesSpan = sortedHashes.AsSpan();
+            var hashesSpan = sortedHashes.AsSpan(0, partHashes.Length); // Only use actual data length
 
             const ulong kmax = 256;
             // Use ArrayPool to avoid allocation
@@ -742,10 +742,10 @@ namespace PtrHash.CSharp.Port.Core
 
                 // Process buckets in size order (largest first)
 
-                var totalBuckets = bucketOrder.Length;
+                var totalBuckets = (int)_bucketsPerPart; // Use actual bucket count, not pooled array length
                 var processedBuckets = 0;
 
-                for (int bucketIdx = 0; bucketIdx < bucketOrder.Length; bucketIdx++)
+                for (int bucketIdx = 0; bucketIdx < (int)_bucketsPerPart; bucketIdx++) // Use actual bucket count
                 {
                     var newBucket = bucketOrder[bucketIdx];
                     var bucketStart = bucketStarts[newBucket];
@@ -826,7 +826,7 @@ namespace PtrHash.CSharp.Port.Core
                         var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, bucketStarts);
                         var bestPilot = bestResult.pilot;
 
-                        // Handle case where no valid pilot was found (matches Rust error handling)
+                        // Handle case where no valid pilot was found
                         if (bestPilot == ulong.MaxValue)
                         {
                             DebugConstruction($"Part {part}: bucket of size {currentBucketHashes.Length} with {_slotsPerPart} slots: Indistinguishable hashes in bucket!");
@@ -914,7 +914,11 @@ namespace PtrHash.CSharp.Port.Core
             }
             finally
             {
+                // Return all pooled arrays
                 ArrayPool<int>.Shared.Return(slots);
+                ArrayPool<HashValue>.Shared.Return(sortedHashes);
+                ArrayPool<int>.Shared.Return(bucketStarts);
+                ArrayPool<int>.Shared.Return(bucketOrder);
             }
         }
 
@@ -924,7 +928,9 @@ namespace PtrHash.CSharp.Port.Core
             var hashBucketPairPool = ArrayPool<(HashValue hash, int bucket)>.Shared;
             var hashBucketPairs = hashBucketPairPool.Rent(partHashes.Length);
 
-            var sortedHashes = new HashValue[partHashes.Length]; // Result array - don't pool this
+            // Use ArrayPool for result arrays too
+            var sortedHashesPool = ArrayPool<HashValue>.Shared;
+            var sortedHashes = sortedHashesPool.Rent(partHashes.Length);
 
             // Compute bucket for each hash
             for (int i = 0; i < partHashes.Length; i++)
@@ -949,8 +955,9 @@ namespace PtrHash.CSharp.Port.Core
                 sortedHashes[i] = hashBucketPairs[i].hash;
             }
 
-            // Create bucket starts array
-            var bucketStarts = new int[_bucketsPerPart + 1]; // +1 for end sentinel
+            // Create bucket starts array - use ArrayPool
+            var bucketStartsPool = ArrayPool<int>.Shared;
+            var bucketStarts = bucketStartsPool.Rent((int)_bucketsPerPart + 1); // +1 for end sentinel
             var currentBucket = 0;
             var hashIndex = 0;
 
@@ -992,8 +999,9 @@ namespace PtrHash.CSharp.Port.Core
                     return sizeCompare != 0 ? sizeCompare : a.bucket.CompareTo(b.bucket);
                 }));
 
-                // Extract bucket order directly (no LINQ)
-                var bucketOrder = new int[_bucketsPerPart]; // Result array - don't pool this
+                // Extract bucket order directly (no LINQ) - use ArrayPool
+                var bucketOrderPool = ArrayPool<int>.Shared;
+                var bucketOrder = bucketOrderPool.Rent((int)_bucketsPerPart);
                 for (int i = 0; i < (int)_bucketsPerPart; i++)
                 {
                     bucketOrder[i] = bucketSizes[i].bucket;
