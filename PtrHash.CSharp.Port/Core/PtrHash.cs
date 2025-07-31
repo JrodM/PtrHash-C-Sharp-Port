@@ -190,6 +190,7 @@ namespace PtrHash.CSharp.Port.Core
                 if (_pilots != null)
                 {
                     NativeMemory.AlignedFree(_pilots);
+                    _pilots = null;
                 }
                 _remapStorage.Dispose();
                 throw;
@@ -720,16 +721,16 @@ namespace PtrHash.CSharp.Port.Core
             // Sort buckets within this part
             var (sortedHashes, bucketStarts, bucketOrder, hashCount, bucketCount) = SortBucketsInPart(part, partHashes);
 
+            // Use ArrayPool to avoid allocation
+            var slots = ArrayPool<int>.Shared.Rent((int)_slotsPerPart);
+            
             try
             {
                 // Use the sorted hashes from here on - this is critical for deterministic ordering
+                // Note: Use the full hashCount range since bucketStarts indices refer to the full range
                 var hashesSpan = sortedHashes.AsSpan(0, hashCount);
 
-            const ulong kmax = 256;
-            // Use ArrayPool to avoid allocation
-            var slots = ArrayPool<int>.Shared.Rent((int)_slotsPerPart);
-            try
-            {
+                const ulong kmax = 256;
                 Array.Fill(slots, -1, 0, (int)_slotsPerPart); // -1 = BucketIdx::NONE
 
                 // Get this part's BitVec - critical: use only this part's bit slice
@@ -742,11 +743,9 @@ namespace PtrHash.CSharp.Port.Core
                 var rng = new FastRand(); // Auto-seeded random number generator (uses WyRand algorithm)
 
                 // Process buckets in size order (largest first)
-
-                var totalBuckets = bucketOrder.Length;
                 var processedBuckets = 0;
 
-                for (int bucketIdx = 0; bucketIdx < bucketOrder.Length; bucketIdx++)
+                for (int bucketIdx = 0; bucketIdx < bucketCount; bucketIdx++)
                 {
                     var newBucket = bucketOrder[bucketIdx];
                     var bucketStart = bucketStarts[newBucket];
@@ -838,32 +837,27 @@ namespace PtrHash.CSharp.Port.Core
                             partStats?.Add(globalBucketId, _bucketsTotal, currentBucketHashes.Length, bestPilot, evictions);
                         }
 
-                        // Phase 1: Process collisions and evict immediately
-                        var evictionsThisRound = 0;
-
-                        // First pass: identify collisions and evict immediately
+                        // Exact Rust logic: for each slot, evict if needed then immediately assign
+                        // Drop the collisions and set the new pilot.
                         foreach (var hash in currentBucketHashes)
                         {
                             var localSlot = SlotInPartHp(hash, hp);
-                            var occupyingBucket = slots[localSlot];
+                            var occupyingBucket = slots[localSlot]; // let b2 = slots[slot];
 
-                            if (occupyingBucket >= 0) // Slot is occupied
+                            if (occupyingBucket >= 0) // if b2.is_some()
                             {
-                                // With atomic placement, self-collision should never happen
-                                // assert!(b2 != b)
+                                // assert!(b2 != b);
                                 if (occupyingBucket == currentBucket)
                                     throw new InvalidOperationException("Self-collision detected - algorithm invariant violated");
 
-                                // Push evicted bucket onto stack for reprocessing
+                                // stack.push((bucket_len(b2), b2));
                                 var evictedStart = bucketStarts[occupyingBucket];
                                 var evictedEnd = bucketStarts[occupyingBucket + 1];
                                 var evictedSize = evictedEnd - evictedStart;
-
                                 stack.Push(new BucketInfo((nuint)evictedSize, (nuint)occupyingBucket));
                                 evictions++;
-                                evictionsThisRound++;
 
-                                // Clear all slots for the evicted bucket immediately
+                                // for p2 in slots_for_bucket(b2, pilots[b2] as Pilot)
                                 var evictedPilot = (ulong)partPilots[occupyingBucket];
                                 var evictedHp = HashPilot(evictedPilot);
                                 var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
@@ -871,16 +865,12 @@ namespace PtrHash.CSharp.Port.Core
                                 foreach (var evictedHash in evictedHashes)
                                 {
                                     var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
-                                    slots[evictedLocalSlot] = -1;
+                                    slots[evictedLocalSlot] = -1; // BucketIdx::NONE
                                     partTaken.Set(evictedLocalSlot, false);
                                 }
                             }
-                        }
 
-                        // Phase 2: Atomically assign all slots for current bucket
-                        foreach (var hash in currentBucketHashes)
-                        {
-                            var localSlot = SlotInPartHp(hash, hp);
+                            // unsafe { *slots.get_unchecked_mut(slot) = b; taken.set_unchecked(slot, true); }
                             slots[localSlot] = currentBucket;
                             partTaken.Set(localSlot, true);
                         }
@@ -899,16 +889,12 @@ namespace PtrHash.CSharp.Port.Core
             }
             finally
             {
+                // Return all pooled arrays
                 ArrayPool<int>.Shared.Return(slots);
+                ArrayPool<HashValue>.Shared.Return(sortedHashes);
+                ArrayPool<int>.Shared.Return(bucketStarts);
+                ArrayPool<int>.Shared.Return(bucketOrder);
             }
-        }
-        finally
-        {
-            // Return pooled arrays from SortBucketsInPart
-            ArrayPool<HashValue>.Shared.Return(sortedHashes);
-            ArrayPool<int>.Shared.Return(bucketStarts);
-            ArrayPool<int>.Shared.Return(bucketOrder);
-        }
         }
 
         // Sort buckets within a single part by size (PtrHash paper Section 3.3)
@@ -926,6 +912,13 @@ namespace PtrHash.CSharp.Port.Core
             var sortedHashes = ArrayPool<HashValue>.Shared.Rent(hashCount);
             var bucketStarts = ArrayPool<int>.Shared.Rent(bucketCount + 1);
             var bucketOrder = ArrayPool<int>.Shared.Rent(bucketCount);
+
+            // Clear arrays within logical bounds to avoid garbage data from pool
+            Array.Clear(bucketStarts, 0, bucketCount + 1);
+            Array.Clear(bucketOrder, 0, bucketCount);
+            Array.Clear(hashBucketPairs, 0, hashCount);
+            // Also clear the sorted hashes array to avoid garbage data
+            Array.Clear(sortedHashes, 0, hashCount);
 
             // Compute bucket for each hash
             for (int i = 0; i < partHashes.Length; i++)
@@ -979,6 +972,9 @@ namespace PtrHash.CSharp.Port.Core
 
             try
             {
+                // Clear bucket sizes array to avoid garbage data from pool
+                Array.Clear(bucketSizes, 0, bucketCount);
+                
                 for (int i = 0; i < bucketCount; i++)
                 {
                     var size = bucketStarts[i + 1] - bucketStarts[i];
@@ -1187,6 +1183,7 @@ namespace PtrHash.CSharp.Port.Core
                             shouldSkip = true;
                             break; // Exit inner loop to continue outer loop
                         }
+
 
                         // Collision scoring: s² penalizes evicting large buckets more (Section 3.3)
                         var bucketSize = bucketStarts[occupyingBucket + 1] - bucketStarts[occupyingBucket];

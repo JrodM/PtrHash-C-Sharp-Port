@@ -37,7 +37,7 @@ namespace PtrHash.CSharp.Port.Storage
         public int Count => _length;
 
         /// <summary>
-        /// The number of values stored (matches Rust len() method).
+        /// The number of values stored
         /// </summary>
         public int Length => _length;
 
@@ -47,7 +47,7 @@ namespace PtrHash.CSharp.Port.Storage
         public bool IsReadOnly => true;
 
         /// <summary>
-        /// Get the value at the given index in the vector (matches Rust index() method).
+        /// Get the value at the given index in the vector
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong Index(int index)
@@ -121,7 +121,11 @@ namespace PtrHash.CSharp.Port.Storage
         public static bool TryNew(ReadOnlySpan<ulong> values, out CachelineEfVec result)
         {
             if (values.Length == 0)
-                throw new ArgumentException("Values cannot be empty");
+            {
+                // Handle empty case - create empty storage
+                result = new CachelineEfVec(Array.Empty<CachelineEf>(), 0);
+                return true;
+            }
 
             var numCachelines = (values.Length + CachelineEf.L - 1) / CachelineEf.L;
             var ef = new CachelineEf[numCachelines];

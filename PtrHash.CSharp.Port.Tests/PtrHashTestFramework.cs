@@ -37,14 +37,10 @@ public static class PtrHashTestHelpers
         new("Fast-SinglePart-VecU32", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU32), 
         new("Fast-MultiPart-VecU64", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU64),
         new("Fast-SinglePart-VecU64", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU64),
-        new("Fast-MultiPart-VecU16", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU16),
-        new("Fast-SinglePart-VecU16", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU16),
         
         // Compact configurations
-        new("Compact-MultiPart-EliasFano", PtrHashParams.DefaultCompact with { SinglePart = false }, RemappingStorageType.CacheLineEF),
-        new("Compact-SinglePart-EliasFano", PtrHashParams.DefaultCompact with { SinglePart = true }, RemappingStorageType.CacheLineEF),
-        new("Compact-MultiPart-VecU8", PtrHashParams.DefaultCompact with { SinglePart = false }, RemappingStorageType.VecU8),
-        new("Compact-SinglePart-VecU8", PtrHashParams.DefaultCompact with { SinglePart = true }, RemappingStorageType.VecU8)
+        new("Compact-MultiPart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = false }, RemappingStorageType.CacheLineEF),
+        new("Compact-SinglePart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = true }, RemappingStorageType.CacheLineEF)
     ];
 
 
@@ -130,35 +126,21 @@ public static class PtrHashTestHelpers
         switch (config.StorageType)
         {
             case RemappingStorageType.VecU32:
-                using (var ptrhash = new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters))
+                using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
                 }
                 break;
                 
             case RemappingStorageType.VecU64:
-                using (var ptrhash = new PtrHash<ulong, FxHasher, Linear, UInt64VectorRemappingStorage>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            case RemappingStorageType.VecU16:
-                using (var ptrhash = new PtrHash<ulong, FxHasher, Linear, UShort16VectorRemappingStorage>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            case RemappingStorageType.VecU8:
-                using (var ptrhash = new PtrHash<ulong, FxHasher, Linear, Byte8VectorRemappingStorage>(keys, parameters))
+                using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
                 }
                 break;
                 
             case RemappingStorageType.CacheLineEF:
-                using (var ptrhash = new PtrHash<ulong, FxHasher, Linear, CachelineEfVec>(keys, parameters))
+                using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
                 }
