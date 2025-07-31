@@ -1,0 +1,27 @@
+# Rust build artifacts
+/target
+/flamegraph.svg
+/perf.data*
+/inputs
+
+# C# build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.tmp
+*.user
+*.suo
+*.sln.docstates
+.vs/
+packages/
+TestResults/
+*.nupkg
+*.snupkg
+
+# Project documentation and logs
+CLAUDE.md
+CHANGELOG.md
+changelog.md

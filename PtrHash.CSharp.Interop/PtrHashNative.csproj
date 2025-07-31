@@ -1,0 +1,83 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+  </PropertyGroup>
+
+  <!-- Choose the right native library based on platform -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <NativeLibExt>dll</NativeLibExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <NativeLibExt>so</NativeLibExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <NativeLibExt>dylib</NativeLibExt>
+  </PropertyGroup>
+
+  <!-- Auto-build Rust library and copy to output directory -->
+  <ItemGroup>
+    <None Include="target/release/libptrhash.$(NativeLibExt)" Condition="Exists('target/release/libptrhash.$(NativeLibExt)')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>libptrhash.$(NativeLibExt)</Link>
+    </None>
+    <None Include="target/debug/libptrhash.$(NativeLibExt)" Condition="Exists('target/debug/libptrhash.$(NativeLibExt)') And !Exists('target/release/libptrhash.$(NativeLibExt)')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>libptrhash.$(NativeLibExt)</Link>
+    </None>
+  </ItemGroup>
+
+  <!-- Build Rust library before C# build -->
+  <Target Name="BuildRustLibrary" BeforeTargets="BeforeBuild">
+    <Message Text="Building Rust library..." Importance="high" />
+    
+    <!-- Check if cargo is available -->
+    <Exec Command="cargo --version" 
+          ContinueOnError="true" 
+          IgnoreExitCode="true"
+          WorkingDirectory=".">
+      <Output TaskParameter="ExitCode" PropertyName="CargoExitCode" />
+    </Exec>
+    
+    <!-- Build release version if cargo is available -->
+    <Exec Command="cargo build --release" 
+          WorkingDirectory="."
+          Condition="'$(CargoExitCode)' == '0'" />
+    
+    <!-- Warn if cargo is not available -->
+    <Warning Text="Cargo not found. Please install Rust and ensure cargo is in PATH. You can manually build with: cargo build --release"
+             Condition="'$(CargoExitCode)' != '0'" />
+  </Target>
+
+  <!-- Verify native library exists after build -->
+  <Target Name="VerifyNativeLibrary" AfterTargets="BuildRustLibrary" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <NativeLibPath>target/release/libptrhash.$(NativeLibExt)</NativeLibPath>
+      <NativeLibPathDebug>target/debug/libptrhash.$(NativeLibExt)</NativeLibPathDebug>
+    </PropertyGroup>
+    
+    <Message Text="Checking for native library at: $(NativeLibPath)" Importance="high" />
+    
+    <Error Text="Native library not found at $(NativeLibPath) or $(NativeLibPathDebug). Please run 'cargo build --release' in the root directory."
+           Condition="!Exists('$(NativeLibPath)') And !Exists('$(NativeLibPathDebug)')" />
+           
+    <Message Text="Found native library: $(NativeLibPath)" 
+             Importance="high" 
+             Condition="Exists('$(NativeLibPath)')" />
+             
+    <Message Text="Found native library: $(NativeLibPathDebug)" 
+             Importance="high" 
+             Condition="!Exists('$(NativeLibPath)') And Exists('$(NativeLibPathDebug)')" />
+  </Target>
+
+  <!-- Add references needed for zero-copy operations -->
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
+
+</Project>
