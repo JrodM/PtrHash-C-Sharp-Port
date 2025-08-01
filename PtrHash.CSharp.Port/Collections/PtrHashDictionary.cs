@@ -278,9 +278,9 @@ namespace PtrHash.CSharp.Port.Collections
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessIndices(
-    ReadOnlySpan<TKey> keys,
-    ReadOnlySpan<nuint> indices,
-    Span<TValue> values)
+            ReadOnlySpan<TKey> keys,
+            ReadOnlySpan<nuint> indices,
+            Span<TValue> values)
         {
             // Hoist fields into locals
             var kvps = _keyValuePairs;

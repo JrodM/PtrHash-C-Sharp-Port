@@ -90,6 +90,9 @@ Thumbs.db
 *.psess
 *.speedscope.json
 
+# Profile folder - profiling tools and temporary profiling code
+Profile/
+
 # Generated assembly files (build artifacts)
 *.asm
 aot/

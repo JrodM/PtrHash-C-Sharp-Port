@@ -17,14 +17,6 @@ using PtrHash.CSharp.Port.Sorting;
 
 namespace PtrHash.CSharp.Port.Core
 {
-    // Const generic emulation for compile-time specialization
-    public interface IBoolConstant { bool Value { get; } }
-    public interface IPartConstant { bool IsSinglePart { get; } }
-    
-    public readonly struct UseMinimal : IBoolConstant { public bool Value => true; }
-    public readonly struct NoMinimal : IBoolConstant { public bool Value => false; }
-    public readonly struct SinglePart : IPartConstant { public bool IsSinglePart => true; }
-    public readonly struct MultiPart : IPartConstant { public bool IsSinglePart => false; }
     
     /// <summary>
     /// PtrHash: Minimal Perfect Hashing at RAM Throughput
@@ -37,7 +29,6 @@ namespace PtrHash.CSharp.Port.Core
     /// 
     /// Current limitations compared to full paper implementation:
     /// - No external-memory construction (sharding for >10^10 keys)
-    /// - CacheLineEF remapping compression exists but isn't well tested.
     /// </summary>
     /// <typeparam name="TKey">Type of keys</typeparam>
     /// <typeparam name="THasher">Hash function implementation</typeparam>
@@ -59,7 +50,7 @@ namespace PtrHash.CSharp.Port.Core
         }
 
         // Cap parallelism to prevent thread explosion
-        private static readonly int MaxParallelism = Environment.ProcessorCount;
+        private static readonly nuint MaxParallelism = (nuint)Environment.ProcessorCount;
 
         private TBucketFunction _bucketFunction;
 
@@ -650,7 +641,7 @@ namespace PtrHash.CSharp.Port.Core
                 // Process parts in parallel
                 var parallelOptions = new ParallelOptions
                 {
-                    MaxDegreeOfParallelism = MaxParallelism
+                    MaxDegreeOfParallelism = (int)Math.Min(_parts, MaxParallelism)
                 };
 
                 var success = 1L; // 1 = true, 0 = false for Interlocked
@@ -986,15 +977,34 @@ namespace PtrHash.CSharp.Port.Core
 
         private (ulong pilot, ulong hashPilot)? FindPilot(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked)
         {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked);
+            // Const generic dispatch - JIT will create specialized FindPilotSlice methods for each size
+            return bucketHashes.Length switch
+            {
+                1 => FindPilotSlice<Size1>(kmax, bucketHashes, taken, out pilotsChecked),
+                2 => FindPilotSlice<Size2>(kmax, bucketHashes, taken, out pilotsChecked),
+                3 => FindPilotSlice<Size3>(kmax, bucketHashes, taken, out pilotsChecked),
+                4 => FindPilotSlice<Size4>(kmax, bucketHashes, taken, out pilotsChecked),
+                5 => FindPilotSlice<Size5>(kmax, bucketHashes, taken, out pilotsChecked),
+                6 => FindPilotSlice<Size6>(kmax, bucketHashes, taken, out pilotsChecked),
+                7 => FindPilotSlice<Size7>(kmax, bucketHashes, taken, out pilotsChecked),
+                8 => FindPilotSlice<Size8>(kmax, bucketHashes, taken, out pilotsChecked),
+                _ => FindPilotSlice<SizeGeneric>(kmax, bucketHashes, taken, out pilotsChecked),
+            };
         }
 
 
-        // Variable-size bucket processing for larger buckets (renamed from FindPilotInPart)
-        private unsafe (ulong pilot, ulong hashPilot)? FindPilotSlice(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked)
+        // Const generic specialized bucket processing - JIT creates separate methods for each size
+        private unsafe (ulong pilot, ulong hashPilot)? FindPilotSlice<TSize>(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked)
+            where TSize : struct, ISizeConstant
         {
+            var sizeConst = default(TSize);
+            var bucketSize = sizeConst.Value;
+            
+            // Use compile-time constant size when available, otherwise fallback to dynamic
+            var actualSize = bucketSize > 0 ? bucketSize : bucketHashes.Length;
+            
             // Sequential pilot search from 0 to kmax-1 with 4x loop unrolling (Section 3.3)
-            int r = bucketHashes.Length / 4 * 4; // let r = bucket.len() / 4 * 4;
+            int r = actualSize / 4 * 4; // let r = bucket.len() / 4 * 4;
 
             pilotsChecked = 0;
 
@@ -1005,6 +1015,8 @@ namespace PtrHash.CSharp.Port.Core
 
                 // Process chunks of 4 bucket elements at a time
                 bool hasCollision = false;
+                
+                // JIT can fully unroll this loop when bucketSize is const
                 for (int i = 0; i < r; i += 4)
                 {
                     // Compute the four candidate slots
@@ -1028,8 +1040,8 @@ namespace PtrHash.CSharp.Port.Core
 
                 if (hasCollision) continue;
 
-                // Check remaining elements
-                for (int i = r; i < bucketHashes.Length; i++)
+                // Check remaining elements - JIT can eliminate bounds checks when size is const
+                for (int i = r; i < actualSize; i++)
                 {
                     var hash = bucketHashes[i];
                     var localSlot = SlotInPartHp(hash, hp);

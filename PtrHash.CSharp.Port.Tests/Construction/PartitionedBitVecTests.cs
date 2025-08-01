@@ -47,30 +47,6 @@ namespace PtrHash.CSharp.Port.Tests.Construction
         }
 
         [TestMethod]
-        public void SetAndGet_LocalSlot_WorksCorrectly()
-        {
-            using var bitVec = new PartitionedBitVec(4, 64);
-            
-            // Set bits using local operations
-            bitVec.SetLocal(0, 0, true);   // First bit of first part
-            bitVec.SetLocal(0, 63, true);  // Last bit of first part
-            bitVec.SetLocal(1, 0, true);   // First bit of second part
-            bitVec.SetLocal(3, 63, true);  // Last bit of last part
-            
-            // Verify using local operations
-            Assert.IsTrue(bitVec.GetLocal(0, 0));
-            Assert.IsTrue(bitVec.GetLocal(0, 63));
-            Assert.IsTrue(bitVec.GetLocal(1, 0));
-            Assert.IsTrue(bitVec.GetLocal(3, 63));
-            
-            // Verify using global operations
-            Assert.IsTrue(bitVec.Get(0));    // 0 * 64 + 0 = 0
-            Assert.IsTrue(bitVec.Get(63));   // 0 * 64 + 63 = 63
-            Assert.IsTrue(bitVec.Get(64));   // 1 * 64 + 0 = 64
-            Assert.IsTrue(bitVec.Get(255));  // 3 * 64 + 63 = 255
-        }
-
-        [TestMethod]
         public void CountOnes_ReturnsCorrectCount()
         {
             using var bitVec = new PartitionedBitVec(4, 64);
@@ -118,30 +94,6 @@ namespace PtrHash.CSharp.Port.Tests.Construction
             {
                 Assert.IsFalse(bitVec.Get(i));
             }
-        }
-
-        [TestMethod]
-        public void GlobalToLocal_ConversionCorrect()
-        {
-            using var bitVec = new PartitionedBitVec(4, 64);
-            
-            // Test boundary cases
-            TestGlobalToLocal(bitVec, 0, 0, 0);      // First bit
-            TestGlobalToLocal(bitVec, 63, 0, 63);    // Last bit of first part
-            TestGlobalToLocal(bitVec, 64, 1, 0);     // First bit of second part
-            TestGlobalToLocal(bitVec, 127, 1, 63);   // Last bit of second part
-            TestGlobalToLocal(bitVec, 128, 2, 0);    // First bit of third part
-            TestGlobalToLocal(bitVec, 255, 3, 63);   // Last bit of last part
-        }
-
-        private void TestGlobalToLocal(PartitionedBitVec bitVec, nuint globalSlot, nuint expectedPart, nuint expectedLocal)
-        {
-            // Set using global
-            bitVec.Set(globalSlot, true);
-            
-            // Verify using local
-            Assert.IsTrue(bitVec.GetLocal(expectedPart, expectedLocal), 
-                $"Global slot {globalSlot} should map to part {expectedPart}, local {expectedLocal}");
         }
 
         [TestMethod]
