@@ -8,13 +8,13 @@ A high-performance C# port of [PtrHash](https://github.com/RagnarGrootKoerkamp/p
 
 ## What is PtrHash?
 
-PtrHash is a minimal perfect hash function that bijectively maps n distinct keys to {0,...,n-1}. It prioritizes query throughput over space efficiency, making it ideal for applications where lookup speed is critical. The original implementation achieves query speeds as low as 8 ns/key when streaming, approaching the theoretical memory bandwidth limit.
+PtrHash is a minimal perfect hash function that bijectively maps n distinct keys to {0,...,n-1}. It prioritizes query throughput over space efficiency, making it ideal for applications where lookup speed is critical. The original Rust implementation achieves **2.5 ns/key** when multi-threaded, while this C# port achieves **1.93 ns/key** single-threaded - achieving comparable performance to the original's best results.
 
 ## Features
 
 This C# port provides:
 
-- **Fast lookups**: 2.66 ns/key point lookups (faster than native due to no P/Invoke overhead)
+- **Extremely fast lookups**: **1.93 ns/key streaming**, **1.68 ns/key point lookups** (comparable to original's best multi-threaded performance)
 - **Memory efficient**: 2.40 bits/key with default parameters
 - **Zero allocations during queries**: GC-friendly for high-throughput scenarios
 - **Pure C# implementation**: Fully managed code with no native dependencies
@@ -138,15 +138,15 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 | **1M** | 2,417 μs (2.42 ns) | 2,554 μs (2.55 ns) | **2,292 μs (2.29 ns)** | 2,088 μs (2.09 ns) | **1,931 μs (1.93 ns)** | **1.25x faster** |
 
 **Perfect Hash (GetIndexNoRemap) Performance Gains**:
-| Lookups | Multi-Part Improvement | Single-Part Improvement | Memory Cost |
-|---------|----------------------|------------------------|-------------|
-| **1K** | **5.0% faster** | **8.9% faster** | ~1% more memory |
-| **50K** | **8.1% faster** | **17.9% faster** | ~1% more memory |
-| **100K** | **11.9% faster** | **14.8% faster** | ~1% more memory |
-| **1M** | **0.2% faster** | **23.1% faster** | ~1% more memory |
+| Lookups | Multi-Part Improvement | Single-Part Improvement | Range Trade-off |
+|---------|----------------------|------------------------|-----------------|
+| **1K** | **5.0% faster** | **8.9% faster** | **[0, n×1.01] vs [0, n-1]** |
+| **50K** | **8.1% faster** | **17.9% faster** | **[0, n×1.01] vs [0, n-1]** |
+| **100K** | **11.9% faster** | **14.8% faster** | **[0, n×1.01] vs [0, n-1]** |
+| **1M** | **0.2% faster** | **23.1% faster** | **[0, n×1.01] vs [0, n-1]** |
 
 **Key Findings:**
-- **Perfect vs Minimal Hash**: GetIndexNoRemap is 5-23% faster at ~1% memory cost
+- **Perfect vs Minimal Hash**: GetIndexNoRemap is 5-23% faster using ~1% extra slots
 - **Single-Part optimal**: Best for point lookups despite slower construction
 - **Streaming competitive**: Port matches native streaming performance
 
@@ -208,14 +208,14 @@ The `PtrHashDictionary` implementation makes specific tradeoffs optimized for ge
 
 **Current Design Choices:**
 - **Single-part construction**: Prioritizes lookup speed over construction time. Multi-part would construct faster but have slower lookups.
-- **Minimal Perfect Hash (MPH)**: Uses remapping to achieve minimal space. Perfect Hash (no remapping) is **5-23% faster** at **~1% memory cost** (measured).
+- **Minimal Perfect Hash (MPH)**: Uses remapping to achieve minimal range [0, n-1]. Perfect Hash (no remapping) is **5-23% faster** using **~1% extra slots** [0, n×1.01].
 - **Key validation**: Stores and compares original keys to handle lookups of keys not in the training set, as expected for a general-purpose dictionary.
 
 **Measured Performance Trade-offs:**
 | Hash Type | Raw Performance | Dictionary Performance | Memory Usage | Use Case |
 |-----------|----------------|----------------------|--------------|----------|
-| **Minimal Perfect** | 2.11ns/lookup | 26.4μs (1M lookups) | **2.40 bits/key** | **Memory-constrained** |
-| **Perfect Hash** | **1.72ns/lookup** | ~21μs (estimated) | **2.42 bits/key** | **Speed-critical** |
+| **Minimal Perfect** | 2.11ns/lookup | 26.4μs (1M lookups) | **Range [0, n-1]** | **Memory-constrained** |
+| **Perfect Hash** | **1.72ns/lookup** | ~21μs (estimated) | **Range [0, n×1.01]** | **Speed-critical** |
 
 **Optimization Opportunities:**
 For specialized use cases that guarantee:
