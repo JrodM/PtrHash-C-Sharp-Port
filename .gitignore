@@ -81,6 +81,15 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Profiling and trace files
+*.nettrace
+*.etlx
+*.etl
+*.diagsession
+*.vsp
+*.psess
+*.speedscope.json
+
 # Generated assembly files (build artifacts)
 *.asm
 aot/
