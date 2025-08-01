@@ -14,7 +14,7 @@ PtrHash is a minimal perfect hash function that bijectively maps n distinct keys
 
 This C# port provides:
 
-- **Blazing fast lookups**: 2.66 ns/key point lookups (faster than native due to no P/Invoke overhead)
+- **Fast lookups**: 2.66 ns/key point lookups (faster than native due to no P/Invoke overhead)
 - **Memory efficient**: 2.40 bits/key with default parameters
 - **Zero allocations during queries**: GC-friendly for high-throughput scenarios
 - **Pure C# implementation**: Fully managed code with no native dependencies
