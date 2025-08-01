@@ -8,13 +8,13 @@ A high-performance C# port of [PtrHash](https://github.com/RagnarGrootKoerkamp/p
 
 ## What is PtrHash?
 
-PtrHash is a minimal perfect hash function that bijectively maps n distinct keys to {0,...,n-1}. It prioritizes query throughput over space efficiency, making it ideal for applications where lookup speed is critical. The original Rust implementation achieves **2.5 ns/key** when multi-threaded, while this C# port achieves **1.93 ns/key** single-threaded - achieving comparable performance to the original's best results.
+PtrHash is a minimal perfect hash function that bijectively maps n distinct keys to {0,...,n-1}. It prioritizes query throughput over space efficiency, making it ideal for applications where lookup speed is critical. The original Rust implementation achieves **2.5 ns/key** when multi-threaded, while this C# port achieves **2.09 ns/key** single-threaded - achieving comparable performance to the original's best results.
 
 ## Features
 
 This C# port provides:
 
-- **Extremely fast lookups**: **1.93 ns/key streaming**, **1.68 ns/key point lookups** (comparable to original's best multi-threaded performance)
+- **Extremely fast lookups**: **2.09 ns/key streaming**, **2.11 ns/key point lookups** (streaming delivers best minimal perfect hash performance)
 - **Memory efficient**: 2.40 bits/key with default parameters
 - **Zero allocations during queries**: GC-friendly for high-throughput scenarios
 - **Pure C# implementation**: Fully managed code with no native dependencies
