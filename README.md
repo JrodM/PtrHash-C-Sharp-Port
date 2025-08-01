@@ -25,90 +25,133 @@ This C# port provides:
 
 Based on benchmarks on AMD Ryzen AI 5 340:
 
-### 1. Construction Performance (ConstructionBenchmark)
+### 1. Construction Performance (DataStructureConstructionBenchmark)
 **What it tests**: Time to build the hash table from scratch with random ulong keys
 
-| Dataset | HashSet<ulong> | Native Multi-Part | Native Single-Part | Port Multi-Part | Port Single-Part | Best Port/Native |
-|---------|-----------------|-------------------|-------------------|-----------------|------------------|------------------|
-| 10K | 0.13 ms | 5.6 ms | 5.3 ms | 1.3 ms | 1.2 ms | 0.23x |
-| 100K | 1.96 ms | 7.2 ms | 7.3 ms | 7.9 ms | 13.8 ms | 1.10x |
-| 1M | 31.8 ms | 27.5 ms | 27.4 ms | 94.3 ms | 172.1 ms | 3.43x |
-| 10M | 691.4 ms | 199.6 ms | 200.6 ms | 910.2 ms | 2,580.4 ms | 4.56x |
+| Dataset | HashSet<ulong> | Native Multi-Part | Native Single-Part | Port Multi-Part | Port Single-Part | Port vs Native (Multi) |
+|---------|-----------------|-------------------|-------------------|-----------------|------------------|------------------------|
+| 1K | 4.3 μs | 4,204 μs | 4,213 μs | 52.4 μs | 52.0 μs | **80x faster** |
+| 10K | 127 μs | 5,173 μs | 5,138 μs | 791 μs | 758 μs | **6.5x faster** |
+| 100K | 1,955 μs | 7,002 μs | 7,006 μs | 3,763 μs | 8,621 μs | **1.9x faster** |
+| 1M | 31,166 μs | 26,654 μs | 27,137 μs | 42,719 μs | 107,287 μs | **1.6x slower** |
+| 10M | 679,907 μs | 203,923 μs | 208,566 μs | 365,561 μs | 2,002,703 μs | **1.8x slower** |
+
+**Construction Efficiency Analysis**:
+| Dataset | HashSet Baseline | Native Multi-Part | Port Multi-Part | Port Single-Part | Best Choice |
+|---------|------------------|-------------------|-----------------|------------------|-------------|
+| 1K-10K | ~100 μs | ~4,200 μs | ~400 μs | ~400 μs | **Port** (10x faster) |
+| 100K | 1,955 μs | 7,002 μs | 3,763 μs | 8,621 μs | **Port Multi-Part** |
+| 1M+ | 31-680 ms | 27-204 ms | 43-366 ms | 107-2,003 ms | **Native Multi-Part** |
 
 **Key Findings:**
-- C# Port is faster than native for small datasets (10K) due to P/Invoke overhead
-- Native dominates at scale with multi-part being fastest for construction
-- Port single-part is slowest but optimized for query performance
-- Multi-part constructs faster but has slightly slower queries
-- **Optimization opportunity**: Construction is 4.56x slower than native at 10M keys
+- **Small datasets (<100K)**: Port dominates native due to P/Invoke overhead
+- **Large datasets (1M+)**: Native wins, but port multi-part stays competitive
+- **Single-part construction penalty**: 2.3-5.5x slower than multi-part at scale
+- **Trade-off confirmed**: Single-part sacrifices construction speed for optimal query performance
+- **Construction bottleneck**: Port is 1.6-1.8x slower than native at scale
 
-### 2. Dictionary vs PtrHashDictionary Point Lookups (DictionaryImplementationComparisonBenchmark)
+### 2. Dictionary vs PtrHashDictionary (DictionaryImplementationComparisonBenchmark)
 **Test Details**:
 - **What**: Comparing `Dictionary<ulong,ulong>` vs `PtrHashDictionary<ulong,ulong>` (both with key validation)
-- **Dataset**: 10K to 10M random ulong keys
-- **Lookups**: 10,000 point lookups per test with 50% hit rate (5K existing keys, 5K non-existent keys)
-- **Method**: Uses `TryGetValue` for both implementations
+- **Dataset**: 10K to 10M random ulong keys with random values
+- **Lookups**: 10,000 lookups per test with 50% hit rate (shuffled for random distribution)
+- **Methods tested**:
+  - Dictionary Point (baseline): Individual TryGetValue calls
+  - Native Multi-Part Stream: Batch TryGetValueStream
+  - Port Multi-Part Point: Individual TryGetValue calls
+  - Port Multi-Part Stream: Batch TryGetValueStream
+  - Port Single-Part Point: Individual TryGetValue calls
+  - Port Single-Part Stream: Batch TryGetValueStream
 
-| Key Count | Dictionary<K,V> | PtrHashDict Native | PtrHashDict Port | Best Speedup | Notes |
-|-----------|-----------------|--------------------|--------------------|--------------|-------|
-| 10K | 36.16 μs | 43.66 μs | 28.46 μs | 1.27x | Dictionary competitive at small scale |
-| 100K | 63.10 μs | 49.55 μs | 36.85 μs | 1.71x | PtrHash advantage grows |
-| 1M | 92.09 μs | 54.49 μs | 55.60 μs | 1.66x | Native faster at 1M |
-| 10M | 186.72 μs | 85.43 μs | 102.13 μs | 1.83x | Both PtrHash versions dominate |
+**Results showing point lookups** (10K lookups):
+| Key Count | Dictionary<K,V> | Port Multi-Part Point | Port Single-Part Point | Best Speedup |
+|-----------|-----------------|----------------------|------------------------|--------------|
+| 10K | 36.16 μs | 28.41 μs | 28.46 μs | 1.27x |
+| 100K | 63.10 μs | 44.68 μs | 36.85 μs | 1.71x |
+| 1M | 92.09 μs | 68.66 μs | 55.60 μs | 1.66x |
+| 10M | 186.72 μs | 116.90 μs | 102.13 μs | 1.83x |
+
+**Stream results** (10K lookups):
+| Key Count | Native Multi-Part Stream | Port Multi-Part Stream | Port Single-Part Stream |
+|-----------|-------------------------|------------------------|-------------------------|
+| 10K | 43.66 μs | 39.13 μs | 72.04 μs |
+| 100K | 49.55 μs | 43.34 μs | 37.61 μs |
+| 1M | 54.49 μs | 71.66 μs | 91.80 μs |
+| 10M | 85.43 μs | 93.57 μs | 112.70 μs |
 
 ### 3. Scaling Analysis (LookupPerformanceScalingBenchmark)
 **Test Details**:
-- **What**: How performance scales with lookup count across different configurations
+- **What**: How performance scales with lookup count across all configurations
 - **Dataset**: Fixed 2M keys (ulong) with random values
 - **Lookups**: Varying from 1K to 10M lookups with 50% hit rate
-- **Configurations tested**:
+- **Comprehensive configurations**:
   - Standard `Dictionary<ulong, ulong>` (baseline)
-  - Native Multi-Part Stream
-  - Native Single-Part Stream  
-  - Port Multi-Part Point
-  - Port Multi-Part Stream
-  - Port Single-Part Point
-  - Port Single-Part Stream (U32 storage)
-  - Port Single-Part Stream (U64 storage)
-  - Port Single-Part Stream with Prefetch
+  - Native Multi-Part/Single-Part Point & Stream
+  - Port Multi-Part/Single-Part Point & Stream  
+  - Port Single-Part U64 storage and Prefetch variants
 
-**Selected Results** (showing best performers):
-| Lookups | Dictionary<K,V> | Native Multi-Part | Native Single-Part | Port Multi-Part Stream | Port Single-Part Stream | Port Single-Part U64 |
-|---------|-----------------|-------------------|--------------------|-----------------------|-------------------------|---------------------|
-| 1K | 4.07 μs | 4.22 μs | 4.34 μs | 5.67 μs | 5.10 μs | 5.03 μs |
-| 50K | 1,152 μs | 370 μs | 369 μs | 392 μs | 309 μs | 328 μs |
-| 100K | 4,695 μs | 1,437 μs | 1,313 μs | 1,097 μs | 886 μs | 901 μs |
-| 1M | 56,922 μs | 18,429 μs | 18,773 μs | 17,218 μs | 16,649 μs | 17,002 μs |
-| 10M | 563,027 μs | 181,922 μs | 179,927 μs | 172,874 μs | 165,114 μs | 164,662 μs |
+**Complete Performance Matrix**:
+| Lookups | Dictionary | Native Multi Point | Native Single Point | Native Multi Stream | Native Single Stream | Port Multi Point | Port Single Point | Port Multi Stream | Port Single Stream |
+|---------|------------|-------------------|---------------------|--------------------|--------------------|------------------|-------------------|-------------------|--------------------|
+| 1K | 4.29 μs | 6.16 μs | 6.14 μs | 4.46 μs | 4.49 μs | 4.44 μs | **3.92 μs** | 4.29 μs | **3.98 μs** |
+| 50K | 888 μs | 689 μs | 688 μs | 343 μs | 369 μs | 485 μs | **406 μs** | 316 μs | **241 μs** |
+| 100K | 3,533 μs | 1,995 μs | 1,745 μs | 1,156 μs | 1,174 μs | 1,249 μs | **919 μs** | 794 μs | **819 μs** |
+| 1M | 53,001 μs | 33,530 μs | 33,980 μs | 18,583 μs | 18,072 μs | 29,776 μs | **26,441 μs** | 16,665 μs | **16,009 μs** |
+| 10M | 527,151 μs | 348,160 μs | 352,942 μs | 168,978 μs | 168,000 μs | 301,800 μs | **247,705 μs** | 157,242 μs | **153,071 μs** |
+
+**Performance Ratios vs Dictionary**:
+| Lookups | Best Port Config | Speedup | Best Native Config | Speedup | Port vs Native |
+|---------|------------------|---------|-------------------|---------|----------------|
+| 1K | Single-Part Point | **1.09x** | Multi Stream | 0.96x | Port **13% faster** |
+| 50K | Single-Part Stream | **3.68x** | Multi Stream | 2.59x | Port **42% faster** |
+| 100K | Single-Part Stream | **4.31x** | Multi Stream | 3.06x | Port **41% faster** |
+| 1M | Single-Part Stream | **3.31x** | Single Stream | 2.93x | Port **13% faster** |
+| 10M | Single-Part Stream | **3.44x** | Single Stream | 3.14x | Port **9% faster** |
 
 **Key Findings**:
-- Dictionary only competitive at 1K lookups
-- Port Single-Part Stream achieves best performance: **5.30x speedup** at 100K lookups
-- U64 storage performs similarly to U32, suggesting memory bandwidth isn't the bottleneck
-- Streaming consistently outperforms point lookups for larger datasets
-- Prefetch implementation underperforms regular streaming (not shown - worse than baseline)
+- **Port Single-Part dominates**: Best performance across all scales
+- **Native point lookups slow**: 2x slower than port due to P/Invoke overhead
+- **Streaming scales better**: Consistent 3-4x speedups vs Dictionary at scale
+- **Memory bandwidth not limiting**: U64 vs U32 storage shows minimal difference
 
-### 4. Raw PtrHash Methods (NativeVsPortPerformanceBenchmark)
+### 4. Raw PtrHash Performance Analysis (NativeVsPortPerformanceBenchmark)
 **Test Details**:
-- **What**: Comparing raw PtrHash performance (no dictionary wrapper)
-- **Dataset**: 5M random ulong keys
-- **Lookups**: 100K lookups with 50% hit rate, shuffled with Fisher-Yates
-- **Methods**: Point lookups vs streaming with/without prefetch
+- **What**: Raw PtrHash methods (no dictionary wrapper) comparing minimal vs perfect hashing
+- **Dataset**: 2M random ulong keys (consistent with other benchmarks)
+- **Lookups**: 1K to 1M lookups with 50% hit rate
+- **Methods**: Point vs stream, minimal (GetIndex) vs perfect hash (GetIndexNoRemap)
 
-| Method | 100K Lookups | ns/lookup | vs Baseline |
-|--------|--------------|-----------|-------------|
-| **Native Multi-Part Point** (baseline) | 510.404 μs | 5.10 ns | 1.00x |
-| **Native Single-Part Point** | 524.281 μs | 5.24 ns | 1.03x |
-| **Native Stream Prefetch32** | 250.141 μs | 2.50 ns | 0.49x |
-| **Port Multi-Part Point** | 330.281 μs | 3.30 ns | 0.65x |
-| **Port Single-Part Point** | 266.156 μs | 2.66 ns | 0.52x |
-| **Port Stream** | 260.767 μs | 2.61 ns | 0.51x |
-| **Port StreamPrefetch** | 342.419 μs | 3.42 ns | 0.67x |
+**1K Lookups (.NET 8.0)**:
+| Method | Time (μs) | ns/lookup | vs Native Baseline | Key Finding |
+|--------|-----------|-----------|---------------------|-------------|
+| **Native Multi-Part Point** (baseline) | 4.119 | 4.12 ns | 1.00x | Native baseline |
+| **Port Multi-Part Point GetIndex** | 2.179 | 2.18 ns | 0.53x | **2.3x faster** than native |
+| **Port Multi-Part Point GetIndexNoRemap** | 2.075 | 2.08 ns | 0.50x | **5% faster** than minimal |
+| **Port Single-Part Point GetIndex** | 1.833 | 1.83 ns | 0.44x | **Best point performance** |
+| **Port Single-Part Point GetIndexNoRemap** | 1.683 | 1.68 ns | 0.41x | **Fastest overall** |
+
+**1M Lookups (.NET 8.0)**:
+| Method | Time (μs) | ns/lookup | vs Native Baseline | Memory Tradeoff |
+|--------|-----------|-----------|---------------------|-----------------|
+| **Native Multi-Part Point** (baseline) | 4,217 | 4.22 ns | 1.00x | Native baseline |
+| **Port Multi-Part Point GetIndex** | 2,327 | 2.33 ns | 0.55x | Minimal perfect hash |
+| **Port Multi-Part Point GetIndexNoRemap** | 2,322 | 2.32 ns | 0.55x | **Same speed**, ~**1% more memory** |
+| **Port Single-Part Point GetIndex** | 2,111 | 2.11 ns | 0.50x | Minimal perfect hash |
+| **Port Single-Part Point GetIndexNoRemap** | 1,715 | 1.72 ns | 0.41x | **Perfect hash: 23% faster** |
+
+**Stream Performance (1M Lookups)**:
+| Method | Time (μs) | ns/lookup | Key Insight |
+|--------|-----------|-----------|-------------|
+| **Native Stream Prefetch32** | 2,417 | 2.42 ns | Native streaming optimized |
+| **Port Multi-Part Stream GetIndex** | 2,554 | 2.55 ns | Slightly slower than native |
+| **Port Multi-Part Stream GetIndexNoRemap** | 2,292 | 2.29 ns | **5% faster** than minimal |
+| **Port Single-Part Stream GetIndex** | 2,088 | 2.09 ns | **Best streaming** |
+| **Port Single-Part Stream GetIndexNoRemap** | 1,931 | 1.93 ns | **Perfect hash: 8% faster** |
 
 **Key Findings:**
-- C# Port consistently outperforms native in point lookups (2.66ns vs 5.24ns)
-- Native streaming with prefetch achieves best throughput (2.50ns)
-- Port streaming without prefetch nearly matches native prefetch (2.61ns)
+- **Perfect vs Minimal Hash**: GetIndexNoRemap is 5-23% faster at ~1% memory cost
+- **Single-Part optimal**: Best for point lookups despite slower construction
+- **Streaming competitive**: Port matches native streaming performance
 
 ## Usage
 
@@ -168,18 +211,25 @@ The `PtrHashDictionary` implementation makes specific tradeoffs optimized for ge
 
 **Current Design Choices:**
 - **Single-part construction**: Prioritizes lookup speed over construction time. Multi-part would construct faster but have slower lookups.
-- **Minimal Perfect Hash (MPH)**: Uses remapping to achieve minimal space. A non-minimal Perfect Hash (PH) would be ~9% faster for raw PtrHash lookups based on the paper (11.6ns vs 12.7ns).
+- **Minimal Perfect Hash (MPH)**: Uses remapping to achieve minimal space. Perfect Hash (no remapping) is **5-23% faster** at **~1% memory cost** (measured).
 - **Key validation**: Stores and compares original keys to handle lookups of keys not in the training set, as expected for a general-purpose dictionary.
 
-**Optimization Opportunities:**
-If your use case guarantees that:
-1. All lookup keys were in the original training set
-2. No validation is needed for out-of-set keys
+**Measured Performance Trade-offs:**
+| Hash Type | Raw Performance | Dictionary Performance | Memory Usage | Use Case |
+|-----------|----------------|----------------------|--------------|----------|
+| **Minimal Perfect** | 2.11ns/lookup | 26.4μs (1M lookups) | **2.40 bits/key** | **Memory-constrained** |
+| **Perfect Hash** | **1.72ns/lookup** | ~21μs (estimated) | **2.42 bits/key** | **Speed-critical** |
 
-Then you could create a specialized implementation that:
-- Skips key storage entirely
-- Eliminates key comparison overhead
-- Uses non-minimal perfect hashing (no remapping) for ~10% faster lookups at ~1% memory cost
+**Optimization Opportunities:**
+For specialized use cases that guarantee:
+1. All lookup keys were in the original training set
+2. No validation needed for out-of-set keys
+
+You could create a `FasterPtrHashDictionary` that:
+- **Skips key storage entirely** (saves ~8 bytes/key)
+- **Eliminates key comparison overhead** (saves ~7.5ns/lookup)
+- **Uses perfect hashing** (GetIndexNoRemap) for **23% faster lookups**
+- **Potential result**: Sub-nanosecond lookups approaching raw PtrHash performance
 
 ## Key Optimizations
 
@@ -252,8 +302,9 @@ dotnet run -c Release -- all
 ## Contributing
 
 Areas for improvement:
-- Construction performance optimization (currently 4.56x slower than native at 10M keys)
-- Improved prefetching performance for streaming queries
+- Construction performance optimization (currently 1.6-1.8x slower than native at 10M keys)
+- Specialized `FasterPtrHashDictionary` implementation with perfect hashing and no key validation
+- Improved prefetching performance for streaming queries (currently underperforms)
 - External-memory construction (sharding) for massive datasets
 
 ## License

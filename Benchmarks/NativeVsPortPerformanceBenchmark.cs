@@ -31,11 +31,10 @@ namespace PtrHash.Benchmarks
             }
         }
 
-        [Params(5_000_000)]
+        [Params(2_000_000)]  // Match LookupPerformanceScalingBenchmark
         public int KeyCount { get; set; }
 
-        [Params(1_000, 10_000, 100_000, 1_000_000)]
-       // [Params( 10_000)]
+        [Params(1_000, 50_000, 100_000, 1_000_000)]  // Match LookupPerformanceScalingBenchmark
         public int LookupCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -258,6 +257,66 @@ namespace PtrHash.Benchmarks
             for (int i = 0; i < _indicesBuffer2.Length; i++)
             {
                 sum += _indicesBuffer2[i];
+            }
+            return sum;
+        }
+
+        // === NO REMAP METHODS (Perfect Hash - no minimal remapping) ===
+        
+        // Multi-Part: Port Point GetIndexNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_Point_GetIndexNoRemap()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _multiPartPtrHash.GetIndexNoRemap(key);
+            }
+            return sum;
+        }
+
+        // Single-Part: Port Point GetIndexNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_Point_GetIndexNoRemap()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _singlePartPtrHash.GetIndexNoRemap(key);
+            }
+            return sum;
+        }
+
+        // Multi-Part: Port Stream GetIndicesStreamNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_Stream_GetIndicesStreamNoRemap()
+        {
+            ulong sum = 0;
+            _multiPartPtrHash.GetIndicesStream(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer5,
+                minimal: false);  // false = no remapping
+
+            for (int i = 0; i < _indicesBuffer5.Length; i++)
+            {
+                sum += _indicesBuffer5[i];
+            }
+            return sum;
+        }
+
+        // Single-Part: Port Stream GetIndicesStreamNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_Stream_GetIndicesStreamNoRemap()
+        {
+            ulong sum = 0;
+            _singlePartPtrHash.GetIndicesStream(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer5,
+                minimal: false);  // false = no remapping
+
+            for (int i = 0; i < _indicesBuffer5.Length; i++)
+            {
+                sum += _indicesBuffer5[i];
             }
             return sum;
         }

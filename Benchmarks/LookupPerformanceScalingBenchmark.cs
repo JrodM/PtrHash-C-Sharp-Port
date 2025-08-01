@@ -169,6 +169,30 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
+        [Benchmark]
+        public ulong PtrHashNative_MultiPart_Point_TryGetValue()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_nativeMultiPartInterop.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHashNative_SinglePart_Point_TryGetValue()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_nativeSinglePartInterop.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            return sum;
+        }
+
         // === STREAM LOOKUPS (Batch processing) ===
         [Benchmark]
         public ulong PtrHashNative_MultiPart_Stream_TryGetValueStream()
