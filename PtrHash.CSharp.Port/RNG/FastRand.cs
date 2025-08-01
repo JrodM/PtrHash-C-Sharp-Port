@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
-
+using System.Security.Cryptography;
 namespace PtrHash.CSharp.Port.RNG
 {
     /// <summary>
@@ -16,9 +16,10 @@ namespace PtrHash.CSharp.Port.RNG
         /// </summary>
         public FastRand()
         {
-            // Auto-seed using system entropy
-            _state = (ulong)Environment.TickCount64 ^ (ulong)DateTime.UtcNow.Ticks;
-            if (_state == 0) _state = 1; // Ensure non-zero state
+            // Get a non-cryptographic 64-bit random value from the OS
+            byte[] seedBytes = RandomNumberGenerator.GetBytes(sizeof(ulong));
+            ulong seed = BitConverter.ToUInt64(seedBytes, 0);
+            _state = (ulong)seed;
         }
         
         /// <summary>
@@ -27,7 +28,6 @@ namespace PtrHash.CSharp.Port.RNG
         public FastRand(ulong seed)
         {
             _state = seed;
-            if (_state == 0) _state = 1; // Ensure non-zero state
         }
         
         /// <summary>

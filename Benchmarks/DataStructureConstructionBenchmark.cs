@@ -60,7 +60,7 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> PtrHashNative_MultiPart_FxHasher_Construction()
+        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> PtrHashNative_MultiPart_FxHasher_Linear_U32Vec_Construction()
         {
             return new PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher>(_keys.AsSpan(), PtrHashNative.FFIParams.Fast);
         }

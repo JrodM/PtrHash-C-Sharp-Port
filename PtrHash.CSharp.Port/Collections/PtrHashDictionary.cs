@@ -8,6 +8,7 @@ using PtrHash.CSharp.Port.Core;
 using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHash.CSharp.Port.Storage;
+using System.Runtime.InteropServices;
 
 namespace PtrHash.CSharp.Port.Collections
 {
@@ -277,25 +278,40 @@ namespace PtrHash.CSharp.Port.Collections
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessIndices(
-            ReadOnlySpan<TKey> keys,
-            ReadOnlySpan<nuint> indices,
-            Span<TValue> values)
+    ReadOnlySpan<TKey> keys,
+    ReadOnlySpan<nuint> indices,
+    Span<TValue> values)
         {
-            for (int i = 0; i < keys.Length; i++)
+            // Hoist fields into locals
+            var kvps = _keyValuePairs;
+            var comparer = _keyComparer;
+            var sentinel = _sentinel;
+            int kvpCount = kvps.Length;
+            int len = keys.Length;
+
+            // Get raw refs to spans to remove bounds-checks
+            ref TKey keyRef = ref MemoryMarshal.GetReference(keys);
+            ref nuint idxRef = ref MemoryMarshal.GetReference(indices);
+            ref TValue valRef = ref MemoryMarshal.GetReference(values);
+
+            for (int i = 0; i < len; i++)
             {
-                var idx = (int)indices[i];
-                
-                if ((uint)idx < (uint)_keyValuePairs.Length)
+                nuint uidx = Unsafe.Add(ref idxRef, i);
+
+                // Default to sentinel
+                TValue result = sentinel;
+
+                // Branchless range-check
+                if (uidx < (nuint)kvpCount)
                 {
-                    ref var kvp = ref _keyValuePairs[idx];
-                    if (_keyComparer.Equals(keys[i], kvp.Key))
-                    {
-                        values[i] = kvp.Value;
-                        continue;
-                    }
+                    // Fetch the slot
+                    ref var kvp = ref kvps[(int)uidx];
+
+                    if (comparer.Equals(Unsafe.Add(ref keyRef, i), kvp.Key))
+                        result = kvp.Value;
                 }
-                
-                values[i] = _sentinel;
+
+                Unsafe.Add(ref valRef, i) = result;
             }
         }
 
