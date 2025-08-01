@@ -7,7 +7,7 @@ namespace PtrHash.CSharp.Port.RNG
 {
     /// <summary>
     /// ChaCha8 RNG using BouncyCastle's ChaChaEngine
-    /// This serves as a reference implementation to test against Rust
+    /// 
     /// </summary>
     public sealed class BouncyCastleChaCha8Rng
     {

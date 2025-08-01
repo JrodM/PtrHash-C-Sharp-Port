@@ -34,7 +34,7 @@ namespace PtrHash.Benchmarks
         [Params(5_000_000)]
         public int KeyCount { get; set; }
 
-        [Params(1_000, 100_000)]//, 1_000_000)]
+        [Params(1_000, 10_000, 100_000, 1_000_000)]
        // [Params( 10_000)]
         public int LookupCount { get; set; }
 
@@ -79,13 +79,6 @@ namespace PtrHash.Benchmarks
                     _lookupKeys[i] = _keys[random.Next(KeyCount)]; // 50% hits
                 else
                     _lookupKeys[i] = (ulong)random.NextInt64(long.MaxValue / 2, long.MaxValue); // 50% misses
-            }
-
-            // Shuffle lookup keys to mix hits and misses randomly
-            for (int i = actualLookupCount - 1; i > 0; i--)
-            {
-                int j = random.Next(i + 1);
-                (_lookupKeys[i], _lookupKeys[j]) = (_lookupKeys[j], _lookupKeys[i]);
             }
 
             // Multi-part PtrHash (default)
