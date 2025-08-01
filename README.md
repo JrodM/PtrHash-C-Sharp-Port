@@ -28,63 +28,35 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 ### 1. Construction Performance (ConstructionBenchmark)
 **What it tests**: Time to build the hash table from scratch with random ulong keys
 
-| Dataset | Dictionary<K,V> | Native Multi-Part | Native Single-Part | Port Multi-Part | Port Single-Part | Best Port/Native |
+| Dataset | HashSet<ulong> | Native Multi-Part | Native Single-Part | Port Multi-Part | Port Single-Part | Best Port/Native |
 |---------|-----------------|-------------------|-------------------|-----------------|------------------|------------------|
 | 10K | 0.13 ms | 5.6 ms | 5.3 ms | 1.3 ms | 1.2 ms | 0.23x |
 | 100K | 1.96 ms | 7.2 ms | 7.3 ms | 7.9 ms | 13.8 ms | 1.10x |
 | 1M | 31.8 ms | 27.5 ms | 27.4 ms | 94.3 ms | 172.1 ms | 3.43x |
 | 10M | 691.4 ms | 199.6 ms | 200.6 ms | 910.2 ms | 2,580.4 ms | 4.56x |
 
-### 2. Raw PtrHash Performance (NativeVsPortPerformanceBenchmark)
-**What it tests**: Raw hash function performance without dictionary overhead
-- **Dataset**: 5M unique random ulong keys
-- **Lookups**: 1K and 100K lookups with 50% hit rate (half keys exist, half don't)
-- **P/Invoke optimizations**: DisableRuntimeMarshalling + LibraryImport + SuppressGCTransition = ~10-20ns overhead
-
-| Method | 100K Lookups Time | Per Lookup |
-|--------|-------------------|------------|
-| **Native Single-Part Point** | 524.281 μs | 5.24 ns |
-| **C# Port Single-Part Point** | 266.156 μs | 2.66 ns |
-
-### 3. Dictionary Comparison (DictionaryImplementationComparisonBenchmark)
-**What it tests**: Full dictionary implementations including key validation
-- **Dataset**: 10K to 10M ulong keys
-- **Lookups**: 10K lookups with 50% hit rate
-- **Comparison**: `Dictionary<ulong,ulong>` vs `PtrHashDictionary<ulong,ulong>`
-
-| Key Count | Dictionary<K,V> | PtrHashDict Port | Per Lookup Comparison |
-|-----------|-----------------|------------------|----------------------|
-| 10M | 186.72 μs | 102.13 μs | 18.67 ns vs 10.21 ns |
-
-**Construction Notes:**
+**Key Findings:**
 - C# Port is faster than native for small datasets (10K) due to P/Invoke overhead
 - Native dominates at scale with multi-part being fastest for construction
 - Port single-part is slowest but optimized for query performance
 - Multi-part constructs faster but has slightly slower queries
-- **optimization opportunity**: Construction is 4.56x slower than native at 10M keys, leaving significant room for improvement in the C# port's construction algorithm
+- **Optimization opportunity**: Construction is 4.56x slower than native at 10M keys
 
-**Query Notes:**
-- C# Port has fastest raw queries (no P/Invoke overhead)
-- PtrHashDictionary includes key validation, adding ~7.5 ns overhead
-- Native queries suffer from P/Invoke overhead despite fast Rust implementation
-
-## Detailed Benchmark Results
-
-### 1. Dictionary vs PtrHashDictionary (DictionaryImplementationComparisonBenchmark)
+### 2. Dictionary vs PtrHashDictionary Point Lookups (DictionaryImplementationComparisonBenchmark)
 **Test Details**:
 - **What**: Comparing `Dictionary<ulong,ulong>` vs `PtrHashDictionary<ulong,ulong>` (both with key validation)
 - **Dataset**: 10K to 10M random ulong keys
-- **Lookups**: 10,000 lookups per test with 50% hit rate (5K existing keys, 5K non-existent keys)
+- **Lookups**: 10,000 point lookups per test with 50% hit rate (5K existing keys, 5K non-existent keys)
 - **Method**: Uses `TryGetValue` for both implementations
 
-| Key Count | Dictionary<K,V> | PtrHashDict Single-Part | Speedup | Notes |
-|-----------|-----------------|-------------------------|---------|-------|
-| 10K | 36.16 μs | 28.46 μs | 1.27x | Dictionary competitive at small scale |
-| 100K | 63.10 μs | 36.85 μs | 1.71x | PtrHash advantage grows |
-| 1M | 92.09 μs | 55.60 μs | 1.66x | Cache effects visible |
-| 10M | 186.72 μs | 102.13 μs | 1.83x | PtrHash dominates at scale |
+| Key Count | Dictionary<K,V> | PtrHashDict Native | PtrHashDict Port | Best Speedup | Notes |
+|-----------|-----------------|--------------------|--------------------|--------------|-------|
+| 10K | 36.16 μs | 43.66 μs | 28.46 μs | 1.27x | Dictionary competitive at small scale |
+| 100K | 63.10 μs | 49.55 μs | 36.85 μs | 1.71x | PtrHash advantage grows |
+| 1M | 92.09 μs | 54.49 μs | 55.60 μs | 1.66x | Native faster at 1M |
+| 10M | 186.72 μs | 85.43 μs | 102.13 μs | 1.83x | Both PtrHash versions dominate |
 
-### 2. Scaling Analysis (DictionaryLookupScalingBenchmark)
+### 3. Scaling Analysis (DictionaryLookupScalingBenchmark)
 **Test Details**:
 - **What**: How performance scales with lookup count
 - **Dataset**: Fixed 2M keys
@@ -99,7 +71,7 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 | 1M | 56,922 μs | 18,773 μs | 16,649 μs | 3.42x |
 | 10M | 563,027 μs | 179,927 μs | 165,114 μs | 3.41x |
 
-### 3. Raw PtrHash Methods (NativeVsPortPerformanceBenchmark)
+### 4. Raw PtrHash Methods (NativeVsPortPerformanceBenchmark)
 **Test Details**:
 - **What**: Comparing raw PtrHash performance (no dictionary wrapper)
 - **Dataset**: 5M random ulong keys
@@ -115,6 +87,11 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 | **Port Single-Part Point** | 266.156 μs | 2.66 ns | 0.52x |
 | **Port Stream** | 260.767 μs | 2.61 ns | 0.51x |
 | **Port StreamPrefetch** | 342.419 μs | 3.42 ns | 0.67x |
+
+**Key Findings:**
+- C# Port consistently outperforms native in point lookups (2.66ns vs 5.24ns)
+- Native streaming with prefetch achieves best throughput (2.50ns)
+- Port streaming without prefetch nearly matches native prefetch (2.61ns)
 
 ## Usage
 
@@ -145,12 +122,23 @@ ulong index = ptrHash.GetIndex(key);  // Returns index in [0, n-1]
 
 ```csharp
 using PtrHash.CSharp.Port.Collections;
+using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 
-// Create with all keys/values upfront (read-only after construction)
-var keys = new string[] { "hello", "world", "foo" };
-var values = new int[] { 42, 100, 123 };
+// Generic form - full control over implementation
+var dict = new PtrHashDictionary<string, int, StringHasher, Linear, UInt32VectorRemappingStorage>(
+    keys: new[] { "hello", "world", "foo" },
+    values: new[] { 42, 100, 123 },
+    notFoundSentinel: -1
+);
 
-var dict = new PtrHashDictionaryString<int>(keys, values, notFoundSentinel: -1);
+// Convenience class for string keys (same as above but simpler)
+var dictString = new PtrHashDictionaryString<int>(
+    keys: new[] { "hello", "world", "foo" },
+    values: new[] { 42, 100, 123 },
+    notFoundSentinel: -1
+);
 
 int value = dict["hello"];  // Returns 42
 bool exists = dict.TryGetValue("world", out int val);  // Returns true, val = 100
@@ -163,7 +151,7 @@ The `PtrHashDictionary` implementation makes specific tradeoffs optimized for ge
 
 **Current Design Choices:**
 - **Single-part construction**: Prioritizes lookup speed over construction time. Multi-part would construct faster but have slower lookups.
-- **Minimal Perfect Hash (MPH)**: Uses remapping to achieve minimal space. A non-minimal Perfect Hash (PH) would be ~9% faster for raw PtrHash lookups based on the paper (11.6ns vs 12.7ns). In our benchmarks, raw PtrHash takes ~2.66ns and key validation adds ~0.81ns, so switching to PH could save ~0.24ns (9% of 2.66ns), improving total dictionary performance by ~7%.
+- **Minimal Perfect Hash (MPH)**: Uses remapping to achieve minimal space. A non-minimal Perfect Hash (PH) would be ~9% faster for raw PtrHash lookups based on the paper (11.6ns vs 12.7ns).
 - **Key validation**: Stores and compares original keys to handle lookups of keys not in the training set, as expected for a general-purpose dictionary.
 
 **Optimization Opportunities:**
