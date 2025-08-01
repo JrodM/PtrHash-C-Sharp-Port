@@ -34,17 +34,6 @@ namespace PtrHash.CSharp.Port.Construction
             _parts[part].Set(localSlot, value);
         }
         
-        // Direct access to part's BitVec for local slot operations
-        public bool GetLocal(nuint part, nuint localSlot)
-        {
-            return _parts[part].Get(localSlot);
-        }
-        
-        public void SetLocal(nuint part, nuint localSlot, bool value)
-        {
-            _parts[part].Set(localSlot, value);
-        }
-        
         public nuint CountOnes()
         {
             nuint total = 0;

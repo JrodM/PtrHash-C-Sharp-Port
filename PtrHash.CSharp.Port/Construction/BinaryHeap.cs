@@ -52,14 +52,7 @@ namespace PtrHash.CSharp.Port.Construction
             
             return result;
         }
-        
-        public T? PopOrDefault()
-        {
-            if (_items.Count == 0)
-                return default(T);
-            return Pop();
-        }
-        
+            
         public T Peek()
         {
             if (_items.Count == 0)

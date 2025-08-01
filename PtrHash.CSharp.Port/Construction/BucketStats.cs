@@ -56,11 +56,6 @@ namespace PtrHash.CSharp.Port.Construction
             }
         }
 
-        public void Print()
-        {
-            Console.Write(ToString());
-        }
-
         public override string ToString()
         {
             var sb = new System.Text.StringBuilder();
@@ -94,39 +89,6 @@ namespace PtrHash.CSharp.Port.Construction
                 var elementsPct = row.Elements * 100.0 / totalElements;
 
                 sb.AppendFormat("{0,4}  {1,11:N0} {2,7:F1} {3,6:F1} {4,6} {5,6:F1} {6,10:F1} {7,10} {8,10:F1} {9,10}\n",
-                    showSize ? i : i,
-                    row.Buckets,
-                    bucketPct,
-                    avgElements,
-                    row.ElementsMax,
-                    elementsPct,
-                    avgPilot,
-                    row.PilotMax,
-                    avgEvictions,
-                    row.EvictionsMax);
-            }
-        }
-
-        private static void PrintRows(Row[] rows, bool showSize)
-        {
-            var totalBuckets = rows.Sum(r => r.Buckets);
-            var totalElements = rows.Sum(r => r.Elements);
-
-            Console.WriteLine("{0,4}  {1,11} {2,7} {3,6} {4,6} {5,6} {6,10} {7,10} {8,10} {9,10}",
-                showSize ? "size" : "%ile", "buckets", "%", "avg", "max", "sum%", "pilot_avg", "pilot_max", "evict_avg", "evict_max");
-
-            for (int i = 0; i < rows.Length; i++)
-            {
-                var row = rows[i];
-                if (row.Buckets == 0) continue;
-
-                var avgElements = row.Elements / (double)row.Buckets;
-                var avgPilot = row.PilotSum / (double)row.Buckets;
-                var avgEvictions = row.Evictions / (double)row.Buckets;
-                var bucketPct = row.Buckets * 100.0 / totalBuckets;
-                var elementsPct = row.Elements * 100.0 / totalElements;
-
-                Console.WriteLine("{0,4}  {1,11:N0} {2,7:F1} {3,6:F1} {4,6} {5,6:F1} {6,10:F1} {7,10} {8,10:F1} {9,10}",
                     showSize ? i : i,
                     row.Buckets,
                     bucketPct,

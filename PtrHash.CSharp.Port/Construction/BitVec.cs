@@ -7,8 +7,7 @@ using System.Numerics;
 namespace PtrHash.CSharp.Port.Construction
 {
     /// <summary>
-    /// High-performance bit vector implementation using unmanaged memory
-    /// Matches Rust's BitVec performance with zero-overhead bit operations
+    /// High-performance bit vector implementation using unmanaged memorys
     /// </summary>
     public sealed unsafe class BitVec : IDisposable
     {

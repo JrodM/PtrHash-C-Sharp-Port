@@ -17,17 +17,17 @@ namespace PtrHash.CSharp.Port.Sorting
 
         /// <summary>
         /// In-place radix sort for HashValue - matches Rust's radix_sort_unstable()
-        /// Sorts HashValue array directly without copying
+        /// Uses ping-pong buffering with temporary array for sorting passes
         /// </summary>
         public static void SortHashValues(Span<HashValue> data)
         {
             int n = data.Length;
             if (n <= 1) return;
             
-            // Small arrays: use insertion sort for better performance
+            // Small arrays: use built-in sort (IntroSort with insertion sort fallback)
             if (n < 32)
             {
-                InsertionSortHashValues(data);
+                data.Sort((a, b) => a.Full().CompareTo(b.Full()));
                 return;
             }
             
@@ -122,29 +122,6 @@ namespace PtrHash.CSharp.Port.Sorting
             }
             
             return true;
-        }
-        
-        /// <summary>
-        /// Optimized insertion sort for small HashValue arrays
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void InsertionSortHashValues(Span<HashValue> data)
-        {
-            for (int i = 1; i < data.Length; i++)
-            {
-                var key = data[i];
-                var keyValue = key.Full();
-                int j = i - 1;
-                
-                // Shift elements greater than key to the right
-                while (j >= 0 && data[j].Full() > keyValue)
-                {
-                    data[j + 1] = data[j];
-                    j--;
-                }
-                
-                data[j + 1] = key;
-            }
         }
     }
 }

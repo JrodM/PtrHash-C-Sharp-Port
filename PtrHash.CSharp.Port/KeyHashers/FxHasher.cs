@@ -15,7 +15,6 @@ namespace PtrHash.CSharp.Port.KeyHashers
     {
         private const ulong FX_HASH_SEED = 0x51_7c_c1_b7_27_22_0a_95;
         private const ulong ROTATE = 5;
-        private const ulong MULTIPLY = 0x51_7c_c1_b7_27_22_0a_95;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashValue Hash(ulong key, ulong seed)

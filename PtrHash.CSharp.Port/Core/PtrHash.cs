@@ -769,7 +769,7 @@ namespace PtrHash.CSharp.Port.Core
                     var recentIdx = 0;
                     recent[0] = newBucket; // Mark bucket as recently processed
 
-                    // Process eviction chain (Rust: while let Some((_b_len, b)) = stack.pop())
+                    // Process eviction chain (let Some((_b_len, b)) = stack.pop())
                     var maxEvictionsForBucket = 0;
 
                     while (!stack.IsEmpty)
@@ -849,10 +849,9 @@ namespace PtrHash.CSharp.Port.Core
                         var globalBucketId = (nuint)(part * (int)_bucketsPerPart + currentBucket);
                         partStats.Add(globalBucketId, _bucketsTotal, currentBucketHashes.Length, bestPilot, evictions);
 
-                        // ATOMIC PLACEMENT: Exact Rust parity - single loop with eviction + placement
                         var evictionsThisRound = 0;
 
-                        // Single pass: handle eviction and placement atomically (matches Rust exactly)
+                        // Single pass: handle eviction and placement atomically 
                         foreach (var hash in currentBucketHashes)
                         {
                             var localSlot = SlotInPartHp(hash, hp);
@@ -860,8 +859,8 @@ namespace PtrHash.CSharp.Port.Core
 
                             if (occupyingBucket >= 0) // Slot is occupied
                             {
-                                // With atomic placement, self-collision should never happen
-                                // This assertion matches Rust: assert!(b2 != b)
+                                // With atomic placement, self-collision should never happen 
+                                // assert!(b2 != b)
                                 if (occupyingBucket == currentBucket)
                                 {
                                     DebugConstruction($"SELF-COLLISION DEBUG:");
@@ -875,7 +874,7 @@ namespace PtrHash.CSharp.Port.Core
                                     throw new InvalidOperationException("Self-collision detected - algorithm invariant violated");
                                 }
 
-                                // Push evicted bucket onto stack for reprocessing (exact Rust match)
+                                // Push evicted bucket onto stack for reprocessing
                                 var evictedStart = bucketStarts[occupyingBucket];
                                 var evictedEnd = bucketStarts[occupyingBucket + 1];
                                 var evictedSize = evictedEnd - evictedStart;
@@ -884,7 +883,7 @@ namespace PtrHash.CSharp.Port.Core
                                 evictions++;
                                 evictionsThisRound++;
 
-                                // Clear all slots for the evicted bucket immediately (exact Rust match)
+                                // Clear all slots for the evicted bucket immediately
                                 var evictedPilot = (ulong)partPilots[occupyingBucket];
                                 var evictedHp = HashPilot(evictedPilot);
                                 var evictedHashes = hashesSpan.Slice(evictedStart, evictedSize);
@@ -923,12 +922,9 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
-        private (int[] bucketStarts, int[] bucketOrder) BuildBucketInfo(int part, ReadOnlySpan<HashValue> partHashes)
+        private (int[] bucketStarts, int[] bucketOrder) BuildBucketInfo(int part, ReadOnlySpan<HashValue> partHashesSorted)
         {
-            // partHashes is ALREADY SORTED from the global radix sort!
-            // Rust doesn't re-sort here - it just scans through to build bucket information
-            // This matches Rust's sort_buckets() which doesn't actually sort
-            
+
             // Create bucket starts array
             var bucketStartsPool = ArrayPool<int>.Shared;
             var bucketStarts = bucketStartsPool.Rent((int)_bucketsPerPart + 1); // +1 for end sentinel
@@ -941,9 +937,9 @@ namespace PtrHash.CSharp.Port.Core
                 
                 // Find all hashes that belong to bucket b
                 // NOTE: Many branch misses here
-                while (end < partHashes.Length)
+                while (end < partHashesSorted.Length)
                 {
-                    var globalBucket = (int)Bucket(partHashes[end]);
+                    var globalBucket = (int)Bucket(partHashesSorted[end]);
                     var localBucket = globalBucket - part * (int)_bucketsPerPart;
                     if (localBucket != b) break;
                     end++;
@@ -1017,7 +1013,7 @@ namespace PtrHash.CSharp.Port.Core
                     nuint slot2 = SlotInPartHp(bucketHashes[i + 2], hp);
                     nuint slot3 = SlotInPartHp(bucketHashes[i + 3], hp);
 
-                    // Use unchecked access for maximum performance - matches Rust's get_unchecked()
+                    // Use unchecked access for maximum performance
                     bool t0 = taken.GetUnchecked(slot0);
                     bool t1 = taken.GetUnchecked(slot1);
                     bool t2 = taken.GetUnchecked(slot2);

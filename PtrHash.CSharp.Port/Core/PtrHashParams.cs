@@ -60,7 +60,7 @@ namespace PtrHash.CSharp.Port.Core
     }
 
     /// <summary>
-    /// Remapping storage type selection - matches Rust's F generic parameter options
+    /// Remapping storage type selection
     /// Controls space/speed tradeoff for the remapping table
     /// </summary>
     public enum RemappingStorageType

@@ -70,10 +70,11 @@ namespace PtrHash.Profile
             Console.WriteLine("2. C# Port Single-Part");
             Console.WriteLine("3. Both Multi-Part and Single-Part");
             Console.WriteLine("4. Repeated Multi-Part (100 runs for extended profiling)");
+            Console.WriteLine("5. Repeated Single-Part (100 runs for extended profiling)");
             Console.WriteLine();
-            Console.Write("Enter choice (1-4): ");
+            Console.Write("Enter choice (1-5): ");
             
-            if (int.TryParse(Console.ReadLine(), out var choice) && choice >= 1 && choice <= 4)
+            if (int.TryParse(Console.ReadLine(), out var choice) && choice >= 1 && choice <= 5)
             {
                 return choice;
             }
@@ -142,6 +143,16 @@ namespace PtrHash.Profile
                     {
                         Console.WriteLine($"Run {i}/100:");
                         ProfileCSharpPortConstruction(keys, multiPart: true);
+                        if (i < 100) Console.WriteLine();
+                    }
+                    break;
+                    
+                case 5:
+                    Console.WriteLine("🔍 Repeated Single-Part Profiling (100 runs for extended profiling)...");
+                    for (int i = 1; i <= 100; i++)
+                    {
+                        Console.WriteLine($"Run {i}/100:");
+                        ProfileCSharpPortConstruction(keys, multiPart: false);
                         if (i < 100) Console.WriteLine();
                     }
                     break;
