@@ -254,7 +254,6 @@ dotnet run -c Release -- all
 Areas for improvement:
 - Construction performance optimization (currently 4.56x slower than native at 10M keys)
 - Improved prefetching performance for streaming queries
-- Additional key types and hash functions
 - External-memory construction (sharding) for massive datasets
 
 ## License
