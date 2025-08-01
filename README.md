@@ -118,35 +118,32 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 **Test Details**:
 - **What**: Raw PtrHash methods (no dictionary wrapper) comparing minimal vs perfect hashing
 - **Dataset**: 2M random ulong keys (consistent with other benchmarks)
-- **Lookups**: 1K to 1M lookups with 50% hit rate
+- **Lookups**: 1K, 50K, 100K, 1M lookups with 50% hit rate
 - **Methods**: Point vs stream, minimal (GetIndex) vs perfect hash (GetIndexNoRemap)
 
-**1K Lookups (.NET 8.0)**:
-| Method | Time (μs) | ns/lookup | vs Native Baseline | Key Finding |
-|--------|-----------|-----------|---------------------|-------------|
-| **Native Multi-Part Point** (baseline) | 4.119 | 4.12 ns | 1.00x | Native baseline |
-| **Port Multi-Part Point GetIndex** | 2.179 | 2.18 ns | 0.53x | **2.3x faster** than native |
-| **Port Multi-Part Point GetIndexNoRemap** | 2.075 | 2.08 ns | 0.50x | **5% faster** than minimal |
-| **Port Single-Part Point GetIndex** | 1.833 | 1.83 ns | 0.44x | **Best point performance** |
-| **Port Single-Part Point GetIndexNoRemap** | 1.683 | 1.68 ns | 0.41x | **Fastest overall** |
+**Point Lookup Performance (.NET 8.0)**:
+| Lookups | Native Multi (baseline) | Port Multi GetIndex | Port Multi NoRemap | Port Single GetIndex | Port Single NoRemap | Best Port Speedup |
+|---------|------------------------|--------------------|--------------------|---------------------|--------------------|--------------------|
+| **1K** | 4.12 μs (4.12 ns) | 2.18 μs (2.18 ns) | **2.08 μs (2.08 ns)** | 1.83 μs (1.83 ns) | **1.68 μs (1.68 ns)** | **2.45x faster** |
+| **50K** | 271.5 μs (5.43 ns) | 121.7 μs (2.43 ns) | **112.4 μs (2.25 ns)** | 104.0 μs (2.08 ns) | **88.1 μs (1.76 ns)** | **3.08x faster** |
+| **100K** | 409.3 μs (4.09 ns) | 234.4 μs (2.34 ns) | **209.3 μs (2.09 ns)** | 194.2 μs (1.94 ns) | **169.2 μs (1.69 ns)** | **2.42x faster** |
+| **1M** | 4,217 μs (4.22 ns) | 2,327 μs (2.33 ns) | **2,322 μs (2.32 ns)** | 2,111 μs (2.11 ns) | **1,715 μs (1.72 ns)** | **2.46x faster** |
 
-**1M Lookups (.NET 8.0)**:
-| Method | Time (μs) | ns/lookup | vs Native Baseline | Memory Tradeoff |
-|--------|-----------|-----------|---------------------|-----------------|
-| **Native Multi-Part Point** (baseline) | 4,217 | 4.22 ns | 1.00x | Native baseline |
-| **Port Multi-Part Point GetIndex** | 2,327 | 2.33 ns | 0.55x | Minimal perfect hash |
-| **Port Multi-Part Point GetIndexNoRemap** | 2,322 | 2.32 ns | 0.55x | **Same speed**, ~**1% more memory** |
-| **Port Single-Part Point GetIndex** | 2,111 | 2.11 ns | 0.50x | Minimal perfect hash |
-| **Port Single-Part Point GetIndexNoRemap** | 1,715 | 1.72 ns | 0.41x | **Perfect hash: 23% faster** |
+**Stream Performance (.NET 8.0)**:
+| Lookups | Native Multi Prefetch | Port Multi GetIndex | Port Multi NoRemap | Port Single GetIndex | Port Single NoRemap | Best Port vs Native |
+|---------|----------------------|--------------------|--------------------|---------------------|--------------------|--------------------|
+| **1K** | 2.39 μs (2.39 ns) | 2.36 μs (2.36 ns) | **2.23 μs (2.23 ns)** | 1.95 μs (1.95 ns) | **1.78 μs (1.78 ns)** | **1.34x faster** |
+| **50K** | 118.6 μs (2.37 ns) | 125.0 μs (2.50 ns) | **118.1 μs (2.36 ns)** | 101.1 μs (2.02 ns) | **98.3 μs (1.97 ns)** | **1.21x faster** |
+| **100K** | 235.1 μs (2.35 ns) | 245.2 μs (2.45 ns) | **219.7 μs (2.20 ns)** | 203.5 μs (2.04 ns) | **180.2 μs (1.80 ns)** | **1.30x faster** |
+| **1M** | 2,417 μs (2.42 ns) | 2,554 μs (2.55 ns) | **2,292 μs (2.29 ns)** | 2,088 μs (2.09 ns) | **1,931 μs (1.93 ns)** | **1.25x faster** |
 
-**Stream Performance (1M Lookups)**:
-| Method | Time (μs) | ns/lookup | Key Insight |
-|--------|-----------|-----------|-------------|
-| **Native Stream Prefetch32** | 2,417 | 2.42 ns | Native streaming optimized |
-| **Port Multi-Part Stream GetIndex** | 2,554 | 2.55 ns | Slightly slower than native |
-| **Port Multi-Part Stream GetIndexNoRemap** | 2,292 | 2.29 ns | **5% faster** than minimal |
-| **Port Single-Part Stream GetIndex** | 2,088 | 2.09 ns | **Best streaming** |
-| **Port Single-Part Stream GetIndexNoRemap** | 1,931 | 1.93 ns | **Perfect hash: 8% faster** |
+**Perfect Hash (GetIndexNoRemap) Performance Gains**:
+| Lookups | Multi-Part Improvement | Single-Part Improvement | Memory Cost |
+|---------|----------------------|------------------------|-------------|
+| **1K** | **5.0% faster** | **8.9% faster** | ~1% more memory |
+| **50K** | **8.1% faster** | **17.9% faster** | ~1% more memory |
+| **100K** | **11.9% faster** | **14.8% faster** | ~1% more memory |
+| **1M** | **0.2% faster** | **23.1% faster** | ~1% more memory |
 
 **Key Findings:**
 - **Perfect vs Minimal Hash**: GetIndexNoRemap is 5-23% faster at ~1% memory cost
@@ -229,7 +226,6 @@ You could create a `FasterPtrHashDictionary` that:
 - **Skips key storage entirely** (saves ~8 bytes/key)
 - **Eliminates key comparison overhead** (saves ~7.5ns/lookup)
 - **Uses perfect hashing** (GetIndexNoRemap) for **23% faster lookups**
-- **Potential result**: Sub-nanosecond lookups approaching raw PtrHash performance
 
 ## Key Optimizations
 
@@ -251,7 +247,7 @@ The C# port implements several critical optimizations to achieve Rust-like perfo
 
 ### Native Interop Optimizations
 
-The native interop achieves remarkably low overhead (~10-20 ns per call) through:
+The native interop achieves low overhead (~10-20 ns per call) through:
 
 - **DisableRuntimeMarshalling**: Removes marshalling code, pinning, buffer copying, and security stack walks (saves ~100+ ns)
 - **LibraryImport**: Source-generated P/Invoke eliminates JIT-emitted IL stubs and reflection-based lookups
