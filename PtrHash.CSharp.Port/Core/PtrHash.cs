@@ -13,6 +13,7 @@ using PtrHash.CSharp.Port.RNG;
 using PtrHash.CSharp.Port.Computation;
 using PtrHash.CSharp.Port.Construction;
 using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Sorting;
 
 namespace PtrHash.CSharp.Port.Core
 {
@@ -614,8 +615,9 @@ namespace PtrHash.CSharp.Port.Core
                     hashBuffer[i] = THasher.Hash(keys[i], seed);
                 }
 
-                // Sort by hash for part assignment
-                hashBuffer.Sort();
+                // Sort by hash for part assignment using radix sort for O(n) performance
+                // This is a critical hot path - sorting millions of hashes in-place
+                RadixSort.SortHashValues(hashBuffer);
 
                 // Check for duplicate hashes - if found, return false to retry with different seed
                 for (int i = 1; i < hashBuffer.Length; i++)
@@ -719,10 +721,10 @@ namespace PtrHash.CSharp.Port.Core
             partStats = new BucketStats();
 
             // Sort buckets within this part - use pooled arrays
-            var (sortedHashes, bucketStarts, bucketOrder) = SortBucketsInPart(part, partHashes);
+            var (bucketStarts, bucketOrder) = BuildBucketInfo(part, partHashes);
 
             // Use the sorted hashes from here on - this is critical for deterministic ordering
-            var hashesSpan = sortedHashes.AsSpan(0, partHashes.Length); // Only use actual data length
+            var hashesSpan = partHashes; // Already sorted from global radix sort
 
             const ulong kmax = 256;
             // Use ArrayPool to avoid allocation
@@ -804,7 +806,7 @@ namespace PtrHash.CSharp.Port.Core
                             continue;
 
                         // 1) Try collision-free pilot first (hot path optimization)
-                        var pilotResult = FindPilot(kmax, currentBucketHashes, partTaken, out var pilotsChecked, currentBucket);
+                        var pilotResult = FindPilot(kmax, currentBucketHashes, partTaken, out var pilotsChecked);
 
                         if (pilotResult.HasValue)
                         {
@@ -916,116 +918,84 @@ namespace PtrHash.CSharp.Port.Core
             {
                 // Return all pooled arrays
                 ArrayPool<int>.Shared.Return(slots);
-                ArrayPool<HashValue>.Shared.Return(sortedHashes);
                 ArrayPool<int>.Shared.Return(bucketStarts);
                 ArrayPool<int>.Shared.Return(bucketOrder);
             }
         }
 
-        private (HashValue[] sortedHashes, int[] bucketStarts, int[] bucketOrder) SortBucketsInPart(int part, ReadOnlySpan<HashValue> partHashes)
+        private (int[] bucketStarts, int[] bucketOrder) BuildBucketInfo(int part, ReadOnlySpan<HashValue> partHashes)
         {
-            // Use ArrayPool for temporary allocations (better than new arrays)
-            var hashBucketPairPool = ArrayPool<(HashValue hash, int bucket)>.Shared;
-            var hashBucketPairs = hashBucketPairPool.Rent(partHashes.Length);
-
-            // Use ArrayPool for result arrays too
-            var sortedHashesPool = ArrayPool<HashValue>.Shared;
-            var sortedHashes = sortedHashesPool.Rent(partHashes.Length);
-
-            // Compute bucket for each hash
-            for (int i = 0; i < partHashes.Length; i++)
-            {
-                var hash = partHashes[i];
-                // Use global bucket index: self.bucket(hashes[end]) == part * self.buckets + b
-                var globalBucket = (int)Bucket(hash);
-                var localBucket = globalBucket - part * (int)_bucketsPerPart;
-                hashBucketPairs[i] = (hash, localBucket);
-            }
-
-            // Use Array.Sort with custom comparison (faster than List.Sort) - only sort actual data length
-            Array.Sort(hashBucketPairs, 0, partHashes.Length, Comparer<(HashValue hash, int bucket)>.Create((a, b) =>
-            {
-                var bucketCompare = a.bucket.CompareTo(b.bucket);
-                return bucketCompare != 0 ? bucketCompare : a.hash.Full().CompareTo(b.hash.Full());
-            }));
-
-            // Extract sorted hashes directly (no LINQ) - use actual data length, not pooled array length
-            for (int i = 0; i < partHashes.Length; i++)
-            {
-                sortedHashes[i] = hashBucketPairs[i].hash;
-            }
-
-            // Create bucket starts array - use ArrayPool
+            // partHashes is ALREADY SORTED from the global radix sort!
+            // Rust doesn't re-sort here - it just scans through to build bucket information
+            // This matches Rust's sort_buckets() which doesn't actually sort
+            
+            // Create bucket starts array
             var bucketStartsPool = ArrayPool<int>.Shared;
             var bucketStarts = bucketStartsPool.Rent((int)_bucketsPerPart + 1); // +1 for end sentinel
-            var currentBucket = 0;
-            var hashIndex = 0;
-
-            for (int i = 0; i < partHashes.Length; i++)
+            
+            // Scan through sorted hashes to find bucket boundaries
+            var end = 0;
+            for (int b = 0; b < (int)_bucketsPerPart; b++)
             {
-                var pair = hashBucketPairs[i];
-                // Fill in start positions for empty buckets
-                while (currentBucket <= pair.bucket)
+                bucketStarts[b] = end;
+                
+                // Find all hashes that belong to bucket b
+                // NOTE: Many branch misses here
+                while (end < partHashes.Length)
                 {
-                    bucketStarts[currentBucket] = hashIndex;
-                    currentBucket++;
+                    var globalBucket = (int)Bucket(partHashes[end]);
+                    var localBucket = globalBucket - part * (int)_bucketsPerPart;
+                    if (localBucket != b) break;
+                    end++;
                 }
-                hashIndex++;
             }
-
-            // Fill remaining bucket starts
-            while (currentBucket <= (int)_bucketsPerPart)
-            {
-                bucketStarts[currentBucket] = hashIndex;
-                currentBucket++;
-            }
-
-            // Create bucket order sorted by size (largest first) - use ArrayPool
+            bucketStarts[_bucketsPerPart] = end; // Final sentinel
+            
+            // Create bucket order sorted by size (largest first)
             var bucketSizePool = ArrayPool<(int size, int bucket)>.Shared;
             var bucketSizes = bucketSizePool.Rent((int)_bucketsPerPart);
-
+            
             try
             {
+                // Calculate sizes
                 for (int i = 0; i < (int)_bucketsPerPart; i++)
                 {
                     var size = bucketStarts[i + 1] - bucketStarts[i];
                     bucketSizes[i] = (size, i);
                 }
-
-                // Sort by size descending, then by bucket index for deterministic order
+                
+                // Sort by size descending (largest buckets first for better eviction performance)
                 Array.Sort(bucketSizes, 0, (int)_bucketsPerPart, Comparer<(int size, int bucket)>.Create((a, b) =>
                 {
                     var sizeCompare = b.size.CompareTo(a.size); // Descending
                     return sizeCompare != 0 ? sizeCompare : a.bucket.CompareTo(b.bucket);
                 }));
-
-                // Extract bucket order directly (no LINQ) - use ArrayPool
+                
+                // Extract bucket order
                 var bucketOrderPool = ArrayPool<int>.Shared;
                 var bucketOrder = bucketOrderPool.Rent((int)_bucketsPerPart);
                 for (int i = 0; i < (int)_bucketsPerPart; i++)
                 {
                     bucketOrder[i] = bucketSizes[i].bucket;
                 }
-
-                return (sortedHashes, bucketStarts, bucketOrder);
+                
+                return (bucketStarts, bucketOrder);
             }
             finally
             {
-                // Return pooled arrays
-                hashBucketPairPool.Return(hashBucketPairs);
                 bucketSizePool.Return(bucketSizes);
             }
         }
 
 
-        private (ulong pilot, ulong hashPilot)? FindPilot(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
+        private (ulong pilot, ulong hashPilot)? FindPilot(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked)
         {
-            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked, bucketId);
+            return FindPilotSlice(kmax, bucketHashes, taken, out pilotsChecked);
         }
 
 
         // Variable-size bucket processing for larger buckets (renamed from FindPilotInPart)
-        private (ulong pilot, ulong hashPilot)? FindPilotSlice(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked, int bucketId = -1)
+        private unsafe (ulong pilot, ulong hashPilot)? FindPilotSlice(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked)
         {
             // Sequential pilot search from 0 to kmax-1 with 4x loop unrolling (Section 3.3)
             int r = bucketHashes.Length / 4 * 4; // let r = bucket.len() / 4 * 4;
@@ -1047,11 +1017,11 @@ namespace PtrHash.CSharp.Port.Core
                     nuint slot2 = SlotInPartHp(bucketHashes[i + 2], hp);
                     nuint slot3 = SlotInPartHp(bucketHashes[i + 3], hp);
 
-                    // Query taken[] once per slot
-                    bool t0 = taken.Get(slot0);
-                    bool t1 = taken.Get(slot1);
-                    bool t2 = taken.Get(slot2);
-                    bool t3 = taken.Get(slot3);
+                    // Use unchecked access for maximum performance - matches Rust's get_unchecked()
+                    bool t0 = taken.GetUnchecked(slot0);
+                    bool t1 = taken.GetUnchecked(slot1);
+                    bool t2 = taken.GetUnchecked(slot2);
+                    bool t3 = taken.GetUnchecked(slot3);
 
                     if (t0 || t1 || t2 || t3)
                     {
@@ -1067,7 +1037,7 @@ namespace PtrHash.CSharp.Port.Core
                 {
                     var hash = bucketHashes[i];
                     var localSlot = SlotInPartHp(hash, hp);
-                    if (taken.Get(localSlot)) // bad |= check(hx)
+                    if (taken.GetUnchecked(localSlot)) // bad |= check(hx)
                     {
                         hasCollision = true;
                         break;
@@ -1087,7 +1057,7 @@ namespace PtrHash.CSharp.Port.Core
         }
 
         // try_take_pilot implementation - marks slots as taken with backtracking (Section 3.3)
-        private bool TryTakePilotInPart(ReadOnlySpan<HashValue> bucketHashes, ulong pilot, BitVec taken)
+        private unsafe bool TryTakePilotInPart(ReadOnlySpan<HashValue> bucketHashes, ulong pilot, BitVec taken)
         {
             var hp = HashPilot(pilot);
 
@@ -1097,7 +1067,7 @@ namespace PtrHash.CSharp.Port.Core
                 var hash = bucketHashes[i];
                 var localSlot = SlotInPartHp(hash, hp);
 
-                if (taken.Get(localSlot))
+                if (taken.GetUnchecked(localSlot))
                 {
                     // Collision within the bucket. Clean already set entries (Section 3.3 backtracking)
                     // for &hx in unsafe { bucket.get_unchecked(..i) }
@@ -1105,13 +1075,13 @@ namespace PtrHash.CSharp.Port.Core
                     {
                         var previousHash = bucketHashes[j];
                         var previousSlot = SlotInPartHp(previousHash, hp);
-                        taken.Set(previousSlot, false);
+                        taken.SetUnchecked(previousSlot, false);
                     }
                     return false;
                 }
 
                 // Mark slot as taken immediately (Section 3.3)
-                taken.Set(localSlot, true);
+                taken.SetUnchecked(localSlot, true);
             }
 
             return true; // Successfully took all slots
