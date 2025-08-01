@@ -56,20 +56,37 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 | 1M | 92.09 μs | 54.49 μs | 55.60 μs | 1.66x | Native faster at 1M |
 | 10M | 186.72 μs | 85.43 μs | 102.13 μs | 1.83x | Both PtrHash versions dominate |
 
-### 3. Scaling Analysis (DictionaryLookupScalingBenchmark)
+### 3. Scaling Analysis (LookupPerformanceScalingBenchmark)
 **Test Details**:
-- **What**: How performance scales with lookup count
-- **Dataset**: Fixed 2M keys
+- **What**: How performance scales with lookup count across different configurations
+- **Dataset**: Fixed 2M keys (ulong) with random values
 - **Lookups**: Varying from 1K to 10M lookups with 50% hit rate
-- **Comparison**: Dictionary vs Native interop vs C# port streaming
+- **Configurations tested**:
+  - Standard `Dictionary<ulong, ulong>` (baseline)
+  - Native Multi-Part Stream
+  - Native Single-Part Stream  
+  - Port Multi-Part Point
+  - Port Multi-Part Stream
+  - Port Single-Part Point
+  - Port Single-Part Stream (U32 storage)
+  - Port Single-Part Stream (U64 storage)
+  - Port Single-Part Stream with Prefetch
 
-| Lookups | Dictionary<K,V> | PtrHashDict Native Stream | PtrHashDict Port Stream | Best Speedup |
-|---------|-----------------|---------------------------|-------------------------|--------------|
-| 1K | 4.07 μs | 4.34 μs | 5.10 μs | 0.94x |
-| 50K | 1,152 μs | 369 μs | 309 μs | 3.73x |
-| 100K | 4,695 μs | 1,313 μs | 886 μs | 5.30x |
-| 1M | 56,922 μs | 18,773 μs | 16,649 μs | 3.42x |
-| 10M | 563,027 μs | 179,927 μs | 165,114 μs | 3.41x |
+**Selected Results** (showing best performers):
+| Lookups | Dictionary<K,V> | Native Multi-Part | Native Single-Part | Port Multi-Part Stream | Port Single-Part Stream | Port Single-Part U64 |
+|---------|-----------------|-------------------|--------------------|-----------------------|-------------------------|---------------------|
+| 1K | 4.07 μs | 4.22 μs | 4.34 μs | 5.67 μs | 5.10 μs | 5.03 μs |
+| 50K | 1,152 μs | 370 μs | 369 μs | 392 μs | 309 μs | 328 μs |
+| 100K | 4,695 μs | 1,437 μs | 1,313 μs | 1,097 μs | 886 μs | 901 μs |
+| 1M | 56,922 μs | 18,429 μs | 18,773 μs | 17,218 μs | 16,649 μs | 17,002 μs |
+| 10M | 563,027 μs | 181,922 μs | 179,927 μs | 172,874 μs | 165,114 μs | 164,662 μs |
+
+**Key Findings**:
+- Dictionary only competitive at 1K lookups
+- Port Single-Part Stream achieves best performance: **5.30x speedup** at 100K lookups
+- U64 storage performs similarly to U32, suggesting memory bandwidth isn't the bottleneck
+- Streaming consistently outperforms point lookups for larger datasets
+- Prefetch implementation underperforms regular streaming (not shown - worse than baseline)
 
 ### 4. Raw PtrHash Methods (NativeVsPortPerformanceBenchmark)
 **Test Details**:
@@ -158,24 +175,11 @@ The `PtrHashDictionary` implementation makes specific tradeoffs optimized for ge
 If your use case guarantees that:
 1. All lookup keys were in the original training set
 2. No validation is needed for out-of-set keys
-3. You can accept wrong results for invalid keys
 
 Then you could create a specialized implementation that:
 - Skips key storage entirely
 - Eliminates key comparison overhead
 - Uses non-minimal perfect hashing (no remapping) for ~10% faster lookups at ~1% memory cost
-
-Example specialized usage:
-```csharp
-// Hypothetical optimized version for known-key scenarios
-public class PtrHashLookupTable<TValue>
-{
-    // Only stores values, no keys
-    // Assumes all lookups are valid
-    // ~50% less memory, faster lookups
-}
-```
-
 
 ## Key Optimizations
 
