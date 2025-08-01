@@ -66,9 +66,9 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> PtrHashNative_MultiPart_StrongerIntHasher_Construction()
+        public PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher> PtrHashNative_SinglePart_FxHasher_Linear_U32Vec_Construction()
         {
-            var config = PtrHashNative.FFIParams.Fast with { OverrideHashFunction = 2 }; // StrongerIntHash
+            var config = PtrHashNative.FFIParams.Fast with { SinglePart = true }; // FxHasher SinglePart
             return new PtrHashImpl.PtrHashInterop<ulong, ULongDispatcher>(_keys.AsSpan(), config);
         }
 
