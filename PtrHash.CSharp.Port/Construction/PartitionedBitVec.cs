@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PtrHash.CSharp.Port.Construction
 {
-    internal class PartitionedBitVec : IDisposable
+    public class PartitionedBitVec : IDisposable
     {
         private readonly BitVec[] _parts;
         private readonly nuint _slotsPerPart;
