@@ -2,8 +2,6 @@
 /target/
 **/target/
 Cargo.lock
-**/.cargo/
-*.rustc_info.json
 
 # C# build artifacts
 [Bb]in/
