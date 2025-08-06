@@ -83,13 +83,13 @@ namespace PtrHash.CSharp.Port.Tests
             {
                 var emptyKeys = Array.Empty<ulong>();
                 var emptyValues = Array.Empty<string>();
-                using var dict = new PtrHashDictionaryU64<string>(emptyKeys, emptyValues, "EMPTY");
+                using var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(emptyKeys, emptyValues, "EMPTY");
             });
 
             // Test single key
             var singleKey = new ulong[] { 42 };
             var singleValue = new string[] { "answer" };
-            using (var dict = new PtrHashDictionaryU64<string>(singleKey, singleValue, "MISSING"))
+            using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(singleKey, singleValue, "MISSING"))
             {
                 Assert.AreEqual("answer", dict[42]);
                 Assert.IsFalse(dict.TryGetValue(43, out var missing));
@@ -101,7 +101,7 @@ namespace PtrHash.CSharp.Port.Tests
             {
                 var keys = new ulong[] { 1, 2 };
                 var values = new string[] { "one" }; // Mismatched length
-                using var dict = new PtrHashDictionaryU64<string>(keys, values, "ERROR");
+                using var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, values, "ERROR");
             });
 
             // Test duplicate keys

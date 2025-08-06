@@ -66,7 +66,7 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
             // Map keys and values to their hash indices
             for (int i = 0; i < keys.Length; i++)
             {
-                int idx = (int)_ptrHash.GetIndex(keys[i]);
+                int idx = (int)_ptrHash.GetIndexNoRemap(keys[i]);
                 _keysByIndex[idx] = keys[i];
                 _valuesByIndex[idx] = values[i];
             }
@@ -89,7 +89,7 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(TKey key, out TValue value)
         {
-            var index = (int)_ptrHash.GetIndex(key);
+            var index = (int)_ptrHash.GetIndexNoRemap(key);
             
             // Single bounds check and cache-friendly access
             if ((uint)index < (uint)_keysByIndex.Length)
@@ -122,7 +122,7 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
             {
                 // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStream(keys, indices, prefetchDistance, true);
+                _ptrHash.GetIndicesStream(keys, indices, prefetchDistance, false);
                 ProcessIndices(keys, indices, values);
             }
             else
@@ -132,7 +132,7 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStream(keys, indicesSpan, prefetchDistance, true);
+                    _ptrHash.GetIndicesStream(keys, indicesSpan, prefetchDistance, false);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally

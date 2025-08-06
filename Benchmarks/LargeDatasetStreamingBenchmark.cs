@@ -24,7 +24,7 @@ namespace PtrHash.Benchmarks
             }
         }
 
-        [Params(200_000_000)]
+        [Params(1_000_000_000)]
         public int KeyCount { get; set; }
 
         [Params(10_000)]

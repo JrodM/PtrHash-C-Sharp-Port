@@ -80,7 +80,7 @@ namespace PtrHash.CSharp.Port.Collections
             // Map keys to their hash indices and store key-value pairs
             for (int i = 0; i < keys.Length; i++)
             {
-                int idx = (int)_ptrHash.GetIndex(keys[i]);
+                int idx = (int)_ptrHash.GetIndexNoRemap(keys[i]);
                 _keyValuePairs[idx] = new KeyValuePair<TKey, TValue>(keys[i], values[i]);
             }
         }
@@ -171,7 +171,7 @@ namespace PtrHash.CSharp.Port.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetValue(TKey key, out TValue value)
         {
-            var idx = (int)_ptrHash.GetIndex(key);
+            var idx = (int)_ptrHash.GetIndexNoRemap(key);
             
             // Single bounds check and cache-friendly access
             if ((uint)idx < (uint)_keyValuePairs.Length)
@@ -211,7 +211,7 @@ namespace PtrHash.CSharp.Port.Collections
             {
                 // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStream(keys, indices, minimal: true);
+                _ptrHash.GetIndicesStream(keys, indices, minimal: false);
                 ProcessIndices(keys, indices, values);
             }
             else
@@ -221,7 +221,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStream(keys, indicesSpan, minimal: true);
+                    _ptrHash.GetIndicesStream(keys, indicesSpan, minimal: false);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally
@@ -251,7 +251,7 @@ namespace PtrHash.CSharp.Port.Collections
             {
                 // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: true, prefetchDistance);
+                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: false, prefetchDistance);
                 ProcessIndices(keys, indices, values);
             }
             else
@@ -261,7 +261,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: true, prefetchDistance);
+                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: false, prefetchDistance);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally
@@ -338,29 +338,5 @@ namespace PtrHash.CSharp.Port.Collections
 
             _disposed = true;
         }
-    }
-
-    /// <summary>
-    /// Convenience class for UInt64 keys using StrongerIntHasher
-    /// </summary>
-    public class PtrHashDictionaryU64<TValue> : PtrHashDictionary<ulong, TValue, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>
-    {
-        public PtrHashDictionaryU64(ulong[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null, IEqualityComparer<ulong>? keyComparer = null)
-            : base(keys, values, notFoundSentinel, parameters, keyComparer)
-        {
-        }
-
-    }
-
-    /// <summary>
-    /// Convenience class for string keys using StringHasher
-    /// </summary>
-    public class PtrHashDictionaryString<TValue> : PtrHashDictionary<string, TValue, StringHasher, Linear, UInt32VectorRemappingStorage>
-    {
-        public PtrHashDictionaryString(string[] keys, TValue[] values, TValue notFoundSentinel, PtrHashParams? parameters = null, IEqualityComparer<string>? keyComparer = null)
-            : base(keys, values, notFoundSentinel, parameters, keyComparer)
-        {
-        }
-
     }
 }

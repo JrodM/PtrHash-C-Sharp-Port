@@ -8,6 +8,9 @@ using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 using PtrHash.CSharp.Interop.Native;
 using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 
@@ -41,9 +44,9 @@ namespace PtrHash.Benchmarks
         private PtrHashInteropDictionary<ulong, ulong, ULongDispatcher> _nativeSinglePartInterop = null!;
         
         // C# port dictionaries
-        private PtrHashDictionaryU64<ulong> _multiPartPtrHashDict = null!;
-        private PtrHashDictionaryU64<ulong> _singlePartPtrHashDict = null!;
-        private PtrHashDictionaryU64<ulong> _singlePartU64PtrHashDict = null!;
+        private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage> _multiPartPtrHashDict = null!;
+        private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage> _singlePartPtrHashDict = null!;
+        private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt64VectorRemappingStorage> _singlePartU64PtrHashDict = null!;
         
         private ulong[] _valuesBuffer1 = null!;
         private ulong[] _valuesBuffer2 = null!;
@@ -106,15 +109,15 @@ namespace PtrHash.Benchmarks
                 singlePartNativeParams);
             
             // Multi-part C# port dictionary
-            _multiPartPtrHashDict = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
+            _multiPartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
             
             // Single-part C# port dictionary (U32 storage)
             var singlePartPortParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartPtrHashDict = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, singlePartPortParams);
+            _singlePartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartPortParams);
             
             // Single-part C# port dictionary (U64 storage)
             var singlePartU64Params = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartU64PtrHashDict = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, singlePartU64Params);
+            _singlePartU64PtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt64VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartU64Params);
 
             _valuesBuffer1 = new ulong[LookupCount];
             _valuesBuffer2 = new ulong[LookupCount];

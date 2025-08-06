@@ -8,6 +8,9 @@ using PtrHash.CSharp.Interop.InteropDictionary;
 using PtrHash.CSharp.Port.Collections;
 using PtrHash.CSharp.Port;
 using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 using PtrHash.CSharp.Interop.Native;
 using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
 
@@ -37,10 +40,10 @@ namespace PtrHash.Benchmarks
         private PtrHashInteropDictionary<ulong, ulong, ULongDispatcher> _nativeSentinelPtrHash = null!;
         
         // C# port dictionary
-        private PtrHashDictionaryU64<ulong> _portPtrHashMap = null!;
+        private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage> _portPtrHashMap = null!;
         
         // Single part dictionaries for comparison
-        private PtrHashDictionaryU64<ulong> _singlePartPtrHashMap = null!;
+        private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage> _singlePartPtrHashMap = null!;
         
         private ulong[] _valuesBuffer = null!;
         private ulong[] _valuesBuffer2 = null!;
@@ -101,11 +104,11 @@ namespace PtrHash.Benchmarks
                 PtrHashNative.FFIParams.Fast);
             
             // C# port dictionary (multi-part)
-            _portPtrHashMap = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
+            _portPtrHashMap = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
             
             // Single part dictionary
             var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartPtrHashMap = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, singlePartParams);
+            _singlePartPtrHashMap = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartParams);
 
             _valuesBuffer = new ulong[lookupCount];
             _valuesBuffer2 = new ulong[lookupCount];
