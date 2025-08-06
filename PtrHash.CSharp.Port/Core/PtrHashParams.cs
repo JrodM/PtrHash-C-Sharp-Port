@@ -13,12 +13,6 @@ namespace PtrHash.CSharp.Port.Core
         public double Lambda { get; init; }
         public bool Minimal { get; init; }
         public bool SinglePart { get; init; }
-        
-        /// <summary>
-        /// Remapping storage type selector
-        /// Controls space/speed tradeoff for remapping table
-        /// </summary>
-        public RemappingStorageType StorageType { get; init; }
 
         /// <summary>
         /// Default fast parameters: 3.0 bits/key, optimized for query speed
@@ -29,7 +23,6 @@ namespace PtrHash.CSharp.Port.Core
             Lambda = 3.0,
             Minimal = true,
             SinglePart = false,  // Multi-part mode
-            StorageType = RemappingStorageType.VecU32
         };
 
         /// <summary>
@@ -41,8 +34,7 @@ namespace PtrHash.CSharp.Port.Core
             Alpha = 0.99,  // Space efficiency parameter
             Lambda = 3.5,  // Expected bucket size parameter
             Minimal = true,
-            SinglePart = false,
-            StorageType = RemappingStorageType.VecU32
+            SinglePart = false
         };
         
         /// <summary>
@@ -54,8 +46,7 @@ namespace PtrHash.CSharp.Port.Core
             Alpha = 0.99,
             Lambda = 3.5,
             Minimal = true,
-            SinglePart = false,
-            StorageType = RemappingStorageType.CacheLineEF
+            SinglePart = false
         };
     }
 

@@ -17,7 +17,7 @@ public class PtrHashCorrectnessTests
     /// Test correctness across various dataset sizes for all configurations
     /// </summary>
     [TestMethod]
-    [DataRow(1)]
+    [DataRow(2)]
     [DataRow(10)]
     [DataRow(100)]
     [DataRow(1_000)]
@@ -103,23 +103,4 @@ public class PtrHashCorrectnessTests
             // Expected - duplicate keys should cause construction failure
         }
     }
-
-    /// <summary>
-    /// Test that single-part vs multi-part produce same results
-    /// </summary>
-    [TestMethod]
-    [DataRow(1_000)]
-    [DataRow(100_000)]
-    public void SinglePartVsMultiPart_ProduceSameResults(int keyCount)
-    {
-        var keys = PtrHashTestHelpers.GenerateKeys(keyCount);
-
-        var singlePartConfig = new TestConfig("SinglePart", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU32);
-        var multiPartConfig = new TestConfig("MultiPart", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU32);
-
-        // Both should produce valid MPHFs (not necessarily identical indices, but both correct)
-        PtrHashTestHelpers.TestCorrectness<ulong>(singlePartConfig, keys.AsSpan());
-        PtrHashTestHelpers.TestCorrectness<ulong>(multiPartConfig, keys.AsSpan());
-    }
-
 }

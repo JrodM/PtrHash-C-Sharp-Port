@@ -63,8 +63,8 @@ namespace PtrHash.CSharp.Port.Collections
                 Lambda = 3.0,
                 Minimal = true,
                 SinglePart = true,  // Single-part mode for fastest point lookups
-                StorageType = RemappingStorageType.VecU32
             };
+            
             _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(keys, optimizedParams);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;

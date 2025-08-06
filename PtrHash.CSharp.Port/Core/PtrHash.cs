@@ -75,7 +75,6 @@ namespace PtrHash.CSharp.Port.Core
         private readonly bool _minimal;
         private readonly bool _isSinglePart;
         private readonly double _bitsPerKey;
-        private readonly RemappingStorageType _storageType;
         private ulong _seed;
 
         /// <summary>
@@ -91,7 +90,6 @@ namespace PtrHash.CSharp.Port.Core
                 _numKeys = (nuint)keys.Length;
                 _minimal = parameters.Minimal;
                 _isSinglePart = parameters.SinglePart;
-                _storageType = parameters.StorageType;
 
                 // Calculate parts and structure sizes (PtrHash paper Section 3.1)
                 if (_isSinglePart)

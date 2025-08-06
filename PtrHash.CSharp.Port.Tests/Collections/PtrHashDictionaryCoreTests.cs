@@ -5,6 +5,8 @@ using PtrHash.CSharp.Port.KeyHashers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
 
 namespace PtrHash.CSharp.Port.Tests
 {
@@ -57,12 +59,7 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = PtrHashTestHelpers.GenerateStringKeys(keyCount);
             var values = GenerateStringValues(keyCount);
 
-            // Test subset of configurations for strings (they need VecU32+ for large indices)
-            var stringConfigs = PtrHashTestHelpers.AllConfigurations
-                .Where(c => c.StorageType is RemappingStorageType.VecU32 or RemappingStorageType.VecU64)
-                .ToArray();
-
-            foreach (var config in stringConfigs)
+            foreach (var config in PtrHashTestHelpers.AllConfigurations)
             {
                 try
                 {
@@ -123,25 +120,6 @@ namespace PtrHash.CSharp.Port.Tests
         }
 
         /// <summary>
-        /// Test that single-part vs multi-part produce same results
-        /// </summary>
-        [TestMethod]
-        [DataRow(1_000)]
-        [DataRow(100_000)]
-        public void SinglePartVsMultiPart_ProduceSameResults(int keyCount)
-        {
-            var keys = PtrHashTestHelpers.GenerateKeys(keyCount);
-            var values = GenerateValues(keyCount);
-
-            var singlePartConfig = new TestConfig("SinglePart", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU32);
-            var multiPartConfig = new TestConfig("MultiPart", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU32);
-
-            // Both should produce valid dictionaries (not necessarily identical lookups, but both correct)
-            TestDictionaryCorrectness(singlePartConfig, keys, values);
-            TestDictionaryCorrectness(multiPartConfig, keys, values);
-        }
-
-        /// <summary>
         /// Test streaming vs individual lookup consistency across configurations
         /// </summary>
         [TestMethod]
@@ -152,31 +130,9 @@ namespace PtrHash.CSharp.Port.Tests
             var keys = PtrHashTestHelpers.GenerateKeys(keyCount);
             var values = GenerateValues(keyCount);
 
-            foreach (var config in PtrHashTestHelpers.AllConfigurations.Take(3)) // Test subset for performance
+            foreach (var config in PtrHashTestHelpers.AllConfigurations)
             {
-                using var dict = CreateDictionary(config, keys, values);
-                
-                // Create mixed query (some valid, some invalid keys)
-                var queryKeys = CreateMixedQueryKeys(keys, keyCount / 10);
-                
-                // Test individual lookups
-                var individualResults = new string[queryKeys.Length];
-                for (int i = 0; i < queryKeys.Length; i++)
-                {
-                    individualResults[i] = dict.TryGetValue(queryKeys[i], out var value) ? value : dict.Sentinel;
-                }
-                
-                // Test streaming
-                var streamResults = new string[queryKeys.Length];
-                var streamPrefetchResults = new string[queryKeys.Length];
-                dict.TryGetValueStream(queryKeys, streamResults);
-                dict.TryGetValueStreamPrefetch(queryKeys, streamPrefetchResults);
-                
-                // Verify consistency
-                CollectionAssert.AreEqual(individualResults, streamResults, 
-                    $"Config {config.Name}: Stream results don't match individual results");
-                CollectionAssert.AreEqual(individualResults, streamPrefetchResults, 
-                    $"Config {config.Name}: StreamPrefetch results don't match individual results");
+                TestStreamingConsistency(config, keys, values);
             }
         }
 
@@ -218,24 +174,134 @@ namespace PtrHash.CSharp.Port.Tests
 
         private static void TestDictionaryCorrectness(TestConfig config, ulong[] keys, string[] values)
         {
-            using var dict = CreateDictionary(config, keys, values);
-            VerifyDictionaryCorrectness(dict, keys, values, config.Name);
+            // Select storage type and create PtrHashDictionary
+            switch (config.StorageType)
+            {
+                case RemappingStorageType.VecU32:
+                    using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyDictionaryCorrectness(dict, keys, values, config.Name);
+                    }
+                    break;
+                    
+                case RemappingStorageType.VecU64:
+                    using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyDictionaryCorrectness(dict, keys, values, config.Name);
+                    }
+                    break;
+                    
+                case RemappingStorageType.CacheLineEF:
+                    using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, CachelineEfVec>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyDictionaryCorrectness(dict, keys, values, config.Name);
+                    }
+                    break;
+                    
+                default:
+                    throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            }
+        }
+
+        private static void TestStreamingConsistency(TestConfig config, ulong[] keys, string[] values)
+        {
+            // Select storage type and create PtrHashDictionary
+            switch (config.StorageType)
+            {
+                case RemappingStorageType.VecU32:
+                    using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyStreamingConsistency(dict, keys, config.Name);
+                    }
+                    break;
+                    
+                case RemappingStorageType.VecU64:
+                    using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyStreamingConsistency(dict, keys, config.Name);
+                    }
+                    break;
+                    
+                case RemappingStorageType.CacheLineEF:
+                    using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, CachelineEfVec>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyStreamingConsistency(dict, keys, config.Name);
+                    }
+                    break;
+                    
+                default:
+                    throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            }
         }
 
         private static void TestStringDictionaryCorrectness(TestConfig config, string[] keys, string[] values)
         {
-            var parameters = config.Parameters with { StorageType = config.StorageType };
-            using var dict = new PtrHashDictionaryString<string>(keys, values, "MISSING", parameters);
-            VerifyStringDictionaryCorrectness(dict, keys, values, config.Name);
+            // Select storage type and create PtrHashDictionary
+            switch (config.StorageType)
+            {
+                case RemappingStorageType.VecU32:
+                    using (var dict = new PtrHashDictionary<string, string, StringHasher, Linear, UInt32VectorRemappingStorage>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyStringDictionaryCorrectness(dict, keys, values, config.Name);
+                    }
+                    break;
+                    
+                case RemappingStorageType.VecU64:
+                    using (var dict = new PtrHashDictionary<string, string, StringHasher, Linear, UInt64VectorRemappingStorage>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyStringDictionaryCorrectness(dict, keys, values, config.Name);
+                    }
+                    break;
+                    
+                case RemappingStorageType.CacheLineEF:
+                    using (var dict = new PtrHashDictionary<string, string, StringHasher, Linear, CachelineEfVec>(
+                        keys, values, "MISSING", config.Parameters))
+                    {
+                        VerifyStringDictionaryCorrectness(dict, keys, values, config.Name);
+                    }
+                    break;
+                    
+                default:
+                    throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            }
         }
 
-        private static PtrHashDictionaryU64<string> CreateDictionary(TestConfig config, ulong[] keys, string[] values)
+        private static void VerifyStreamingConsistency<TStorage>(PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, TStorage> dict, ulong[] keys, string configName)
+            where TStorage : struct, IRemappingStorage<TStorage>
         {
-            var parameters = config.Parameters with { StorageType = config.StorageType };
-            return new PtrHashDictionaryU64<string>(keys, values, "MISSING", parameters);
+            // Create mixed query (some valid, some invalid keys)
+            var queryKeys = CreateMixedQueryKeys(keys, keys.Length / 10);
+            
+            // Test individual lookups
+            var individualResults = new string[queryKeys.Length];
+            for (int i = 0; i < queryKeys.Length; i++)
+            {
+                individualResults[i] = dict.TryGetValue(queryKeys[i], out var value) ? value : dict.Sentinel;
+            }
+            
+            // Test streaming
+            var streamResults = new string[queryKeys.Length];
+            var streamPrefetchResults = new string[queryKeys.Length];
+            dict.TryGetValueStream(queryKeys, streamResults);
+            dict.TryGetValueStreamPrefetch(queryKeys, streamPrefetchResults);
+            
+            // Verify consistency
+            CollectionAssert.AreEqual(individualResults, streamResults, 
+                $"Config {configName}: Stream results don't match individual results");
+            CollectionAssert.AreEqual(individualResults, streamPrefetchResults, 
+                $"Config {configName}: StreamPrefetch results don't match individual results");
         }
 
-        private static void VerifyDictionaryCorrectness(PtrHashDictionaryU64<string> dict, ulong[] keys, string[] values, string configName)
+        private static void VerifyDictionaryCorrectness<TStorage>(PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, TStorage> dict, ulong[] keys, string[] values, string configName)
+            where TStorage : struct, IRemappingStorage<TStorage>
         {
             // Test 1: All original keys should map to their values
             for (int i = 0; i < keys.Length; i++)
@@ -283,7 +349,8 @@ namespace PtrHash.CSharp.Port.Tests
                 $"Config {configName}: Values collection should match input values");
         }
 
-        private static void VerifyStringDictionaryCorrectness(PtrHashDictionaryString<string> dict, string[] keys, string[] values, string configName)
+        private static void VerifyStringDictionaryCorrectness<TStorage>(PtrHashDictionary<string, string, StringHasher, Linear, TStorage> dict, string[] keys, string[] values, string configName)
+            where TStorage : struct, IRemappingStorage<TStorage>
         {
             // Test 1: All original keys should map to their values
             for (int i = 0; i < keys.Length; i++)

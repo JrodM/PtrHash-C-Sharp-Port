@@ -113,7 +113,7 @@ namespace PtrHash.Benchmarks
             _singlePartPtrHashDict = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, singlePartPortParams);
             
             // Single-part C# port dictionary (U64 storage)
-            var singlePartU64Params = PtrHashParams.DefaultFast with { SinglePart = true, StorageType = RemappingStorageType.VecU64 };
+            var singlePartU64Params = PtrHashParams.DefaultFast with { SinglePart = true };
             _singlePartU64PtrHashDict = new PtrHashDictionaryU64<ulong>(_keys, _values, ulong.MaxValue, singlePartU64Params);
 
             _valuesBuffer1 = new ulong[LookupCount];

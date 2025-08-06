@@ -99,9 +99,7 @@ public static class PtrHashTestHelpers
     public static void TestCorrectness<TKey>(TestConfig config, ReadOnlySpan<TKey> keys)
         where TKey : notnull
     {
-        var parameters = config.Parameters with { 
-            StorageType = config.StorageType 
-        };
+        var parameters = config.Parameters;
 
         // Create appropriate PtrHash based on key type
         if (typeof(TKey) == typeof(ulong))
@@ -153,9 +151,33 @@ public static class PtrHashTestHelpers
 
     private static void TestCorrectnessString(TestConfig config, PtrHashParams parameters, string[] keys)
     {
-        // String keys - use string hasher with VecU32 (strings need larger indices)
-        using var ptrhash = new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters);
-        VerifyCorrectness(ptrhash, keys, config.Name);
+        // Select storage type and create PtrHash
+        switch (config.StorageType)
+        {
+            case RemappingStorageType.VecU32:
+                using (var ptrhash = new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters))
+                {
+                    VerifyCorrectness(ptrhash, keys, config.Name);
+                }
+                break;
+                
+            case RemappingStorageType.VecU64:
+                using (var ptrhash = new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage>(keys, parameters))
+                {
+                    VerifyCorrectness(ptrhash, keys, config.Name);
+                }
+                break;
+                
+            case RemappingStorageType.CacheLineEF:
+                using (var ptrhash = new PtrHash<string, StringHasher, Linear, CachelineEfVec>(keys, parameters))
+                {
+                    VerifyCorrectness(ptrhash, keys, config.Name);
+                }
+                break;
+                
+            default:
+                throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+        }
     }
 
     private static void VerifyCorrectness<TKey>(IPtrHash<TKey> ptrhash, TKey[] keys, string configName)
