@@ -7,7 +7,7 @@ using System.Numerics;
 namespace PtrHash.CSharp.Port.Construction
 {
     /// <summary>
-    /// High-performance bit vector implementation using unmanaged memorys
+    /// bit vector implementation using unmanaged memory
     /// </summary>
     public sealed unsafe class BitVec : IDisposable
     {
@@ -24,33 +24,16 @@ namespace PtrHash.CSharp.Port.Construction
             _length = length;
             _numWords = (int)((length + BITS_PER_WORD - 1) / BITS_PER_WORD);
             
-            // Allocate unmanaged memory
             var sizeInBytes = _numWords * sizeof(ulong);
             _bits = (ulong*)NativeMemory.Alloc((nuint)sizeInBytes);
             
-            // Clear the memory
             NativeMemory.Clear(_bits, (nuint)sizeInBytes);
-        }
-        
-        // Constructor for external unmanaged memory (no allocation)
-        internal BitVec(nuint length, ulong* bits)
-        {
-            _length = length;
-            _numWords = (int)((length + BITS_PER_WORD - 1) / BITS_PER_WORD);
-            _bits = bits;
-            _disposed = true; // Don't free external memory
         }
         
         public nuint Length => _length;
         
         /// <summary>
-        /// Get raw pointer for maximum performance in hot paths
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong* GetBitsPtr() => _bits;
-        
-        /// <summary>
-        /// Standard safe Get - includes bounds checking
+        /// Includes bounds checking
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Get(nuint index)
@@ -64,8 +47,8 @@ namespace PtrHash.CSharp.Port.Construction
         }
         
         /// <summary>
-        /// Unsafe unchecked Get for hot paths - no bounds checking
-        /// Matches Rust's get_unchecked() performance
+        /// Unsafe unchecked i.e no bounds checking
+        /// Matches get_unchecked()
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool GetUnchecked(nuint index)
@@ -94,22 +77,6 @@ namespace PtrHash.CSharp.Port.Construction
                 _bits[wordIndex] &= ~mask;
         }
         
-        /// <summary>
-        /// Unsafe unchecked Set for hot paths - no bounds checking
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetUnchecked(nuint index, bool value)
-        {
-            var wordIndex = index >> LOG2_BITS_PER_WORD;
-            var bitIndex = (int)(index & (BITS_PER_WORD - 1));
-            var mask = 1UL << bitIndex;
-            
-            if (value)
-                _bits[wordIndex] |= mask;
-            else
-                _bits[wordIndex] &= ~mask;
-        }
-        
         public nuint CountOnes()
         {
             nuint count = 0;
@@ -120,11 +87,6 @@ namespace PtrHash.CSharp.Port.Construction
             return count;
         }
         
-        public nuint CountZeros()
-        {
-            return _length - CountOnes();
-        }
-        
         /// <summary>
         /// Efficiently iterates over only the zero bits (unset bits) in the bit vector.
         /// Iterates over zero bit positions with O(number_of_zeros) complexity
@@ -133,23 +95,18 @@ namespace PtrHash.CSharp.Port.Construction
         /// <returns>An enumerable of indices where bits are zero</returns>
         public IEnumerable<nuint> IterZeros()
         {
-            // Process each word by accessing through safe methods
             for (int wordIndex = 0; wordIndex < _numWords; wordIndex++)
             {
                 var word = GetWord(wordIndex);
                 var baseIndex = (nuint)(wordIndex * BITS_PER_WORD);
                 
-                // Skip words that are all 1s - major optimization for sparse bit vectors
                 if (word == ulong.MaxValue)
                     continue;
                 
-                // Invert the word so we can find zero bits using trailing zero count
                 var invertedWord = ~word;
-                
-                // Process all zero bits in this word
+
                 while (invertedWord != 0)
                 {
-                    // Find the position of the next zero bit
                     var trailingZeros = BitOperations.TrailingZeroCount(invertedWord);
                     var bitIndex = baseIndex + (nuint)trailingZeros;
                     
@@ -160,7 +117,6 @@ namespace PtrHash.CSharp.Port.Construction
                     }
                     else
                     {
-                        // We've gone past the end of the bit vector, stop processing this word
                         yield break;
                     }
                     
@@ -171,7 +127,7 @@ namespace PtrHash.CSharp.Port.Construction
         }
         
         /// <summary>
-        /// Helper method to get a word - keeps unsafe code out of iterator
+        /// Keeps unsafe code out of iterator
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ulong GetWord(int index)

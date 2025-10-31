@@ -6,7 +6,6 @@ using PtrHash.CSharp.Port.KeyHashers;
 namespace PtrHash.CSharp.Port.Sorting
 {
     /// <summary>
-    /// High-performance radix sort implementation optimized for PtrHash
     /// Based on Rust's rdst::RadixSort used in the original implementation
     /// </summary>
     public static class RadixSort
@@ -16,7 +15,7 @@ namespace PtrHash.CSharp.Port.Sorting
         private const int RADIX_MASK = RADIX_SIZE - 1;
 
         /// <summary>
-        /// In-place radix sort for HashValue - matches Rust's radix_sort_unstable()
+        /// In place radix sort for HashValue.
         /// Uses ping-pong buffering with temporary array for sorting passes
         /// </summary>
         public static void SortHashValues(Span<HashValue> data)
@@ -24,27 +23,17 @@ namespace PtrHash.CSharp.Port.Sorting
             int n = data.Length;
             if (n <= 1) return;
             
-            // Small arrays: use built-in sort (IntroSort with insertion sort fallback)
-            if (n < 32)
-            {
-                data.Sort((a, b) => a.Full().CompareTo(b.Full()));
-                return;
-            }
-            
-            // Rent a temporary buffer for ping-pong sorting
             var pool = ArrayPool<HashValue>.Shared;
             var tempArray = pool.Rent(n);
             try
             {
                 var temp = tempArray.AsSpan(0, n);
-                
-                // Allocate counts buffer once on the stack
                 Span<int> counts = stackalloc int[RADIX_SIZE];
                 
                 // Track which buffer contains the data
                 bool dataInOriginal = true;
                 
-                // Process each byte (8 passes for 64-bit values)
+                // Process each byte (8 passes for 64 bit values)
                 for (int shift = 0; shift < 64; shift += RADIX_BITS)
                 {
                     counts.Clear();
@@ -60,7 +49,7 @@ namespace PtrHash.CSharp.Port.Sorting
                     }
                     
                     if (!continueSort)
-                        break; // Early exit if remaining bits are all the same
+                        break; // exit if remaining bits are all the same
                     
                     dataInOriginal = !dataInOriginal;
                 }
@@ -77,7 +66,7 @@ namespace PtrHash.CSharp.Port.Sorting
         
         /// <summary>
         /// Single radix sort pass for HashValue
-        /// Returns false if all values have the same byte (can skip remaining passes)
+        /// Returns false if all values have the same byte
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool RadixPassHashValues(
@@ -99,7 +88,7 @@ namespace PtrHash.CSharp.Port.Sorting
                 allSame &= (b == firstByte);
             }
             
-            // Early exit if all bytes are the same - no copy here!
+            // Early exit if all bytes are the same
             if (allSame)
                 return false;
             

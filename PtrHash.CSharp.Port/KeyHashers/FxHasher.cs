@@ -9,7 +9,6 @@ namespace PtrHash.CSharp.Port.KeyHashers
 {
     /// <summary>
     /// FxHash implementation for fast hashing of ulong keys
-    /// FxHash implementation designed for speed over cryptographic security
     /// </summary>
     public readonly struct FxHasher : IKeyHasher<ulong>
     {
@@ -47,15 +46,6 @@ namespace PtrHash.CSharp.Port.KeyHashers
             unchecked
             {
                 return a * b;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong WrappingAdd(this ulong a, ulong b)
-        {
-            unchecked
-            {
-                return a + b;
             }
         }
     }

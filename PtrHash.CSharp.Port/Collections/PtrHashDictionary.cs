@@ -27,7 +27,9 @@ namespace PtrHash.CSharp.Port.Collections
         private readonly TValue _sentinel;
         private readonly IEqualityComparer<TKey> _keyComparer;
         private bool _disposed;
-
+        
+        const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
+        
         /// <summary>
         /// The sentinel value returned for keys not found in the dictionary
         /// </summary>
@@ -62,7 +64,7 @@ namespace PtrHash.CSharp.Port.Collections
                 Alpha = 0.99,
                 Lambda = 3.0,
                 Minimal = true,
-                SinglePart = true,  // Single-part mode for fastest point lookups
+                SinglePart = true,
             };
             
             _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(keys, optimizedParams);
@@ -173,11 +175,11 @@ namespace PtrHash.CSharp.Port.Collections
         {
             var idx = (int)_ptrHash.GetIndexNoRemap(key);
             
-            // Single bounds check and cache-friendly access
+            // Single bounds check
             if ((uint)idx < (uint)_keyValuePairs.Length)
             {
                 ref var kvp = ref _keyValuePairs[idx];
-                // Use cached comparer - faster than EqualityComparer.Default lookup
+                
                 if (_keyComparer.Equals(kvp.Key, key))
                 {
                     value = kvp.Value;
@@ -205,18 +207,14 @@ namespace PtrHash.CSharp.Port.Collections
             if (keys.Length != values.Length)
                 throw new ArgumentException("Key and value spans must have the same length");
             
-            const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
-            
             if (keys.Length <= MAX_STACK_SIZE)
             {
-                // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[keys.Length];
                 _ptrHash.GetIndicesStream(keys, indices, minimal: false);
                 ProcessIndices(keys, indices, values);
             }
             else
             {
-                // Large datasets: rent from array pool to avoid stack overflow
                 var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
                 try
                 {
@@ -245,18 +243,14 @@ namespace PtrHash.CSharp.Port.Collections
             if (keys.Length != values.Length)
                 throw new ArgumentException("Key and value spans must have the same length");
             
-            const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
-            
             if (keys.Length <= MAX_STACK_SIZE)
             {
-                // Small datasets: single allocation on stack
                 Span<nuint> indices = stackalloc nuint[keys.Length];
                 _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: false, prefetchDistance);
                 ProcessIndices(keys, indices, values);
             }
             else
             {
-                // Large datasets: rent from array pool to avoid stack overflow
                 var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
                 try
                 {
@@ -289,7 +283,7 @@ namespace PtrHash.CSharp.Port.Collections
             int kvpCount = kvps.Length;
             int len = keys.Length;
 
-            // Get raw refs to spans to remove bounds-checks
+            // Get raw refs to spans to remove bounds checks
             ref TKey keyRef = ref MemoryMarshal.GetReference(keys);
             ref nuint idxRef = ref MemoryMarshal.GetReference(indices);
             ref TValue valRef = ref MemoryMarshal.GetReference(values);
@@ -297,14 +291,11 @@ namespace PtrHash.CSharp.Port.Collections
             for (int i = 0; i < len; i++)
             {
                 nuint uidx = Unsafe.Add(ref idxRef, i);
-
-                // Default to sentinel
+                
                 TValue result = sentinel;
-
-                // Branchless range-check
+                
                 if (uidx < (nuint)kvpCount)
                 {
-                    // Fetch the slot
                     ref var kvp = ref kvps[(int)uidx];
 
                     if (comparer.Equals(Unsafe.Add(ref keyRef, i), kvp.Key))

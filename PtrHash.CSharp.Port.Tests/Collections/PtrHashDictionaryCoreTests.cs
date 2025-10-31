@@ -10,9 +10,6 @@ using PtrHash.CSharp.Port.Storage;
 
 namespace PtrHash.CSharp.Port.Tests
 {
-    /// <summary>
-    /// Comprehensive correctness tests for PtrHashDictionary across all configurations and dataset sizes
-    /// </summary>
     [TestClass]
     public class PtrHashDictionaryCorrectnessTests
     {

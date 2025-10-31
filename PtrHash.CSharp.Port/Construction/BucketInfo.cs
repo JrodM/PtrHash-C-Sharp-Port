@@ -4,7 +4,7 @@ namespace PtrHash.CSharp.Port.Construction
 {
     /// <summary>
     /// Bucket information for eviction queue priority
-    /// Implements IComparable to work with BinaryHeap (max-heap by bucket size)
+    /// Implements IComparable to work with BinaryHeap
     /// </summary>
     public readonly struct BucketInfo : IComparable<BucketInfo>, IEquatable<BucketInfo>
     {
@@ -19,14 +19,13 @@ namespace PtrHash.CSharp.Port.Construction
         
         public int CompareTo(BucketInfo other)
         {
-            // Use max-heap to process larger sizes first
             // Return negative for larger sizes to get max-heap behavior
             var sizeCompare = other.Size.CompareTo(Size); // Reverse for max-heap
             if (sizeCompare != 0)
                 return sizeCompare;
                 
             // If sizes are equal, compare by bucket ID for deterministic ordering
-            return other.BucketId.CompareTo(BucketId); // Reverse for deterministic order
+            return other.BucketId.CompareTo(BucketId);
         }
         
         public bool Equals(BucketInfo other)

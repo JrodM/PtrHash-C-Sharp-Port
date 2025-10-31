@@ -56,7 +56,6 @@ namespace PtrHash.CSharp.Port.Construction
         
         public nuint TotalLength => (nuint)_parts.Length * _slotsPerPart;
         
-        // Clear all bits for reuse
         public void Clear()
         {
             foreach (var part in _parts)
@@ -65,10 +64,8 @@ namespace PtrHash.CSharp.Port.Construction
             }
         }
         
-        // Access to individual parts for remap algorithm
         public BitVec[] Parts => _parts;
         
-        // Get a specific part's BitVec
         public BitVec GetPart(int partIndex) => _parts[partIndex];
         
         /// <summary>

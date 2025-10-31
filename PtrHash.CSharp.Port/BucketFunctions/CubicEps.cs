@@ -10,7 +10,7 @@ namespace PtrHash.CSharp.Port.BucketFunctions
 
         public void SetBucketsPerPart(ulong b)
         {
-            // No-op for CubicEps
+            // No op
         }
 
         public ulong Call(ulong x)

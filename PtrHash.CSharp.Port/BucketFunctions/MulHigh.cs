@@ -9,7 +9,6 @@ namespace PtrHash.CSharp.Port.BucketFunctions
         /// </summary>
         public static ulong Multiply(ulong a, ulong b)
         {
-            // Use 128-bit arithmetic to get the high 64 bits
             return (ulong)(((UInt128)a * b) >> 64);
         }
     }

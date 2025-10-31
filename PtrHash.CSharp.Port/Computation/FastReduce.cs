@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace PtrHash.CSharp.Port.Computation
 {
     /// <summary>
-    /// FastReduce instance for pre-computed modular reduction (PtrHash paper Section 3.2)
+    /// FastReduce instance for pre-computed modular reduction
     /// </summary>
     internal readonly struct FastReduce
     {
