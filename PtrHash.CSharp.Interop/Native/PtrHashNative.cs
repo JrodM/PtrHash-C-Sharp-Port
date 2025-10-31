@@ -6,7 +6,7 @@ namespace PtrHash.CSharp.Interop.Native
 {
     public static partial class PtrHashNative
     {
-        private const string LibraryName = "libptrhash";
+        private const string LibraryName = "ptrhash";
 
         #region Structures
 
