@@ -6,7 +6,7 @@ namespace PtrHash.CSharp.Interop.Native
 {
     public static partial class PtrHashNative
     {
-        private const string LibraryName = "libptrhash";
+        private const string LibraryName = "ptrhash";
 
         #region Structures
 
@@ -131,41 +131,36 @@ namespace PtrHash.CSharp.Interop.Native
 
         #region U64 Key Functions
 
-        [LibraryImport(LibraryName)]
-        [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-        internal static partial FFIResultHandle ptrhash_new_u64(
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern FFIResultHandle ptrhash_new_u64(
             IntPtr keys,
             nuint n,
             FFIParams parameters);
 
-        [LibraryImport(LibraryName)]
-        [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         [SuppressGCTransition] // Critical: 10-20ns vs 100-200ns call overhead with source-gen
-        internal static partial FFIResultIndex ptrhash_index_u64(
+        internal static extern FFIResultIndex ptrhash_index_u64(
             IntPtr handle,
             ulong key);
 
-        [LibraryImport(LibraryName)]
-        [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         [SuppressGCTransition] // Critical: 10-20ns vs 100-200ns call overhead with source-gen
-        internal static partial FFIResultIndex ptrhash_index_no_remap_u64(
+        internal static extern FFIResultIndex ptrhash_index_no_remap_u64(
             IntPtr handle,
             ulong key);
 
-        [LibraryImport(LibraryName)]
-        [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         [SuppressGCTransition] // Batch operations are compute-intensive, ideal for SuppressGCTransition
-        internal static partial FFIResultVoid ptrhash_index_batch_u64(
+        internal static extern FFIResultVoid ptrhash_index_batch_u64(
             IntPtr handle,
             IntPtr keys,
             nuint n,
             IntPtr results,
             [MarshalAs(UnmanagedType.U1)] bool minimal);
 
-        [LibraryImport(LibraryName)]
-        [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         [SuppressGCTransition] // Stream operations with prefetch are compute-intensive
-        internal static partial FFIResultVoid ptrhash_index_stream_u64(
+        internal static extern FFIResultVoid ptrhash_index_stream_u64(
             IntPtr handle,
             IntPtr keys,
             nuint n,

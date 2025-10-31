@@ -75,51 +75,42 @@ namespace PtrHash.CSharp.Port.Tests
             var success = CachelineEfVec.TryNew(values, out var vec);
             Assert.IsTrue(success, "CachelineEfVec creation should succeed");
 
-            // Assert
-            Assert.AreEqual(100, vec.Count);
+            // Assert - using IRemappingStorage interface
             for (int i = 0; i < 100; i++)
             {
-                Assert.AreEqual(values[i], vec[i], $"Value at index {i} should match");
+                Assert.AreEqual(values[i], (ulong)CachelineEfVec.Index(vec, (nuint)i), $"Value at index {i} should match");
             }
         }
 
         [TestMethod]
-        public void CachelineEfVec_ImplementsIListCorrectly()
+        public void CachelineEfVec_IRemappingStorage_WorksCorrectly()
         {
             // Arrange
             var values = new ulong[] { 100, 200, 300, 400, 500 };
             var success = CachelineEfVec.TryNew(values, out var vec);
             Assert.IsTrue(success, "CachelineEfVec creation should succeed");
 
-            // Act & Assert
-            Assert.IsTrue(vec.IsReadOnly);
-            Assert.AreEqual(5, vec.Count);
-            Assert.IsTrue(vec.Contains(300UL));
-            Assert.IsFalse(vec.Contains(999UL));
-            Assert.AreEqual(2, vec.IndexOf(300UL));
-            Assert.AreEqual(-1, vec.IndexOf(999UL));
-
-            // Test enumeration
-            var enumerated = vec.ToArray();
-            CollectionAssert.AreEqual(values, enumerated);
+            // Act & Assert - test IRemappingStorage interface
+            Assert.AreEqual("CacheLineEF", CachelineEfVec.Name);
+            Assert.IsTrue(CachelineEfVec.GetSizeInBytes(vec) > 0);
+            
+            // Test indexing
+            for (int i = 0; i < values.Length; i++)
+            {
+                Assert.AreEqual(values[i], (ulong)CachelineEfVec.Index(vec, (nuint)i), $"Value at index {i} should match");
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void CachelineEfVec_Add_ThrowsNotSupported()
+        public void CachelineEfVec_Dispose_WorksCorrectly()
         {
-            var success = CachelineEfVec.TryNew(new ulong[] { 100, 200 }, out var vec);
-            Assert.IsTrue(success);
-            vec.Add(300);
-        }
+            // Arrange
+            var values = new ulong[] { 100, 200, 300 };
+            var success = CachelineEfVec.TryNew(values, out var vec);
+            Assert.IsTrue(success, "CachelineEfVec creation should succeed");
 
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void CachelineEfVec_Remove_ThrowsNotSupported()
-        {
-            var success = CachelineEfVec.TryNew(new ulong[] { 100, 200 }, out var vec);
-            Assert.IsTrue(success);
-            vec.Remove(100);
+            // Act & Assert - should not throw
+            vec.Dispose();
         }
     }
 }

@@ -24,11 +24,6 @@ public readonly record struct TestConfig(
 public static class PtrHashTestHelpers
 {
     /// <summary>
-    /// Standard dataset sizes for correctness testing
-    /// </summary>
-    public static readonly int[] StandardDatasetSizes = [1, 10, 100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000];
-
-    /// <summary>
     /// All PtrHash configurations to test
     /// </summary>
     public static readonly TestConfig[] AllConfigurations = [

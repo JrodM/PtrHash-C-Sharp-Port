@@ -312,4 +312,99 @@ namespace PtrHash.CSharp.Port.Storage
             }
         }
     }
+
+    /// <summary>
+    /// A vector of CachelineEf that implements IRemappingStorage for 64-bit values.
+    /// Provides efficient storage and lookup for sorted 40-bit values using
+    /// Elias-Fano encoding with cacheline alignment.
+    /// Uses native memory for maximum performance.
+    /// WARNING: This struct manages unmanaged memory and must be explicitly disposed!
+    /// </summary>
+    public readonly unsafe struct CachelineEfVec : IRemappingStorage<CachelineEfVec>
+    {
+        private readonly CachelineEf* _ef;
+        private readonly int _numCachelines;
+        private readonly int _length;
+
+        private CachelineEfVec(CachelineEf* ef, int numCachelines, int length)
+        {
+            _ef = ef;
+            _numCachelines = numCachelines;
+            _length = length;
+        }
+
+        /// <summary>
+        /// Static method for IRemappingStorage interface
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static nuint Index(CachelineEfVec self, nuint index)
+        {
+            if (self._length == 0)
+                return 0;
+            
+            return (nuint)self._ef[index / CachelineEf.L].Index((int)(index % CachelineEf.L));
+        }
+        
+        /// <summary>
+        /// Static method for IRemappingStorage interface
+        /// </summary>
+        public static int GetSizeInBytes(CachelineEfVec self) => self._numCachelines * sizeof(CachelineEf);
+        
+        /// <summary>
+        /// Name for diagnostics
+        /// </summary>
+        public static string Name => "CacheLineEF";
+
+        /// <summary>
+        /// Dispose of the native memory. Must be called explicitly since structs cannot have finalizers.
+        /// </summary>
+        public readonly void Dispose()
+        {
+            if (_ef != null)
+            {
+                NativeMemory.AlignedFree(_ef);
+            }
+        }
+
+        /// <summary>
+        /// Try to construct a new CachelineEfVec for the given sorted values.
+        /// Returns false if any cacheline would span too large a range (enables retry with different seeds).
+        /// Throws on programmer errors like invalid input format.
+        /// </summary>
+        public static bool TryNew(ReadOnlySpan<ulong> values, out CachelineEfVec result)
+        {
+            var numCachelines = (values.Length + CachelineEf.L - 1) / CachelineEf.L;
+            var byteSize = numCachelines * sizeof(CachelineEf);
+            
+            var memory = NativeMemory.AlignedAlloc((nuint)byteSize, 64);
+            var ptr = (CachelineEf*)memory;
+            
+            try
+            {
+                for (int i = 0; i < numCachelines; i++)
+                {
+                    var start = i * CachelineEf.L;
+                    var end = Math.Min(start + CachelineEf.L, values.Length);
+                    var chunk = values.Slice(start, end - start);
+                    
+                    if (!CachelineEf.TryNew(chunk, out var cacheline))
+                    {
+                        result = default;
+                        return false;
+                    }
+                    ptr[i] = cacheline;
+                }
+
+                result = new CachelineEfVec(ptr, numCachelines, values.Length);
+                return true;
+            }
+            catch
+            {
+                if (memory != null)
+                    NativeMemory.AlignedFree(memory);
+                result = default;
+                return false;
+            }
+        }
+    }
 }

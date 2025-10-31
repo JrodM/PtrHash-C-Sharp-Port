@@ -10,13 +10,8 @@ namespace PtrHash.CSharp.Port.RNG
     public sealed class FastRand
     {
         private ulong _state;
-        
-        /// <summary>
-        /// Create FastRand with auto-seeding (matching fastrand::Rng::new())
-        /// </summary>
         public FastRand()
         {
-            // Get a non-cryptographic 64-bit random value from the OS
             byte[] seedBytes = RandomNumberGenerator.GetBytes(sizeof(ulong));
             ulong seed = BitConverter.ToUInt64(seedBytes, 0);
             _state = (ulong)seed;

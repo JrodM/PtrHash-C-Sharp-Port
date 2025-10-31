@@ -22,19 +22,7 @@ namespace PtrHash.CSharp.Port.Core
             Alpha = 0.99,
             Lambda = 3.0,
             Minimal = true,
-            SinglePart = false,  // Multi-part mode
-        };
-
-        /// <summary>
-        /// Default balanced parameters: 2.4 bits/key, balanced trade-off
-        /// Uses VecU32 storage for balanced performance
-        /// </summary>
-        public static PtrHashParams DefaultBalanced => new()
-        {
-            Alpha = 0.99,  // Space efficiency parameter
-            Lambda = 3.5,  // Expected bucket size parameter
-            Minimal = true,
-            SinglePart = false
+            SinglePart = false,
         };
         
         /// <summary>

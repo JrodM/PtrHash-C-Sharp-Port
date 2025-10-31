@@ -5,8 +5,6 @@ using System.Runtime.Intrinsics.X86;
 
 namespace PtrHash.CSharp.Port.Storage
 {
-    //TODO: WARNING THIS IS NOT WELL TESTED. If you plan on using this, you should test more thoroughly. 
-    
     /// <summary>
     /// A single cacheline that holds 44 Elias-Fano encoded 40-bit values in a range of size 256*84=21504.
     /// Aligned to 64 bytes to ensure it fits in a single cache line.
@@ -52,7 +50,7 @@ namespace PtrHash.CSharp.Port.Storage
 
             var l = values.Length;
             
-            // Return false for compression limitation - allows retry with different seed
+            // Return false for compression limitation, retry with different seed
             if (values[l - 1] - values[0] > 256UL * (128 - L))
             {
                 result = default;
@@ -140,7 +138,7 @@ namespace PtrHash.CSharp.Port.Storage
                 return System.Numerics.BitOperations.TrailingZeroCount(one);
             }
 
-            // Fallback implementation based on Vigna's broadword select
+            // Fallback implementation based on Vigna broadword select
             const ulong ONES_STEP_4 = 0x1111111111111111UL;
             const ulong ONES_STEP_8 = 0x0101010101010101UL;
             const ulong LAMBDAS_STEP_8 = 0x80UL * ONES_STEP_8;

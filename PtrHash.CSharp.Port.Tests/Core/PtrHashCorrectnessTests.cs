@@ -7,9 +7,6 @@ using PtrHash.CSharp.Port.Storage;
 
 namespace PtrHash.CSharp.Port.Tests;
 
-/// <summary>
-/// Comprehensive correctness tests for all PtrHash configurations
-/// </summary>
 [TestClass]
 public class PtrHashCorrectnessTests
 {
