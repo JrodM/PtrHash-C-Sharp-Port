@@ -193,6 +193,21 @@ namespace PtrHash.CSharp.Port.Collections
 
         #endregion
 
+        /// <summary>
+        /// Updates the value at a specific index.
+        /// </summary>
+        /// <param name="index">The index to update</param>
+        /// <param name="value">The new value</param>
+        /// <exception cref="ArgumentOutOfRangeException">If index is out of range</exception>
+        public void UpdateByIndex(int index, TValue value)
+        {
+            if ((uint)index >= (uint)_keyValuePairs.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), $"Index {index} is out of range [0, {_keyValuePairs.Length})");
+            
+            ref var kvp = ref _keyValuePairs[index];
+            _keyValuePairs[index] = new KeyValuePair<TKey, TValue>(kvp.Key, value);
+        }
+
 
         /// <summary>
         /// Performs batch lookup using streaming for better performance on large datasets.
