@@ -195,7 +195,7 @@ namespace PtrHash.CSharp.Port.Core
             if (dataSize < PtrHashFileFormat.HeaderSize)
                 throw new ArgumentException("Data size too small for header", nameof(dataSize));
                 
-            PtrHashTypeValidator.ValidateTypes<TKey, THasher, TBucketFunction, TRemappingStorage>(header);
+            ValidateTypes(header);
             _ownsMemory = false;
             
             // Initialize fields from header
@@ -248,7 +248,7 @@ namespace PtrHash.CSharp.Port.Core
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
                 
-            PtrHashTypeValidator.ValidateTypes<TKey, THasher, TBucketFunction, TRemappingStorage>(header);
+            ValidateTypes(header);
             _ownsMemory = true;
             
             // Initialize fields from header

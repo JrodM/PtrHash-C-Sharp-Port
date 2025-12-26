@@ -138,6 +138,30 @@ namespace PtrHash.CSharp.Port.Core
         
         #region Serialization Helper Methods
         
+        /// <summary>
+        /// Validate that the generic types match what's stored in the file header.
+        /// </summary>
+        private static void ValidateTypes(in PtrHashFileFormat.FileHeader header)
+        {
+            // Validate hasher type
+            var expectedHasherType = (uint)PtrHashGenericTypes.ResolveKeyHasher<THasher>();
+            
+            if (header.KeyHasherType != expectedHasherType)
+                throw new InvalidOperationException($"Key hasher type mismatch. Expected {typeof(THasher).Name}, found type ID {header.KeyHasherType}");
+            
+            // Validate bucket function type
+            var expectedBucketType = (uint)PtrHashGenericTypes.ResolveBucketFunction<TBucketFunction>();
+            
+            if (header.BucketFunctionType != expectedBucketType)
+                throw new InvalidOperationException($"Bucket function type mismatch. Expected {typeof(TBucketFunction).Name}, found type ID {header.BucketFunctionType}");
+            
+            // Validate remapping storage type
+            var expectedStorageType = (uint)PtrHashGenericTypes.ResolveRemappingStorage<TRemappingStorage>();
+            
+            if (header.RemappingStorageType != expectedStorageType)
+                throw new InvalidOperationException($"Remapping storage type mismatch. Expected {typeof(TRemappingStorage).Name}, found type ID {header.RemappingStorageType}");
+        }
+        
         private static PtrHashFileFormat.FileHeader ReadHeader(Stream stream)
         {
             var headerBytes = new byte[PtrHashFileFormat.HeaderSize];
