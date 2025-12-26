@@ -24,9 +24,10 @@ namespace PtrHash.CSharp.Port.Core
             if (!stream.CanWrite)
                 throw new ArgumentException("Stream must be writable", nameof(stream));
 
-            // Build header
+            // Build header following the optimized cache-line layout
             var header = new PtrHashFileFormat.FileHeader
             {
+                // Cache Line 1: Header identification & cold-path serialization data
                 Magic = PtrHashFileFormat.MagicNumber,
                 VersionMajor = PtrHashFileFormat.CurrentMajorVersion,
                 VersionMinor = PtrHashFileFormat.CurrentMinorVersion,
@@ -35,21 +36,22 @@ namespace PtrHash.CSharp.Port.Core
                 RemappingStorageType = (uint)PtrHashGenericTypes.ResolveRemappingStorage<TRemappingStorage>(),
                 KeyHasherType = (uint)PtrHashGenericTypes.ResolveKeyHasher<THasher>(),
                 
-                // Core fields
+                // Still in cache line 1: Cold-path serialization fields
+                SlotsTotal = _slotsTotal,
+                // RemapOffset and RemapCount set below after calculation
+                
+                // Cache Line 2: Hot-path lookup data
                 Seed = _seed,
                 BucketsPerPart = _bucketsPerPart,
                 SlotsPerPart = _slotsPerPart,
                 NumKeys = _numKeys,
+                Parts = _parts,
+                BucketsTotal = _bucketsTotal,
                 
-                // Get actual magic multipliers from the PtrHash instance
+                // Pre-computed magic multipliers for fast modulo
                 BucketsPerPartMagic = (uint)_remBuckets.d,
                 SlotsPerPartMagic = (uint)_remSlots.m,
                 PartsCountMagic = _parts > 1 ? (uint)_remParts.d : 0,
-                
-                // Cold path data
-                Parts = _parts,
-                BucketsTotal = _bucketsTotal,
-                SlotsTotal = _slotsTotal,
                 BucketsTotalMagic = _bucketFunction.IsLinear ? (uint)_remBucketsTotal.d : 0
             };
             
