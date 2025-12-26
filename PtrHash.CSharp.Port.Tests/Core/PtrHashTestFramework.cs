@@ -15,7 +15,7 @@ namespace PtrHash.CSharp.Port.Tests;
 public readonly record struct TestConfig(
     string Name,
     PtrHashParams Parameters,
-    RemappingStorageType StorageType
+    PtrHashGenericTypes.RemappingStorage StorageType
 );
 
 /// <summary>
@@ -28,14 +28,14 @@ public static class PtrHashTestHelpers
     /// </summary>
     public static readonly TestConfig[] AllConfigurations = [
         // Fast configurations - both single and multi part
-        new("Fast-MultiPart-VecU32", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU32),
-        new("Fast-SinglePart-VecU32", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU32), 
-        new("Fast-MultiPart-VecU64", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU64),
-        new("Fast-SinglePart-VecU64", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU64),
+        new("Fast-MultiPart-VecU32", PtrHashParams.DefaultFast with { SinglePart = false }, PtrHashGenericTypes.RemappingStorage.VecU32),
+        new("Fast-SinglePart-VecU32", PtrHashParams.DefaultFast with { SinglePart = true }, PtrHashGenericTypes.RemappingStorage.VecU32), 
+        new("Fast-MultiPart-VecU64", PtrHashParams.DefaultFast with { SinglePart = false }, PtrHashGenericTypes.RemappingStorage.VecU64),
+        new("Fast-SinglePart-VecU64", PtrHashParams.DefaultFast with { SinglePart = true }, PtrHashGenericTypes.RemappingStorage.VecU64),
         
         // Compact configurations
-        new("Compact-MultiPart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = false }, RemappingStorageType.CacheLineEF),
-        new("Compact-SinglePart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = true }, RemappingStorageType.CacheLineEF)
+        new("Compact-MultiPart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = false }, PtrHashGenericTypes.RemappingStorage.CacheLineEF),
+        new("Compact-SinglePart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = true }, PtrHashGenericTypes.RemappingStorage.CacheLineEF)
     ];
 
 
@@ -96,7 +96,6 @@ public static class PtrHashTestHelpers
     {
         var parameters = config.Parameters;
 
-        // Create appropriate PtrHash based on key type
         if (typeof(TKey) == typeof(ulong))
         {
             var ulongKeys = keys.ToArray() as ulong[];
@@ -115,24 +114,23 @@ public static class PtrHashTestHelpers
 
     private static void TestCorrectnessULong(TestConfig config, PtrHashParams parameters, ulong[] keys)
     {
-        // Select storage type and create PtrHash
         switch (config.StorageType)
         {
-            case RemappingStorageType.VecU32:
+            case PtrHashGenericTypes.RemappingStorage.VecU32:
                 using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
                 }
                 break;
                 
-            case RemappingStorageType.VecU64:
+            case PtrHashGenericTypes.RemappingStorage.VecU64:
                 using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
                 }
                 break;
                 
-            case RemappingStorageType.CacheLineEF:
+            case PtrHashGenericTypes.RemappingStorage.CacheLineEF:
                 using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
@@ -146,24 +144,23 @@ public static class PtrHashTestHelpers
 
     private static void TestCorrectnessString(TestConfig config, PtrHashParams parameters, string[] keys)
     {
-        // Select storage type and create PtrHash
         switch (config.StorageType)
         {
-            case RemappingStorageType.VecU32:
+            case PtrHashGenericTypes.RemappingStorage.VecU32:
                 using (var ptrhash = new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
                 }
                 break;
                 
-            case RemappingStorageType.VecU64:
+            case PtrHashGenericTypes.RemappingStorage.VecU64:
                 using (var ptrhash = new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
                 }
                 break;
                 
-            case RemappingStorageType.CacheLineEF:
+            case PtrHashGenericTypes.RemappingStorage.CacheLineEF:
                 using (var ptrhash = new PtrHash<string, StringHasher, Linear, CachelineEfVec>(keys, parameters))
                 {
                     VerifyCorrectness(ptrhash, keys, config.Name);
@@ -216,13 +213,9 @@ public static class PtrHashTestHelpers
         // Test 4: Test streaming interface matches individual lookups for both minimal and non-minimal
         var streamMinimal = new nuint[keys.Length];
         var streamNoRemap = new nuint[keys.Length];
-        var streamPrefetchMinimal = new nuint[keys.Length];
-        var streamPrefetchNoRemap = new nuint[keys.Length];
         
         ptrhash.GetIndicesStream(keys, streamMinimal, minimal: true);
         ptrhash.GetIndicesStream(keys, streamNoRemap, minimal: false);
-        ptrhash.GetIndicesStreamPrefetch(keys, streamPrefetchMinimal, minimal: true);
-        ptrhash.GetIndicesStreamPrefetch(keys, streamPrefetchNoRemap, minimal: false);
         
         for (int i = 0; i < keys.Length; i++)
         {
@@ -233,10 +226,6 @@ public static class PtrHashTestHelpers
                 $"Config {configName}: Stream minimal {streamMinimal[i]} != individual minimal {individualMinimal} for key {keys[i]}");
             Assert.AreEqual(individualNoRemap, streamNoRemap[i], 
                 $"Config {configName}: Stream NoRemap {streamNoRemap[i]} != individual NoRemap {individualNoRemap} for key {keys[i]}");
-            Assert.AreEqual(individualMinimal, streamPrefetchMinimal[i], 
-                $"Config {configName}: StreamPrefetch minimal {streamPrefetchMinimal[i]} != individual minimal {individualMinimal} for key {keys[i]}");
-            Assert.AreEqual(individualNoRemap, streamPrefetchNoRemap[i], 
-                $"Config {configName}: StreamPrefetch NoRemap {streamPrefetchNoRemap[i]} != individual NoRemap {individualNoRemap} for key {keys[i]}");
         }
     }
 

@@ -54,7 +54,7 @@ public class PtrHashCorrectnessTests
 
         // Test subset of configurations for strings (they need VecU32+ for large indices)
         var stringConfigs = PtrHashTestHelpers.AllConfigurations
-            .Where(c => c.StorageType is RemappingStorageType.VecU32 or RemappingStorageType.VecU64)
+            .Where(c => c.StorageType is PtrHashGenericTypes.RemappingStorage.VecU32 or PtrHashGenericTypes.RemappingStorage.VecU64)
             .ToArray();
 
         foreach (var config in stringConfigs)

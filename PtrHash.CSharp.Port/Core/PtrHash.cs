@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,6 +15,7 @@ using PtrHash.CSharp.Port.Computation;
 using PtrHash.CSharp.Port.Construction;
 using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHash.CSharp.Port.Sorting;
+using PtrHash.CSharp.Port.Core.Serialization;
 
 namespace PtrHash.CSharp.Port.Core
 {
@@ -34,7 +36,7 @@ namespace PtrHash.CSharp.Port.Core
     /// <typeparam name="THasher">Hash function implementation</typeparam>
     /// <typeparam name="TBucketFunction">Bucket function implementation</typeparam>
     /// <typeparam name="TRemappingStorage">Remapping storage type for minimal mode</typeparam>
-    public sealed unsafe class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> : IPtrHash<TKey>, IDisposable
+    public sealed unsafe partial class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> : IPtrHash<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
@@ -52,30 +54,33 @@ namespace PtrHash.CSharp.Port.Core
         // Cap parallelism to prevent thread explosion
         private static readonly nuint MaxParallelism = (nuint)Environment.ProcessorCount;
 
-        private TBucketFunction _bucketFunction;
+        internal TBucketFunction _bucketFunction;
 
-        private TRemappingStorage _remapStorage;
+        internal TRemappingStorage _remapStorage;
 
-        private byte* _pilots;
+        internal byte* _pilots;
 
         // Multi-part support fields
-        private readonly nuint _parts;
-        private readonly nuint _slotsPerPart;
-        private readonly nuint _slotsTotal;
-        private readonly nuint _bucketsPerPart;
-        private readonly nuint _bucketsTotal;
+        internal readonly nuint _parts;
+        internal readonly nuint _slotsPerPart;
+        internal readonly nuint _slotsTotal;
+        internal readonly nuint _bucketsPerPart;
+        internal readonly nuint _bucketsTotal;
 
         // Pre-computed reduction structures (rem_* fields)
-        private readonly FastReduce _remParts; // rem_parts: Rp::new(parts)
-        private readonly FastReduce _remBuckets; // rem_buckets: Rb::new(buckets_per_part)
-        private readonly FastReduce _remBucketsTotal; // rem_buckets_total: Rb::new(buckets_total)
-        private readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
+        internal readonly FastReduce _remParts; // rem_parts: Rp::new(parts)
+        internal readonly FastReduce _remBuckets; // rem_buckets: Rb::new(buckets_per_part)
+        internal readonly FastReduce _remBucketsTotal; // rem_buckets_total: Rb::new(buckets_total)
+        internal readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
 
-        private readonly nuint _numKeys;
-        private readonly bool _minimal;
-        private readonly bool _isSinglePart;
-        private readonly double _bitsPerKey;
-        private ulong _seed;
+        internal readonly nuint _numKeys;
+        internal readonly bool _minimal;
+        internal readonly bool _isSinglePart;
+        internal readonly double _bitsPerKey;
+        internal ulong _seed;
+        
+        // Memory ownership tracking
+        private readonly bool _ownsMemory = true;
 
         /// <summary>
         /// Construct a PtrHash from a collection of keys
@@ -84,6 +89,8 @@ namespace PtrHash.CSharp.Port.Core
         {
             if (keys.Length == 0)
                 throw new ArgumentException("Keys collection cannot be empty", nameof(keys));
+            
+            _ownsMemory = true;
 
             try
             {
@@ -175,6 +182,145 @@ namespace PtrHash.CSharp.Port.Core
                 _remapStorage.Dispose();
                 throw;
             }
+        }
+        
+        /// <summary>
+        /// Construct a PtrHash from memory-mapped data (zero-copy).
+        /// The caller is responsible for keeping the mapped memory alive.
+        /// </summary>
+        public unsafe PtrHash(byte* mappedDataPtr, nuint dataSize, in PtrHashFileFormat.FileHeader header)
+        {
+            if (mappedDataPtr == null)
+                throw new ArgumentNullException(nameof(mappedDataPtr));
+            if (dataSize < PtrHashFileFormat.HeaderSize)
+                throw new ArgumentException("Data size too small for header", nameof(dataSize));
+                
+            PtrHashTypeValidator.ValidateTypes<TKey, THasher, TBucketFunction, TRemappingStorage>(header);
+            _ownsMemory = false;
+            
+            // Initialize fields from header
+            _seed = header.Seed;
+            _parts = (nuint)header.Parts;
+            _bucketsPerPart = (nuint)header.BucketsPerPart;
+            _slotsPerPart = (nuint)header.SlotsPerPart;
+            _bucketsTotal = (nuint)header.BucketsTotal;
+            _slotsTotal = (nuint)header.SlotsTotal;
+            _numKeys = (nuint)header.NumKeys;
+            _minimal = (header.Flags & PtrHashFileFormat.HeaderFlags.IsMinimal) != 0;
+            _isSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
+            
+            // Point pilots directly to mapped memory
+            _pilots = mappedDataPtr + PtrHashFileFormat.PilotsOffset;
+            
+            // Initialize reduction structures from header magic values
+            _remParts = new FastReduce(_parts);
+            _remBuckets = new FastReduce(_bucketsPerPart);
+            _remBucketsTotal = new FastReduce(_bucketsTotal);
+            _remSlots = new FM32(Math.Max(1, _slotsPerPart));
+            
+            // Initialize bucket function
+            _bucketFunction = new TBucketFunction();
+            _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
+            
+            // Initialize remapping storage from mapped memory if minimal
+            if (_minimal && header.RemapCount > 0)
+            {
+                var remapPtr = mappedDataPtr + header.RemapOffset;
+                _remapStorage = TRemappingStorage.CreateFromMemoryMap(remapPtr, header.RemapCount);
+            }
+            else
+            {
+                _remapStorage = default;
+            }
+            
+            // Calculate bits per key
+            var pilotBits = (ulong)(_bucketsTotal * 8);
+            var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
+            var totalBits = pilotBits + remapBits;
+            _bitsPerKey = totalBits / (double)_numKeys;
+        }
+        
+        /// <summary>
+        /// Construct a PtrHash from a stream (copy-to-memory).
+        /// </summary>
+        public unsafe PtrHash(Stream stream, in PtrHashFileFormat.FileHeader header)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+                
+            PtrHashTypeValidator.ValidateTypes<TKey, THasher, TBucketFunction, TRemappingStorage>(header);
+            _ownsMemory = true;
+            
+            // Initialize fields from header
+            _seed = header.Seed;
+            _parts = (nuint)header.Parts;
+            _bucketsPerPart = (nuint)header.BucketsPerPart;
+            _slotsPerPart = (nuint)header.SlotsPerPart;
+            _bucketsTotal = (nuint)header.BucketsTotal;
+            _slotsTotal = (nuint)header.SlotsTotal;
+            _numKeys = (nuint)header.NumKeys;
+            _minimal = (header.Flags & PtrHashFileFormat.HeaderFlags.IsMinimal) != 0;
+            _isSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
+            
+            // Allocate memory for pilots
+            var pilotsPtr = (byte*)NativeMemory.AlignedAlloc(_bucketsTotal, 64);
+            NativeMemory.Clear(pilotsPtr, _bucketsTotal);
+            _pilots = pilotsPtr;
+            
+            try
+            {
+                // Read pilots into allocated memory
+                var pilotsSpan = new Span<byte>(_pilots, (int)_bucketsTotal);
+                stream.ReadExactly(pilotsSpan);
+                
+                // Skip padding to align to 64 bytes
+                var padding = AlignTo64(_bucketsTotal) - _bucketsTotal;
+                if (padding > 0)
+                {
+                    stream.Seek((long)padding, SeekOrigin.Current);
+                }
+                
+                // Initialize reduction structures from header magic values
+                _remParts = new FastReduce(_parts);
+                _remBuckets = new FastReduce(_bucketsPerPart);
+                _remBucketsTotal = new FastReduce(_bucketsTotal);
+                _remSlots = new FM32(Math.Max(1, _slotsPerPart));
+                
+                // Initialize bucket function
+                _bucketFunction = new TBucketFunction();
+                _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
+                
+                // Read remapping storage if minimal
+                if (_minimal && header.RemapCount > 0)
+                {
+                    _remapStorage = TRemappingStorage.Deserialize(stream, header.RemapCount);
+                }
+                else
+                {
+                    _remapStorage = default;
+                }
+                
+                // Calculate bits per key
+                var pilotBits = (ulong)(_bucketsTotal * 8);
+                var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
+                var totalBits = pilotBits + remapBits;
+                _bitsPerKey = totalBits / (double)_numKeys;
+            }
+            catch
+            {
+                // Clean up on failure
+                if (_pilots != null)
+                {
+                    NativeMemory.AlignedFree(_pilots);
+                    _pilots = null;
+                }
+                throw;
+            }
+        }
+        
+        private static nuint AlignTo64(nuint value)
+        {
+            return (value + 63) & ~(nuint)63;
         }
 
         public PtrHashInfo GetInfo()
@@ -381,134 +527,6 @@ namespace PtrHash.CSharp.Port.Core
         }
 
 
-        // Prefetch-enabled streaming, this preformed worse than the naive version for C# ( unless we use AOT )
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStreamPrefetch(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true, int prefetchDistance = 32)
-        {
-            // Fall back to regular streaming if SSE2 prefetch not supported
-            if (!Sse2.IsSupported)
-            {
-                GetIndicesStream(keys, results, minimal);
-                return;
-            }
-            
-            if (_isSinglePart)
-            {
-                if (minimal)
-                    GetIndicesStreamPrefetchCore<SinglePart, UseMinimal>(keys, results, prefetchDistance);
-                else
-                    GetIndicesStreamPrefetchCore<SinglePart, NoMinimal>(keys, results, prefetchDistance);
-            }
-            else
-            {
-                if (minimal)
-                    GetIndicesStreamPrefetchCore<MultiPart, UseMinimal>(keys, results, prefetchDistance);
-                else
-                    GetIndicesStreamPrefetchCore<MultiPart, NoMinimal>(keys, results, prefetchDistance);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void GetIndicesStreamPrefetchCore<TPart, TMinimal>(ReadOnlySpan<TKey> keys, Span<nuint> results, int prefetchDistance)
-            where TPart : struct, IPartConstant
-            where TMinimal : struct, IBoolConstant
-        {
-            if (keys.Length != results.Length)
-                throw new ArgumentException("Keys and results spans must have the same length");
-            
-            var useMinimal = default(TMinimal).Value;
-            var numKeys = _numKeys;
-
-            // Ring buffers for prefetching
-            Span<HashValue> nextHashes = stackalloc HashValue[prefetchDistance];
-            Span<ulong> nextBuckets = stackalloc ulong[prefetchDistance];
-
-            ref var keysRef = ref MemoryMarshal.GetReference(keys);
-            ref var resultsRef = ref MemoryMarshal.GetReference(results);
-
-            unsafe
-            {
-                // Get raw pointers to ring buffers to avoid bounds checks
-                fixed (HashValue* hashBufPtr = &MemoryMarshal.GetReference(nextHashes))
-                fixed (ulong* bucketBufPtr = &MemoryMarshal.GetReference(nextBuckets))
-                {
-                    // Initialize and prefetch first batch
-                    int leftover = prefetchDistance;
-                    for (int i = 0; i < prefetchDistance; i++)
-                    {
-                        HashValue hash;
-                        if (i < keys.Length)
-                        {
-                            var key = Unsafe.Add(ref keysRef, i);
-                            hash = THasher.Hash(key, _seed);
-                            leftover--;
-                        }
-                        else
-                        {
-                            hash = default;
-                        }
-
-                        hashBufPtr[i] = hash;
-
-                        bucketBufPtr[i] = Bucket(hashBufPtr[i]);
-                        
-                        Sse.Prefetch0(_pilots + bucketBufPtr[i]);
-                    }
-                    
-                    int processed = 0;
-                    int mainLoopEnd = Math.Max(0, keys.Length - prefetchDistance);
-
-                    while (processed < mainLoopEnd)
-                    {
-                        int idx = processed % prefetchDistance;
-
-                        // Prefetch the next key and pilot first to overlap memory latency
-                        var nextKey = Unsafe.Add(ref keysRef, processed + prefetchDistance);
-                        var nextHash = THasher.Hash(nextKey, _seed);
-                        var nextBucket = Bucket(nextHash);
-                        Sse.Prefetch0(_pilots + nextBucket);
-
-                        // Process the current key using previously prefetched data
-                        var currentHash = hashBufPtr[idx];
-                        var currentBucket = bucketBufPtr[idx];
-                        var pilot = _pilots[currentBucket];
-                        var slot = Slot(currentHash, pilot);
-
-                        if (useMinimal && slot >= numKeys)
-                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
-
-                        Unsafe.Add(ref resultsRef, processed) = slot;
-
-                        // Update the ring buffer with the next key and bucket
-                        hashBufPtr[idx] = nextHash;
-                        bucketBufPtr[idx] = nextBucket;
-
-                        processed++;
-                    }
-
-                    // for _ in 0..B - self.leftover
-                    int leftoverCount = prefetchDistance - leftover;
-                    for (int i = 0; i < leftoverCount; i++)
-                    {
-                        int idx = processed % prefetchDistance;
-                        var currentHash = hashBufPtr[idx];
-                        var currentBucket = bucketBufPtr[idx];
-
-                        var pilot = _pilots[currentBucket];
-                        var slot = Slot(currentHash, pilot);
-
-                        // JIT will optimize this branch away if useMinimal is false
-                        if (useMinimal && slot >= numKeys)
-                        {
-                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
-                        }
-
-                        Unsafe.Add(ref resultsRef, processed) = slot;
-                        processed++;
-                    }
-                }
-            }
-        }
 
         #endregion
 
@@ -1239,14 +1257,17 @@ namespace PtrHash.CSharp.Port.Core
             {
                 unsafe
                 {
-                    if (_pilots != null)
+                    if (_ownsMemory && _pilots != null)
                     {
                         NativeMemory.AlignedFree(_pilots);
                         _pilots = null;
                     }
                 }
 
-                _remapStorage.Dispose();
+                if (_ownsMemory)
+                {
+                    _remapStorage.Dispose();
+                }
 
                 _disposed = true;
             }

@@ -217,44 +217,6 @@ The `PtrHashDictionary` implementation makes specific tradeoffs optimized for ge
 | **Minimal Perfect** | 2.11ns/lookup | 26.4μs (1M lookups) | **Range [0, n-1]** | **Memory-constrained** |
 | **Perfect Hash** | **1.72ns/lookup** | ~21μs (estimated) | **Range [0, n×1.01]** | **Speed-critical** |
 
-**Optimization Opportunities:**
-For specialized use cases that guarantee:
-1. All lookup keys were in the original training set
-2. No validation needed for out-of-set keys
-
-You could create a `FasterPtrHashDictionary` that:
-- **Skips key storage entirely** (saves ~8 bytes/key)
-- **Eliminates key comparison overhead** (saves ~7.5ns/lookup)
-- **Uses perfect hashing** (GetIndexNoRemap) for **23% faster lookups**
-
-## Key Optimizations
-
-### C# Port Optimizations
-
-The C# port implements several critical optimizations to achieve Rust-like performance:
-
-1. **Monomorphism via Const Generics**: To match Rust's zero-cost abstractions, we use interface-based const generics (e.g., `IBucketFunction`, `IKeyHasher`, `IRemappingStorage`) that get specialized at compile time. This ensures the JIT generates optimized code paths for each concrete type combination, eliminating virtual dispatch overhead.
-
-2. **Size-based Specialization**: FindPilot methods use const generic dispatch based on bucket size, allowing the JIT to inline and optimize for specific sizes (similar to Rust's monomorphization).
-
-3. **Radix Sort**: Custom radix sort implementation for hash value sorting, avoiding generic comparison overhead.
-
-4. **Array Pooling**: Extensive use of `ArrayPool<T>` to minimize allocations during construction.
-
-5. **Unsafe Code**: Strategic use of unchecked array access and pointer arithmetic in hot paths.
-
-6. **SIMD-friendly Loops**: 4x unrolled loops aligned with CPU vector operations.
-
-### Native Interop Optimizations
-
-The native interop achieves low overhead (~10-20 ns per call) through:
-
-- **DisableRuntimeMarshalling**: Removes marshalling code, pinning, buffer copying, and security stack walks (saves ~100+ ns)
-- **LibraryImport**: Source-generated P/Invoke eliminates JIT-emitted IL stubs and reflection-based lookups
-- **SuppressGCTransition**: Avoids thread GC mode switches between cooperative and preemptive (saves ~20 ns)
-
-These optimizations reduce P/Invoke overhead from hundreds of nanoseconds to just 10-20 ns, making native interop competitive for performance comparisons.
-
 ## Limitations
 
 This C# port does not support:
