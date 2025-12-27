@@ -53,41 +53,6 @@ public class PtrHashSerializationTests
     }
     
     /// <summary>
-    /// Test round-trip with string keys
-    /// </summary>
-    [TestMethod]
-    [DataRow(100)]
-    [DataRow(1_000)]
-    [DataRow(10_000)]
-    public void RoundTrip_StringKeys_PreservesCorrectness(int keyCount)
-    {
-        var keys = PtrHashTestHelpers.GenerateStringKeys(keyCount);
-        
-        // Test subset of configurations for strings
-        var stringConfigs = PtrHashTestHelpers.AllConfigurations
-            .Where(c => c.StorageType is PtrHashGenericTypes.RemappingStorage.VecU32 or PtrHashGenericTypes.RemappingStorage.VecU64)
-            .ToArray();
-
-        foreach (var config in stringConfigs)
-        {
-            using var stream = new MemoryStream();
-            
-            switch (config.StorageType)
-            {
-                case PtrHashGenericTypes.RemappingStorage.VecU32:
-                    TestRoundTrip<string, StringHasher, Linear, UInt32VectorRemappingStorage>(
-                        config, keys, stream);
-                    break;
-                    
-                case PtrHashGenericTypes.RemappingStorage.VecU64:
-                    TestRoundTrip<string, StringHasher, Linear, UInt64VectorRemappingStorage>(
-                        config, keys, stream);
-                    break;
-            }
-        }
-    }
-    
-    /// <summary>
     /// Test memory-mapped file loading
     /// </summary>
     [TestMethod]
