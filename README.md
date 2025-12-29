@@ -79,5 +79,3 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 
 This C# port does not support:
 - **External-memory construction (sharding)**: The original supports datasets with >10^10 keys by sharding to disk
-
-**Note on Streaming**: The port includes high-performance streaming query support for batch lookups, matching or exceeding native performance in most scenarios.
