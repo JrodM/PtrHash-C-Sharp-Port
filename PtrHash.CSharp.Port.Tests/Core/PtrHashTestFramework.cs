@@ -311,4 +311,42 @@ public static class PtrHashTestHelpers
         }
     }
 
+    /// <summary>
+    /// Factory method to deserialize PtrHash from memory-mapped data based on configuration
+    /// </summary>
+    public static unsafe IPtrHash<TKey> DeserializePtrHashFromMemoryMap<TKey>(TestConfig config, byte* ptr, nuint dataSize)
+        where TKey : notnull
+    {
+        if (typeof(TKey) == typeof(ulong))
+        {
+            return config.StorageType switch
+            {
+                PtrHashGenericTypes.RemappingStorage.VecU32 => 
+                    PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                PtrHashGenericTypes.RemappingStorage.VecU64 => 
+                    PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
+                    PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+            } ?? throw new InvalidOperationException();
+        }
+        else if (typeof(TKey) == typeof(string))
+        {
+            return config.StorageType switch
+            {
+                PtrHashGenericTypes.RemappingStorage.VecU32 => 
+                    PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                PtrHashGenericTypes.RemappingStorage.VecU64 => 
+                    PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
+                    PtrHash<string, StringHasher, Linear, CachelineEfVec>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+            } ?? throw new InvalidOperationException();
+        }
+        else
+        {
+            throw new NotSupportedException($"Key type {typeof(TKey)} not supported in tests");
+        }
+    }
+
 }

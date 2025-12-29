@@ -29,8 +29,12 @@ public class PtrHashSerializationTests
 
         foreach (var config in PtrHashTestHelpers.AllConfigurations)
         {
+            // Test stream-based deserialization
             using var stream = new MemoryStream();
             TestRoundTrip(config, keys, stream);
+            
+            // Test memory-mapped deserialization
+            TestRoundTripMemoryMapped(config, keys);
         }
     }
     
@@ -276,5 +280,43 @@ public class PtrHashSerializationTests
         using var loaded = PtrHashTestHelpers.DeserializePtrHash<TKey>(config, stream);
         
         PtrHashTestHelpers.VerifyCorrectness(loaded, keys, config.Name);
+    }
+    
+    // Helper method for memory-mapped round-trip testing
+    private static unsafe void TestRoundTripMemoryMapped<TKey>(TestConfig config, TKey[] keys)
+        where TKey : notnull
+    {
+        var tempFile = Path.GetTempFileName();
+        try
+        {
+            // Serialize to file
+            dynamic original = PtrHashTestHelpers.CreatePtrHash(config, keys);
+            using (original)
+            {
+                using var fileStream = File.Create(tempFile);
+                original.Serialize(fileStream);
+            }
+            
+            // Load via memory-mapped file
+            var fileInfo = new FileInfo(tempFile);
+            using var mmf = MemoryMappedFile.CreateFromFile(tempFile, FileMode.Open, null, fileInfo.Length, MemoryMappedFileAccess.Read);
+            using var accessor = mmf.CreateViewAccessor(0, fileInfo.Length, MemoryMappedFileAccess.Read);
+            
+            byte* ptr = null;
+            accessor.SafeMemoryMappedViewHandle.AcquirePointer(ref ptr);
+            try
+            {
+                using var loaded = PtrHashTestHelpers.DeserializePtrHashFromMemoryMap<TKey>(config, ptr, (nuint)fileInfo.Length);
+                PtrHashTestHelpers.VerifyCorrectness(loaded, keys, config.Name + " (MemoryMapped)");
+            }
+            finally
+            {
+                accessor.SafeMemoryMappedViewHandle.ReleasePointer();
+            }
+        }
+        finally
+        {
+            File.Delete(tempFile);
+        }
     }
 }
