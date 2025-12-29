@@ -10,16 +10,6 @@ A high-performance C# port of [PtrHash](https://github.com/RagnarGrootKoerkamp/p
 
 PtrHash is a minimal perfect hash function that bijectively maps n distinct keys to {0,...,n-1}. It prioritizes query throughput over space efficiency, making it ideal for applications where lookup speed is critical. The original Rust implementation achieves **2.5 ns/key** when multi-threaded, while this C# port achieves **2.09 ns/key** single-threaded - achieving comparable performance to the original's best results.
 
-## Features
-
-This C# port provides:
-
-- **Extremely fast lookups**: **2.09 ns/key streaming**, **2.11 ns/key point lookups** (streaming delivers best minimal perfect hash performance)
-- **Memory efficient**: 2.40 bits/key with default parameters
-- **Zero allocations during queries**: GC-friendly for high-throughput scenarios
-- **Pure C# implementation**: Fully managed code with no native dependencies
-- **Native interop available**: P/Invoke bindings to compare against Rust implementation
-
 ## Performance Comparison
 
 Based on benchmarks on AMD Ryzen AI 5 340:
@@ -85,94 +75,9 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 - **Single-Part optimal**: Best for point lookups despite slower construction
 - **Streaming competitive**: Port matches native streaming performance
 
-## Usage
-
-### Basic Example
-
-```csharp
-using PtrHash.CSharp.Port.Core;
-using PtrHash.CSharp.Port.KeyHashers;
-
-// Create PtrHash for ulong keys
-var keys = new ulong[] { 123, 456, 789, /* ... */ };
-var parameters = new PtrHashParams
-{
-    Alpha = 0.99,       // Load factor
-    Lambda = 3.0,       // Average bucket size
-    Minimal = true,     // Create minimal perfect hash
-    SinglePart = true   // Use single-part construction
-};
-
-using var ptrHash = new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters);
-
-// Query
-ulong key = 456;
-ulong index = ptrHash.GetIndex(key);  // Returns index in [0, n-1]
-```
-
 ## Limitations
 
 This C# port does not support:
 - **External-memory construction (sharding)**: The original supports datasets with >10^10 keys by sharding to disk
 
 **Note on Streaming**: The port includes high-performance streaming query support for batch lookups, matching or exceeding native performance in most scenarios.
-
-## Building
-
-```bash
-# Build the entire solution
-dotnet build -c Release
-
-# Run tests
-dotnet test
-
-# Run benchmarks
-cd Benchmarks
-dotnet run -c Release -- all
-```
-
-## Project Structure
-
-- `PtrHash.CSharp.Port/` - Pure C# implementation
-  - `Core/` - Main PtrHash implementation
-  - `KeyHashers/` - Hash function implementations (FxHash, xxHash, StrongerIntHasher)
-  - `BucketFunctions/` - Bucket assignment functions (Linear, CubicEps)
-  - `Storage/` - Remapping storage implementations (VectorRemappingStorage, CachelineEf)
-  - `Construction/` - Build-time data structures (BitVec, BinaryHeap)
-  - `Sorting/` - Custom RadixSort implementation
-- `PtrHash.CSharp.Interop/` - Native Rust bindings
-  - `PtrHash/` - Interop wrapper and dispatchers
-  - `Native/` - P/Invoke declarations
-  - `src/` - Rust source code
-- `PtrHash.CSharp.Port.Tests/` - Unit tests
-- `PtrHash.CSharp.Interop.Tests/` - Interop tests
-- `Benchmarks/` - Performance benchmarks
-- `docs/` - Documentation and paper
-
-## Contributing
-
-Areas for improvement:
-- Construction performance optimization (currently 1.6-1.8x slower than native at 10M keys)
-- External-memory construction (sharding) for massive datasets
-
-## License
-
-This project is licensed under the same terms as the original PtrHash implementation.
-
-## Acknowledgments
-
-- [Ragnar Groot Koerkamp](https://github.com/RagnarGrootKoerkamp) for the original PtrHash algorithm and implementation
-- The [paper](https://arxiv.org/abs/2502.15539) provides comprehensive details on the algorithm
-
-## Citations
-
-If you use this implementation, please cite the original paper:
-
-```bibtex
-@article{koerkamp2025ptrhash,
-  title={PtrHash: Minimal Perfect Hashing at RAM Throughput},
-  author={Ragnar Groot Koerkamp},
-  journal={arXiv preprint arXiv:2502.15539},
-  year={2025}
-}
-```
