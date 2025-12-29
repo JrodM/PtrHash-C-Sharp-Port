@@ -15,9 +15,6 @@ namespace PtrHash.CSharp.Port.Tests.Serialization;
 [TestClass]
 public class PtrHashSerializationTests
 {
-    /// <summary>
-    /// Test round-trip serialization for all configurations and various dataset sizes
-    /// </summary>
     [TestMethod]
     [DataRow(2)]
     [DataRow(100)]
@@ -29,18 +26,13 @@ public class PtrHashSerializationTests
 
         foreach (var config in PtrHashTestHelpers.AllConfigurations)
         {
-            // Test stream-based deserialization
             using var stream = new MemoryStream();
             TestRoundTrip(config, keys, stream);
             
-            // Test memory-mapped deserialization
             TestRoundTripMemoryMapped(config, keys);
         }
     }
     
-    /// <summary>
-    /// Test memory-mapped file loading
-    /// </summary>
     [TestMethod]
     [DataRow(1_000)]
     [DataRow(10_000)]
@@ -85,9 +77,6 @@ public class PtrHashSerializationTests
         }
     }
     
-    /// <summary>
-    /// Test type validation - wrong storage type
-    /// </summary>
     [TestMethod]
     public void Deserialize_WrongStorageType_ThrowsException()
     {
@@ -107,9 +96,6 @@ public class PtrHashSerializationTests
         });
     }
     
-    /// <summary>
-    /// Test type validation - wrong hasher type
-    /// </summary>
     [TestMethod]
     public void Deserialize_WrongHasherType_ThrowsException()
     {
@@ -129,9 +115,6 @@ public class PtrHashSerializationTests
         });
     }
     
-    /// <summary>
-    /// Test type validation - wrong bucket function
-    /// </summary>
     [TestMethod]
     public void Deserialize_WrongBucketFunction_ThrowsException()
     {
@@ -151,9 +134,6 @@ public class PtrHashSerializationTests
         });
     }
     
-    /// <summary>
-    /// Test invalid magic number
-    /// </summary>
     [TestMethod]
     public void Deserialize_InvalidMagicNumber_ThrowsException()
     {
@@ -170,9 +150,6 @@ public class PtrHashSerializationTests
         });
     }
     
-    /// <summary>
-    /// Test unsupported version
-    /// </summary>
     [TestMethod]
     public void Deserialize_UnsupportedVersion_ThrowsException()
     {
@@ -191,9 +168,6 @@ public class PtrHashSerializationTests
         });
     }
     
-    /// <summary>
-    /// Test stream position after operations
-    /// </summary>
     [TestMethod]
     public void StreamPosition_CorrectAfterOperations()
     {
@@ -216,13 +190,9 @@ public class PtrHashSerializationTests
         
         using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream);
         
-        // Stream should be at the end of PtrHash data
         Assert.AreEqual(endPos, stream.Position);
     }
     
-    /// <summary>
-    /// Test edge case - single key
-    /// </summary>
     [TestMethod]
     public void RoundTrip_SingleKey_Works()
     {
@@ -233,9 +203,6 @@ public class PtrHashSerializationTests
         TestRoundTrip(config, keys, stream);
     }
     
-    /// <summary>
-    /// Test FileStream in addition to MemoryStream
-    /// </summary>
     [TestMethod]
     public void RoundTrip_FileStream_Works()
     {
@@ -289,7 +256,6 @@ public class PtrHashSerializationTests
         var tempFile = Path.GetTempFileName();
         try
         {
-            // Serialize to file
             dynamic original = PtrHashTestHelpers.CreatePtrHash(config, keys);
             using (original)
             {
@@ -297,7 +263,6 @@ public class PtrHashSerializationTests
                 original.Serialize(fileStream);
             }
             
-            // Load via memory-mapped file
             var fileInfo = new FileInfo(tempFile);
             using var mmf = MemoryMappedFile.CreateFromFile(tempFile, FileMode.Open, null, fileInfo.Length, MemoryMappedFileAccess.Read);
             using var accessor = mmf.CreateViewAccessor(0, fileInfo.Length, MemoryMappedFileAccess.Read);

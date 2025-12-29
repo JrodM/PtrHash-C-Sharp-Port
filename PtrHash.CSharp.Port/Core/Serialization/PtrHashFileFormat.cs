@@ -14,29 +14,17 @@ namespace PtrHash.CSharp.Port.Core.Serialization
         /// </summary>
         public const uint MagicNumber = 0x48525450; // "PTRH" in little-endian
 
-        /// <summary>
-        /// Current file format version
-        /// </summary>
         public static readonly ushort CurrentMajorVersion = (ushort)int.Parse(ThisAssembly.AssemblyVersion.Split('.')[0]);
         public static readonly ushort CurrentMinorVersion = (ushort)int.Parse(ThisAssembly.AssemblyVersion.Split('.')[1]);
 
-        /// <summary>
-        /// Header size constants
-        /// </summary>
         public const int HeaderSize = 192; // 3 cache lines
         public const int HeaderAlignment = 192;
         public const int PilotsAlignment = 64;
         public const int RemapAlignment = 64;
         
-        /// <summary>
-        /// Fixed offset where pilots array begins (immediately after header)
-        /// </summary>
         public const int PilotsOffset = HeaderSize;
         
 
-        /// <summary>
-        /// Flags for the header
-        /// </summary>
         [Flags]
         public enum HeaderFlags : ushort
         {
@@ -83,7 +71,7 @@ namespace PtrHash.CSharp.Port.Core.Serialization
             public ulong NumKeys;                 // 8 bytes - total number of keys
             
             // Partitioning data (16 bytes)
-            public ulong Parts;                   // 8 bytes - number of parts (1 for single-part)
+            public ulong Parts;                   // 8 bytes
             public ulong BucketsTotal;            // 8 bytes - total buckets across all parts
             
             // Pre-computed magic multipliers for fast modulo operations (16 bytes)
@@ -95,9 +83,6 @@ namespace PtrHash.CSharp.Port.Core.Serialization
             // ========== Cache Line 3 (64 bytes) - Reserved ==========
             private fixed byte _reserved3[64];    // 64 bytes reserved for future expansion
 
-            /// <summary>
-            /// Get pointer to pilots array when header is memory-mapped
-            /// </summary>
             public readonly byte* GetPilotsPointer()
             {
                 fixed (FileHeader* self = &this)
@@ -106,9 +91,6 @@ namespace PtrHash.CSharp.Port.Core.Serialization
                 }
             }
 
-            /// <summary>
-            /// Validate the header for correctness
-            /// </summary>
             public readonly bool Validate()
             {
                 if (Magic != MagicNumber)
@@ -144,9 +126,6 @@ namespace PtrHash.CSharp.Port.Core.Serialization
                 return true;
             }
 
-            /// <summary>
-            /// Check if this version is supported
-            /// </summary>
             public readonly bool IsVersionSupported()
             {
                 return VersionMajor == CurrentMajorVersion && 

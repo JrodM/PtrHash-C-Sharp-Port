@@ -66,9 +66,6 @@ namespace PtrHash.CSharp.Port.Core
             CacheLineEF = 4
         }
         
-        /// <summary>
-        /// Resolves a bucket function type to its enum value based on the type.
-        /// </summary>
         public static BucketFunction ResolveBucketFunction<TBucketFunction>()
         {
             return typeof(TBucketFunction) switch
@@ -79,9 +76,6 @@ namespace PtrHash.CSharp.Port.Core
             };
         }
         
-        /// <summary>
-        /// Resolves a key hasher type to its enum value based on the type.
-        /// </summary>
         public static KeyHasher ResolveKeyHasher<THasher>()
         {
             return typeof(THasher) switch
@@ -94,9 +88,6 @@ namespace PtrHash.CSharp.Port.Core
             };
         }
         
-        /// <summary>
-        /// Resolves a remapping storage type to its enum value based on the type.
-        /// </summary>
         public static RemappingStorage ResolveRemappingStorage<TRemappingStorage>()
         {
             return typeof(TRemappingStorage) switch

@@ -14,9 +14,6 @@ namespace PtrHash.CSharp.Port.Core
         where TBucketFunction : struct, IBucketFunction
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
     {
-        /// <summary>
-        /// Serialize this PtrHash instance to a stream.
-        /// </summary>
         public void Serialize(Stream stream)
         {
             if (stream == null)
@@ -24,7 +21,6 @@ namespace PtrHash.CSharp.Port.Core
             if (!stream.CanWrite)
                 throw new ArgumentException("Stream must be writable", nameof(stream));
 
-            // Build header following the optimized cache-line layout
             var header = new PtrHashFileFormat.FileHeader
             {
                 // Cache Line 1: Header identification & cold-path serialization data
@@ -55,10 +51,8 @@ namespace PtrHash.CSharp.Port.Core
                 BucketsTotalMagic = _bucketFunction.IsLinear ? (uint)_remBucketsTotal.d : 0
             };
             
-            // Calculate remapping info
             if (_minimal)
             {
-                // Store the byte size of remapping storage
                 header.RemapCount = (ulong)TRemappingStorage.GetSizeInBytes(_remapStorage);
                 header.RemapOffset = (ulong)(PtrHashFileFormat.HeaderSize + AlignTo64(_bucketsTotal));
             }
@@ -68,31 +62,21 @@ namespace PtrHash.CSharp.Port.Core
                 header.RemapOffset = 0;
             }
             
-            // Write header
             WriteHeader(stream, header);
-            
-            // Write pilots array
             WritePilots(stream);
             
-            // Write remapping storage if minimal
             if (_minimal)
             {
                 WriteRemappingStorage(stream);
             }
         }
         
-        /// <summary>
-        /// Serialize this PtrHash instance to a file.
-        /// </summary>
         public void SerializeToFile(string filePath)
         {
             using var fileStream = File.Create(filePath);
             Serialize(fileStream);
         }
         
-        /// <summary>
-        /// Deserialize a PtrHash from a stream.
-        /// </summary>
         public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> Deserialize(Stream stream)
         {
             if (stream == null)
@@ -100,15 +84,11 @@ namespace PtrHash.CSharp.Port.Core
             if (!stream.CanRead)
                 throw new ArgumentException("Stream must be readable", nameof(stream));
 
-            // Read and validate header
             var header = ReadHeader(stream);
             
             return new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(stream, header);
         }
         
-        /// <summary>
-        /// Deserialize a PtrHash from a file.
-        /// </summary>
         public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> DeserializeFromFile(string filePath)
         {
             using var fileStream = File.OpenRead(filePath);
@@ -142,19 +122,16 @@ namespace PtrHash.CSharp.Port.Core
         /// </summary>
         private static void ValidateTypes(in PtrHashFileFormat.FileHeader header)
         {
-            // Validate hasher type
             var expectedHasherType = (uint)PtrHashGenericTypes.ResolveKeyHasher<THasher>();
             
             if (header.KeyHasherType != expectedHasherType)
                 throw new InvalidOperationException($"Key hasher type mismatch. Expected {typeof(THasher).Name}, found type ID {header.KeyHasherType}");
             
-            // Validate bucket function type
             var expectedBucketType = (uint)PtrHashGenericTypes.ResolveBucketFunction<TBucketFunction>();
             
             if (header.BucketFunctionType != expectedBucketType)
                 throw new InvalidOperationException($"Bucket function type mismatch. Expected {typeof(TBucketFunction).Name}, found type ID {header.BucketFunctionType}");
             
-            // Validate remapping storage type
             var expectedStorageType = (uint)PtrHashGenericTypes.ResolveRemappingStorage<TRemappingStorage>();
             
             if (header.RemappingStorageType != expectedStorageType)
@@ -189,11 +166,9 @@ namespace PtrHash.CSharp.Port.Core
         
         private void WritePilots(Stream stream)
         {
-            // Write pilots array
             var pilotsSpan = new ReadOnlySpan<byte>(_pilots, (int)_bucketsTotal);
             stream.Write(pilotsSpan);
             
-            // Add padding to align to 64 bytes
             var padding = AlignTo64(_bucketsTotal) - _bucketsTotal;
             if (padding > 0)
             {
