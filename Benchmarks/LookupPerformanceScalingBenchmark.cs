@@ -282,22 +282,6 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
-        public ulong PtrHashPort_SinglePart_Stream_TryGetValueStreamPrefetch()
-        {
-            ulong sum = 0;
-            _singlePartPtrHashDict.TryGetValueStreamPrefetch(
-                _lookupKeys.AsSpan(),
-                _valuesBuffer6);
-
-            for (int i = 0; i < _valuesBuffer6.Length; i++)
-            {
-                ulong v = _valuesBuffer6[i];
-                if (v != _singlePartPtrHashDict.Sentinel)
-                    sum += v;
-            }
-            return sum;
-        }
 
     }
 }

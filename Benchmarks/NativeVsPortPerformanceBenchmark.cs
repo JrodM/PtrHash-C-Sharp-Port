@@ -170,21 +170,6 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
-        public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Stream_GetIndicesStreamPrefetch()
-        {
-            ulong sum = 0;
-            _multiPartPtrHash.GetIndicesStreamPrefetch(
-                _lookupKeys.AsSpan(),
-                _indicesBuffer1,
-                minimal: true);
-
-            for (int i = 0; i < _indicesBuffer1.Length; i++)
-            {
-                sum += _indicesBuffer1[i];
-            }
-            return sum;
-        }
 
         // === SINGLE-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
         
@@ -245,21 +230,6 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
-        public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Stream_GetIndicesStreamPrefetch()
-        {
-            ulong sum = 0;
-            _singlePartPtrHash.GetIndicesStreamPrefetch(
-                _lookupKeys.AsSpan(),
-                _indicesBuffer2,
-                minimal: true);
-
-            for (int i = 0; i < _indicesBuffer2.Length; i++)
-            {
-                sum += _indicesBuffer2[i];
-            }
-            return sum;
-        }
 
         // === NO REMAP METHODS (Perfect Hash - no minimal remapping) ===
         
