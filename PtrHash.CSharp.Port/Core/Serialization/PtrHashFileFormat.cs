@@ -126,14 +126,12 @@ namespace PtrHash.CSharp.Port.Core.Serialization
                 if (SlotsTotal != Parts * SlotsPerPart)
                     return false;
                 
-                // Validate magic multipliers are non-zero (they should be pre-computed)
                 if (BucketsPerPartMagic == 0 || SlotsPerPartMagic == 0)
                     return false;
                     
                 if (Parts > 1 && PartsCountMagic == 0)
                     return false;
                 
-                // Validate type identifiers are known enum values
                 if (!Enum.IsDefined(typeof(PtrHashGenericTypes.BucketFunction), BucketFunctionType))
                     return false;
                     

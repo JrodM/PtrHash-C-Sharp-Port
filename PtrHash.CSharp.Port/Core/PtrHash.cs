@@ -198,7 +198,6 @@ namespace PtrHash.CSharp.Port.Core
             ValidateTypes(header);
             _ownsMemory = false;
             
-            // Initialize fields from header
             _seed = header.Seed;
             _parts = (nuint)header.Parts;
             _bucketsPerPart = (nuint)header.BucketsPerPart;
@@ -209,20 +208,16 @@ namespace PtrHash.CSharp.Port.Core
             _minimal = (header.Flags & PtrHashFileFormat.HeaderFlags.IsMinimal) != 0;
             _isSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
             
-            // Point pilots directly to mapped memory
             _pilots = mappedDataPtr + PtrHashFileFormat.PilotsOffset;
             
-            // Initialize reduction structures from header magic values
             _remParts = new FastReduce(_parts);
             _remBuckets = new FastReduce(_bucketsPerPart);
             _remBucketsTotal = new FastReduce(_bucketsTotal);
             _remSlots = new FM32(Math.Max(1, _slotsPerPart));
             
-            // Initialize bucket function
             _bucketFunction = new TBucketFunction();
             _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
             
-            // Initialize remapping storage from mapped memory if minimal
             if (_minimal && header.RemapCount > 0)
             {
                 var remapPtr = mappedDataPtr + header.RemapOffset;
@@ -233,7 +228,6 @@ namespace PtrHash.CSharp.Port.Core
                 _remapStorage = default;
             }
             
-            // Calculate bits per key
             var pilotBits = (ulong)(_bucketsTotal * 8);
             var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
             var totalBits = pilotBits + remapBits;
@@ -251,7 +245,6 @@ namespace PtrHash.CSharp.Port.Core
             ValidateTypes(header);
             _ownsMemory = true;
             
-            // Initialize fields from header
             _seed = header.Seed;
             _parts = (nuint)header.Parts;
             _bucketsPerPart = (nuint)header.BucketsPerPart;
@@ -269,7 +262,6 @@ namespace PtrHash.CSharp.Port.Core
             
             try
             {
-                // Read pilots into allocated memory
                 var pilotsSpan = new Span<byte>(_pilots, (int)_bucketsTotal);
                 stream.ReadExactly(pilotsSpan);
                 
@@ -280,17 +272,14 @@ namespace PtrHash.CSharp.Port.Core
                     stream.Seek((long)padding, SeekOrigin.Current);
                 }
                 
-                // Initialize reduction structures from header magic values
-                _remParts = new FastReduce(_parts);
+                    _remParts = new FastReduce(_parts);
                 _remBuckets = new FastReduce(_bucketsPerPart);
                 _remBucketsTotal = new FastReduce(_bucketsTotal);
                 _remSlots = new FM32(Math.Max(1, _slotsPerPart));
                 
-                // Initialize bucket function
-                _bucketFunction = new TBucketFunction();
+                    _bucketFunction = new TBucketFunction();
                 _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
                 
-                // Read remapping storage if minimal
                 if (_minimal && header.RemapCount > 0)
                 {
                     _remapStorage = TRemappingStorage.Deserialize(stream, header.RemapCount);
@@ -300,15 +289,13 @@ namespace PtrHash.CSharp.Port.Core
                     _remapStorage = default;
                 }
                 
-                // Calculate bits per key
-                var pilotBits = (ulong)(_bucketsTotal * 8);
+                    var pilotBits = (ulong)(_bucketsTotal * 8);
                 var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
                 var totalBits = pilotBits + remapBits;
                 _bitsPerKey = totalBits / (double)_numKeys;
             }
             catch
             {
-                // Clean up on failure
                 if (_pilots != null)
                 {
                     NativeMemory.AlignedFree(_pilots);

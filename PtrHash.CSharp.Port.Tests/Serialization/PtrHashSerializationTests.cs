@@ -48,14 +48,12 @@ public class PtrHashSerializationTests
         var tempFile = Path.GetTempFileName();
         try
         {
-            // Create and save PtrHash
             using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, config.Parameters))
             {
                 using var fileStream = File.Create(tempFile);
                 original.Serialize(fileStream);
             }
             
-            // Load via memory-mapped file - caller manages the MMF lifetime
             var fileInfo = new FileInfo(tempFile);
             using var mmf = MemoryMappedFile.CreateFromFile(tempFile, FileMode.Open, null, fileInfo.Length, MemoryMappedFileAccess.Read);
             using var accessor = mmf.CreateViewAccessor(0, fileInfo.Length, MemoryMappedFileAccess.Read);
@@ -66,7 +64,6 @@ public class PtrHashSerializationTests
             {
                 using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, (nuint)fileInfo.Length);
                 
-                // Verify by checking a sample of keys
                 foreach (var key in keys.Take(Math.Min(100, keys.Length)))
                 {
                     var index = loaded.GetIndex(key);
@@ -93,14 +90,12 @@ public class PtrHashSerializationTests
         var keys = PtrHashTestHelpers.GenerateKeys(100);
         using var stream = new MemoryStream();
         
-        // Serialize as VecU32
         using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
             keys, PtrHashParams.DefaultFast))
         {
             original.Serialize(stream);
         }
         
-        // Try to deserialize as VecU64
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
@@ -117,14 +112,12 @@ public class PtrHashSerializationTests
         var keys = PtrHashTestHelpers.GenerateKeys(100);
         using var stream = new MemoryStream();
         
-        // Serialize with StrongerIntHasher
         using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
             keys, PtrHashParams.DefaultFast))
         {
             original.Serialize(stream);
         }
         
-        // Try to deserialize with FxHasher
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
@@ -141,14 +134,12 @@ public class PtrHashSerializationTests
         var keys = PtrHashTestHelpers.GenerateKeys(100);
         using var stream = new MemoryStream();
         
-        // Serialize with Linear
         using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
             keys, PtrHashParams.DefaultFast))
         {
             original.Serialize(stream);
         }
         
-        // Try to deserialize with CubicEps
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
@@ -164,7 +155,6 @@ public class PtrHashSerializationTests
     {
         using var stream = new MemoryStream();
         
-        // Write invalid header
         var invalidHeader = new byte[PtrHashFileFormat.HeaderSize];
         BitConverter.GetBytes(0xDEADBEEFu).CopyTo(invalidHeader, 0); // Wrong magic
         stream.Write(invalidHeader);
@@ -184,7 +174,6 @@ public class PtrHashSerializationTests
     {
         using var stream = new MemoryStream();
         
-        // Write header with unsupported version
         var header = new byte[PtrHashFileFormat.HeaderSize];
         BitConverter.GetBytes(PtrHashFileFormat.MagicNumber).CopyTo(header, 0);
         BitConverter.GetBytes((ushort)999).CopyTo(header, 4); // Major version 999
@@ -207,12 +196,10 @@ public class PtrHashSerializationTests
         var keys = PtrHashTestHelpers.GenerateKeys(100);
         using var stream = new MemoryStream();
         
-        // Write some data before
         var preamble = new byte[] { 1, 2, 3, 4 };
         stream.Write(preamble);
         var startPos = stream.Position;
         
-        // Serialize
         using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
             keys, PtrHashParams.DefaultFast))
         {
@@ -221,10 +208,8 @@ public class PtrHashSerializationTests
         
         var endPos = stream.Position;
         
-        // Reset to start of PtrHash data
         stream.Position = startPos;
         
-        // Deserialize
         using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream);
         
         // Stream should be at the end of PtrHash data
@@ -256,7 +241,6 @@ public class PtrHashSerializationTests
         var tempFile = Path.GetTempFileName();
         try
         {
-            // Serialize to file
             using (var fileStream = File.Create(tempFile))
             {
                 dynamic original = PtrHashTestHelpers.CreatePtrHash(config, keys);
@@ -266,7 +250,6 @@ public class PtrHashSerializationTests
                 }
             }
             
-            // Deserialize from file and verify
             using (var fileStream = File.OpenRead(tempFile))
             {
                 using var loaded = PtrHashTestHelpers.DeserializePtrHash<ulong>(config, fileStream);
@@ -283,18 +266,15 @@ public class PtrHashSerializationTests
     private static void TestRoundTrip<TKey>(TestConfig config, TKey[] keys, Stream stream)
         where TKey : notnull
     {
-        // Create and serialize - we need the concrete type to call Serialize
         dynamic original = PtrHashTestHelpers.CreatePtrHash(config, keys);
         using (original)
         {
             original.Serialize(stream);
         }
         
-        // Deserialize and verify
         stream.Position = 0;
         using var loaded = PtrHashTestHelpers.DeserializePtrHash<TKey>(config, stream);
         
-        // Verify correctness using framework helper
         PtrHashTestHelpers.VerifyCorrectness(loaded, keys, config.Name);
     }
 }

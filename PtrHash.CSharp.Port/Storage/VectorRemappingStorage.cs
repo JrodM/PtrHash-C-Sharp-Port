@@ -207,7 +207,6 @@ namespace PtrHash.CSharp.Port.Storage
             
             var length = (int)(byteSize / sizeof(uint));
             
-            // Check if stream has enough data
             if (stream.CanSeek)
             {
                 var remainingBytes = stream.Length - stream.Position;
@@ -542,9 +541,7 @@ namespace PtrHash.CSharp.Port.Storage
 
         public static CachelineEfVec Deserialize(System.IO.Stream stream, ulong byteSize)
         {
-            // ByteSize is the total bytes, calculate cachelines
             var numCachelines = (int)(byteSize / (ulong)sizeof(CachelineEf));
-            // Calculate the actual number of values (L values per cacheline)
             var length = numCachelines * CachelineEf.L;
             
             var memory = NativeMemory.AlignedAlloc((nuint)byteSize, 64);
@@ -567,9 +564,7 @@ namespace PtrHash.CSharp.Port.Storage
 
         public static unsafe CachelineEfVec CreateFromMemoryMap(byte* ptr, ulong byteSize)
         {
-            // ByteSize is the total bytes, calculate cachelines
             var numCachelines = (int)(byteSize / (ulong)sizeof(CachelineEf));
-            // Calculate the actual number of values (L values per cacheline)
             var length = numCachelines * CachelineEf.L;
             return new CachelineEfVec((CachelineEf*)ptr, numCachelines, length, ownsMemory: false);
         }

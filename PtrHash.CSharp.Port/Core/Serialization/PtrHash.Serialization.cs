@@ -103,7 +103,6 @@ namespace PtrHash.CSharp.Port.Core
             // Read and validate header
             var header = ReadHeader(stream);
             
-            // Create PtrHash instance - validation happens in constructor
             return new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(stream, header);
         }
         
@@ -129,12 +128,10 @@ namespace PtrHash.CSharp.Port.Core
             if (dataSize < PtrHashFileFormat.HeaderSize)
                 throw new ArgumentException("Data size too small for header", nameof(dataSize));
                 
-            // Read and validate header
             var header = *(PtrHashFileFormat.FileHeader*)mappedDataPtr;
             if (!header.Validate())
                 throw new InvalidOperationException("Invalid PtrHash file header");
                 
-            // Create PtrHash using memory-mapped constructor - type validation happens there
             return new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(mappedDataPtr, dataSize, header);
         }
         
