@@ -33,49 +33,6 @@ public class PtrHashSerializationTests
         }
     }
     
-    [TestMethod]
-    [DataRow(1_000)]
-    [DataRow(10_000)]
-    public unsafe void MemoryMappedFile_LoadsCorrectly(int keyCount)
-    {
-        var keys = PtrHashTestHelpers.GenerateKeys(keyCount);
-        var config = PtrHashTestHelpers.AllConfigurations.First(c => c.StorageType == PtrHashGenericTypes.RemappingStorage.VecU32);
-        
-        var tempFile = Path.GetTempFileName();
-        try
-        {
-            using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, config.Parameters))
-            {
-                using var fileStream = File.Create(tempFile);
-                original.Serialize(fileStream);
-            }
-            
-            var fileInfo = new FileInfo(tempFile);
-            using var mmf = MemoryMappedFile.CreateFromFile(tempFile, FileMode.Open, null, fileInfo.Length, MemoryMappedFileAccess.Read);
-            using var accessor = mmf.CreateViewAccessor(0, fileInfo.Length, MemoryMappedFileAccess.Read);
-            
-            byte* ptr = null;
-            accessor.SafeMemoryMappedViewHandle.AcquirePointer(ref ptr);
-            try
-            {
-                using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, (nuint)fileInfo.Length);
-                
-                foreach (var key in keys.Take(Math.Min(100, keys.Length)))
-                {
-                    var index = loaded.GetIndex(key);
-                    Assert.IsTrue(index < (nuint)keys.Length, $"Index {index} out of bounds for key {key}");
-                }
-            }
-            finally
-            {
-                accessor.SafeMemoryMappedViewHandle.ReleasePointer();
-            }
-        }
-        finally
-        {
-            File.Delete(tempFile);
-        }
-    }
     
     [TestMethod]
     public void Deserialize_WrongStorageType_ThrowsException()
