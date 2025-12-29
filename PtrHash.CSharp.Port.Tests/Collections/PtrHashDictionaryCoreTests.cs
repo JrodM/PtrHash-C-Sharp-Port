@@ -174,7 +174,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Select storage type and create PtrHashDictionary
             switch (config.StorageType)
             {
-                case RemappingStorageType.VecU32:
+                case PtrHashGenericTypes.RemappingStorage.VecU32:
                     using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -182,7 +182,7 @@ namespace PtrHash.CSharp.Port.Tests
                     }
                     break;
                     
-                case RemappingStorageType.VecU64:
+                case PtrHashGenericTypes.RemappingStorage.VecU64:
                     using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -190,7 +190,7 @@ namespace PtrHash.CSharp.Port.Tests
                     }
                     break;
                     
-                case RemappingStorageType.CacheLineEF:
+                case PtrHashGenericTypes.RemappingStorage.CacheLineEF:
                     using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, CachelineEfVec>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -208,7 +208,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Select storage type and create PtrHashDictionary
             switch (config.StorageType)
             {
-                case RemappingStorageType.VecU32:
+                case PtrHashGenericTypes.RemappingStorage.VecU32:
                     using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -216,7 +216,7 @@ namespace PtrHash.CSharp.Port.Tests
                     }
                     break;
                     
-                case RemappingStorageType.VecU64:
+                case PtrHashGenericTypes.RemappingStorage.VecU64:
                     using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -224,7 +224,7 @@ namespace PtrHash.CSharp.Port.Tests
                     }
                     break;
                     
-                case RemappingStorageType.CacheLineEF:
+                case PtrHashGenericTypes.RemappingStorage.CacheLineEF:
                     using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, CachelineEfVec>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -242,7 +242,7 @@ namespace PtrHash.CSharp.Port.Tests
             // Select storage type and create PtrHashDictionary
             switch (config.StorageType)
             {
-                case RemappingStorageType.VecU32:
+                case PtrHashGenericTypes.RemappingStorage.VecU32:
                     using (var dict = new PtrHashDictionary<string, string, StringHasher, Linear, UInt32VectorRemappingStorage>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -250,7 +250,7 @@ namespace PtrHash.CSharp.Port.Tests
                     }
                     break;
                     
-                case RemappingStorageType.VecU64:
+                case PtrHashGenericTypes.RemappingStorage.VecU64:
                     using (var dict = new PtrHashDictionary<string, string, StringHasher, Linear, UInt64VectorRemappingStorage>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -258,7 +258,7 @@ namespace PtrHash.CSharp.Port.Tests
                     }
                     break;
                     
-                case RemappingStorageType.CacheLineEF:
+                case PtrHashGenericTypes.RemappingStorage.CacheLineEF:
                     using (var dict = new PtrHashDictionary<string, string, StringHasher, Linear, CachelineEfVec>(
                         keys, values, "MISSING", config.Parameters))
                     {
@@ -286,15 +286,11 @@ namespace PtrHash.CSharp.Port.Tests
             
             // Test streaming
             var streamResults = new string[queryKeys.Length];
-            var streamPrefetchResults = new string[queryKeys.Length];
             dict.TryGetValueStream(queryKeys, streamResults);
-            dict.TryGetValueStreamPrefetch(queryKeys, streamPrefetchResults);
             
             // Verify consistency
             CollectionAssert.AreEqual(individualResults, streamResults, 
                 $"Config {configName}: Stream results don't match individual results");
-            CollectionAssert.AreEqual(individualResults, streamPrefetchResults, 
-                $"Config {configName}: StreamPrefetch results don't match individual results");
         }
 
         private static void VerifyDictionaryCorrectness<TStorage>(PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, TStorage> dict, ulong[] keys, string[] values, string configName)
@@ -327,15 +323,11 @@ namespace PtrHash.CSharp.Port.Tests
                     $"Config {configName}: Invalid key {invalidKey} should return sentinel");
             }
 
-            // Test 3: Streaming consistency (both regular and prefetch)
+            // Test 3: Streaming consistency
             var streamResults = new string[keys.Length];
-            var streamPrefetchResults = new string[keys.Length];
             dict.TryGetValueStream(keys, streamResults);
-            dict.TryGetValueStreamPrefetch(keys, streamPrefetchResults);
             CollectionAssert.AreEqual(values, streamResults, 
                 $"Config {configName}: Stream results don't match expected values");
-            CollectionAssert.AreEqual(values, streamPrefetchResults, 
-                $"Config {configName}: StreamPrefetch results don't match expected values");
 
             // Test 4: Properties
             Assert.AreEqual(keys.Length, dict.Count, 
@@ -360,15 +352,11 @@ namespace PtrHash.CSharp.Port.Tests
                     $"Config {configName}: Indexer for key {keys[i]} has wrong value");
             }
 
-            // Test 2: Streaming consistency (both regular and prefetch)
+            // Test 2: Streaming consistency
             var streamResults = new string[keys.Length];
-            var streamPrefetchResults = new string[keys.Length];
             dict.TryGetValueStream(keys, streamResults);
-            dict.TryGetValueStreamPrefetch(keys, streamPrefetchResults);
             CollectionAssert.AreEqual(values, streamResults, 
                 $"Config {configName}: Stream results don't match expected values");
-            CollectionAssert.AreEqual(values, streamPrefetchResults, 
-                $"Config {configName}: StreamPrefetch results don't match expected values");
         }
     }
 }

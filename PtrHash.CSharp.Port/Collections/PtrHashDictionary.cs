@@ -230,42 +230,6 @@ namespace PtrHash.CSharp.Port.Collections
         }
 
         /// <summary>
-        /// Performs batch lookup using streaming with prefetch for better performance on large datasets.
-        /// Uses GetIndicesStreamPrefetch for memory-intensive workloads.
-        /// </summary>
-        /// <param name="keys">Keys to look up</param>
-        /// <param name="values">Output array for values (must be same length as keys)</param>
-        public void TryGetValueStreamPrefetch(
-            ReadOnlySpan<TKey> keys,
-            Span<TValue> values,
-            int prefetchDistance = 32)
-        {
-            if (keys.Length != values.Length)
-                throw new ArgumentException("Key and value spans must have the same length");
-            
-            if (keys.Length <= MAX_STACK_SIZE)
-            {
-                Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: false, prefetchDistance);
-                ProcessIndices(keys, indices, values);
-            }
-            else
-            {
-                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
-                try
-                {
-                    var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: false, prefetchDistance);
-                    ProcessIndices(keys, indicesSpan, values);
-                }
-                finally
-                {
-                    ArrayPool<nuint>.Shared.Return(indices);
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets information about the underlying PtrHash structure
         /// </summary>
         public PtrHashInfo GetInfo() => _ptrHash.GetInfo();

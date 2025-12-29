@@ -1,5 +1,6 @@
 using System;
 using PtrHash.CSharp.Port.Storage;
+using RemappingStorageType = PtrHash.CSharp.Port.Core.PtrHashGenericTypes.RemappingStorage;
 
 namespace PtrHash.CSharp.Port.Core
 {
@@ -36,39 +37,6 @@ namespace PtrHash.CSharp.Port.Core
             Minimal = true,
             SinglePart = false
         };
-    }
-
-    /// <summary>
-    /// Remapping storage type selection
-    /// Controls space/speed tradeoff for the remapping table
-    /// </summary>
-    public enum RemappingStorageType
-    {
-        /// <summary>
-        /// Vec&lt;u8&gt; - 8-bit values, most compact for small numbers
-        /// </summary>
-        VecU8,
-        
-        /// <summary>
-        /// Vec&lt;u16&gt; - 16-bit values, good for medium numbers
-        /// </summary>
-        VecU16,
-        
-        /// <summary>
-        /// Vec&lt;u32&gt; - 32-bit values, default.
-        /// </summary>
-        VecU32,
-        
-        /// <summary>
-        /// Vec&lt;u64&gt; - 64-bit values, supports largest numbers
-        /// </summary>
-        VecU64,
-        
-        
-        /// <summary>
-        /// CacheLineEF - Standard Elias-Fano compressed encoding, maximum compression
-        /// </summary>
-        CacheLineEF,
     }
 
     /// <summary>

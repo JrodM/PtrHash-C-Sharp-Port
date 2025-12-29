@@ -37,6 +37,21 @@ namespace PtrHash.CSharp.Port.Storage
         static abstract string Name { get; }
 
         /// <summary>
+        /// Serialize this storage to a stream.
+        /// </summary>
+        static abstract void Serialize(TSelf self, System.IO.Stream stream);
+
+        /// <summary>
+        /// Deserialize from a stream.
+        /// </summary>
+        static abstract TSelf Deserialize(System.IO.Stream stream, ulong byteSize);
+
+        /// <summary>
+        /// Create from memory-mapped data (zero-copy).
+        /// </summary>
+        static abstract unsafe TSelf CreateFromMemoryMap(byte* ptr, ulong byteSize);
+
+        /// <summary>
         /// Dispose of any resources held by this storage.
         /// </summary>
         new void Dispose();

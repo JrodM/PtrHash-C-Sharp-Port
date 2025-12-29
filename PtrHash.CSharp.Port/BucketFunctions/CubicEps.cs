@@ -1,3 +1,5 @@
+using System;
+
 namespace PtrHash.CSharp.Port.BucketFunctions
 {
     /// <summary>
@@ -16,8 +18,16 @@ namespace PtrHash.CSharp.Port.BucketFunctions
         public ulong Call(ulong x)
         {
             // x * x * (1 + x)/2
-            ulong xxPlusX = MulHigh.Multiply(MulHigh.Multiply(x, x), (x >> 1) | (1ul << 63));
+            ulong xxPlusX = Multiply(Multiply(x, x), (x >> 1) | (1ul << 63));
             return xxPlusX / 256 * 255 + x / 256;
+        }
+
+                /// <summary>
+        /// Computes the high 64 bits of a * b (equivalent to ((a as u128 * b as u128) >> 64) as u64)
+        /// </summary>
+        public static ulong Multiply(ulong a, ulong b)
+        {
+            return (ulong)(((UInt128)a * b) >> 64);
         }
     }
 }

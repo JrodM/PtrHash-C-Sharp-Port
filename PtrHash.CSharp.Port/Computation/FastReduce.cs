@@ -8,7 +8,7 @@ namespace PtrHash.CSharp.Port.Computation
     /// </summary>
     internal readonly struct FastReduce
     {
-        private readonly nuint d;
+        public readonly nuint d;
         
         public FastReduce(nuint modulus)
         {

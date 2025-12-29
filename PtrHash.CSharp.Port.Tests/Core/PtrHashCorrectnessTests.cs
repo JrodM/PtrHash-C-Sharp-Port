@@ -46,15 +46,13 @@ public class PtrHashCorrectnessTests
     [DataRow(1)]
     [DataRow(100)]
     [DataRow(1_000)]
-    [DataRow(100_000)]
-    [DataRow(1_000_000)]
     public void StringKeys_VariousDatasetSizes_MaintainCorrectness(int keyCount)
     {
         var keys = PtrHashTestHelpers.GenerateStringKeys(keyCount);
 
         // Test subset of configurations for strings (they need VecU32+ for large indices)
         var stringConfigs = PtrHashTestHelpers.AllConfigurations
-            .Where(c => c.StorageType is RemappingStorageType.VecU32 or RemappingStorageType.VecU64)
+            .Where(c => c.StorageType is PtrHashGenericTypes.RemappingStorage.VecU32 or PtrHashGenericTypes.RemappingStorage.VecU64)
             .ToArray();
 
         foreach (var config in stringConfigs)

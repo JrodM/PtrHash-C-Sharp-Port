@@ -19,7 +19,6 @@ This C# port provides:
 - **Zero allocations during queries**: GC-friendly for high-throughput scenarios
 - **Pure C# implementation**: Fully managed code with no native dependencies
 - **Native interop available**: P/Invoke bindings to compare against Rust implementation
-- **Dictionary compatibility**: Drop-in replacement via `PtrHashDictionary<TKey>`
 
 ## Performance Comparison
 
@@ -50,74 +49,10 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 - **Trade-off confirmed**: Single-part sacrifices construction speed for optimal query performance
 - **Construction bottleneck**: Port is 1.6-1.8x slower than native at scale
 
-### 2. Dictionary vs PtrHashDictionary (DictionaryImplementationComparisonBenchmark)
+### 2. Raw PtrHash Performance Analysis (NativeVsPortPerformanceBenchmark)
 **Test Details**:
-- **What**: Comparing `Dictionary<ulong,ulong>` vs `PtrHashDictionary<ulong,ulong>` (both with key validation)
-- **Dataset**: 10K to 10M random ulong keys with random values
-- **Lookups**: 10,000 lookups per test with 50% hit rate (shuffled for random distribution)
-- **Methods tested**:
-  - Dictionary Point (baseline): Individual TryGetValue calls
-  - Native Multi-Part Stream: Batch TryGetValueStream
-  - Port Multi-Part Point: Individual TryGetValue calls
-  - Port Multi-Part Stream: Batch TryGetValueStream
-  - Port Single-Part Point: Individual TryGetValue calls
-  - Port Single-Part Stream: Batch TryGetValueStream
-
-**Results showing point lookups** (10K lookups):
-| Key Count | Dictionary<K,V> | Port Multi-Part Point | Port Single-Part Point | Best Speedup |
-|-----------|-----------------|----------------------|------------------------|--------------|
-| 10K | 36.16 μs | 28.41 μs | 28.46 μs | 1.27x |
-| 100K | 63.10 μs | 44.68 μs | 36.85 μs | 1.71x |
-| 1M | 92.09 μs | 68.66 μs | 55.60 μs | 1.66x |
-| 10M | 186.72 μs | 116.90 μs | 102.13 μs | 1.83x |
-
-**Stream results** (10K lookups):
-| Key Count | Native Multi-Part Stream | Port Multi-Part Stream | Port Single-Part Stream |
-|-----------|-------------------------|------------------------|-------------------------|
-| 10K | 43.66 μs | 39.13 μs | 72.04 μs |
-| 100K | 49.55 μs | 43.34 μs | 37.61 μs |
-| 1M | 54.49 μs | 71.66 μs | 91.80 μs |
-| 10M | 85.43 μs | 93.57 μs | 112.70 μs |
-
-### 3. Scaling Analysis (LookupPerformanceScalingBenchmark)
-**Test Details**:
-- **What**: How performance scales with lookup count across all configurations
-- **Dataset**: Fixed 2M keys (ulong) with random values
-- **Lookups**: Varying from 1K to 10M lookups with 50% hit rate
-- **Comprehensive configurations**:
-  - Standard `Dictionary<ulong, ulong>` (baseline)
-  - Native Multi-Part/Single-Part Point & Stream
-  - Port Multi-Part/Single-Part Point & Stream  
-  - Port Single-Part U64 storage and Prefetch variants
-
-**Complete Performance Matrix**:
-| Lookups | Dictionary | Native Multi Point | Native Single Point | Native Multi Stream | Native Single Stream | Port Multi Point | Port Single Point | Port Multi Stream | Port Single Stream |
-|---------|------------|-------------------|---------------------|--------------------|--------------------|------------------|-------------------|-------------------|--------------------|
-| 1K | 4.29 μs | 6.16 μs | 6.14 μs | 4.46 μs | 4.49 μs | 4.44 μs | **3.92 μs** | 4.29 μs | **3.98 μs** |
-| 50K | 888 μs | 689 μs | 688 μs | 343 μs | 369 μs | 485 μs | **406 μs** | 316 μs | **241 μs** |
-| 100K | 3,533 μs | 1,995 μs | 1,745 μs | 1,156 μs | 1,174 μs | 1,249 μs | **919 μs** | 794 μs | **819 μs** |
-| 1M | 53,001 μs | 33,530 μs | 33,980 μs | 18,583 μs | 18,072 μs | 29,776 μs | **26,441 μs** | 16,665 μs | **16,009 μs** |
-| 10M | 527,151 μs | 348,160 μs | 352,942 μs | 168,978 μs | 168,000 μs | 301,800 μs | **247,705 μs** | 157,242 μs | **153,071 μs** |
-
-**Performance Ratios vs Dictionary**:
-| Lookups | Best Port Config | Speedup | Best Native Config | Speedup | Port vs Native |
-|---------|------------------|---------|-------------------|---------|----------------|
-| 1K | Single-Part Point | **1.09x** | Multi Stream | 0.96x | Port **13% faster** |
-| 50K | Single-Part Stream | **3.68x** | Multi Stream | 2.59x | Port **42% faster** |
-| 100K | Single-Part Stream | **4.31x** | Multi Stream | 3.06x | Port **41% faster** |
-| 1M | Single-Part Stream | **3.31x** | Single Stream | 2.93x | Port **13% faster** |
-| 10M | Single-Part Stream | **3.44x** | Single Stream | 3.14x | Port **9% faster** |
-
-**Key Findings**:
-- **Port Single-Part dominates**: Best performance across all scales
-- **Native point lookups slow**: 2x slower than port due to P/Invoke overhead
-- **Streaming scales better**: Consistent 3-4x speedups vs Dictionary at scale
-- **Memory bandwidth not limiting**: U64 vs U32 storage shows minimal difference
-
-### 4. Raw PtrHash Performance Analysis (NativeVsPortPerformanceBenchmark)
-**Test Details**:
-- **What**: Raw PtrHash methods (no dictionary wrapper) comparing minimal vs perfect hashing
-- **Dataset**: 2M random ulong keys (consistent with other benchmarks)
+- **What**: Raw PtrHash methods comparing minimal vs perfect hashing
+- **Dataset**: 2M random ulong keys
 - **Lookups**: 1K, 50K, 100K, 1M lookups with 50% hit rate
 - **Methods**: Point vs stream, minimal (GetIndex) vs perfect hash (GetIndexNoRemap)
 
@@ -130,8 +65,8 @@ Based on benchmarks on AMD Ryzen AI 5 340:
 | **1M** | 4,217 μs (4.22 ns) | 2,327 μs (2.33 ns) | **2,322 μs (2.32 ns)** | 2,111 μs (2.11 ns) | **1,715 μs (1.72 ns)** | **2.46x faster** |
 
 **Stream Performance (.NET 8.0)**:
-| Lookups | Native Multi Prefetch | Port Multi GetIndex | Port Multi NoRemap | Port Single GetIndex | Port Single NoRemap | Best Port vs Native |
-|---------|----------------------|--------------------|--------------------|---------------------|--------------------|--------------------|
+| Lookups | Native Multi Stream | Port Multi GetIndex | Port Multi NoRemap | Port Single GetIndex | Port Single NoRemap | Best Port vs Native |
+|---------|---------------------|--------------------|--------------------|---------------------|--------------------|--------------------|
 | **1K** | 2.39 μs (2.39 ns) | 2.36 μs (2.36 ns) | **2.23 μs (2.23 ns)** | 1.95 μs (1.95 ns) | **1.78 μs (1.78 ns)** | **1.34x faster** |
 | **50K** | 118.6 μs (2.37 ns) | 125.0 μs (2.50 ns) | **118.1 μs (2.36 ns)** | 101.1 μs (2.02 ns) | **98.3 μs (1.97 ns)** | **1.21x faster** |
 | **100K** | 235.1 μs (2.35 ns) | 245.2 μs (2.45 ns) | **219.7 μs (2.20 ns)** | 203.5 μs (2.04 ns) | **180.2 μs (1.80 ns)** | **1.30x faster** |
@@ -175,92 +110,12 @@ ulong key = 456;
 ulong index = ptrHash.GetIndex(key);  // Returns index in [0, n-1]
 ```
 
-### Dictionary Replacement
-
-```csharp
-using PtrHash.CSharp.Port.Collections;
-using PtrHash.CSharp.Port.KeyHashers;
-using PtrHash.CSharp.Port.BucketFunctions;
-using PtrHash.CSharp.Port.Storage;
-
-// Generic form - full control over implementation
-var dict = new PtrHashDictionary<string, int, StringHasher, Linear, UInt32VectorRemappingStorage>(
-    keys: new[] { "hello", "world", "foo" },
-    values: new[] { 42, 100, 123 },
-    notFoundSentinel: -1
-);
-
-// Convenience class for string keys (same as above but simpler)
-var dictString = new PtrHashDictionaryString<int>(
-    keys: new[] { "hello", "world", "foo" },
-    values: new[] { 42, 100, 123 },
-    notFoundSentinel: -1
-);
-
-int value = dict["hello"];  // Returns 42
-bool exists = dict.TryGetValue("world", out int val);  // Returns true, val = 100
-bool missing = dict.TryGetValue("missing", out int sentinel);  // Returns false, sentinel = -1
-```
-
-#### PtrHashDictionary Design Tradeoffs
-
-The `PtrHashDictionary` implementation makes specific tradeoffs optimized for general use:
-
-**Current Design Choices:**
-- **Single-part construction**: Prioritizes lookup speed over construction time. Multi-part would construct faster but have slower lookups.
-- **Minimal Perfect Hash (MPH)**: Uses remapping to achieve minimal range [0, n-1]. Perfect Hash (no remapping) is **5-23% faster** using **~1% extra slots** [0, n×1.01].
-- **Key validation**: Stores and compares original keys to handle lookups of keys not in the training set, as expected for a general-purpose dictionary.
-
-**Measured Performance Trade-offs:**
-| Hash Type | Raw Performance | Dictionary Performance | Memory Usage | Use Case |
-|-----------|----------------|----------------------|--------------|----------|
-| **Minimal Perfect** | 2.11ns/lookup | 26.4μs (1M lookups) | **Range [0, n-1]** | **Memory-constrained** |
-| **Perfect Hash** | **1.72ns/lookup** | ~21μs (estimated) | **Range [0, n×1.01]** | **Speed-critical** |
-
-**Optimization Opportunities:**
-For specialized use cases that guarantee:
-1. All lookup keys were in the original training set
-2. No validation needed for out-of-set keys
-
-You could create a `FasterPtrHashDictionary` that:
-- **Skips key storage entirely** (saves ~8 bytes/key)
-- **Eliminates key comparison overhead** (saves ~7.5ns/lookup)
-- **Uses perfect hashing** (GetIndexNoRemap) for **23% faster lookups**
-
-## Key Optimizations
-
-### C# Port Optimizations
-
-The C# port implements several critical optimizations to achieve Rust-like performance:
-
-1. **Monomorphism via Const Generics**: To match Rust's zero-cost abstractions, we use interface-based const generics (e.g., `IBucketFunction`, `IKeyHasher`, `IRemappingStorage`) that get specialized at compile time. This ensures the JIT generates optimized code paths for each concrete type combination, eliminating virtual dispatch overhead.
-
-2. **Size-based Specialization**: FindPilot methods use const generic dispatch based on bucket size, allowing the JIT to inline and optimize for specific sizes (similar to Rust's monomorphization).
-
-3. **Radix Sort**: Custom radix sort implementation for hash value sorting, avoiding generic comparison overhead.
-
-4. **Array Pooling**: Extensive use of `ArrayPool<T>` to minimize allocations during construction.
-
-5. **Unsafe Code**: Strategic use of unchecked array access and pointer arithmetic in hot paths.
-
-6. **SIMD-friendly Loops**: 4x unrolled loops aligned with CPU vector operations.
-
-### Native Interop Optimizations
-
-The native interop achieves low overhead (~10-20 ns per call) through:
-
-- **DisableRuntimeMarshalling**: Removes marshalling code, pinning, buffer copying, and security stack walks (saves ~100+ ns)
-- **LibraryImport**: Source-generated P/Invoke eliminates JIT-emitted IL stubs and reflection-based lookups
-- **SuppressGCTransition**: Avoids thread GC mode switches between cooperative and preemptive (saves ~20 ns)
-
-These optimizations reduce P/Invoke overhead from hundreds of nanoseconds to just 10-20 ns, making native interop competitive for performance comparisons.
-
 ## Limitations
 
 This C# port does not support:
 - **External-memory construction (sharding)**: The original supports datasets with >10^10 keys by sharding to disk
 
-**Note on Streaming**: The port includes streaming query support with prefetching (`GetIndicesStreamPrefetch`), but performance is suboptimal due to JIT optimization conflicts. Regular streaming without prefetch often performs better. NativeAOT shows improved prefetch performance closer to native.
+**Note on Streaming**: The port includes high-performance streaming query support for batch lookups, matching or exceeding native performance in most scenarios.
 
 ## Building
 
@@ -283,7 +138,6 @@ dotnet run -c Release -- all
   - `KeyHashers/` - Hash function implementations (FxHash, xxHash, StrongerIntHasher)
   - `BucketFunctions/` - Bucket assignment functions (Linear, CubicEps)
   - `Storage/` - Remapping storage implementations (VectorRemappingStorage, CachelineEf)
-  - `Collections/` - Dictionary wrapper
   - `Construction/` - Build-time data structures (BitVec, BinaryHeap)
   - `Sorting/` - Custom RadixSort implementation
 - `PtrHash.CSharp.Interop/` - Native Rust bindings
@@ -299,8 +153,6 @@ dotnet run -c Release -- all
 
 Areas for improvement:
 - Construction performance optimization (currently 1.6-1.8x slower than native at 10M keys)
-- Specialized `FasterPtrHashDictionary` implementation with perfect hashing and no key validation
-- Improved prefetching performance for streaming queries (currently underperforms)
 - External-memory construction (sharding) for massive datasets
 
 ## License
