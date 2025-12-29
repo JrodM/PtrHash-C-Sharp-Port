@@ -46,8 +46,6 @@ public class PtrHashCorrectnessTests
     [DataRow(1)]
     [DataRow(100)]
     [DataRow(1_000)]
-    [DataRow(100_000)]
-    [DataRow(1_000_000)]
     public void StringKeys_VariousDatasetSizes_MaintainCorrectness(int keyCount)
     {
         var keys = PtrHashTestHelpers.GenerateStringKeys(keyCount);

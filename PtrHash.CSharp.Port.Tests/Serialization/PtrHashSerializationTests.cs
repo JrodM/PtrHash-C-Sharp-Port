@@ -30,25 +30,7 @@ public class PtrHashSerializationTests
         foreach (var config in PtrHashTestHelpers.AllConfigurations)
         {
             using var stream = new MemoryStream();
-            
-            // Create, serialize, deserialize, and verify
-            switch (config.StorageType)
-            {
-                case PtrHashGenericTypes.RemappingStorage.VecU32:
-                    TestRoundTrip<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
-                        config, keys, stream);
-                    break;
-                    
-                case PtrHashGenericTypes.RemappingStorage.VecU64:
-                    TestRoundTrip<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(
-                        config, keys, stream);
-                    break;
-                    
-                case PtrHashGenericTypes.RemappingStorage.CacheLineEF:
-                    TestRoundTrip<ulong, StrongerIntHasher, Linear, CachelineEfVec>(
-                        config, keys, stream);
-                    break;
-            }
+            TestRoundTrip(config, keys, stream);
         }
     }
     
@@ -259,8 +241,7 @@ public class PtrHashSerializationTests
         var config = PtrHashTestHelpers.AllConfigurations[0];
         
         using var stream = new MemoryStream();
-        TestRoundTrip<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
-            config, keys, stream);
+        TestRoundTrip(config, keys, stream);
     }
     
     /// <summary>
@@ -278,25 +259,18 @@ public class PtrHashSerializationTests
             // Serialize to file
             using (var fileStream = File.Create(tempFile))
             {
-                using var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
-                    keys, config.Parameters);
-                original.Serialize(fileStream);
+                dynamic original = PtrHashTestHelpers.CreatePtrHash(config, keys);
+                using (original)
+                {
+                    original.Serialize(fileStream);
+                }
             }
             
-            // Deserialize from file
+            // Deserialize from file and verify
             using (var fileStream = File.OpenRead(tempFile))
             {
-                using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(fileStream);
-                
-                // Verify by checking all keys produce valid indices
-                var indices = new HashSet<nuint>();
-                foreach (var key in keys)
-                {
-                    var index = loaded.GetIndex(key);
-                    Assert.IsTrue(index < (nuint)keys.Length, $"Index {index} out of bounds for key {key}");
-                    Assert.IsTrue(indices.Add(index), $"Duplicate index {index} for key {key}");
-                }
-                Assert.AreEqual(keys.Length, indices.Count);
+                using var loaded = PtrHashTestHelpers.DeserializePtrHash<ulong>(config, fileStream);
+                PtrHashTestHelpers.VerifyCorrectness(loaded, keys, config.Name);
             }
         }
         finally
@@ -306,33 +280,21 @@ public class PtrHashSerializationTests
     }
     
     // Helper method for round-trip testing
-    private static void TestRoundTrip<TKey, THasher, TBucketFunction, TRemappingStorage>(
-        TestConfig config, 
-        TKey[] keys, 
-        Stream stream)
+    private static void TestRoundTrip<TKey>(TestConfig config, TKey[] keys, Stream stream)
         where TKey : notnull
-        where THasher : struct, IKeyHasher<TKey>
-        where TBucketFunction : struct, IBucketFunction
-        where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
     {
-        // Create and serialize
-        using (var original = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(keys, config.Parameters))
+        // Create and serialize - we need the concrete type to call Serialize
+        dynamic original = PtrHashTestHelpers.CreatePtrHash(config, keys);
+        using (original)
         {
             original.Serialize(stream);
         }
         
         // Deserialize and verify
         stream.Position = 0;
-        using var loaded = PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>.Deserialize(stream);
+        using var loaded = PtrHashTestHelpers.DeserializePtrHash<TKey>(config, stream);
         
-        // Verify all keys produce the same indices as before serialization
-        var indices = new HashSet<nuint>();
-        foreach (var key in keys)
-        {
-            var index = loaded.GetIndex(key);
-            Assert.IsTrue(index < (nuint)keys.Length, $"{config.Name}: Index {index} out of bounds for key {key}");
-            Assert.IsTrue(indices.Add(index), $"{config.Name}: Duplicate index {index} for key {key}");
-        }
-        Assert.AreEqual(keys.Length, indices.Count, $"{config.Name}: Not all indices were unique");
+        // Verify correctness using framework helper
+        PtrHashTestHelpers.VerifyCorrectness(loaded, keys, config.Name);
     }
 }
