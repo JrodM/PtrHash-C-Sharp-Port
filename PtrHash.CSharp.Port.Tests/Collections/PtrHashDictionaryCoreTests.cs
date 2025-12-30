@@ -75,7 +75,6 @@ namespace PtrHash.CSharp.Port.Tests
         [TestMethod]
         public void EdgeCases_HandledCorrectly()
         {
-            // Test empty keys - should throw
             Assert.ThrowsException<ArgumentException>(() =>
             {
                 var emptyKeys = Array.Empty<ulong>();
@@ -83,7 +82,6 @@ namespace PtrHash.CSharp.Port.Tests
                 using var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(emptyKeys, emptyValues, "EMPTY");
             });
 
-            // Test single key
             var singleKey = new ulong[] { 42 };
             var singleValue = new string[] { "answer" };
             using (var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(singleKey, singleValue, "MISSING"))
@@ -93,7 +91,6 @@ namespace PtrHash.CSharp.Port.Tests
                 Assert.AreEqual("MISSING", missing);
             }
 
-            // Test mismatched arrays
             Assert.ThrowsException<ArgumentException>(() =>
             {
                 var keys = new ulong[] { 1, 2 };
@@ -101,7 +98,6 @@ namespace PtrHash.CSharp.Port.Tests
                 using var dict = new PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, values, "ERROR");
             });
 
-            // Test duplicate keys
             var duplicateKeys = new ulong[] { 42, 42 };
             var duplicateValues = new string[] { "first", "second" };
             var testConfig = PtrHashTestHelpers.AllConfigurations[0];
@@ -112,7 +108,6 @@ namespace PtrHash.CSharp.Port.Tests
             }
             catch (Exception)
             {
-                // Expected - duplicate keys should cause construction failure
             }
         }
 
@@ -148,13 +143,11 @@ namespace PtrHash.CSharp.Port.Tests
             var random = new Random(42);
             var queries = new List<ulong>();
             
-            // Add some valid keys
             for (int i = 0; i < queryCount / 2; i++)
             {
                 queries.Add(validKeys[random.Next(validKeys.Length)]);
             }
             
-            // Add some invalid keys
             for (int i = 0; i < queryCount / 2; i++)
             {
                 ulong invalidKey;
@@ -171,7 +164,6 @@ namespace PtrHash.CSharp.Port.Tests
 
         private static void TestDictionaryCorrectness(TestConfig config, ulong[] keys, string[] values)
         {
-            // Select storage type and create PtrHashDictionary
             switch (config.StorageType)
             {
                 case PtrHashGenericTypes.RemappingStorage.VecU32:
@@ -205,7 +197,6 @@ namespace PtrHash.CSharp.Port.Tests
 
         private static void TestStreamingConsistency(TestConfig config, ulong[] keys, string[] values)
         {
-            // Select storage type and create PtrHashDictionary
             switch (config.StorageType)
             {
                 case PtrHashGenericTypes.RemappingStorage.VecU32:
@@ -239,7 +230,6 @@ namespace PtrHash.CSharp.Port.Tests
 
         private static void TestStringDictionaryCorrectness(TestConfig config, string[] keys, string[] values)
         {
-            // Select storage type and create PtrHashDictionary
             switch (config.StorageType)
             {
                 case PtrHashGenericTypes.RemappingStorage.VecU32:
@@ -274,21 +264,17 @@ namespace PtrHash.CSharp.Port.Tests
         private static void VerifyStreamingConsistency<TStorage>(PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, TStorage> dict, ulong[] keys, string configName)
             where TStorage : struct, IRemappingStorage<TStorage>
         {
-            // Create mixed query (some valid, some invalid keys)
             var queryKeys = CreateMixedQueryKeys(keys, keys.Length / 10);
             
-            // Test individual lookups
             var individualResults = new string[queryKeys.Length];
             for (int i = 0; i < queryKeys.Length; i++)
             {
                 individualResults[i] = dict.TryGetValue(queryKeys[i], out var value) ? value : dict.Sentinel;
             }
             
-            // Test streaming
             var streamResults = new string[queryKeys.Length];
             dict.TryGetValueStream(queryKeys, streamResults);
             
-            // Verify consistency
             CollectionAssert.AreEqual(individualResults, streamResults, 
                 $"Config {configName}: Stream results don't match individual results");
         }
@@ -296,7 +282,6 @@ namespace PtrHash.CSharp.Port.Tests
         private static void VerifyDictionaryCorrectness<TStorage>(PtrHashDictionary<ulong, string, StrongerIntHasher, Linear, TStorage> dict, ulong[] keys, string[] values, string configName)
             where TStorage : struct, IRemappingStorage<TStorage>
         {
-            // Test 1: All original keys should map to their values
             for (int i = 0; i < keys.Length; i++)
             {
                 Assert.IsTrue(dict.TryGetValue(keys[i], out var value), 
@@ -307,7 +292,6 @@ namespace PtrHash.CSharp.Port.Tests
                     $"Config {configName}: Indexer for key {keys[i]} has wrong value");
             }
 
-            // Test 2: Invalid keys should return sentinel
             var random = new Random(42);
             for (int i = 0; i < Math.Min(100, keys.Length); i++)
             {
@@ -323,13 +307,11 @@ namespace PtrHash.CSharp.Port.Tests
                     $"Config {configName}: Invalid key {invalidKey} should return sentinel");
             }
 
-            // Test 3: Streaming consistency
             var streamResults = new string[keys.Length];
             dict.TryGetValueStream(keys, streamResults);
             CollectionAssert.AreEqual(values, streamResults, 
                 $"Config {configName}: Stream results don't match expected values");
 
-            // Test 4: Properties
             Assert.AreEqual(keys.Length, dict.Count, 
                 $"Config {configName}: Count should match key count");
             CollectionAssert.AreEquivalent(keys, dict.Keys.ToArray(), 
@@ -341,7 +323,6 @@ namespace PtrHash.CSharp.Port.Tests
         private static void VerifyStringDictionaryCorrectness<TStorage>(PtrHashDictionary<string, string, StringHasher, Linear, TStorage> dict, string[] keys, string[] values, string configName)
             where TStorage : struct, IRemappingStorage<TStorage>
         {
-            // Test 1: All original keys should map to their values
             for (int i = 0; i < keys.Length; i++)
             {
                 Assert.IsTrue(dict.TryGetValue(keys[i], out var value), 
@@ -352,7 +333,6 @@ namespace PtrHash.CSharp.Port.Tests
                     $"Config {configName}: Indexer for key {keys[i]} has wrong value");
             }
 
-            // Test 2: Streaming consistency
             var streamResults = new string[keys.Length];
             dict.TryGetValueStream(keys, streamResults);
             CollectionAssert.AreEqual(values, streamResults, 

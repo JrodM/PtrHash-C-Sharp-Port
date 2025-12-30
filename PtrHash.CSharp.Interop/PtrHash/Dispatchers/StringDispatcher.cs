@@ -18,7 +18,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             if (keys.IsEmpty)
                 throw new ArgumentException("Keys span cannot be empty", nameof(keys));
 
-            // Convert strings to UTF-8 byte arrays
             var utf8Keys = new byte[keys.Length][];
             var keyLengths = new nuint[keys.Length];
             var keyHandles = new SafeHGlobalHandle[keys.Length];
@@ -27,7 +26,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
 
             try
             {
-                // Convert to UTF-8 and allocate individual string pointers with SafeHandles
                 for (int i = 0; i < keys.Length; i++)
                 {
                     if (keys[i] == null)
@@ -36,16 +34,13 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
                     utf8Keys[i] = Encoding.UTF8.GetBytes(keys[i]);
                     keyLengths[i] = (nuint)utf8Keys[i].Length;
                     
-                    // Allocate and copy each string using SafeHandle
                     keyHandles[i] = SafeHGlobalHandle.Allocate(utf8Keys[i].Length);
                     Marshal.Copy(utf8Keys[i], 0, keyHandles[i].DangerousGetHandle(), utf8Keys[i].Length);
                 }
 
-                // Allocate array of pointers and key lengths using SafeHandles
                 keysPtrArrayHandle = SafeHGlobalHandle.Allocate(keys.Length * IntPtr.Size);
                 keyLengthsPtrHandle = SafeHGlobalHandle.Allocate((int)(keys.Length * sizeof(nuint)));
                 
-                // Copy array of string pointers
                 var keyPointers = new IntPtr[keys.Length];
                 for (int i = 0; i < keys.Length; i++)
                 {
@@ -53,14 +48,12 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
                 }
                 Marshal.Copy(keyPointers, 0, keysPtrArrayHandle.DangerousGetHandle(), keys.Length);
 
-                // Copy key lengths array
                 fixed (nuint* keyLengthsArray = keyLengths)
                 {
                     Buffer.MemoryCopy(keyLengthsArray, keyLengthsPtrHandle.DangerousGetHandle().ToPointer(), 
                         keys.Length * sizeof(nuint), keys.Length * sizeof(nuint));
                 }
 
-                // Call native function
                 var result = PtrHashNative.ptrhash_new_string(
                     keysPtrArrayHandle.DangerousGetHandle(), keyLengthsPtrHandle.DangerousGetHandle(), (nuint)keys.Length, parameters);
                     
@@ -68,7 +61,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             }
             finally
             {
-                // Clean up all allocated memory - SafeHandles will dispose automatically
                 for (int i = 0; i < keyHandles.Length; i++)
                 {
                     keyHandles[i]?.Dispose();
@@ -83,10 +75,8 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
                 
-            // Convert string to UTF-8 bytes
             var utf8Bytes = Encoding.UTF8.GetBytes(key);
             
-            // Pin the byte array and call native function
             fixed (byte* keyPtr = utf8Bytes)
             {
                 return PtrHashNative.ptrhash_index_string(
@@ -99,10 +89,8 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
                 
-            // Convert string to UTF-8 bytes
             var utf8Bytes = Encoding.UTF8.GetBytes(key);
             
-            // Pin the byte array and call native function
             fixed (byte* keyPtr = utf8Bytes)
             {
                 return PtrHashNative.ptrhash_index_no_remap_string(
@@ -118,7 +106,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             if (keys.IsEmpty)
                 return new PtrHashNative.FFIResultVoid { Success = true, Value = 0, ErrorMsg = IntPtr.Zero, ErrorLen = 0 };
 
-            // Convert strings to UTF-8 byte arrays
             var utf8Keys = new byte[keys.Length][];
             var keyLengths = new nuint[keys.Length];
             var keyHandles = new SafeHGlobalHandle[keys.Length];
@@ -127,7 +114,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
 
             try
             {
-                // Convert to UTF-8 and allocate individual string pointers with SafeHandles
                 for (int i = 0; i < keys.Length; i++)
                 {
                     if (keys[i] == null)
@@ -136,16 +122,13 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
                     utf8Keys[i] = Encoding.UTF8.GetBytes(keys[i]);
                     keyLengths[i] = (nuint)utf8Keys[i].Length;
                     
-                    // Allocate and copy each string using SafeHandle
                     keyHandles[i] = SafeHGlobalHandle.Allocate(utf8Keys[i].Length);
                     Marshal.Copy(utf8Keys[i], 0, keyHandles[i].DangerousGetHandle(), utf8Keys[i].Length);
                 }
 
-                // Allocate array of pointers and key lengths using SafeHandles
                 keysPtrArrayHandle = SafeHGlobalHandle.Allocate(keys.Length * IntPtr.Size);
                 keyLengthsPtrHandle = SafeHGlobalHandle.Allocate((int)(keys.Length * sizeof(nuint)));
                 
-                // Copy array of string pointers
                 var keyPointers = new IntPtr[keys.Length];
                 for (int i = 0; i < keys.Length; i++)
                 {
@@ -153,14 +136,12 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
                 }
                 Marshal.Copy(keyPointers, 0, keysPtrArrayHandle.DangerousGetHandle(), keys.Length);
 
-                // Copy key lengths array
                 fixed (nuint* keyLengthsArray = keyLengths)
                 {
                     Buffer.MemoryCopy(keyLengthsArray, keyLengthsPtrHandle.DangerousGetHandle().ToPointer(), 
                         keys.Length * sizeof(nuint), keys.Length * sizeof(nuint));
                 }
 
-                // Pin results array and call native function
                 fixed (nuint* resultsPtr = results)
                 {
                     return PtrHashNative.ptrhash_index_batch_string(
@@ -170,7 +151,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             }
             finally
             {
-                // Clean up all allocated memory - SafeHandles will dispose automatically
                 for (int i = 0; i < keyHandles.Length; i++)
                 {
                     keyHandles[i]?.Dispose();
@@ -188,12 +168,10 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             if (keys.IsEmpty)
                 return new PtrHashNative.FFIResultVoid { Success = true, Value = 0, ErrorMsg = IntPtr.Zero, ErrorLen = 0 };
 
-            // Convert strings to UTF-8 byte arrays
             var utf8Keys = new byte[keys.Length][];
             var keyLengths = new nuint[keys.Length];
             var totalKeyBytes = 0;
 
-            // Convert to UTF-8 and calculate total size
             for (int i = 0; i < keys.Length; i++)
             {
                 if (keys[i] == null)
@@ -204,7 +182,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
                 totalKeyBytes += utf8Keys[i].Length;
             }
 
-            // Allocate unmanaged memory using SafeHandles
             SafeHGlobalHandle keysPtrHandle = null;
             SafeHGlobalHandle keyLengthsPtrHandle = null;
             
@@ -213,7 +190,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
                 keysPtrHandle = SafeHGlobalHandle.Allocate(totalKeyBytes);
                 keyLengthsPtrHandle = SafeHGlobalHandle.Allocate((int)(keys.Length * sizeof(nuint)));
 
-                // Copy UTF-8 key data to unmanaged memory
                 var currentPtr = keysPtrHandle.DangerousGetHandle();
                 for (int i = 0; i < keys.Length; i++)
                 {
@@ -221,14 +197,12 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
                     currentPtr += utf8Keys[i].Length;
                 }
 
-                // Copy key lengths array
                 fixed (nuint* keyLengthsArray = keyLengths)
                 {
                     Buffer.MemoryCopy(keyLengthsArray, keyLengthsPtrHandle.DangerousGetHandle().ToPointer(), 
                         keys.Length * sizeof(nuint), keys.Length * sizeof(nuint));
                 }
 
-                // Pin results array and call native function
                 fixed (nuint* resultsPtr = results)
                 {
                     return PtrHashNative.ptrhash_index_stream_string(
@@ -238,7 +212,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
             }
             finally
             {
-                // Clean up allocated memory - SafeHandles will dispose automatically
                 keysPtrHandle?.Dispose();
                 keyLengthsPtrHandle?.Dispose();
             }
@@ -246,7 +219,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
 
         public PtrHashNative.FFIResultInfo GetInfo(IntPtr handle)
         {
-            // String info function is the same as U64 - no key-specific data needed
             return PtrHashNative.ptrhash_info_u64(handle);
         }
     }
