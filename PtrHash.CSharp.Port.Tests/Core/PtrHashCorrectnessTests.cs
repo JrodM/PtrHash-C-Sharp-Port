@@ -74,18 +74,15 @@ public class PtrHashCorrectnessTests
     [TestMethod]
     public void EdgeCases_HandledCorrectly()
     {
-        // Test empty keys - should throw
         Assert.ThrowsException<ArgumentException>(() =>
         {
             var emptyKeys = Array.Empty<ulong>();
             PtrHashTestHelpers.TestCorrectness<ulong>(PtrHashTestHelpers.AllConfigurations[0], emptyKeys);
         });
 
-        // Test single key
         var singleKey = new ulong[] { 42 };
         PtrHashTestHelpers.TestCorrectness<ulong>(PtrHashTestHelpers.AllConfigurations[0], singleKey);
 
-        // Test two identical keys
         var duplicateKeys = new ulong[] { 42, 42 };
         var testConfig = PtrHashTestHelpers.AllConfigurations[0];
         try
@@ -95,7 +92,6 @@ public class PtrHashCorrectnessTests
         }
         catch (Exception)
         {
-            // Expected - duplicate keys should cause construction failure
         }
     }
 }

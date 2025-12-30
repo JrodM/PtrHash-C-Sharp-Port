@@ -73,7 +73,6 @@ public static class PtrHashTestHelpers
         var keys = new ulong[count];
         var random = new Random(42); // Fixed seed for reproducibility
         
-        // Generate unique keys
         var used = new HashSet<ulong>();
         for (int i = 0; i < count; i++)
         {
@@ -252,7 +251,6 @@ public static class PtrHashTestHelpers
             using IPtrHash<TKey> ptrhash = CreatePtrHash(config, emptyKeys);
         }, $"Config {config.Name}: Should throw on empty keys");
 
-        // Test single key
         if (typeof(TKey) == typeof(ulong))
         {
             var singleKey = new[] { (TKey)(object)42UL };

@@ -75,7 +75,6 @@ namespace PtrHash.CSharp.Interop.PtrHash
             }
             else
             {
-                // Free error but don't throw
                 PtrHashNative.ptrhash_free_error(result.ErrorMsg, result.ErrorLen);
                 index = 0;
                 return false;
@@ -137,7 +136,7 @@ namespace PtrHash.CSharp.Interop.PtrHash
 
         public async IAsyncEnumerable<nuint> GetIndicesAsync(IAsyncEnumerable<TKey> keys, bool minimal = true)
         {
-            const int batchSize = 1024; // Process in batches for efficiency
+            const int batchSize = 1024;
             var keyBuffer = new TKey[batchSize];
             var resultBuffer = new nuint[batchSize];
             var keyCount = 0;
@@ -148,7 +147,6 @@ namespace PtrHash.CSharp.Interop.PtrHash
 
                 if (keyCount == batchSize)
                 {
-                    // Process current batch
                     GetIndicesBatch(keyBuffer.AsSpan(0, keyCount), resultBuffer.AsSpan(0, keyCount), minimal);
                     
                     for (int i = 0; i < keyCount; i++)
@@ -160,7 +158,6 @@ namespace PtrHash.CSharp.Interop.PtrHash
                 }
             }
 
-            // Process remaining keys
             if (keyCount > 0)
             {
                 GetIndicesBatch(keyBuffer.AsSpan(0, keyCount), resultBuffer.AsSpan(0, keyCount), minimal);
@@ -205,8 +202,6 @@ namespace PtrHash.CSharp.Interop.PtrHash
         }
     }
 
-    // Convenience type aliases for common key types - eliminates dispatcher lookup overhead
-    // Convenience type aliases for common key types - eliminates dispatcher lookup overhead
     /// <summary>
     /// Optimized PtrHash for ulong keys - zero virtual call overhead
     /// </summary>

@@ -25,7 +25,6 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
 
         public TValue Sentinel => _sentinel;
 
-        // IDictionary<TKey, TValue> implementation
         public TValue this[TKey key] 
         { 
             get => TryGetValue(key, out var value) ? value : throw new KeyNotFoundException($"Key '{key}' not found");
@@ -56,14 +55,12 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
             _keysByIndex = new TKey[maxIndex + 1];
             _valuesByIndex = new TValue[maxIndex + 1];
 
-            // Initialize arrays with sentinel values
             for (int i = 0; i <= maxIndex; i++)
             {
                 _keysByIndex[i] = default(TKey)!;
                 _valuesByIndex[i] = _sentinel;
             }
 
-            // Map keys and values to their hash indices
             for (int i = 0; i < keys.Length; i++)
             {
                 int idx = (int)_ptrHash.GetIndexNoRemap(keys[i]);
@@ -91,11 +88,9 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
         {
             var index = (int)_ptrHash.GetIndexNoRemap(key);
             
-            // Single bounds check and cache-friendly access
             if ((uint)index < (uint)_keysByIndex.Length)
             {
                 var storedKey = _keysByIndex[index];
-                // Use cached comparer - faster than EqualityComparer.Default lookup
                 if (_keyComparer.Equals(storedKey, key))
                 {
                     value = _valuesByIndex[index];
@@ -153,8 +148,7 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
             {
                 var index = (int)indices[i];
                 
-                // Single bounds check and cache-friendly access
-                if ((uint)index < (uint)_keysByIndex.Length)
+                    if ((uint)index < (uint)_keysByIndex.Length)
                 {
                     var storedKey = _keysByIndex[index];
                     if (_keyComparer.Equals(keys[i], storedKey))
@@ -169,7 +163,6 @@ namespace PtrHash.CSharp.Interop.InteropDictionary
         }
 
 
-        // IDictionary<TKey, TValue> methods that don't make sense for read-only hash
         public void Add(TKey key, TValue value) 
             => throw new NotSupportedException("PtrHashInteropDictionary is read-only");
         
