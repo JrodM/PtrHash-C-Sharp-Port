@@ -279,7 +279,7 @@ namespace PtrHash.CSharp.Port.Core
                     _remapStorage = default;
                 }
                 
-                    var pilotBits = (ulong)(_bucketsTotal * 8);
+                var pilotBits = (ulong)(_bucketsTotal * 8);
                 var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
                 var totalBits = pilotBits + remapBits;
                 _bitsPerKey = totalBits / (double)_numKeys;
@@ -376,7 +376,6 @@ namespace PtrHash.CSharp.Port.Core
         #region Core Hash Functions
 
         // Global bucket calculation
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Bucket(HashValue hx)
         {
@@ -478,7 +477,7 @@ namespace PtrHash.CSharp.Port.Core
                 Unsafe.Add(ref resultsRef, i) = slot;
             }
         }
-            
+
         public unsafe void GetIndicesStreamPrefetch<TMinimal, TPrefetchDistance>(ReadOnlySpan<TKey> keys, Span<nuint> results)
             where TMinimal : struct, IBoolConstant
             where TPrefetchDistance : struct, IPrefetchDistanceConstant
@@ -1133,7 +1132,7 @@ namespace PtrHash.CSharp.Port.Core
                         }
                     }
 
-                        if (shouldSkip)
+                    if (shouldSkip)
                         continue;
 
                     if (!DuplicateSlots(bucketHashes, pilot))
@@ -1191,7 +1190,7 @@ namespace PtrHash.CSharp.Port.Core
                     if (freeSlotIndex >= _numKeys) // take_while(|&i| i < self.n) - stop when we exceed n
                         break;
 
-                        var i = (uint)freeSlotIndex;
+                    var i = (uint)freeSlotIndex;
                     while (!Get(_numKeys + (nuint)remapCount))
                     {
                         remapArray[remapCount++] = i;

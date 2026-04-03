@@ -70,14 +70,14 @@ namespace PtrHash.Benchmarks
 
             // Create lookup keys - half found, half not found
             _lookupKeys = new ulong[LookupCount];
-            var halfCount = LookupCount;
-            
+            var halfCount = LookupCount / 2;
+
             // First half: keys that exist in the set
             for (int i = 0; i < halfCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
-            
+
             // Second half: keys that don't exist in the set
-            /*var usedKeys = new HashSet<ulong>(_keys);
+            var usedKeys = new HashSet<ulong>(_keys);
             for (int i = halfCount; i < LookupCount; i++)
             {
                 ulong notFoundKey;
@@ -86,7 +86,7 @@ namespace PtrHash.Benchmarks
                     notFoundKey = (ulong)random.NextInt64(1, long.MaxValue);
                 } while (usedKeys.Contains(notFoundKey));
                 _lookupKeys[i] = notFoundKey;
-            }*/
+            }
 
             // Shuffle to interleave hits/misses — avoids branch predictor skew from sequential pattern
             _lookupKeys = _lookupKeys.OrderBy(_ => random.Next()).ToArray();

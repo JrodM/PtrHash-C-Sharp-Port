@@ -35,7 +35,6 @@ namespace PtrHash.CSharp.Port.Core
 
     /// <summary>
     /// Interface for compile-time prefetch distance constants.
-    /// Mirrors Rust's <c>const B: usize</c> in <c>index_stream&lt;B, MINIMAL, _&gt;</c>.
     /// When used as a generic parameter the JIT inlines the constant value, turning
     /// <c>i % B</c> into a cheap bitwise AND (all supported values are powers of two).
     /// </summary>

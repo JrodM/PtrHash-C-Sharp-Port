@@ -1,0 +1,323 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Jobs;
+using PtrHash.CSharp.Port;
+using PtrHash.CSharp.Port.Core;
+using PtrHash.CSharp.Port.KeyHashers;
+using PtrHash.CSharp.Port.BucketFunctions;
+using PtrHash.CSharp.Port.Storage;
+using PtrHash.CSharp.Port.Collections;
+using PtrHash.CSharp.Interop.PtrHash;
+using PtrHash.CSharp.Interop.Native;
+using PtrHash.CSharp.Interop.PtrHash.Dispatchers;
+
+namespace PtrHash.Benchmarks
+{
+    [Config(typeof(Config))]
+    [MemoryDiagnoser]
+    [SimpleJob(RuntimeMoniker.Net80)]
+    public class NativeVsPortPerformanceBenchmark
+    {
+        private class Config : ManualConfig
+        {
+            public Config()
+            {
+                // Add configuration for better benchmarking
+                WithOption(ConfigOptions.JoinSummary, true);
+            }
+        }
+
+        [Params(2_000_000)]  // Match LookupPerformanceScalingBenchmark
+        public int KeyCount { get; set; }
+
+        [Params(1_000, 50_000, 100_000)]  // Match LookupPerformanceScalingBenchmark
+        public int LookupCount { get; set; }
+
+        private ulong[] _keys = null!;
+        private ulong[] _lookupKeys = null!;
+        
+        // Multi-part PtrHash
+        private PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, MultiPart> _multiPartPtrHash = null!;
+
+        // Single-part PtrHash
+        private PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, SinglePart> _singlePartPtrHash = null!;
+        
+        
+        // Native interop - multi-part
+        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher> _nativeMultiPartPtrHash = null!;
+        
+        // Native interop - single-part
+        private PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher> _nativeSinglePartPtrHash = null!;
+        
+        private nuint[] _indicesBuffer1 = null!;
+        private nuint[] _indicesBuffer2 = null!;
+        private nuint[] _indicesBuffer3 = null!;
+        private nuint[] _indicesBuffer4 = null!;
+        private nuint[] _indicesBuffer5 = null!;
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            var random = new Random(42);
+            var keySet = new HashSet<ulong>();
+            while (keySet.Count < KeyCount)
+                keySet.Add((ulong)random.NextInt64(1, long.MaxValue));
+            _keys = keySet.ToArray();
+
+            // Ensure lookup count doesn't exceed key count
+            var actualLookupCount = Math.Min(LookupCount, KeyCount);
+            
+            _lookupKeys = new ulong[actualLookupCount];
+            for (int i = 0; i < actualLookupCount; i++)
+            {
+                if (i < actualLookupCount / 2)
+                    _lookupKeys[i] = _keys[random.Next(KeyCount)]; // 50% hits
+                else
+                    _lookupKeys[i] = (ulong)random.NextInt64(long.MaxValue / 2, long.MaxValue); // 50% misses
+            }
+
+            // Multi-part PtrHash (default)
+            _multiPartPtrHash = new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(_keys, PtrHashParams.DefaultFast);
+
+            // Single-part PtrHash
+            _singlePartPtrHash = new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, SinglePart>(_keys, PtrHashParams.DefaultFast);
+
+            
+            // Native interop - multi-part
+            _nativeMultiPartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher>(_keys, PtrHashNative.FFIParams.Fast);
+            
+            // Native interop - single-part
+            var singlePartNativeParams = PtrHashNative.FFIParams.FastWithOverrides(singlePart: true);
+            _nativeSinglePartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher>(_keys, singlePartNativeParams);
+
+            _indicesBuffer1 = new nuint[actualLookupCount];
+            _indicesBuffer2 = new nuint[actualLookupCount];
+            _indicesBuffer3 = new nuint[actualLookupCount];
+            _indicesBuffer4 = new nuint[actualLookupCount];
+            _indicesBuffer5 = new nuint[actualLookupCount];
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+            _multiPartPtrHash?.Dispose();
+            _singlePartPtrHash?.Dispose();
+            _nativeMultiPartPtrHash?.Dispose();
+            _nativeSinglePartPtrHash?.Dispose();
+        }
+
+        // === MULTI-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
+        
+        // Multi-Part: Native vs Port Point Lookups
+        [Benchmark]
+        public ulong PtrHashNative_MultiPart_Point_GetIndex()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _nativeMultiPartPtrHash.GetIndex(key);
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Point_GetIndex()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _multiPartPtrHash.GetIndex(key);
+            }
+            return sum;
+        }
+
+        // Multi-Part: Native vs Port Stream Lookups
+        [Benchmark(Baseline = true)]
+        public ulong PtrHashNative_MultiPart_Stream_GetIndicesStream_Prefetch32()
+        {
+            ulong sum = 0;
+            _nativeMultiPartPtrHash.GetIndicesStream(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer3.AsSpan(),
+                prefetchDistance: 32,
+                minimal: true);
+
+            for (int i = 0; i < _indicesBuffer3.Length; i++)
+            {
+                sum += _indicesBuffer3[i];
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Stream_GetIndicesStream()
+        {
+            ulong sum = 0;
+            _multiPartPtrHash.GetIndicesStream<UseMinimal>(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer1);
+
+            for (int i = 0; i < _indicesBuffer1.Length; i++)
+            {
+                sum += _indicesBuffer1[i];
+            }
+            return sum;
+        }
+
+<<<<<<< HEAD
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Stream_GetIndicesStreamPrefetch()
+        {
+            ulong sum = 0;
+            _multiPartPtrHash.GetIndicesStreamPrefetch<UseMinimal, PrefetchDistance32>(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer1);
+
+            for (int i = 0; i < _indicesBuffer1.Length; i++)
+            {
+                sum += _indicesBuffer1[i];
+            }
+            return sum;
+        }
+=======
+>>>>>>> main
+
+        // === SINGLE-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
+        
+        // Single-Part: Native vs Port Point Lookups
+        [Benchmark]
+        public ulong PtrHashNative_SinglePart_Point_GetIndex()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _nativeSinglePartPtrHash.GetIndex(key);
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Point_GetIndex()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _singlePartPtrHash.GetIndex(key);
+            }
+            return sum;
+        }
+
+        // Single-Part: Native vs Port Stream Lookups
+        [Benchmark]
+        public ulong PtrHashNative_SinglePart_Stream_GetIndicesStream_Prefetch32()
+        {
+            ulong sum = 0;
+            _nativeSinglePartPtrHash.GetIndicesStream(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer4.AsSpan(),
+                prefetchDistance: 32,
+                minimal: true);
+
+            for (int i = 0; i < _indicesBuffer4.Length; i++)
+            {
+                sum += _indicesBuffer4[i];
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Stream_GetIndicesStream()
+        {
+            ulong sum = 0;
+            _singlePartPtrHash.GetIndicesStream<UseMinimal>(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer2);
+
+            for (int i = 0; i < _indicesBuffer2.Length; i++)
+            {
+                sum += _indicesBuffer2[i];
+            }
+            return sum;
+        }
+
+<<<<<<< HEAD
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Stream_GetIndicesStreamPrefetch()
+        {
+            ulong sum = 0;
+            _singlePartPtrHash.GetIndicesStreamPrefetch<UseMinimal, PrefetchDistance32>(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer2);
+
+            for (int i = 0; i < _indicesBuffer2.Length; i++)
+            {
+                sum += _indicesBuffer2[i];
+            }
+            return sum;
+        }
+=======
+>>>>>>> main
+
+        // === NO REMAP METHODS (Perfect Hash - no minimal remapping) ===
+        
+        // Multi-Part: Port Point GetIndexNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_Point_GetIndexNoRemap()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _multiPartPtrHash.GetIndexNoRemap(key);
+            }
+            return sum;
+        }
+
+        // Single-Part: Port Point GetIndexNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_Point_GetIndexNoRemap()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                sum += _singlePartPtrHash.GetIndexNoRemap(key);
+            }
+            return sum;
+        }
+
+        // Multi-Part: Port Stream GetIndicesStreamNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_Stream_GetIndicesStreamNoRemap()
+        {
+            ulong sum = 0;
+            _multiPartPtrHash.GetIndicesStream<NoMinimal>(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer5);
+
+            for (int i = 0; i < _indicesBuffer5.Length; i++)
+            {
+                sum += _indicesBuffer5[i];
+            }
+            return sum;
+        }
+
+        // Single-Part: Port Stream GetIndicesStreamNoRemap
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_Stream_GetIndicesStreamNoRemap()
+        {
+            ulong sum = 0;
+            _singlePartPtrHash.GetIndicesStream<NoMinimal>(
+                _lookupKeys.AsSpan(),
+                _indicesBuffer5);
+
+            for (int i = 0; i < _indicesBuffer5.Length; i++)
+            {
+                sum += _indicesBuffer5[i];
+            }
+            return sum;
+        }
+
+    }
+}

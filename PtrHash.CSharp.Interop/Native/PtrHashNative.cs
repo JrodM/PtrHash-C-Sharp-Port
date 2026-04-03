@@ -166,6 +166,8 @@ namespace PtrHash.CSharp.Interop.Native
         internal static extern FFIResultInfo ptrhash_info_u64(
             IntPtr handle);
 
+        #endregion
+
         #region String Key Functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -206,6 +208,8 @@ namespace PtrHash.CSharp.Interop.Native
             nuint prefetchDistance,
             [MarshalAs(UnmanagedType.U1)] bool minimal);
 
+        #endregion
+
         #region Memory Management
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -213,6 +217,8 @@ namespace PtrHash.CSharp.Interop.Native
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void ptrhash_free_error(IntPtr errorMsg, nuint errorLen);
+
+        #endregion
 
         #region Hash Function Testing
 
@@ -225,12 +231,6 @@ namespace PtrHash.CSharp.Interop.Native
         [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
         [SuppressGCTransition] // Hash functions are very fast, perfect for SuppressGCTransition
         internal static partial ulong test_native_stronger_hash(ulong key, ulong seed);
-
-        #endregion
-
-        #endregion
-
-        #endregion
 
         #endregion
     }
