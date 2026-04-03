@@ -9,8 +9,8 @@ namespace PtrHash.CSharp.Port.Computation
     /// </summary>
     public readonly struct FM32
     {
-        private readonly ulong d;
-        private readonly ulong m;
+        public readonly ulong d;
+        public readonly ulong m;
         
         public FM32(nuint modulus)
         {

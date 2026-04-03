@@ -8,20 +8,16 @@ namespace PtrHash.CSharp.Interop.Native
     {
         private const string LibraryName = "ptrhash";
 
-        #region Structures
-
         [StructLayout(LayoutKind.Sequential)]
         public struct FFIParams
         {
-            public uint DefaultParamSet; // 0=custom, 1=fast
+            public uint DefaultParamSet;
             
-            // Optional override flags (1=set, 0=use preset default)
             public byte HasOverrideSinglePart;
             public byte HasOverrideLambda;
             public byte HasOverrideHashFunction;
             public byte HasOverrideBucketFunction;
             
-            // Override values (only used if corresponding HasOverride* is 1)
             [MarshalAs(UnmanagedType.U1)]
             public bool OverrideSinglePart;
             public double OverrideLambda;
@@ -30,15 +26,15 @@ namespace PtrHash.CSharp.Interop.Native
 
             public static FFIParams Fast => new()
             {
-                DefaultParamSet = 1, // Fast preset
-                HasOverrideSinglePart = 0, // Use preset default
-                HasOverrideLambda = 0, // Use preset default
-                HasOverrideHashFunction = 0, // Use preset default
-                HasOverrideBucketFunction = 0, // Use preset default
-                OverrideSinglePart = false, // Unused
-                OverrideLambda = 0.0, // Unused
-                OverrideHashFunction = 0, // Unused
-                OverrideBucketFunction = 0 // Unused
+                DefaultParamSet = 1,
+                HasOverrideSinglePart = 0,
+                HasOverrideLambda = 0,
+                HasOverrideHashFunction = 0,
+                HasOverrideBucketFunction = 0,
+                OverrideSinglePart = false,
+                OverrideLambda = 0.0,
+                OverrideHashFunction = 0,
+                OverrideBucketFunction = 0
             };
 
 
@@ -49,7 +45,7 @@ namespace PtrHash.CSharp.Interop.Native
                 uint? bucketFunction = null
             ) => new()
             {
-                DefaultParamSet = 1, // Fast preset
+                DefaultParamSet = 1,
                 HasOverrideSinglePart = (byte)(singlePart.HasValue ? 1 : 0),
                 HasOverrideLambda = (byte)(lambda.HasValue ? 1 : 0),
                 HasOverrideHashFunction = (byte)(hashFunction.HasValue ? 1 : 0),
@@ -63,15 +59,15 @@ namespace PtrHash.CSharp.Interop.Native
             public static FFIParams Custom(
                 bool singlePart = false,
                 double lambda = 3.0,
-                uint hashFunction = 0, // FxHash
-                uint bucketFunction = 0 // Linear
+                uint hashFunction = 0,
+                uint bucketFunction = 0
             ) => new()
             {
-                DefaultParamSet = 0, // Custom
-                HasOverrideSinglePart = 1, // Always set for custom
-                HasOverrideLambda = 1, // Always set for custom
-                HasOverrideHashFunction = 1, // Always set for custom
-                HasOverrideBucketFunction = 1, // Always set for custom
+                DefaultParamSet = 0,
+                HasOverrideSinglePart = 1,
+                HasOverrideLambda = 1,
+                HasOverrideHashFunction = 1,
+                HasOverrideBucketFunction = 1,
                 OverrideSinglePart = singlePart,
                 OverrideLambda = lambda,
                 OverrideHashFunction = hashFunction,
@@ -127,8 +123,6 @@ namespace PtrHash.CSharp.Interop.Native
             public nuint MaxIndex;
         }
 
-        #endregion
-
         #region U64 Key Functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -172,8 +166,6 @@ namespace PtrHash.CSharp.Interop.Native
         internal static extern FFIResultInfo ptrhash_info_u64(
             IntPtr handle);
 
-        #endregion
-
         #region String Key Functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -214,8 +206,6 @@ namespace PtrHash.CSharp.Interop.Native
             nuint prefetchDistance,
             [MarshalAs(UnmanagedType.U1)] bool minimal);
 
-        #endregion
-
         #region Memory Management
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -223,8 +213,6 @@ namespace PtrHash.CSharp.Interop.Native
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void ptrhash_free_error(IntPtr errorMsg, nuint errorLen);
-
-        #endregion
 
         #region Hash Function Testing
 

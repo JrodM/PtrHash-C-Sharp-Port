@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,6 +15,7 @@ using PtrHash.CSharp.Port.Computation;
 using PtrHash.CSharp.Port.Construction;
 using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHash.CSharp.Port.Sorting;
+using PtrHash.CSharp.Port.Core.Serialization;
 
 namespace PtrHash.CSharp.Port.Core
 {
@@ -34,7 +36,7 @@ namespace PtrHash.CSharp.Port.Core
     /// <typeparam name="THasher">Hash function implementation</typeparam>
     /// <typeparam name="TBucketFunction">Bucket function implementation</typeparam>
     /// <typeparam name="TRemappingStorage">Remapping storage type for minimal mode</typeparam>
-    public sealed unsafe class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart> : IPtrHash<TKey>, IDisposable
+    public sealed unsafe class partial PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> : IPtrHash<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
@@ -53,29 +55,30 @@ namespace PtrHash.CSharp.Port.Core
         // Cap parallelism to prevent thread explosion
         private static readonly nuint MaxParallelism = (nuint)Environment.ProcessorCount;
 
-        private TBucketFunction _bucketFunction;
+        internal TBucketFunction _bucketFunction;
 
-        private TRemappingStorage _remapStorage;
+        internal TRemappingStorage _remapStorage;
 
-        private byte* _pilots;
+        internal byte* _pilots;
 
-        // Multi-part support fields
-        private readonly nuint _parts;
-        private readonly nuint _slotsPerPart;
-        private readonly nuint _slotsTotal;
-        private readonly nuint _bucketsPerPart;
-        private readonly nuint _bucketsTotal;
+        internal readonly nuint _parts;
+        internal readonly nuint _slotsPerPart;
+        internal readonly nuint _slotsTotal;
+        internal readonly nuint _bucketsPerPart;
+        internal readonly nuint _bucketsTotal;
 
-        // Pre-computed reduction structures (rem_* fields)
-        private readonly FastReduce _remParts; // rem_parts: Rp::new(parts)
-        private readonly FastReduce _remBuckets; // rem_buckets: Rb::new(buckets_per_part)
-        private readonly FastReduce _remBucketsTotal; // rem_buckets_total: Rb::new(buckets_total)
-        private readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
+        internal readonly FastReduce _remParts; // rem_parts: Rp::new(parts)
+        internal readonly FastReduce _remBuckets; // rem_buckets: Rb::new(buckets_per_part)
+        internal readonly FastReduce _remBucketsTotal; // rem_buckets_total: Rb::new(buckets_total)
+        internal readonly FM32 _remSlots; // rem_slots: RemSlots::new(slots_per_part.max(1))
 
-        private readonly nuint _numKeys;
-        private readonly bool _minimal;
-        private readonly double _bitsPerKey;
-        private ulong _seed;
+        internal readonly nuint _numKeys;
+        internal readonly bool _minimal;
+        private readonly bool _isSinglePart;
+        internal readonly double _bitsPerKey;
+        internal ulong _seed;
+        
+        private readonly bool _ownsMemory = true;
 
         /// <summary>
         /// Construct a PtrHash from a collection of keys
@@ -84,6 +87,8 @@ namespace PtrHash.CSharp.Port.Core
         {
             if (keys.Length == 0)
                 throw new ArgumentException("Keys collection cannot be empty", nameof(keys));
+            
+            _ownsMemory = true;
 
             try
             {
@@ -103,7 +108,7 @@ namespace PtrHash.CSharp.Port.Core
                 else
                 {
                     // Multi-part mode: partition keys for better cache locality and parallelism
-                    var shards = 1; // Sharding::None => 1
+                    var shards = 1;
 
                     // Formula of Vigna, eps-cost-sharding: https://arxiv.org/abs/2503.18397
                     // (1-alpha)/2, so that on average we still have some room to play with.
@@ -116,7 +121,7 @@ namespace PtrHash.CSharp.Port.Core
                     _parts = Math.Max(1, partsPerShard) * (nuint)shards;
 
                     var keysPerPart = _numKeys / _parts;
-                    partsPerShard = _parts / (nuint)shards; // Recalculate after adjustment
+                    partsPerShard = _parts / (nuint)shards;
                     var slotsPerPart = CalculateSlotsPerPart(keysPerPart, parameters.Alpha);
 
                     // Avoid powers of two, since then %S does not depend on all bits
@@ -136,7 +141,6 @@ namespace PtrHash.CSharp.Port.Core
                 NativeMemory.Clear(pilotsPtr, _bucketsTotal);
                 _pilots = pilotsPtr;
 
-                // Will allocate remap storage later if minimal=true
                 _remapStorage = default;
                 
                 _remParts = new FastReduce(_parts);
@@ -174,10 +178,133 @@ namespace PtrHash.CSharp.Port.Core
                 throw;
             }
         }
+        
+        /// <summary>
+        /// Construct a PtrHash from memory-mapped data (zero-copy).
+        /// The caller is responsible for keeping the mapped memory alive.
+        /// </summary>
+        public unsafe PtrHash(byte* mappedDataPtr, nuint dataSize, in PtrHashFileFormat.FileHeader header)
+        {
+            if (mappedDataPtr == null)
+                throw new ArgumentNullException(nameof(mappedDataPtr));
+            if (dataSize < PtrHashFileFormat.HeaderSize)
+                throw new ArgumentException("Data size too small for header", nameof(dataSize));
+                
+            ValidateTypes(header);
+            _ownsMemory = false;
+            
+            _seed = header.Seed;
+            _parts = (nuint)header.Parts;
+            _bucketsPerPart = (nuint)header.BucketsPerPart;
+            _slotsPerPart = (nuint)header.SlotsPerPart;
+            _bucketsTotal = (nuint)header.BucketsTotal;
+            _slotsTotal = (nuint)header.SlotsTotal;
+            _numKeys = (nuint)header.NumKeys;
+            _minimal = (header.Flags & PtrHashFileFormat.HeaderFlags.IsMinimal) != 0;
+            _isSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
+            
+            _pilots = mappedDataPtr + PtrHashFileFormat.PilotsOffset;
+            
+            _remParts = new FastReduce(_parts);
+            _remBuckets = new FastReduce(_bucketsPerPart);
+            _remBucketsTotal = new FastReduce(_bucketsTotal);
+            _remSlots = new FM32(Math.Max(1, _slotsPerPart));
+            
+            _bucketFunction = new TBucketFunction();
+            _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
+            
+            if (_minimal && header.RemapCount > 0)
+            {
+                var remapPtr = mappedDataPtr + header.RemapOffset;
+                _remapStorage = TRemappingStorage.CreateFromMemoryMap(remapPtr, header.RemapCount);
+            }
+            else
+            {
+                _remapStorage = default;
+            }
+            
+            var pilotBits = (ulong)(_bucketsTotal * 8);
+            var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
+            var totalBits = pilotBits + remapBits;
+            _bitsPerKey = totalBits / (double)_numKeys;
+        }
+        
+        /// <summary>
+        /// Construct a PtrHash from a stream (copy-to-memory).
+        /// </summary>
+        public unsafe PtrHash(Stream stream, in PtrHashFileFormat.FileHeader header)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+                
+            ValidateTypes(header);
+            _ownsMemory = true;
+            
+            _seed = header.Seed;
+            _parts = (nuint)header.Parts;
+            _bucketsPerPart = (nuint)header.BucketsPerPart;
+            _slotsPerPart = (nuint)header.SlotsPerPart;
+            _bucketsTotal = (nuint)header.BucketsTotal;
+            _slotsTotal = (nuint)header.SlotsTotal;
+            _numKeys = (nuint)header.NumKeys;
+            _minimal = (header.Flags & PtrHashFileFormat.HeaderFlags.IsMinimal) != 0;
+            _isSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
+            
+            var pilotsPtr = (byte*)NativeMemory.AlignedAlloc(_bucketsTotal, 64);
+            NativeMemory.Clear(pilotsPtr, _bucketsTotal);
+            _pilots = pilotsPtr;
+            
+            try
+            {
+                var pilotsSpan = new Span<byte>(_pilots, (int)_bucketsTotal);
+                stream.ReadExactly(pilotsSpan);
+                
+                    var padding = AlignTo64(_bucketsTotal) - _bucketsTotal;
+                if (padding > 0)
+                {
+                    stream.Seek((long)padding, SeekOrigin.Current);
+                }
+                
+                    _remParts = new FastReduce(_parts);
+                _remBuckets = new FastReduce(_bucketsPerPart);
+                _remBucketsTotal = new FastReduce(_bucketsTotal);
+                _remSlots = new FM32(Math.Max(1, _slotsPerPart));
+                
+                    _bucketFunction = new TBucketFunction();
+                _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
+                
+                if (_minimal && header.RemapCount > 0)
+                {
+                    _remapStorage = TRemappingStorage.Deserialize(stream, header.RemapCount);
+                }
+                else
+                {
+                    _remapStorage = default;
+                }
+                
+                    var pilotBits = (ulong)(_bucketsTotal * 8);
+                var remapBits = (ulong)(TRemappingStorage.GetSizeInBytes(_remapStorage) * 8);
+                var totalBits = pilotBits + remapBits;
+                _bitsPerKey = totalBits / (double)_numKeys;
+            }
+            catch
+            {
+                if (_pilots != null)
+                {
+                    NativeMemory.AlignedFree(_pilots);
+                    _pilots = null;
+                }
+                throw;
+            }
+        }
+        
+        private static nuint AlignTo64(nuint value)
+        {
+            return (value + 63) & ~(nuint)63;
+        }
 
         public PtrHashInfo GetInfo()
         {
-            // MaxIndex is always slots_total, this is the upper bound for GetIndexNoRemap
             return new PtrHashInfo(_numKeys, _bitsPerKey, _slotsTotal);
         }
 
@@ -222,7 +349,7 @@ namespace PtrHash.CSharp.Port.Core
             var hx = THasher.Hash(key, _seed);
             var bucket = BucketInPart(hx.High());
             var pilot = (ulong)_pilots[bucket];
-            return SlotInPart(hx, pilot); // Direct slot calculation without part offset
+            return SlotInPart(hx, pilot);
         }
 
         #endregion
@@ -317,7 +444,7 @@ namespace PtrHash.CSharp.Port.Core
 
         private ulong HashPilot(ulong pilot)
         {
-            const ulong C = 0x51_7c_c1_b7_27_22_0a_95UL; // FxHash mixing constant from Firefox
+            const ulong C = 0x51_7c_c1_b7_27_22_0a_95UL;
             return C * (pilot ^ _seed);
         }
 
@@ -341,7 +468,6 @@ namespace PtrHash.CSharp.Port.Core
             {
                 ref TKey key = ref Unsafe.Add(ref keysRef, i);
 
-                // Type checks resolved at compile-time per specialization
                 var slot = typeof(TPart) == typeof(SinglePart)
                     ? GetIndexNoRemapSinglePart(key)
                     : GetIndexNoRemapMultiPart(key);
@@ -355,7 +481,7 @@ namespace PtrHash.CSharp.Port.Core
                 Unsafe.Add(ref resultsRef, i) = slot;
             }
         }
-        
+            
         public unsafe void GetIndicesStreamPrefetch<TMinimal, TPrefetchDistance>(ReadOnlySpan<TKey> keys, Span<nuint> results)
             where TMinimal : struct, IBoolConstant
             where TPrefetchDistance : struct, IPrefetchDistanceConstant
@@ -383,14 +509,10 @@ namespace PtrHash.CSharp.Port.Core
             // Phase: Init
             // Hash the first B keys, compute their buckets, and issue prefetches.
             uint leftover = B;
-            for (uint i = 0; i < B; i++)
-            {
-                HashValue hash = default;
-                if (i < (uint)keys.Length)
-                {
-                    hash = THasher.Hash(Unsafe.Add(ref keysRef, (int)i), seed);
-                    leftover--;
-                }
+                    for (int i = 0; i < prefetchDistance; i++)
+                        HashValue hash;
+                        if (i < keys.Length)
+                            var key = Unsafe.Add(ref keysRef, i);
                 hashBuf[i]   = hash;
                 // SinglePart skips the part-selection step (GetPart always returns 0).
                 bucketBuf[i] = typeof(TPart) == typeof(SinglePart)
@@ -447,17 +569,11 @@ namespace PtrHash.CSharp.Port.Core
             {
                 uint idx  = processed % B;
                 var pilot = (ulong)pilots[bucketBuf[idx]];
-                var slot  = typeof(TPart) == typeof(SinglePart)
+                        var slot = Slot(currentHash, pilot);
                     ? SlotInPart(hashBuf[idx], pilot)
                     : Slot(hashBuf[idx], pilot);
-
-                if (useMinimal && slot >= numKeys)
-                    slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
-
-                Unsafe.Add(ref resultsRef, (int)processed) = slot;
-                processed++;
-            }
-        }
+                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
+                        Unsafe.Add(ref resultsRef, processed) = slot;
 
         #endregion
 
@@ -470,19 +586,19 @@ namespace PtrHash.CSharp.Port.Core
             var tries = 0;
             const int MAX_TRIES = 10;
 
-            var rng = new BouncyCastleChaCha8Rng(31415); // Stronger RNG than built in rand.
+            var rng = new BouncyCastleChaCha8Rng(31415);
 
             // Create PartitionedBitVec once and reuse it across seed attempts
             using var taken = new PartitionedBitVec(_parts, _slotsPerPart);
 
-            while (true) // Try seeds until construction succeeds
+            while (true)
             {
                 tries++;
                 if (tries > MAX_TRIES)
                 {
                     DebugConstruction($"ERROR: PtrHash failed to find a global seed after {MAX_TRIES} tries.");
                     finalSeed = 0;
-                    return false; // Construction failed after max attempts
+                    return false;
                 }
                 
                 _seed = rng.NextUInt64();
@@ -494,7 +610,6 @@ namespace PtrHash.CSharp.Port.Core
                     return true;
                 }
 
-                // If build failed, continue to next seed
             }
         }
 
@@ -550,22 +665,20 @@ namespace PtrHash.CSharp.Port.Core
                     MaxDegreeOfParallelism = (int)Math.Min(_parts, MaxParallelism)
                 };
 
-                var success = 1L; // 1 = true, 0 = false for Interlocked
+                var success = 1L;
                 var partStatsList = DEBUG_CONSTRUCTION ? new BucketStats[_parts] : null;
 
                 Parallel.For(0, (int)_parts, parallelOptions, part =>
                 {
-                    if (Interlocked.Read(ref success) == 0) return; // Early exit if another thread failed
+                    if (Interlocked.Read(ref success) == 0) return;
 
                     var partStart = (int)partStarts[part];
                     var partEnd = (int)partStarts[part + 1];
                     var partHashes = new Span<HashValue>(hashArray, partStart, partEnd - partStart);
 
-                    // Get pilot slice for this part
                     var partPilotStart = part * (int)_bucketsPerPart;
                     Span<byte> partPilots = new Span<byte>(_pilots + partPilotStart, (int)_bucketsPerPart);
 
-                    // Build this part using hash evict
                     if (!BuildPart(part, partHashes, partPilots, taken, out var partStats))
                     {
                         Interlocked.Exchange(ref success, 0L);
@@ -576,14 +689,12 @@ namespace PtrHash.CSharp.Port.Core
                     }
                 });
 
-                // After successful construction, create remap table if needed
                 if (success == 0L || !TryRemapFreeSlots(taken))
                 {
                     stats = null;
-                    return false; // try next seed
+                    return false;
                 }
 
-                // Aggregate statistics
                 if (partStatsList != null)
                 {
                     stats = new BucketStats();
@@ -622,17 +733,15 @@ namespace PtrHash.CSharp.Port.Core
             
             try
             {
-                Array.Fill(slots, -1, 0, (int)_slotsPerPart); // -1 = BucketIdx::NONE
+                Array.Fill(slots, -1, 0, (int)_slotsPerPart);
                 
                 var partTaken = taken.GetPart(part);
 
-                // Binary heap for bucket eviction processing
                 var stack = new BinaryHeap<BucketInfo>();
                 var recent = new int[16];
-                Array.Fill(recent, -1); // -1 = BucketIdx::NONE
+                Array.Fill(recent, -1);
                 var rng = new FastRand();
 
-                // Process buckets in size order (largest first)
                 var processedBuckets = 0;
 
                 for (int bucketIdx = 0; bucketIdx < (int)_bucketsPerPart; bucketIdx++)
@@ -655,30 +764,25 @@ namespace PtrHash.CSharp.Port.Core
                     stack.Push(new BucketInfo((nuint)newBucketSize, (nuint)newBucket));
                     Array.Fill(recent, -1);
                     var recentIdx = 0;
-                    recent[0] = newBucket; // Mark bucket as recently processed
+                    recent[0] = newBucket;
 
-                    // Process eviction chain (let Some((_b_len, b)) = stack.pop())
                     var maxEvictionsForBucket = 0;
 
                     while (!stack.IsEmpty)
                     {
-                        // prevent infinite eviction cycles
                         if (evictions >= 10 * (int)_slotsPerPart)
                         {
                             return false;
                         }
 
-                        // Track max evictions for this bucket
                         if (evictions > maxEvictionsForBucket)
                             maxEvictionsForBucket = evictions;
 
-                        // Additional termination check for excessive evictions
                         if (evictions > (int)_slotsPerPart && IsPowerOfTwo(evictions))
                         {
-                            // Expensive logging/diagnostics on power-of-two intervals only
                             if (evictions >= 10 * (int)_slotsPerPart)
                             {
-                                return false; // Too many evictions, abort
+                                return false;
                             }
                         }
 
@@ -693,7 +797,6 @@ namespace PtrHash.CSharp.Port.Core
                         if (currentBucketHashes.Length == 0)
                             continue;
 
-                        // 1) Try collision-free pilot
                         var pilotResult = FindPilot(kmax, currentBucketHashes, partTaken, out var pilotsChecked);
 
                         if (pilotResult.HasValue)
@@ -701,21 +804,17 @@ namespace PtrHash.CSharp.Port.Core
                             var (pilot, hashPilot) = pilotResult.Value;
                             partPilots[currentBucket] = (byte)pilot;
 
-                            // Place bucket in slots
                             foreach (var hash in currentBucketHashes)
                             {
                                 var localSlot = SlotInPartHp(hash, hashPilot);
                                 slots[localSlot] = currentBucket;
-                                // DO NOT mark slots as taken here
                             }
                             continue;
                         }
 
-                        // 2) Find pilot with minimal collisions and evict
                         var bestResult = FindBestPilotWithEvictionInPart(currentBucketHashes, slots, recent, rng, kmax, bucketStarts);
                         var bestPilot = bestResult.pilot;
 
-                        // Handle case where no valid pilot was found
                         if (bestPilot == ulong.MaxValue)
                         {
                             DebugConstruction($"Part {part}: bucket of size {currentBucketHashes.Length} with {_slotsPerPart} slots: Indistinguishable hashes in bucket!");
@@ -728,7 +827,6 @@ namespace PtrHash.CSharp.Port.Core
                             return false;
                         }
 
-                        // Set pilot and compute hash of pilot
                         partPilots[currentBucket] = (byte)bestPilot;
                         var hp = HashPilot(bestPilot);
                         
@@ -737,16 +835,13 @@ namespace PtrHash.CSharp.Port.Core
 
                         var evictionsThisRound = 0;
 
-                        // handle eviction and placement atomically 
                         foreach (var hash in currentBucketHashes)
                         {
                             var localSlot = SlotInPartHp(hash, hp);
                             var occupyingBucket = slots[localSlot];
 
-                            if (occupyingBucket >= 0) // Slot is occupied
+                            if (occupyingBucket >= 0)
                             {
-                                // With atomic placement, self-collision should never happen 
-                                // assert!(b2 != b)
                                 if (occupyingBucket == currentBucket)
                                 {
                                     DebugConstruction($"SELF-COLLISION DEBUG:");
@@ -760,7 +855,6 @@ namespace PtrHash.CSharp.Port.Core
                                     throw new InvalidOperationException("Self-collision detected - algorithm invariant violated");
                                 }
 
-                                // Push evicted bucket onto stack for reprocessing
                                 var evictedStart = bucketStarts[occupyingBucket];
                                 var evictedEnd = bucketStarts[occupyingBucket + 1];
                                 var evictedSize = evictedEnd - evictedStart;
@@ -769,7 +863,6 @@ namespace PtrHash.CSharp.Port.Core
                                 evictions++;
                                 evictionsThisRound++;
 
-                                // Clear all slots for the evicted bucket immediately
                                 var evictedPilot = (ulong)partPilots[occupyingBucket];
                                 var evictedHp = HashPilot(evictedPilot);
                                 var evictedHashes = partHashes.Slice(evictedStart, evictedSize);
@@ -787,10 +880,9 @@ namespace PtrHash.CSharp.Port.Core
                         }
 
 
-                        // Update recent buckets for collision avoidance
-                        recentIdx += 1; // recent_idx += 1
-                        recentIdx %= recent.Length; // recent_idx %= recent.len()
-                        recent[recentIdx] = currentBucket; // recent[recent_idx] = b
+                        recentIdx += 1;
+                        recentIdx %= recent.Length;
+                        recent[recentIdx] = currentBucket;
                     }
 
                     processedBuckets++;
@@ -811,14 +903,11 @@ namespace PtrHash.CSharp.Port.Core
             var bucketStartsPool = ArrayPool<int>.Shared;
             var bucketStarts = bucketStartsPool.Rent((int)_bucketsPerPart + 1); // +1 for end sentinel
             
-            // Scan through sorted hashes to find bucket boundaries
             var end = 0;
             for (int b = 0; b < (int)_bucketsPerPart; b++)
             {
                 bucketStarts[b] = end;
                 
-                // Find all hashes that belong to bucket b
-                // NOTE: Many branch misses here
                 while (end < partHashesSorted.Length)
                 {
                     var globalBucket = (int)Bucket(partHashesSorted[end]);
@@ -827,9 +916,8 @@ namespace PtrHash.CSharp.Port.Core
                     end++;
                 }
             }
-            bucketStarts[_bucketsPerPart] = end; // Final sentinel
+            bucketStarts[_bucketsPerPart] = end;
             
-            // Create bucket order sorted by size (largest first)
             var bucketSizePool = ArrayPool<(int size, int bucket)>.Shared;
             var bucketSizes = bucketSizePool.Rent((int)_bucketsPerPart);
             
@@ -841,10 +929,9 @@ namespace PtrHash.CSharp.Port.Core
                     bucketSizes[i] = (size, i);
                 }
                 
-                // Sort by size descending (largest buckets first for better eviction performance)
                 Array.Sort(bucketSizes, 0, (int)_bucketsPerPart, Comparer<(int size, int bucket)>.Create((a, b) =>
                 {
-                    var sizeCompare = b.size.CompareTo(a.size); // Descending
+                    var sizeCompare = b.size.CompareTo(a.size);
                     return sizeCompare != 0 ? sizeCompare : a.bucket.CompareTo(b.bucket);
                 }));
                 
@@ -866,8 +953,7 @@ namespace PtrHash.CSharp.Port.Core
 
         private (ulong pilot, ulong hashPilot)? FindPilot(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked)
         {
-            // Const generic dispatch, JIT will create specialized FindPilotSlice methods for each size
-            return bucketHashes.Length switch
+                return bucketHashes.Length switch
             {
                 1 => FindPilotSlice<Size1>(kmax, bucketHashes, taken, out pilotsChecked),
                 2 => FindPilotSlice<Size2>(kmax, bucketHashes, taken, out pilotsChecked),
@@ -882,7 +968,6 @@ namespace PtrHash.CSharp.Port.Core
         }
 
 
-        // Const generic specialized bucket processing
         private unsafe (ulong pilot, ulong hashPilot)? FindPilotSlice<TSize>(ulong kmax, ReadOnlySpan<HashValue> bucketHashes, BitVec taken, out int pilotsChecked)
             where TSize : struct, ISizeConstant
         {
@@ -890,16 +975,15 @@ namespace PtrHash.CSharp.Port.Core
             var bucketSize = sizeConst.Value;
             
             var actualSize = bucketSize > 0 ? bucketSize : bucketHashes.Length;
-            int r = actualSize / 4 * 4; // let r = bucket.len() / 4 * 4;
+            int r = actualSize / 4 * 4;
 
             pilotsChecked = 0;
 
-            for (ulong pilot = 0; pilot < kmax; pilot++) // 'p: for p in 0u64..kmax
+            for (ulong pilot = 0; pilot < kmax; pilot++)
             {
                 pilotsChecked++;
                 var hp = HashPilot(pilot);
 
-                // Process chunks of 4 bucket elements at a time
                 bool hasCollision = false;
                 
                 for (int i = 0; i < r; i += 4)
@@ -936,22 +1020,19 @@ namespace PtrHash.CSharp.Port.Core
 
                 if (hasCollision) continue;
 
-                // If no external collision, try to take this pilot
-                if (TryTakePilotInPart(bucketHashes, pilot, taken)) // if self.try_take_pilot(bucket, hp, taken)
+                if (TryTakePilotInPart(bucketHashes, pilot, taken))
                 {
-                    return (pilot, hp); // return Some((p, hp))
+                    return (pilot, hp);
                 }
             }
 
-            return null; // None
+            return null;
         }
 
-        // try_take_pilot implementation, marks slots as taken with backtracking
         private unsafe bool TryTakePilotInPart(ReadOnlySpan<HashValue> bucketHashes, ulong pilot, BitVec taken)
         {
             var hp = HashPilot(pilot);
 
-            // This bucket does not collide with previous buckets, but it may still collide with itself.
             for (int i = 0; i < bucketHashes.Length; i++)
             {
                 var hash = bucketHashes[i];
@@ -959,8 +1040,6 @@ namespace PtrHash.CSharp.Port.Core
 
                 if (taken.GetUnchecked(localSlot))
                 {
-                    // Collision within the bucket, clean already set entries
-                    // for &hx in unsafe { bucket.get_unchecked(..i) }
                     for (int j = 0; j < i; j++)
                     {
                         var previousHash = bucketHashes[j];
@@ -991,7 +1070,7 @@ namespace PtrHash.CSharp.Port.Core
         {
             var bestScore = ulong.MaxValue;
             var bestPilot = ulong.MaxValue;
-            var startPilot = (ulong)rng.NextByte(); // Random starting pilot
+            var startPilot = (ulong)rng.NextByte();
             var newBLen = (ulong)bucketHashes.Length;
             var slotsTmp = ArrayPool<nuint>.Shared.Rent(bucketHashes.Length);
             
@@ -1001,28 +1080,24 @@ namespace PtrHash.CSharp.Port.Core
                 {
                     var hp = HashPilot(pilot);
 
-                    //  : slots_tmp.clear(); slots_tmp.extend(slots_for_bucket(b, p));
                     for (int i = 0; i < bucketHashes.Length; i++)
                     {
                         slotsTmp[i] = SlotInPartHp(bucketHashes[i], hp);
                     }
 
-                    //  : slots_tmp.sort_unstable();
                     slotsTmp.AsSpan(0, bucketHashes.Length).Sort();
 
-                    //  : slots_tmp.iter().tuple_windows().any(|(a, b)| a == b)
                     for (int i = 0; i < bucketHashes.Length - 1; i++)
                     {
                         if (slotsTmp[i] == slotsTmp[i + 1])
                         {
-                            return true; // Duplicate found
+                            return true;
                         }
                     }
 
-                    return false; // No duplicates
+                    return false;
                 }
 
-                // 'p: for delta in 0u64..kmax
                 for (ulong delta = 0; delta < kmax; delta++)
                 {
                     var pilot = (startPilot + delta) % kmax;
@@ -1031,52 +1106,41 @@ namespace PtrHash.CSharp.Port.Core
                     var collisionScore = 0UL;
                     var shouldSkip = false;
 
-                    // for p in b_slots(hp)
                     foreach (var hash in bucketHashes)
                     {
                         var localSlot = SlotInPartHp(hash, hp);
                         var occupyingBucket = slots[localSlot];
 
-                        // let s = unsafe { *slots.get_unchecked(p) };
-                        // if s.is_none() { continue; }
                         if (occupyingBucket == -1)
                         {
                             continue;
                         }
-                        // else if recent.contains(&s) { continue 'p; }
-                        // Optimized: recent array is small (16 elements), so linear search is fine but we can optimize it
                         else if (IsInRecentArray(recent, occupyingBucket))
                         {
                             shouldSkip = true;
-                            break; // Exit inner loop to continue outer loop
+                            break;
                         }
 
 
-                        // Collision scoring: s^2 penalizes evicting large buckets more
                         var bucketSize = bucketStarts[occupyingBucket + 1] - bucketStarts[occupyingBucket];
                         var newScore = (ulong)(bucketSize * bucketSize);
                         collisionScore += newScore;
 
-                        // skip pilots with worse collision scores
                         if (collisionScore >= bestScore)
                         {
                             shouldSkip = true;
-                            break; // Exit inner loop to continue outer loop
+                            break;
                         }
                     }
 
-                    // Skip this pilot if we hit a recent bucket or score exceeded best
-                    if (shouldSkip)
+                        if (shouldSkip)
                         continue;
 
-                    // if !duplicate_slots(b, p)
                     if (!DuplicateSlots(bucketHashes, pilot))
                     {
-                        //  best = (collision_score, p);
                         bestScore = collisionScore;
                         bestPilot = pilot;
 
-                        // if collision_score == new_b_len * new_b_len { break; }
                         if (collisionScore == newBLen * newBLen)
                         {
                             break;
@@ -1098,7 +1162,7 @@ namespace PtrHash.CSharp.Port.Core
             var freeSlotCount = taken.CountZeros();
             if (freeSlotCount != _slotsTotal - _numKeys)
             {
-                return false; // Inconsistent state
+                return false;
             }
 
             if (!_minimal || _slotsTotal == _numKeys)
@@ -1113,7 +1177,6 @@ namespace PtrHash.CSharp.Port.Core
 
             try
             {
-                // Helper function for slot access
                 // get = |t: &Vec<BitVec>, idx: usize| t[idx / self.slots][idx % self.slots];
                 bool Get(nuint idx)
                 {
@@ -1128,8 +1191,7 @@ namespace PtrHash.CSharp.Port.Core
                     if (freeSlotIndex >= _numKeys) // take_while(|&i| i < self.n) - stop when we exceed n
                         break;
 
-                    // Process this free slot immediately
-                    var i = (uint)freeSlotIndex;
+                        var i = (uint)freeSlotIndex;
                     while (!Get(_numKeys + (nuint)remapCount))
                     {
                         remapArray[remapCount++] = i;
@@ -1137,11 +1199,10 @@ namespace PtrHash.CSharp.Port.Core
                     remapArray[remapCount++] = i;
                 }
 
-                // Create remapping storage using selected type
                 var remapValues = remapArray.AsSpan(0, remapCount);
                 if (!TRemappingStorage.TryNew(remapValues, out _remapStorage))
                 {
-                    return false; // Remapping storage creation failed, retry with different seed
+                    return false;
                 }
 
             }
@@ -1188,14 +1249,17 @@ namespace PtrHash.CSharp.Port.Core
             {
                 unsafe
                 {
-                    if (_pilots != null)
+                    if (_ownsMemory && _pilots != null)
                     {
                         NativeMemory.AlignedFree(_pilots);
                         _pilots = null;
                     }
                 }
 
-                _remapStorage.Dispose();
+                if (_ownsMemory)
+                {
+                    _remapStorage.Dispose();
+                }
 
                 _disposed = true;
             }

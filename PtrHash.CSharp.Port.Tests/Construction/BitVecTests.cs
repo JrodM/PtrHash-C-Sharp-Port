@@ -227,7 +227,6 @@ namespace PtrHash.CSharp.Port.Tests.Construction
                 zeros.Add(index);
             }
             
-            // Should return only odd indices
             Assert.AreEqual(64, zeros.Count);
             foreach (var index in zeros)
             {
@@ -252,7 +251,6 @@ namespace PtrHash.CSharp.Port.Tests.Construction
                 zeros.Add(index);
             }
             
-            // Should not include indices >= 100
             Assert.AreEqual(97, zeros.Count); // 100 - 3 set bits
             foreach (var index in zeros)
             {
@@ -278,7 +276,6 @@ namespace PtrHash.CSharp.Port.Tests.Construction
                 zeros.Add(index);
             }
             
-            // Should return indices 0-63 and 128-191
             Assert.AreEqual(128, zeros.Count);
             foreach (var index in zeros)
             {
@@ -358,7 +355,6 @@ namespace PtrHash.CSharp.Port.Tests.Construction
             bitVec.Set(0, true);
             
             bitVec.Dispose();
-            // Should not throw when called multiple times
             bitVec.Dispose();
         }
 

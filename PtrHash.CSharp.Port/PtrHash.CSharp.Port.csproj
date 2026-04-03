@@ -33,17 +33,15 @@
 
     <!-- SIMD sets for the AOT image - disable AVX-512 -->
     <NativeAotInstructionSet Condition="'$(PublishAot)'=='true'">-avx512f,-avx512cd,-avx512bw,-avx512dq,-avx512vl,-avx512vbmi</NativeAotInstructionSet>
-
-    <!-- Enable hardware-intrinsics -->
-    <EnableHWIntrinsic>true</EnableHWIntrinsic>
-    <EnableSSE>true</EnableSSE>
-    <EnableSSE2>true</EnableSSE2>
-    <EnableAVX>true</EnableAVX>
-    <EnableAVX2>true</EnableAVX2>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.10.8-alpha"/>
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
 </Project>

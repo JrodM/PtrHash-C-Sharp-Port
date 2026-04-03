@@ -13,11 +13,10 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
 
         public unsafe PtrHashNative.FFIResultHandle CreateNew(ReadOnlySpan<int> keys, PtrHashNative.FFIParams parameters)
         {
-            // Convert int[] to ulong[] for native call (reinterpret as unsigned)
             var ulongKeys = new ulong[keys.Length];
             for (int i = 0; i < keys.Length; i++)
             {
-                ulongKeys[i] = (ulong)(uint)keys[i]; // Cast to uint first to preserve bit pattern
+                ulongKeys[i] = (ulong)(uint)keys[i];
             }
             
             fixed (ulong* keysPtr = ulongKeys)
@@ -28,7 +27,7 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PtrHashNative.FFIResultIndex GetIndex(IntPtr handle, int key)
-            => PtrHashNative.ptrhash_index_u64(handle, (ulong)(uint)key); // Preserve bit pattern
+            => PtrHashNative.ptrhash_index_u64(handle, (ulong)(uint)key);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PtrHashNative.FFIResultIndex GetIndexNoRemap(IntPtr handle, int key)
@@ -36,7 +35,6 @@ namespace PtrHash.CSharp.Interop.PtrHash.Dispatchers
 
         public unsafe PtrHashNative.FFIResultVoid GetIndicesBatch(IntPtr handle, ReadOnlySpan<int> keys, Span<nuint> results, bool minimal)
         {
-            // Convert to ulong for batch operation
             var ulongKeys = new ulong[keys.Length];
             for (int i = 0; i < keys.Length; i++)
             {
