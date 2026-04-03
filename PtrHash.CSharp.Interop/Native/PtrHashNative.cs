@@ -227,5 +227,11 @@ namespace PtrHash.CSharp.Interop.Native
         internal static partial ulong test_native_stronger_hash(ulong key, ulong seed);
 
         #endregion
+
+        #endregion
+
+        #endregion
+
+        #endregion
     }
 }

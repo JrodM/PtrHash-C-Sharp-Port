@@ -36,7 +36,7 @@ namespace PtrHash.CSharp.Port.Core
     /// <typeparam name="THasher">Hash function implementation</typeparam>
     /// <typeparam name="TBucketFunction">Bucket function implementation</typeparam>
     /// <typeparam name="TRemappingStorage">Remapping storage type for minimal mode</typeparam>
-    public sealed unsafe class partial PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> : IPtrHash<TKey>, IDisposable
+    public sealed unsafe partial class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart> : IPtrHash<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
@@ -74,7 +74,6 @@ namespace PtrHash.CSharp.Port.Core
 
         internal readonly nuint _numKeys;
         internal readonly bool _minimal;
-        private readonly bool _isSinglePart;
         internal readonly double _bitsPerKey;
         internal ulong _seed;
         
@@ -201,8 +200,7 @@ namespace PtrHash.CSharp.Port.Core
             _slotsTotal = (nuint)header.SlotsTotal;
             _numKeys = (nuint)header.NumKeys;
             _minimal = (header.Flags & PtrHashFileFormat.HeaderFlags.IsMinimal) != 0;
-            _isSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
-            
+
             _pilots = mappedDataPtr + PtrHashFileFormat.PilotsOffset;
             
             _remParts = new FastReduce(_parts);
@@ -248,8 +246,7 @@ namespace PtrHash.CSharp.Port.Core
             _slotsTotal = (nuint)header.SlotsTotal;
             _numKeys = (nuint)header.NumKeys;
             _minimal = (header.Flags & PtrHashFileFormat.HeaderFlags.IsMinimal) != 0;
-            _isSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
-            
+
             var pilotsPtr = (byte*)NativeMemory.AlignedAlloc(_bucketsTotal, 64);
             NativeMemory.Clear(pilotsPtr, _bucketsTotal);
             _pilots = pilotsPtr;
@@ -259,18 +256,18 @@ namespace PtrHash.CSharp.Port.Core
                 var pilotsSpan = new Span<byte>(_pilots, (int)_bucketsTotal);
                 stream.ReadExactly(pilotsSpan);
                 
-                    var padding = AlignTo64(_bucketsTotal) - _bucketsTotal;
+                var padding = AlignTo64(_bucketsTotal) - _bucketsTotal;
                 if (padding > 0)
                 {
                     stream.Seek((long)padding, SeekOrigin.Current);
                 }
                 
-                    _remParts = new FastReduce(_parts);
+                _remParts = new FastReduce(_parts);
                 _remBuckets = new FastReduce(_bucketsPerPart);
                 _remBucketsTotal = new FastReduce(_bucketsTotal);
                 _remSlots = new FM32(Math.Max(1, _slotsPerPart));
-                
-                    _bucketFunction = new TBucketFunction();
+
+                _bucketFunction = new TBucketFunction();
                 _bucketFunction.SetBucketsPerPart(_bucketsPerPart);
                 
                 if (_minimal && header.RemapCount > 0)
@@ -508,13 +505,11 @@ namespace PtrHash.CSharp.Port.Core
 
             // Phase: Init
             // Hash the first B keys, compute their buckets, and issue prefetches.
-            uint leftover = B;
-                    for (int i = 0; i < prefetchDistance; i++)
-                        HashValue hash;
-                        if (i < keys.Length)
-                            var key = Unsafe.Add(ref keysRef, i);
+            uint initCount = (uint)Math.Min((int)B, keys.Length);
+            for (uint i = 0; i < initCount; i++)
+            {
+                var hash     = THasher.Hash(Unsafe.Add(ref keysRef, (int)i), seed);
                 hashBuf[i]   = hash;
-                // SinglePart skips the part-selection step (GetPart always returns 0).
                 bucketBuf[i] = typeof(TPart) == typeof(SinglePart)
                     ? BucketInPart(hash.High())
                     : Bucket(hash);
@@ -564,16 +559,21 @@ namespace PtrHash.CSharp.Port.Core
 
             // Phase: Drain
             // Process the last B entries still sitting in the ring buffer (no new prefetches).
-            uint leftoverCount = B - leftover;
-            for (uint i = 0; i < leftoverCount; i++)
+            while (processed < (uint)keys.Length)
             {
                 uint idx  = processed % B;
                 var pilot = (ulong)pilots[bucketBuf[idx]];
-                        var slot = Slot(currentHash, pilot);
+                var slot  = typeof(TPart) == typeof(SinglePart)
                     ? SlotInPart(hashBuf[idx], pilot)
                     : Slot(hashBuf[idx], pilot);
-                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
-                        Unsafe.Add(ref resultsRef, processed) = slot;
+
+                if (useMinimal && slot >= numKeys)
+                    slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
+
+                Unsafe.Add(ref resultsRef, (int)processed) = slot;
+                processed++;
+            }
+        }
 
         #endregion
 

@@ -40,16 +40,16 @@ public class PtrHashSerializationTests
         var keys = PtrHashTestHelpers.GenerateKeys(100);
         using var stream = new MemoryStream();
         
-        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
+        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(
             keys, PtrHashParams.DefaultFast))
         {
             original.Serialize(stream);
         }
-        
+
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
-            PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>.Deserialize(stream);
+            PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, MultiPart>.Deserialize(stream);
         });
     }
     
@@ -59,16 +59,16 @@ public class PtrHashSerializationTests
         var keys = PtrHashTestHelpers.GenerateKeys(100);
         using var stream = new MemoryStream();
         
-        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
+        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(
             keys, PtrHashParams.DefaultFast))
         {
             original.Serialize(stream);
         }
-        
+
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
-            PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream);
+            PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream);
         });
     }
     
@@ -78,16 +78,16 @@ public class PtrHashSerializationTests
         var keys = PtrHashTestHelpers.GenerateKeys(100);
         using var stream = new MemoryStream();
         
-        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
+        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(
             keys, PtrHashParams.DefaultFast))
         {
             original.Serialize(stream);
         }
-        
+
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
-            PtrHash<ulong, StrongerIntHasher, CubicEps, UInt32VectorRemappingStorage>.Deserialize(stream);
+            PtrHash<ulong, StrongerIntHasher, CubicEps, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream);
         });
     }
     
@@ -103,10 +103,10 @@ public class PtrHashSerializationTests
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
-            PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream);
+            PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream);
         });
     }
-    
+
     [TestMethod]
     public void Deserialize_UnsupportedVersion_ThrowsException()
     {
@@ -121,10 +121,10 @@ public class PtrHashSerializationTests
         stream.Position = 0;
         Assert.ThrowsException<InvalidOperationException>(() =>
         {
-            PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream);
+            PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream);
         });
     }
-    
+
     [TestMethod]
     public void StreamPosition_CorrectAfterOperations()
     {
@@ -135,17 +135,17 @@ public class PtrHashSerializationTests
         stream.Write(preamble);
         var startPos = stream.Position;
         
-        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(
+        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(
             keys, PtrHashParams.DefaultFast))
         {
             original.Serialize(stream);
         }
-        
+
         var endPos = stream.Position;
-        
+
         stream.Position = startPos;
-        
-        using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream);
+
+        using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream);
         
         Assert.AreEqual(endPos, stream.Position);
     }

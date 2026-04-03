@@ -71,13 +71,11 @@ namespace PtrHash.CSharp.Port.Collections
 
             _keyValuePairs = new KeyValuePair<TKey, TValue>[maxIndex];
 
-            // Initialize all slots with default values
             for (int i = 0; i < maxIndex; i++)
             {
                 _keyValuePairs[i] = new KeyValuePair<TKey, TValue>(default(TKey)!, _sentinel);
             }
 
-            // Map keys to their hash indices and store key-value pairs
             for (int i = 0; i < keys.Length; i++)
             {
                 int idx = (int)_ptrHash.GetIndexNoRemap(keys[i]);
@@ -172,8 +170,7 @@ namespace PtrHash.CSharp.Port.Collections
         public bool TryGetValue(TKey key, out TValue value)
         {
             var idx = (int)_ptrHash.GetIndexNoRemap(key);
-            
-            // Single bounds check
+
             if ((uint)idx < (uint)_keyValuePairs.Length)
             {
                 ref var kvp = ref _keyValuePairs[idx];
