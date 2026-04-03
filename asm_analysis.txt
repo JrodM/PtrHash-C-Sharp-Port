@@ -1,0 +1,226 @@
+═══════════════════════════════════════════════════════════════════════
+PtrHash C# Port — Optimizations & ASM Analysis
+═══════════════════════════════════════════════════════════════════════
+
+─────────────────────────────────────────────────────────────────────
+SECTION 1: OPTIMIZATIONS APPLIED
+─────────────────────────────────────────────────────────────────────
+
+1. CONST-GENERIC PREFETCH DISTANCE (IPrefetchDistanceConstant)
+   ─────────────────────────────────────────────────────────────
+   What: Replaced runtime `int prefetchDistance` param with a struct
+   type parameter (PrefetchDistance8/16/32/64) implementing
+   IPrefetchDistanceConstant.
+
+   Why it works: The JIT generates a separate native method body for
+   each struct type argument. Inside that body `B = default(T).Value`
+   is a JIT-visible constant, identical to Rust's `const B: usize`
+   const-generic. This enables:
+     - stackalloc HashValue[B] — exact stack frame size (not worst-case)
+     - `processed % B` -> `& (B-1)` when B is power-of-2 (see #3)
+     - Dead-code elimination of unreachable branches
+
+2. uint LOOP COUNTER (not int)
+   ────────────────────────────
+   What: Changed `processed`, `idx`, `leftover`, `mainLoopEnd` from
+   int to uint.
+
+   Why it works: `int % 32` is signed modulo — the JIT must emit the
+   full 5-instruction signed divide sequence because the dividend could
+   theoretically be negative. `uint % 32` is unsigned — the JIT proves
+   `i % 32 == i & 31` trivially (same as LLVM on Rust's usize), emits
+   a single `and r10d, 31`. Confirmed in the captured asm:
+
+     IG07:  mov  r10d, edi
+            and  r10d, 31          <- single instruction, no idiv
+
+   Rust gets the same optimization because usize is unsigned.
+
+3. FIELD HOISTING — seed and pilots
+   ──────────────────────────────────
+   What: `ulong seed = _seed; byte* pilots = _pilots;` captured before
+   the loops.
+
+   Why it works: The JIT accesses instance fields via `this` (a GC
+   heap pointer) and has no interprocedural alias analysis. After any
+   inlined call it conservatively re-proves all `this.field` reads,
+   because it cannot rule out that the call wrote through an alias.
+   Capturing to a local severs the alias chain — the local is a scalar
+   on the stack, never addressable through `this`, so the JIT keeps it
+   in a register for the entire loop.
+
+   seed is used in THasher.Hash (FxHasher). pilots is used in both
+   the prefetcht0 and the pilot byte load.
+
+4. FIELD HOISTING — remBucketsTotal, remParts, remSlots, slotsPerPart
+   ────────────────────────────────────────────────────────────────────
+   What: Struct copies of _remBucketsTotal (FastReduce), _remParts
+   (FastReduce), _remSlots (FM32) and scalar copy of _slotsPerPart
+   (nuint) captured as locals before the loops.
+
+   Why it works: Same alias-analysis reason as #3. However, merely
+   capturing them is NOT enough — the instance methods Bucket() and
+   Slot() still read `this._remBucketsTotal.d`, `this._remParts.d`,
+   `this._seed`, `this._remSlots.d/m` through the `this` pointer.
+   Calling the methods on the LOCAL struct copies (remBucketsTotal.Reduce,
+   remParts.Reduce, remSlots.Reduce) reads from the local stack variables
+   instead, which the JIT keeps in registers.
+
+   This required inlining the Bucket() and Slot() call chains directly
+   in the hot loop:
+     Bucket() -> remBucketsTotal.Reduce(hash.High())  [Linear path]
+     Slot()   -> remParts.Reduce(hash.High()) * slotsPerPart
+               + remSlots.Reduce(hash.Low() ^ HashPilotC*(pilot^seed))
+
+   Before this fix (from Prefetch.txt Tier0-FullOpts dump):
+     IG07:  lea r12, bword ptr [rcx+0x78]    ; _remBucketsTotal.d
+            mov r12, qword ptr [r12]           ; load from heap per iter
+            lea rdx, bword ptr [rcx+0x68]    ; _remParts.d
+            mov rdx, qword ptr [rdx]           ; load from heap per iter
+            imul rdx, qword ptr [rcx+0x18]    ; _slotsPerPart per iter
+            xor r10, qword ptr [rcx+0x48]     ; _seed reloaded in HashPilot
+            lea rsi, bword ptr [rcx+0x80]     ; _remSlots per iter
+     (5 heap object reloads per iteration)
+
+   After this fix: all five become register-resident values loaded once
+   before the loop.
+
+5. HashPilot INLINED WITH HOISTED seed
+   ─────────────────────────────────────
+   What: Instead of calling Slot() which chains to HashPilot() which
+   reads `this._seed`, the hot loop now does:
+     const ulong HashPilotC = 0x517cc1b727220a95UL;
+     ulong hp = HashPilotC * (pilot ^ seed);
+
+   Why it works: HashPilot() is a private instance method. Even though
+   `seed` was already captured as a local, the inlined HashPilot body
+   generates a `this._seed` load — not a `seed` local read. Only
+   inlining the computation with the local variable eliminates the
+   reload. The constant folds to an immediate, matching Rust's
+   movabs $0x517cc1b727220a95, rXX.
+
+6. Sse.Prefetch0 (_MM_HINT_T0)
+   ──────────────────────────────
+   What: `Sse.Prefetch0(pilots + nextBucket)` in the main loop.
+
+   Why it works: Issues a prefetcht0 (L1 cache prefetch) for the pilot
+   byte needed B=32 iterations later. Hides the DRAM latency of the
+   random pilot access (the dominant bottleneck in the non-prefetch
+   path). Confirmed in the asm at both init loop and main loop:
+     prefetcht0 byte ptr [rdx]
+
+   Matches Rust's prefetcht0 in the same loop position.
+
+─────────────────────────────────────────────────────────────────────
+SECTION 2: C# PREFETCH ASM vs RUST — COMPARISON
+─────────────────────────────────────────────────────────────────────
+
+SOURCE FILES:
+  C# dump:   Prefetch.txt  (GetIndicesStreamPrefetchCore, Tier0-FullOpts)
+  Rust dump: rust_asm.txt  (10 standalone index_stream variants via
+             objdump/nm on libptrhash.so)
+
+NOTE ON TIERS:
+  The C# dump is Tier0-FullOpts, not Tier1+PGO. 50 warmup calls fire
+  but the Tier1 background recompile races against process exit and
+  loses. Use DOTNET_TieredCompilation=0 to force Tier1 from first call.
+  Tier0-FullOpts applies the same instruction-selection passes as Tier1
+  but without PGO branch layout, so instruction selection is
+  representative but branch ordering may differ slightly.
+
+WHAT THE RUST ASM ACTUALLY CONTAINS:
+  The functions in rust_asm.txt are index_stream() INIT variants only.
+  They construct the It<B, MINIMAL> struct (fill the ring buffer and
+  return the iterator state). The actual streaming main loop is inlined
+  by LLVM into the fold() call site and does not appear as a standalone
+  symbol in the shared library. The init functions are still useful for
+  comparing ring buffer setup, prefetch placement, and field access.
+
+STRUCTURAL COMPARISON — INIT PHASE:
+  +---------------------------------+--------------------------------------+
+  | C# (IG03-IG05)                  | Rust (b23b0 / b25c0 region)         |
+  +---------------------------------+--------------------------------------+
+  | rorx+xor+imul  FxHash           | rorx+xor+imul  FxHash               |
+  | mulx  FastReduce.Reduce         | mulx  PtrHash reduce                 |
+  | prefetcht0 [r11+bucket]         | prefetcht0 [r8+bucket]              |
+  | linear counter i=0..B-1        | linear counter i=0..B-1             |
+  | no modulo in init loop          | no modulo in init loop              |
+  +---------------------------------+--------------------------------------+
+  Init phase is structurally identical. Both zero-initialise the ring
+  buffer with vmovdqu YMM stores, hash with the same FxHash sequence,
+  reduce with mulx, and issue prefetcht0.
+
+MAIN LOOP COMPARISON (C# IG07 vs Rust inlined fold):
+  +-----------------------------+---------------------+------------------+
+  | Feature                     | C# (pre-hoist fix)  | Rust             |
+  +-----------------------------+---------------------+------------------+
+  | Ring buffer index           | and r10d,31      V  | & implied     V  |
+  | FxHash (rorx+xor+imul)      | 3 insns          V  | 3 insns       V  |
+  | FastReduce (mulx)           | mulx             V  | mulx          V  |
+  | prefetcht0                  | present          V  | present       V  |
+  | Pilot byte load             | movzx byte       V  | movzx byte    V  |
+  | HashPilot (imul+xor)        | 2 insns          V  | 2 insns       V  |
+  | FM32 slot reduce            | imul + mulx      V  | imul + mulx   V  |
+  | Slot combine (add)          | add              V  | add           V  |
+  | this.field reloads/iter     | 5                X  | 0             V  |
+  | Keys base ptr spill         | yes (stack)      X  | no (register) V  |
+  | mainLoopEnd spill           | yes (stack)      X  | no (register) V  |
+  +-----------------------------+---------------------+------------------+
+
+  Post hoist-fix (applied in this session): all 5 per-iteration this
+  reloads eliminated. Stack spills expected to reduce as register
+  pressure drops from eliminating the live heap-pointer dereferences.
+
+REMAINING GAPS (post-fix, expected):
+  1. Tier0 vs Rust inlined fold: Rust's LLVM performs loop pipelining
+     and instruction scheduling across the full inlined function.
+     C# Tier0-FullOpts does a simpler local schedule. Tier1+PGO closes
+     some of this but is hard to capture without process lifetime tricks.
+
+  2. Register pressure: LLVM does global register allocation across the
+     entire inlined fold body. JIT uses a more local allocator. With
+     field hoisting applied the register file usage improves but some
+     intermediates may still spill where Rust keeps them in registers.
+
+  3. Loop unrolling: The B=64 Rust init processes 2 keys per iteration
+     (unrolled by 2, visible from the +2 step in r10 at b2408).
+     C# JIT does not currently unroll.
+
+  4. AVX2 zero-init: Both use vmovdqu YMM stores to zero the ring
+     buffer. Identical.
+
+  5. vzeroupper: Rust emits at function entry. C# JIT emits at method
+     entry (IG01). Both correct.
+
+EXPECTED PERFORMANCE:
+  Non-prefetch: Serial hash+bucket+pilot dependency chain, one DRAM
+    access per key for cold pilot data. Memory latency bound.
+
+  Prefetch (post all fixes): Pilot load latency hidden by B=32
+    lookahead. Bottleneck shifts to hash+reduce throughput.
+    FxHash=3 insns, FastReduce=mulx, FM32=imul+mulx — roughly 8
+    critical-path insns per key.
+    Expected: 30-60% improvement over non-prefetch on cache-cold data,
+    comparable to Rust's gain from the same technique.
+
+─────────────────────────────────────────────────────────────────────
+SECTION 3: TIER EXPLANATION
+─────────────────────────────────────────────────────────────────────
+
+Tier0: Fast first-compile with call-count probes. "Tier0-FullOpts"
+       enables optimization passes but no PGO data.
+
+Tier1: Background recompile after ~30 calls with PGO from Tier0 probe
+       data. OSR (On-Stack Replacement) = mid-loop recompile triggered
+       when the loop itself runs long enough before the method returns.
+
+BenchmarkDotNet: Runs each method 15+ times in warmup before timing.
+Both paths reach Tier1+PGO before any measurement. DisasmTest shows
+Tier0 because the process exits before the async Tier1 recompile of
+the prefetch path finishes.
+
+To capture true Tier1 asm:
+  $env:DOTNET_TieredCompilation = "0"
+  $env:DOTNET_JitDisasm = "GetIndicesStream"
+  dotnet run -c Release --project .\Benchmarks\ -p:Disasm=true 2>&1 | Tee-Object asm_tier1.txt
+═══════════════════════════════════════════════════════════════════════

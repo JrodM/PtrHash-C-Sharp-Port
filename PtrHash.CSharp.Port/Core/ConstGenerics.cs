@@ -8,9 +8,9 @@ namespace PtrHash.CSharp.Port.Core
     /// Used to provide compile-time specialization similar to Rust's const generics.
     /// The JIT compiler creates separate method instances for each implementing type.
     /// </summary>
-    public interface IBoolConstant 
-    { 
-        bool Value { get; } 
+    public interface IBoolConstant
+    {
+        bool Value { get; }
     }
 
     /// <summary>
@@ -18,9 +18,9 @@ namespace PtrHash.CSharp.Port.Core
     /// Used to specialize PtrHash construction for single-part vs multi-part modes
     /// at compile time, eliminating runtime branches.
     /// </summary>
-    public interface IPartConstant 
-    { 
-        bool IsSinglePart { get; } 
+    public interface IPartConstant
+    {
+        bool IsSinglePart { get; }
     }
 
     /// <summary>
@@ -28,9 +28,20 @@ namespace PtrHash.CSharp.Port.Core
     /// Used to specialize FindPilot methods for specific bucket sizes,
     /// enabling aggressive JIT optimizations like loop unrolling and bounds check elimination.
     /// </summary>
-    public interface ISizeConstant 
-    { 
-        int Value { get; } 
+    public interface ISizeConstant
+    {
+        int Value { get; }
+    }
+
+    /// <summary>
+    /// Interface for compile-time prefetch distance constants.
+    /// Mirrors Rust's <c>const B: usize</c> in <c>index_stream&lt;B, MINIMAL, _&gt;</c>.
+    /// When used as a generic parameter the JIT inlines the constant value, turning
+    /// <c>i % B</c> into a cheap bitwise AND (all supported values are powers of two).
+    /// </summary>
+    public interface IPrefetchDistanceConstant
+    {
+        uint Value { get; }
     }
     #endregion
 
@@ -161,9 +172,20 @@ namespace PtrHash.CSharp.Port.Core
     /// Falls back to runtime size determination using bucketHashes.Length.
     /// Used as the default case in the size-based dispatch switch statement.
     /// </summary>
-    public readonly struct SizeGeneric : ISizeConstant 
-    { 
-        public int Value => -1; 
+    public readonly struct SizeGeneric : ISizeConstant
+    {
+        public int Value => -1;
     }
+    #endregion
+
+    #region Prefetch Distance Constants
+    /// <summary>Prefetch 8 iterations ahead. Use for small datasets that fit mostly in L1/L2.</summary>
+    public readonly struct PrefetchDistance8  : IPrefetchDistanceConstant { public uint Value => 8; }
+    /// <summary>Prefetch 16 iterations ahead.</summary>
+    public readonly struct PrefetchDistance16 : IPrefetchDistanceConstant { public uint Value => 16; }
+    /// <summary>Prefetch 32 iterations ahead. Matches Rust default (<c>index_stream::&lt;32, ..&gt;</c>).</summary>
+    public readonly struct PrefetchDistance32 : IPrefetchDistanceConstant { public uint Value => 32; }
+    /// <summary>Prefetch 64 iterations ahead. Use when the pilots table is large and DRAM latency dominates.</summary>
+    public readonly struct PrefetchDistance64 : IPrefetchDistanceConstant { public uint Value => 64; }
     #endregion
 }

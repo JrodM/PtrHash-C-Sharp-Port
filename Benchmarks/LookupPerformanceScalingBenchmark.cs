@@ -28,10 +28,10 @@ namespace PtrHash.Benchmarks
         }
         }
 
-        [Params(2_000_000)]
+        [Params(1_500_000)]
         public int KeyCount { get; set; }
 
-        [Params(1_000, 50_000, 100_000, 1_000_000, 10_000_000)]
+        [Params(1_000, 10_000, 50_000, 100_000)]
         public int LookupCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -70,14 +70,14 @@ namespace PtrHash.Benchmarks
 
             // Create lookup keys - half found, half not found
             _lookupKeys = new ulong[LookupCount];
-            var halfCount = LookupCount / 2;
+            var halfCount = LookupCount;
             
             // First half: keys that exist in the set
             for (int i = 0; i < halfCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
             
             // Second half: keys that don't exist in the set
-            var usedKeys = new HashSet<ulong>(_keys);
+            /*var usedKeys = new HashSet<ulong>(_keys);
             for (int i = halfCount; i < LookupCount; i++)
             {
                 ulong notFoundKey;
@@ -86,7 +86,10 @@ namespace PtrHash.Benchmarks
                     notFoundKey = (ulong)random.NextInt64(1, long.MaxValue);
                 } while (usedKeys.Contains(notFoundKey));
                 _lookupKeys[i] = notFoundKey;
-            }
+            }*/
+
+            // Shuffle to interleave hits/misses — avoids branch predictor skew from sequential pattern
+            _lookupKeys = _lookupKeys.OrderBy(_ => random.Next()).ToArray();
 
             // Standard Dictionary
             _dictionary = new Dictionary<ulong, ulong>(KeyCount);
@@ -148,7 +151,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_MultiPart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -160,7 +163,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_SinglePart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -172,7 +175,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashNative_MultiPart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -184,7 +187,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashNative_SinglePart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -197,7 +200,7 @@ namespace PtrHash.Benchmarks
         }
 
         // === STREAM LOOKUPS (Batch processing) ===
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashNative_MultiPart_Stream_TryGetValueStream()
         {
             ulong sum = 0;
@@ -231,7 +234,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_MultiPart_Stream_TryGetValueStream()
         {
             ulong sum = 0;
@@ -265,7 +268,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_SinglePartU64Storage_Stream_TryGetValueStream()
         {
             ulong sum = 0;

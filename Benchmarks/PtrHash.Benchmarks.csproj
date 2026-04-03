@@ -30,9 +30,12 @@
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
   </ItemGroup>
   
-  <!-- Exclude DisasmTest from compilation -->
-  <ItemGroup>
+  <!-- Exclude DisasmTest from compilation unless /p:Disasm=true is passed -->
+  <ItemGroup Condition="'$(Disasm)' != 'true'">
     <Compile Remove="DisasmTest/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Disasm)' == 'true'">
+    <Compile Remove="Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../PtrHash.CSharp.Interop/PtrHashNative.csproj" />

@@ -237,8 +237,7 @@ namespace PtrHash.CSharp.Port.Collections
         /// <param name="values">Output array for values (must be same length as keys)</param>
         public void TryGetValueStreamPrefetch(
             ReadOnlySpan<TKey> keys,
-            Span<TValue> values,
-            int prefetchDistance = 32)
+            Span<TValue> values)
         {
             if (keys.Length != values.Length)
                 throw new ArgumentException("Key and value spans must have the same length");
@@ -246,7 +245,7 @@ namespace PtrHash.CSharp.Port.Collections
             if (keys.Length <= MAX_STACK_SIZE)
             {
                 Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: false, prefetchDistance);
+                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: false);
                 ProcessIndices(keys, indices, values);
             }
             else
@@ -255,7 +254,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: false, prefetchDistance);
+                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: false);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally

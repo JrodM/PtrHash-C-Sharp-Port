@@ -1,0 +1,263 @@
+﻿; Assembly listing for method PtrHash.CSharp.Port.Core.PtrHash`4[ulong,PtrHash.CSharp.Port.KeyHashers.FxHasher,PtrHash.CSharp.Port.BucketFunctions.Linear,PtrHash.CSharp.Port.Storage.UInt32VectorRemappingStorage]:GetIndicesStreamPrefetchCore[PtrHash.CSharp.Port.Core.SinglePart,PtrHash.CSharp.Port.Core.NoMinimal,PtrHash.CSharp.Port.Core.PrefetchDistance32](System.ReadOnlySpan`1[ulong],System.Span`1[ulong]):this (Tier0-FullOpts)
+; Emitting BLENDED_CODE for X64 with AVX - Windows
+; Tier-0 switched to FullOpts code
+; optimized code
+; rbp based frame
+; fully interruptible
+; No PGO data
+; 1 inlinees with PGO data; 178 single block inlinees; 28 inlinees without PGO data
+
+G_M000_IG01:                ;; offset=0x0000
+       push     rbp
+       push     r15
+       push     r14
+       push     r13
+       push     r12
+       push     rdi
+       push     rsi
+       push     rbx
+       sub      rsp, 136
+       vzeroupper 
+       lea      rbp, [rsp+0x20]
+       xor      eax, eax
+       mov      qword ptr [rbp+0x18], rax
+       vxorps   xmm4, xmm4, xmm4
+       vmovdqa  xmmword ptr [rbp+0x20], xmm4
+       vmovdqa  xmmword ptr [rbp+0x30], xmm4
+       vmovdqa  xmmword ptr [rbp+0x40], xmm4
+       mov      qword ptr [rbp+0x50], rax
+       mov      rax, 0x9F8499B42491
+       mov      qword ptr [rbp], rax
+ 
+G_M000_IG02:                ;; offset=0x0046
+       mov      rax, bword ptr [rdx]
+       mov      r10d, dword ptr [rdx+0x08]
+       cmp      r10d, dword ptr [r8+0x08]
+       jne      G_M000_IG16
+       mov      edx, dword ptr [rcx+0x38]
+       mov      r9, qword ptr [rcx+0x48]
+       mov      r11, qword ptr [rcx+0x08]
+       test     dword ptr [rsp], esp
+       sub      rsp, 256
+       lea      rdx, [rsp+0x20]
+       vxorps   ymm0, ymm0, ymm0
+       vmovdqu  ymmword ptr [rdx], ymm0
+       vmovdqu  ymmword ptr [rdx+0x20], ymm0
+       vmovdqu  ymmword ptr [rdx+0x40], ymm0
+       vmovdqu  ymmword ptr [rdx+0x60], ymm0
+       vmovdqu  ymmword ptr [rdx+0x80], ymm0
+       vmovdqu  ymmword ptr [rdx+0xA0], ymm0
+       vmovdqu  ymmword ptr [rdx+0xC0], ymm0
+       vmovdqu  ymmword ptr [rdx+0xE0], ymm0
+       mov      qword ptr [rbp+0x60], rdx
+       test     dword ptr [rsp], esp
+       sub      rsp, 256
+       lea      rbx, [rsp+0x20]
+       vxorps   ymm0, ymm0, ymm0
+       vmovdqu  ymmword ptr [rbx], ymm0
+       vmovdqu  ymmword ptr [rbx+0x20], ymm0
+       vmovdqu  ymmword ptr [rbx+0x40], ymm0
+       vmovdqu  ymmword ptr [rbx+0x60], ymm0
+       vmovdqu  ymmword ptr [rbx+0x80], ymm0
+       vmovdqu  ymmword ptr [rbx+0xA0], ymm0
+       vmovdqu  ymmword ptr [rbx+0xC0], ymm0
+       vmovdqu  ymmword ptr [rbx+0xE0], ymm0
+       mov      bword ptr [rbp+0x08], rax
+       mov      r8, bword ptr [r8]
+       mov      esi, 32
+       xor      edi, edi
+       align    [0 bytes for IG03]
+ 
+G_M000_IG03:                ;; offset=0x0100
+       xor      r14d, r14d
+       cmp      edi, r10d
+       jae      G_M000_IG15
+ 
+G_M000_IG04:                ;; offset=0x010C
+       movsxd   r14, edi
+       rorx     r15, r9, 59
+       xor      r15, qword ptr [rax+8*r14]
+       mov      r14, 0x517CC1B727220A95
+       imul     r14, r15
+       dec      esi
+       mov      dword ptr [rbp+0x5C], esi
+ 
+G_M000_IG05:                ;; offset=0x012C
+       mov      r15d, edi
+       mov      qword ptr [rdx+8*r15], r14
+       lea      r13, bword ptr [rcx+0x78]
+       mov      r13, qword ptr [r13]
+       lea      r12, [rbp+0x50]
+       mov      rdx, r13
+       mulx     rdx, rsi, r14
+       mov      qword ptr [r12], rsi
+       mov      qword ptr [rbx+8*r15], rdx
+       mov      rdx, r11
+       add      rdx, qword ptr [rbx+8*r15]
+       prefetcht0 byte  ptr [rdx]
+       inc      edi
+       cmp      edi, 32
+       mov      rdx, qword ptr [rbp+0x60]
+       mov      esi, dword ptr [rbp+0x5C]
+       jb       SHORT G_M000_IG03
+ 
+G_M000_IG06:                ;; offset=0x0167
+       xor      edi, edi
+       sub      r10d, 32
+       xor      r14d, r14d
+       test     r10d, r10d
+       cmovg    r14d, r10d
+       mov      dword ptr [rbp+0x58], r14d
+       test     r14d, r14d
+       mov      dword ptr [rbp+0x5C], esi
+       jbe      G_M000_IG14
+       align    [0 bytes for IG07]
+ 
+G_M000_IG07:                ;; offset=0x0187
+       mov      r10d, edi
+       and      r10d, 31
+       mov      r15, qword ptr [rdx+8*r10]
+       mov      r13, qword ptr [rbx+8*r10]
+       lea      r12d, [rdi+0x20]
+       movsxd   r12, r12d
+       rorx     rsi, r9, 59
+       xor      rsi, qword ptr [rax+8*r12]
+       mov      r12, 0x517CC1B727220A95
+       imul     rsi, r12
+       lea      r12, bword ptr [rcx+0x78]
+       mov      r12, qword ptr [r12]
+       lea      r14, [rbp+0x48]
+       mov      rdx, r12
+       mulx     rdx, rax, rsi
+       mov      qword ptr [r14], rax
+       mov      rax, qword ptr [rbp+0x60]
+       mov      qword ptr [rax+8*r10], rsi
+       mov      qword ptr [rbx+8*r10], rdx
+       add      rdx, r11
+       prefetcht0 byte  ptr [rdx]
+       movzx    r10, byte  ptr [r11+r13]
+       lea      rdx, bword ptr [rcx+0x68]
+       mov      rdx, qword ptr [rdx]
+       lea      rsi, [rbp+0x38]
+       mulx     rdx, r14, r15
+       mov      qword ptr [rsi], r14
+       imul     rdx, qword ptr [rcx+0x18]
+       mov      qword ptr [rbp+0x40], rdx
+       xor      r10, qword ptr [rcx+0x48]
+       mov      rsi, 0x517CC1B727220A95
+       imul     r10, rsi
+       lea      rsi, bword ptr [rcx+0x80]
+       xor      r10, r15
+       imul     r10, qword ptr [rsi+0x08]
+       mov      rsi, qword ptr [rsi]
+       lea      r14, [rbp+0x30]
+       mov      rdx, r10
+       mulx     rdx, r15, rsi
+       mov      qword ptr [r14], r15
+       mov      r10, qword ptr [rbp+0x40]
+       add      rdx, r10
+       movsxd   r10, edi
+       mov      qword ptr [r8+8*r10], rdx
+       inc      edi
+       mov      r14d, dword ptr [rbp+0x58]
+       cmp      edi, r14d
+       jb       G_M000_IG13
+ 
+G_M000_IG08:                ;; offset=0x024F
+       mov      r10d, 32
+       sub      r10d, dword ptr [rbp+0x5C]
+       xor      r9d, r9d
+       test     r10d, r10d
+       jbe      G_M000_IG10
+       align    [0 bytes for IG09]
+ 
+G_M000_IG09:                ;; offset=0x0265
+       mov      edx, edi
+       and      edx, 31
+       mov      esi, edx
+       mov      rsi, qword ptr [rbx+8*rsi]
+       movzx    rsi, byte  ptr [rsi+r11]
+       mov      rdx, qword ptr [rax+8*rdx]
+       mov      qword ptr [rbp+0x10], rdx
+       lea      r14, bword ptr [rcx+0x68]
+       mov      r14, qword ptr [r14]
+       lea      r15, [rbp+0x20]
+       mov      r13, qword ptr [rbp+0x10]
+       mov      rdx, r14
+       mulx     rdx, r12, r13
+       mov      qword ptr [r15], r12
+       imul     rdx, qword ptr [rcx+0x18]
+       mov      qword ptr [rbp+0x28], rdx
+       xor      rsi, qword ptr [rcx+0x48]
+       mov      r14, 0x517CC1B727220A95
+       imul     rsi, r14
+       lea      r14, bword ptr [rcx+0x80]
+       xor      rsi, r13
+       imul     rsi, qword ptr [r14+0x08]
+       mov      r14, qword ptr [r14]
+       lea      r15, [rbp+0x18]
+       mov      rdx, rsi
+       mulx     rdx, r13, r14
+       mov      qword ptr [r15], r13
+       mov      rsi, qword ptr [rbp+0x28]
+       add      rdx, rsi
+       movsxd   rsi, edi
+       mov      qword ptr [r8+8*rsi], rdx
+       inc      edi
+       inc      r9d
+       cmp      r9d, r10d
+       jb       G_M000_IG09
+ 
+G_M000_IG10:                ;; offset=0x02EF
+       mov      rcx, 0x9F8499B42491
+       cmp      qword ptr [rbp], rcx
+       je       SHORT G_M000_IG11
+       call     CORINFO_HELP_FAIL_FAST
+ 
+G_M000_IG11:                ;; offset=0x0304
+       nop      
+ 
+G_M000_IG12:                ;; offset=0x0305
+       lea      rsp, [rbp+0x68]
+       pop      rbx
+       pop      rsi
+       pop      rdi
+       pop      r12
+       pop      r13
+       pop      r14
+       pop      r15
+       pop      rbp
+       ret      
+ 
+G_M000_IG13:                ;; offset=0x0316
+       mov      rdx, rax
+       mov      rax, bword ptr [rbp+0x08]
+       jmp      G_M000_IG07
+ 
+G_M000_IG14:                ;; offset=0x0322
+       mov      rax, rdx
+       jmp      G_M000_IG08
+ 
+G_M000_IG15:                ;; offset=0x032A
+       mov      dword ptr [rbp+0x5C], esi
+       jmp      G_M000_IG05
+ 
+G_M000_IG16:                ;; offset=0x0332
+       mov      rcx, 0x7FFAB9BA67B0
+       call     CORINFO_HELP_NEWSFAST
+       mov      rbx, rax
+       mov      ecx, 0x440
+       mov      rdx, 0x7FFAB9CEF000
+       call     CORINFO_HELP_STRCNS
+       mov      rdx, rax
+       mov      rcx, rbx
+       call     [System.ArgumentException:.ctor(System.String):this]
+       mov      rcx, rbx
+       call     CORINFO_HELP_THROW
+       int3     
+ 
+; Total bytes of code 877
+
+Non-prefetch: OK
+Prefetch:     OK
+Check asm.txt ΓÇö search for GetIndicesStreamCore and GetIndicesStreamPrefetchCore

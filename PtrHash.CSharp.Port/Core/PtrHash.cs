@@ -255,6 +255,7 @@ namespace PtrHash.CSharp.Port.Core
 
         // Global bucket calculation
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint Bucket(HashValue hx)
         {
             // If using linear bucket function, use total buckets reduction
@@ -272,8 +273,7 @@ namespace PtrHash.CSharp.Port.Core
             return part * _bucketsPerPart + bucket;
         }
 
-        // Bucket calculation within a part
-        //MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private nuint BucketInPart(ulong x)
         {
             // Linear: reduce directly; B_OUTPUT: use bucket function result;
@@ -348,7 +348,7 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void GetIndicesStreamCore<TPart, TMinimal>(ReadOnlySpan<TKey> keys, Span<nuint> results)
             where TPart : struct, IPartConstant
             where TMinimal : struct, IBoolConstant
@@ -356,9 +356,10 @@ namespace PtrHash.CSharp.Port.Core
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            var numKeys = _numKeys;
+            var numKeys    = _numKeys;
+            var remapStorage = _remapStorage;
 
-            ref TKey keysRef = ref MemoryMarshal.GetReference(keys);
+            ref TKey  keysRef    = ref MemoryMarshal.GetReference(keys);
             ref nuint resultsRef = ref MemoryMarshal.GetReference(results);
 
             for (int i = 0; i < keys.Length; i++)
@@ -373,7 +374,7 @@ namespace PtrHash.CSharp.Port.Core
                 if (typeof(TMinimal) == typeof(UseMinimal) && slot >= numKeys)
                 {
                     var remapIndex = slot - numKeys;
-                    slot = TRemappingStorage.Index(_remapStorage, remapIndex);
+                    slot = TRemappingStorage.Index(remapStorage, remapIndex);
                 }
 
                 Unsafe.Add(ref resultsRef, i) = slot;
@@ -381,132 +382,133 @@ namespace PtrHash.CSharp.Port.Core
         }
 
 
-        // Prefetch-enabled streaming, this preformed worse than the naive version for C# ( unless we use AOT )
+        // Convenience overload (satisfies IPtrHash interface): maps a runtime int to the
+        // const-generic method below, the same way the Rust FFI shim maps prefetch_distance
+        // to index_stream::<B, ..>.  Values > 64 fall back to 32 (matches Rust FFI behaviour).
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStreamPrefetch(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true, int prefetchDistance = 32)
+        public void GetIndicesStreamPrefetch(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
         {
-            // Fall back to regular streaming if SSE2 prefetch not supported
-            if (!Sse2.IsSupported)
-            {
-                GetIndicesStream(keys, results, minimal);
-                return;
-            }
-            
             if (_isSinglePart)
             {
-                if (minimal)
-                    GetIndicesStreamPrefetchCore<SinglePart, UseMinimal>(keys, results, prefetchDistance);
-                else
-                    GetIndicesStreamPrefetchCore<SinglePart, NoMinimal>(keys, results, prefetchDistance);
+                if (minimal) GetIndicesStreamPrefetchCore<SinglePart, UseMinimal, PrefetchDistance32>(keys, results);
+                else         GetIndicesStreamPrefetchCore<SinglePart, NoMinimal,  PrefetchDistance32>(keys, results);
             }
             else
             {
-                if (minimal)
-                    GetIndicesStreamPrefetchCore<MultiPart, UseMinimal>(keys, results, prefetchDistance);
-                else
-                    GetIndicesStreamPrefetchCore<MultiPart, NoMinimal>(keys, results, prefetchDistance);
+                if (minimal) GetIndicesStreamPrefetchCore<MultiPart, UseMinimal, PrefetchDistance32>(keys, results);
+                else         GetIndicesStreamPrefetchCore<MultiPart, NoMinimal,  PrefetchDistance32>(keys, results);
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void GetIndicesStreamPrefetchCore<TPart, TMinimal>(ReadOnlySpan<TKey> keys, Span<nuint> results, int prefetchDistance)
-            where TPart : struct, IPartConstant
+        // Direct port of Rust index_stream fold + drain pattern.
+        // TPrefetchDistance is the const-generic B: all ring-buffer indexing uses
+        // `i % B` which the JIT folds to `i & (B-1)` after specialization.
+        private unsafe void GetIndicesStreamPrefetchCore<TPart, TMinimal, TPrefetchDistance>(
+            ReadOnlySpan<TKey> keys, Span<nuint> results)
+            where TPart   : struct, IPartConstant
             where TMinimal : struct, IBoolConstant
+            where TPrefetchDistance : struct, IPrefetchDistanceConstant
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
-            
+
+            uint B         = (uint)default(TPrefetchDistance).Value; // JIT constant after specialization
             var useMinimal = default(TMinimal).Value;
-            var numKeys = _numKeys;
+            var numKeys    = _numKeys;
+            // Capture fields accessed directly in this method body as locals.
+            // The JIT reloads instance fields from `this` on every iteration because
+            // it cannot prove they are unchanged across calls (no alias analysis).
+            // Locals break that chain and stay in registers for the loop duration.
+            ulong             seed         = _seed;
+            byte*             pilots       = _pilots;
+            TRemappingStorage remapStorage = _remapStorage;
 
-            // Ring buffers for prefetching
-            Span<HashValue> nextHashes = stackalloc HashValue[prefetchDistance];
-            Span<ulong> nextBuckets = stackalloc ulong[prefetchDistance];
+            HashValue* hashBuf   = stackalloc HashValue[(int)B];
+            ulong*     bucketBuf = stackalloc ulong[(int)B];
 
-            ref var keysRef = ref MemoryMarshal.GetReference(keys);
+            ref var keysRef    = ref MemoryMarshal.GetReference(keys);
             ref var resultsRef = ref MemoryMarshal.GetReference(results);
 
-            unsafe
+            // ── Init phase ─────────────────────────────────────────────────────────
+            // Hash the first B keys, compute their buckets, and issue prefetches.
+            // Exactly mirrors Rust's init loop that consumes the first B items from
+            // the iterator before constructing the It struct.
+            uint leftover = B;
+            for (uint i = 0; i < B; i++)
             {
-                // Get raw pointers to ring buffers to avoid bounds checks
-                fixed (HashValue* hashBufPtr = &MemoryMarshal.GetReference(nextHashes))
-                fixed (ulong* bucketBufPtr = &MemoryMarshal.GetReference(nextBuckets))
+                HashValue hash = default;
+                if (i < (uint)keys.Length)
                 {
-                    // Initialize and prefetch first batch
-                    int leftover = prefetchDistance;
-                    for (int i = 0; i < prefetchDistance; i++)
-                    {
-                        HashValue hash;
-                        if (i < keys.Length)
-                        {
-                            var key = Unsafe.Add(ref keysRef, i);
-                            hash = THasher.Hash(key, _seed);
-                            leftover--;
-                        }
-                        else
-                        {
-                            hash = default;
-                        }
-
-                        hashBufPtr[i] = hash;
-
-                        bucketBufPtr[i] = Bucket(hashBufPtr[i]);
-                        
-                        Sse.Prefetch0(_pilots + bucketBufPtr[i]);
-                    }
-                    
-                    int processed = 0;
-                    int mainLoopEnd = Math.Max(0, keys.Length - prefetchDistance);
-
-                    while (processed < mainLoopEnd)
-                    {
-                        int idx = processed % prefetchDistance;
-
-                        // Prefetch the next key and pilot first to overlap memory latency
-                        var nextKey = Unsafe.Add(ref keysRef, processed + prefetchDistance);
-                        var nextHash = THasher.Hash(nextKey, _seed);
-                        var nextBucket = Bucket(nextHash);
-                        Sse.Prefetch0(_pilots + nextBucket);
-
-                        // Process the current key using previously prefetched data
-                        var currentHash = hashBufPtr[idx];
-                        var currentBucket = bucketBufPtr[idx];
-                        var pilot = _pilots[currentBucket];
-                        var slot = Slot(currentHash, pilot);
-
-                        if (useMinimal && slot >= numKeys)
-                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
-
-                        Unsafe.Add(ref resultsRef, processed) = slot;
-
-                        // Update the ring buffer with the next key and bucket
-                        hashBufPtr[idx] = nextHash;
-                        bucketBufPtr[idx] = nextBucket;
-
-                        processed++;
-                    }
-
-                    // for _ in 0..B - self.leftover
-                    int leftoverCount = prefetchDistance - leftover;
-                    for (int i = 0; i < leftoverCount; i++)
-                    {
-                        int idx = processed % prefetchDistance;
-                        var currentHash = hashBufPtr[idx];
-                        var currentBucket = bucketBufPtr[idx];
-
-                        var pilot = _pilots[currentBucket];
-                        var slot = Slot(currentHash, pilot);
-
-                        // JIT will optimize this branch away if useMinimal is false
-                        if (useMinimal && slot >= numKeys)
-                        {
-                            slot = TRemappingStorage.Index(_remapStorage, slot - numKeys);
-                        }
-
-                        Unsafe.Add(ref resultsRef, processed) = slot;
-                        processed++;
-                    }
+                    hash = THasher.Hash(Unsafe.Add(ref keysRef, (int)i), seed);
+                    leftover--;
                 }
+                hashBuf[i]   = hash;
+                // SinglePart skips the part-selection step (GetPart always returns 0).
+                bucketBuf[i] = typeof(TPart) == typeof(SinglePart)
+                    ? BucketInPart(hash.High())
+                    : Bucket(hash);
+                Sse.Prefetch0(pilots + bucketBuf[i]);
+            }
+
+            // ── Main loop ──────────────────────────────────────────────────────────
+            // For each result slot [0 .. N-B):
+            //   1. Read the ring-buffer entry for keys[processed]   (hash + bucket)
+            //   2. Hash the look-ahead key keys[processed + B]
+            //   3. Update the ring-buffer slot with the look-ahead data
+            //   4. Prefetch the look-ahead pilot                    (hides DRAM latency)
+            //   5. Read the current pilot                           (was prefetched B iterations ago)
+            //   6. Compute the slot and optionally remap
+            uint processed   = 0;
+            uint mainLoopEnd = (uint)Math.Max(0, keys.Length - (int)B);
+
+            while (processed < mainLoopEnd)
+            {
+                // uint % B: JIT folds to & (B-1) automatically when B is a power-of-2 constant,
+                // same as LLVM does for Rust's usize — no explicit mask needed.
+                uint idx = processed % B;
+
+                var currentHash   = hashBuf[idx];
+                var currentBucket = bucketBuf[idx];
+
+                var nextHash   = THasher.Hash(Unsafe.Add(ref keysRef, (int)(processed + B)), seed);
+                var nextBucket = typeof(TPart) == typeof(SinglePart)
+                    ? BucketInPart(nextHash.High())
+                    : Bucket(nextHash);
+
+                // Update ring buffer then prefetch — matches Rust fold ordering.
+                hashBuf[idx]   = nextHash;
+                bucketBuf[idx] = nextBucket;
+                Sse.Prefetch0(pilots + nextBucket);
+
+                var pilot = (ulong)pilots[currentBucket]; // cache miss hidden by prefetch B iters ago
+                var slot  = typeof(TPart) == typeof(SinglePart)
+                    ? SlotInPart(currentHash, pilot)
+                    : Slot(currentHash, pilot);
+
+                if (useMinimal && slot >= numKeys)
+                    slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
+
+                Unsafe.Add(ref resultsRef, (int)processed) = slot;
+                processed++;
+            }
+
+            // ── Drain phase ────────────────────────────────────────────────────────
+            // Process the last B entries still sitting in the ring buffer (no new prefetches).
+            // Mirrors Rust's `for _ in 0..B - self.leftover` drain loop.
+            uint leftoverCount = B - leftover;
+            for (uint i = 0; i < leftoverCount; i++)
+            {
+                uint idx  = processed % B;
+                var pilot = (ulong)pilots[bucketBuf[idx]];
+                var slot  = typeof(TPart) == typeof(SinglePart)
+                    ? SlotInPart(hashBuf[idx], pilot)
+                    : Slot(hashBuf[idx], pilot);
+
+                if (useMinimal && slot >= numKeys)
+                    slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
+
+                Unsafe.Add(ref resultsRef, (int)processed) = slot;
+                processed++;
             }
         }
 

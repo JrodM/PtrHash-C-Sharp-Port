@@ -18,8 +18,7 @@ namespace PtrHash.Benchmarks
 {
     [Config(typeof(Config))]
     [MemoryDiagnoser]
-    [SimpleJob(RuntimeMoniker.Net80, baseline: true)]
-    [SimpleJob(RuntimeMoniker.NativeAot80)]
+    [SimpleJob(RuntimeMoniker.Net80)]
     public class NativeVsPortPerformanceBenchmark
     {
         private class Config : ManualConfig
@@ -34,7 +33,7 @@ namespace PtrHash.Benchmarks
         [Params(2_000_000)]  // Match LookupPerformanceScalingBenchmark
         public int KeyCount { get; set; }
 
-        [Params(1_000, 50_000, 100_000, 1_000_000)]  // Match LookupPerformanceScalingBenchmark
+        [Params(1_000, 50_000, 100_000)]  // Match LookupPerformanceScalingBenchmark
         public int LookupCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -92,7 +91,7 @@ namespace PtrHash.Benchmarks
             _nativeMultiPartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher>(_keys, PtrHashNative.FFIParams.Fast);
             
             // Native interop - single-part
-            var singlePartNativeParams = PtrHashNative.FFIParams.Fast with { OverrideSinglePart = true };
+            var singlePartNativeParams = PtrHashNative.FFIParams.FastWithOverrides(singlePart: true);
             _nativeSinglePartPtrHash = new PtrHash.CSharp.Interop.PtrHash.PtrHashInterop<ulong, ULongDispatcher>(_keys, singlePartNativeParams);
 
             _indicesBuffer1 = new nuint[actualLookupCount];
@@ -114,7 +113,7 @@ namespace PtrHash.Benchmarks
         // === MULTI-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
         
         // Multi-Part: Native vs Port Point Lookups
-        [Benchmark(Baseline = true)]
+        //[Benchmark(Baseline = true)]
         public ulong PtrHashNative_MultiPart_Point_GetIndex()
         {
             ulong sum = 0;
@@ -125,7 +124,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Point_GetIndex()
         {
             ulong sum = 0;
@@ -137,7 +136,7 @@ namespace PtrHash.Benchmarks
         }
 
         // Multi-Part: Native vs Port Stream Lookups
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public ulong PtrHashNative_MultiPart_Stream_GetIndicesStream_Prefetch32()
         {
             ulong sum = 0;
@@ -189,7 +188,7 @@ namespace PtrHash.Benchmarks
         // === SINGLE-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
         
         // Single-Part: Native vs Port Point Lookups
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashNative_SinglePart_Point_GetIndex()
         {
             ulong sum = 0;
@@ -200,7 +199,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Point_GetIndex()
         {
             ulong sum = 0;
@@ -264,7 +263,7 @@ namespace PtrHash.Benchmarks
         // === NO REMAP METHODS (Perfect Hash - no minimal remapping) ===
         
         // Multi-Part: Port Point GetIndexNoRemap
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_MultiPart_Point_GetIndexNoRemap()
         {
             ulong sum = 0;
@@ -276,7 +275,7 @@ namespace PtrHash.Benchmarks
         }
 
         // Single-Part: Port Point GetIndexNoRemap
-        [Benchmark]
+        //[Benchmark]
         public ulong PtrHashPort_SinglePart_Point_GetIndexNoRemap()
         {
             ulong sum = 0;
