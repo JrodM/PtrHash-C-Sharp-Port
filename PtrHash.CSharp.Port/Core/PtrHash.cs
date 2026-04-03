@@ -34,10 +34,11 @@ namespace PtrHash.CSharp.Port.Core
     /// <typeparam name="THasher">Hash function implementation</typeparam>
     /// <typeparam name="TBucketFunction">Bucket function implementation</typeparam>
     /// <typeparam name="TRemappingStorage">Remapping storage type for minimal mode</typeparam>
-    public sealed unsafe class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> : IPtrHash<TKey>, IDisposable
+    public sealed unsafe class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart> : IPtrHash<TKey>, IDisposable
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
+        where TPart : struct, IPartConstant
     {
 
         // Debug feature flag
@@ -73,7 +74,6 @@ namespace PtrHash.CSharp.Port.Core
 
         private readonly nuint _numKeys;
         private readonly bool _minimal;
-        private readonly bool _isSinglePart;
         private readonly double _bitsPerKey;
         private ulong _seed;
 
@@ -89,10 +89,9 @@ namespace PtrHash.CSharp.Port.Core
             {
                 _numKeys = (nuint)keys.Length;
                 _minimal = parameters.Minimal;
-                _isSinglePart = parameters.SinglePart;
 
                 // Calculate parts and structure sizes
-                if (_isSinglePart)
+                if (typeof(TPart) == typeof(SinglePart))
                 {
                     // Single part mode: all keys in one partition for faster queries
                     _parts = 1;
@@ -115,7 +114,6 @@ namespace PtrHash.CSharp.Port.Core
                     // In Rust, negative float as usize becomes 0. In C#, we need to handle this explicitly
                     var partsPerShard = targetParts > 0 ? (nuint)Math.Floor(targetParts) / (nuint)shards : 0;
                     _parts = Math.Max(1, partsPerShard) * (nuint)shards;
-                    _isSinglePart = _parts == 1;
 
                     var keysPerPart = _numKeys / _parts;
                     partsPerShard = _parts / (nuint)shards; // Recalculate after adjustment
@@ -237,7 +235,7 @@ namespace PtrHash.CSharp.Port.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public nuint GetIndex(TKey key)
         {
-            return _isSinglePart ? GetIndexSinglePart(key) : GetIndexMultiPart(key);
+            return typeof(TPart) == typeof(SinglePart) ? GetIndexSinglePart(key) : GetIndexMultiPart(key);
         }
 
         /// <summary>
@@ -246,7 +244,7 @@ namespace PtrHash.CSharp.Port.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public nuint GetIndexNoRemap(TKey key)
         {
-            return _isSinglePart ? GetIndexNoRemapSinglePart(key) : GetIndexNoRemapMultiPart(key);
+            return typeof(TPart) == typeof(SinglePart) ? GetIndexNoRemapSinglePart(key) : GetIndexNoRemapMultiPart(key);
         }
 
         #endregion
@@ -327,36 +325,13 @@ namespace PtrHash.CSharp.Port.Core
 
         #region Streaming Methods
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStream(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
-        {
-            var useMinimal = minimal && _minimal;
-
-            if (_isSinglePart)
-            {
-                if (useMinimal)
-                    GetIndicesStreamCore<SinglePart, UseMinimal>(keys, results);
-                else
-                    GetIndicesStreamCore<SinglePart, NoMinimal>(keys, results);
-            }
-            else
-            {
-                if (useMinimal)
-                    GetIndicesStreamCore<MultiPart, UseMinimal>(keys, results);
-                else
-                    GetIndicesStreamCore<MultiPart, NoMinimal>(keys, results);
-            }
-        }
-
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void GetIndicesStreamCore<TPart, TMinimal>(ReadOnlySpan<TKey> keys, Span<nuint> results)
-            where TPart : struct, IPartConstant
+        public void GetIndicesStream<TMinimal>(ReadOnlySpan<TKey> keys, Span<nuint> results)
             where TMinimal : struct, IBoolConstant
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            var numKeys    = _numKeys;
+            var numKeys      = _numKeys;
             var remapStorage = _remapStorage;
 
             ref TKey  keysRef    = ref MemoryMarshal.GetReference(keys);
@@ -380,32 +355,8 @@ namespace PtrHash.CSharp.Port.Core
                 Unsafe.Add(ref resultsRef, i) = slot;
             }
         }
-
-
-        // Convenience overload (satisfies IPtrHash interface): maps a runtime int to the
-        // const-generic method below, the same way the Rust FFI shim maps prefetch_distance
-        // to index_stream::<B, ..>.  Values > 64 fall back to 32 (matches Rust FFI behaviour).
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void GetIndicesStreamPrefetch(ReadOnlySpan<TKey> keys, Span<nuint> results, bool minimal = true)
-        {
-            if (_isSinglePart)
-            {
-                if (minimal) GetIndicesStreamPrefetchCore<SinglePart, UseMinimal, PrefetchDistance32>(keys, results);
-                else         GetIndicesStreamPrefetchCore<SinglePart, NoMinimal,  PrefetchDistance32>(keys, results);
-            }
-            else
-            {
-                if (minimal) GetIndicesStreamPrefetchCore<MultiPart, UseMinimal, PrefetchDistance32>(keys, results);
-                else         GetIndicesStreamPrefetchCore<MultiPart, NoMinimal,  PrefetchDistance32>(keys, results);
-            }
-        }
-
-        // Direct port of Rust index_stream fold + drain pattern.
-        // TPrefetchDistance is the const-generic B: all ring-buffer indexing uses
-        // `i % B` which the JIT folds to `i & (B-1)` after specialization.
-        private unsafe void GetIndicesStreamPrefetchCore<TPart, TMinimal, TPrefetchDistance>(
-            ReadOnlySpan<TKey> keys, Span<nuint> results)
-            where TPart   : struct, IPartConstant
+        
+        public unsafe void GetIndicesStreamPrefetch<TMinimal, TPrefetchDistance>(ReadOnlySpan<TKey> keys, Span<nuint> results)
             where TMinimal : struct, IBoolConstant
             where TPrefetchDistance : struct, IPrefetchDistanceConstant
         {
@@ -429,10 +380,8 @@ namespace PtrHash.CSharp.Port.Core
             ref var keysRef    = ref MemoryMarshal.GetReference(keys);
             ref var resultsRef = ref MemoryMarshal.GetReference(results);
 
-            // ── Init phase ─────────────────────────────────────────────────────────
+            // Phase: Init
             // Hash the first B keys, compute their buckets, and issue prefetches.
-            // Exactly mirrors Rust's init loop that consumes the first B items from
-            // the iterator before constructing the It struct.
             uint leftover = B;
             for (uint i = 0; i < B; i++)
             {
@@ -450,7 +399,7 @@ namespace PtrHash.CSharp.Port.Core
                 Sse.Prefetch0(pilots + bucketBuf[i]);
             }
 
-            // ── Main loop ──────────────────────────────────────────────────────────
+            // Phase: Main loop
             // For each result slot [0 .. N-B):
             //   1. Read the ring-buffer entry for keys[processed]   (hash + bucket)
             //   2. Hash the look-ahead key keys[processed + B]
@@ -463,8 +412,7 @@ namespace PtrHash.CSharp.Port.Core
 
             while (processed < mainLoopEnd)
             {
-                // uint % B: JIT folds to & (B-1) automatically when B is a power-of-2 constant,
-                // same as LLVM does for Rust's usize — no explicit mask needed.
+                // uint % B: JIT folds to & (B-1) when B is a power-of-2 constant — no explicit mask needed.
                 uint idx = processed % B;
 
                 var currentHash   = hashBuf[idx];
@@ -475,7 +423,7 @@ namespace PtrHash.CSharp.Port.Core
                     ? BucketInPart(nextHash.High())
                     : Bucket(nextHash);
 
-                // Update ring buffer then prefetch — matches Rust fold ordering.
+                // Update ring buffer, then prefetch the look-ahead bucket.
                 hashBuf[idx]   = nextHash;
                 bucketBuf[idx] = nextBucket;
                 Sse.Prefetch0(pilots + nextBucket);
@@ -492,9 +440,8 @@ namespace PtrHash.CSharp.Port.Core
                 processed++;
             }
 
-            // ── Drain phase ────────────────────────────────────────────────────────
+            // Phase: Drain
             // Process the last B entries still sitting in the ring buffer (no new prefetches).
-            // Mirrors Rust's `for _ in 0..B - self.leftover` drain loop.
             uint leftoverCount = B - leftover;
             for (uint i = 0; i < leftoverCount; i++)
             {

@@ -73,16 +73,15 @@ namespace PtrHash.Benchmarks
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Construction()
+        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, MultiPart> PtrHashPort_MultiPart_FxHasher_Linear_U32Vec_Construction()
         {
-            return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, PtrHashParams.DefaultFast);
+            return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(_keys, PtrHashParams.DefaultFast);
         }
 
         [Benchmark]
-        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage> PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Construction()
+        public PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, SinglePart> PtrHashPort_SinglePart_FxHasher_Linear_U32Vec_Construction()
         {
-            var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, singlePartParams);
+            return new PtrHash<ulong, FxHasher, Linear, UInt32VectorRemappingStorage, SinglePart>(_keys, PtrHashParams.DefaultFast);
         }
 
         [GlobalCleanup]

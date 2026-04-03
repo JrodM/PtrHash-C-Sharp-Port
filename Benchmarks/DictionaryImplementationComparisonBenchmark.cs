@@ -106,9 +106,7 @@ namespace PtrHash.Benchmarks
             // C# port dictionary (multi-part)
             _portPtrHashMap = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
             
-            // Single part dictionary
-            var singlePartParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartPtrHashMap = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartParams);
+            _singlePartPtrHashMap = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
 
             _valuesBuffer = new ulong[lookupCount];
             _valuesBuffer2 = new ulong[lookupCount];

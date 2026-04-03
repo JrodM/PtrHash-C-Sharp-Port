@@ -22,7 +22,7 @@ namespace PtrHash.CSharp.Port.Collections
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
         where TKey : notnull
     {
-        private readonly PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> _ptrHash;
+        private readonly PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, SinglePart> _ptrHash;
         private readonly KeyValuePair<TKey, TValue>[] _keyValuePairs;
         private readonly TValue _sentinel;
         private readonly IEqualityComparer<TKey> _keyComparer;
@@ -58,16 +58,14 @@ namespace PtrHash.CSharp.Port.Collections
             _sentinel = notFoundSentinel;
             _keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             
-            // Use single-part mode for optimal point lookup performance (based on benchmarks)
             var optimizedParams = parameters ?? new PtrHashParams
             {
                 Alpha = 0.99,
                 Lambda = 3.0,
                 Minimal = true,
-                SinglePart = true,
             };
-            
-            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(keys, optimizedParams);
+
+            _ptrHash = new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, SinglePart>(keys, optimizedParams);
             var info = _ptrHash.GetInfo();
             int maxIndex = (int)info.MaxIndex;
 
@@ -210,7 +208,7 @@ namespace PtrHash.CSharp.Port.Collections
             if (keys.Length <= MAX_STACK_SIZE)
             {
                 Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStream(keys, indices, minimal: false);
+                _ptrHash.GetIndicesStream<NoMinimal>(keys, indices);
                 ProcessIndices(keys, indices, values);
             }
             else
@@ -219,7 +217,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStream(keys, indicesSpan, minimal: false);
+                    _ptrHash.GetIndicesStream<NoMinimal>(keys, indicesSpan);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally
@@ -245,7 +243,7 @@ namespace PtrHash.CSharp.Port.Collections
             if (keys.Length <= MAX_STACK_SIZE)
             {
                 Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStreamPrefetch(keys, indices, minimal: false);
+                _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indices);
                 ProcessIndices(keys, indices, values);
             }
             else
@@ -254,7 +252,7 @@ namespace PtrHash.CSharp.Port.Collections
                 try
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStreamPrefetch(keys, indicesSpan, minimal: false);
+                    _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indicesSpan);
                     ProcessIndices(keys, indicesSpan, values);
                 }
                 finally

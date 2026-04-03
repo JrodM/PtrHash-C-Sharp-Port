@@ -15,7 +15,8 @@ namespace PtrHash.CSharp.Port.Tests;
 public readonly record struct TestConfig(
     string Name,
     PtrHashParams Parameters,
-    RemappingStorageType StorageType
+    RemappingStorageType StorageType,
+    bool SinglePart
 );
 
 /// <summary>
@@ -28,14 +29,14 @@ public static class PtrHashTestHelpers
     /// </summary>
     public static readonly TestConfig[] AllConfigurations = [
         // Fast configurations - both single and multi part
-        new("Fast-MultiPart-VecU32", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU32),
-        new("Fast-SinglePart-VecU32", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU32), 
-        new("Fast-MultiPart-VecU64", PtrHashParams.DefaultFast with { SinglePart = false }, RemappingStorageType.VecU64),
-        new("Fast-SinglePart-VecU64", PtrHashParams.DefaultFast with { SinglePart = true }, RemappingStorageType.VecU64),
-        
+        new("Fast-MultiPart-VecU32",  PtrHashParams.DefaultFast,    RemappingStorageType.VecU32,      SinglePart: false),
+        new("Fast-SinglePart-VecU32", PtrHashParams.DefaultFast,    RemappingStorageType.VecU32,      SinglePart: true),
+        new("Fast-MultiPart-VecU64",  PtrHashParams.DefaultFast,    RemappingStorageType.VecU64,      SinglePart: false),
+        new("Fast-SinglePart-VecU64", PtrHashParams.DefaultFast,    RemappingStorageType.VecU64,      SinglePart: true),
+
         // Compact configurations
-        new("Compact-MultiPart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = false }, RemappingStorageType.CacheLineEF),
-        new("Compact-SinglePart-CacheLineEF", PtrHashParams.DefaultCompact with { SinglePart = true }, RemappingStorageType.CacheLineEF)
+        new("Compact-MultiPart-CacheLineEF",  PtrHashParams.DefaultCompact, RemappingStorageType.CacheLineEF, SinglePart: false),
+        new("Compact-SinglePart-CacheLineEF", PtrHashParams.DefaultCompact, RemappingStorageType.CacheLineEF, SinglePart: true),
     ];
 
 
@@ -115,63 +116,89 @@ public static class PtrHashTestHelpers
 
     private static void TestCorrectnessULong(TestConfig config, PtrHashParams parameters, ulong[] keys)
     {
-        // Select storage type and create PtrHash
-        switch (config.StorageType)
+        if (config.SinglePart)
         {
-            case RemappingStorageType.VecU32:
-                using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            case RemappingStorageType.VecU64:
-                using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            case RemappingStorageType.CacheLineEF:
-                using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            default:
-                throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            switch (config.StorageType)
+            {
+                case RemappingStorageType.VecU32:
+                    using (var ph = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, SinglePart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.VecU64:
+                    using (var ph = new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, SinglePart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.CacheLineEF:
+                    using (var ph = new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, SinglePart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                default:
+                    throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            }
+        }
+        else
+        {
+            switch (config.StorageType)
+            {
+                case RemappingStorageType.VecU32:
+                    using (var ph = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.VecU64:
+                    using (var ph = new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, MultiPart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.CacheLineEF:
+                    using (var ph = new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, MultiPart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                default:
+                    throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            }
         }
     }
 
     private static void TestCorrectnessString(TestConfig config, PtrHashParams parameters, string[] keys)
     {
-        // Select storage type and create PtrHash
-        switch (config.StorageType)
+        if (config.SinglePart)
         {
-            case RemappingStorageType.VecU32:
-                using (var ptrhash = new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            case RemappingStorageType.VecU64:
-                using (var ptrhash = new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            case RemappingStorageType.CacheLineEF:
-                using (var ptrhash = new PtrHash<string, StringHasher, Linear, CachelineEfVec>(keys, parameters))
-                {
-                    VerifyCorrectness(ptrhash, keys, config.Name);
-                }
-                break;
-                
-            default:
-                throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            switch (config.StorageType)
+            {
+                case RemappingStorageType.VecU32:
+                    using (var ph = new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, SinglePart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.VecU64:
+                    using (var ph = new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, SinglePart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.CacheLineEF:
+                    using (var ph = new PtrHash<string, StringHasher, Linear, CachelineEfVec, SinglePart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                default:
+                    throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            }
+        }
+        else
+        {
+            switch (config.StorageType)
+            {
+                case RemappingStorageType.VecU32:
+                    using (var ph = new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.VecU64:
+                    using (var ph = new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, MultiPart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                case RemappingStorageType.CacheLineEF:
+                    using (var ph = new PtrHash<string, StringHasher, Linear, CachelineEfVec, MultiPart>(keys, parameters))
+                        VerifyCorrectness(ph, keys, config.Name);
+                    break;
+                default:
+                    throw new NotSupportedException($"Storage type {config.StorageType} not supported");
+            }
         }
     }
 
@@ -219,10 +246,10 @@ public static class PtrHashTestHelpers
         var streamPrefetchMinimal = new nuint[keys.Length];
         var streamPrefetchNoRemap = new nuint[keys.Length];
         
-        ptrhash.GetIndicesStream(keys, streamMinimal, minimal: true);
-        ptrhash.GetIndicesStream(keys, streamNoRemap, minimal: false);
-        ptrhash.GetIndicesStreamPrefetch(keys, streamPrefetchMinimal, minimal: true);
-        ptrhash.GetIndicesStreamPrefetch(keys, streamPrefetchNoRemap, minimal: false);
+        ptrhash.GetIndicesStream<UseMinimal>(keys, streamMinimal);
+        ptrhash.GetIndicesStream<NoMinimal>(keys, streamNoRemap);
+        ptrhash.GetIndicesStreamPrefetch<UseMinimal, PrefetchDistance32>(keys, streamPrefetchMinimal);
+        ptrhash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, streamPrefetchNoRemap);
         
         for (int i = 0; i < keys.Length; i++)
         {

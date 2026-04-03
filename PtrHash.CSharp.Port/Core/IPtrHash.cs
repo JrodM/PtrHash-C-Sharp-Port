@@ -42,14 +42,17 @@ namespace PtrHash.CSharp.Port.Core
         nuint GetIndexNoRemapSinglePart(TKey key);
 
         /// <summary>
-        /// Stream lookup for maximum throughput - auto-chooses optimal implementation
+        /// Stream lookup for maximum throughput.
         /// </summary>
-        void GetIndicesStream(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, bool minimal = true);
+        void GetIndicesStream<TMinimal>(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results)
+            where TMinimal : struct, IBoolConstant;
 
         /// <summary>
-        /// Prefetch-enabled stream lookup for maximum throughput with memory prefetching
+        /// Prefetch-enabled stream lookup for maximum throughput.
         /// </summary>
-        void GetIndicesStreamPrefetch(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results, bool minimal = true);
+        void GetIndicesStreamPrefetch<TMinimal, TPrefetchDistance>(System.ReadOnlySpan<TKey> keys, System.Span<nuint> results)
+            where TMinimal : struct, IBoolConstant
+            where TPrefetchDistance : struct, IPrefetchDistanceConstant;
 
     }
 }

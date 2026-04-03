@@ -115,12 +115,10 @@ namespace PtrHash.Benchmarks
             _multiPartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
             
             // Single-part C# port dictionary (U32 storage)
-            var singlePartPortParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartPortParams);
-            
+            _singlePartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
+
             // Single-part C# port dictionary (U64 storage)
-            var singlePartU64Params = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartU64PtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt64VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartU64Params);
+            _singlePartU64PtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt64VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
 
             _valuesBuffer1 = new ulong[LookupCount];
             _valuesBuffer2 = new ulong[LookupCount];
@@ -151,7 +149,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong PtrHashPort_MultiPart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -163,7 +161,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong PtrHashPort_SinglePart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -175,7 +173,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong PtrHashNative_MultiPart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -187,7 +185,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong PtrHashNative_SinglePart_Point_TryGetValue()
         {
             ulong sum = 0;
@@ -200,7 +198,7 @@ namespace PtrHash.Benchmarks
         }
 
         // === STREAM LOOKUPS (Batch processing) ===
-        //[Benchmark]
+        [Benchmark]
         public ulong PtrHashNative_MultiPart_Stream_TryGetValueStream()
         {
             ulong sum = 0;
@@ -234,7 +232,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong PtrHashPort_MultiPart_Stream_TryGetValueStream()
         {
             ulong sum = 0;
@@ -268,7 +266,7 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public ulong PtrHashPort_SinglePartU64Storage_Stream_TryGetValueStream()
         {
             ulong sum = 0;
