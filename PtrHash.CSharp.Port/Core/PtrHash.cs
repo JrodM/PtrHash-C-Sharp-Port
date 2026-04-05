@@ -318,9 +318,9 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexNoRemapMultiPart(TKey key)
         {
             var hx = THasher.Hash(key, _seed);
-            var bucket = Bucket(hx);
+            var bucket = Bucket(hx, _remBucketsTotal, _remParts, _bucketsPerPart, _remBuckets, _bucketFunction);
             var pilot = (ulong)_pilots[bucket];
-            return Slot(hx, pilot);
+            return Slot(hx, pilot, _seed, _remParts, _slotsPerPart, _remSlots);
         }
 
         #endregion
@@ -344,9 +344,9 @@ namespace PtrHash.CSharp.Port.Core
         public nuint GetIndexNoRemapSinglePart(TKey key)
         {
             var hx = THasher.Hash(key, _seed);
-            var bucket = BucketInPart(hx.High());
+            var bucket = BucketInPart(hx.High(), _remBuckets, _bucketFunction);
             var pilot = (ulong)_pilots[bucket];
-            return SlotInPart(hx, pilot);
+            return SlotInPart(hx, pilot, _seed, _remSlots);
         }
 
         #endregion
@@ -375,73 +375,56 @@ namespace PtrHash.CSharp.Port.Core
 
         #region Core Hash Functions
 
-        // Global bucket calculation
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private nuint Bucket(HashValue hx)
-        {
-            // If using linear bucket function, use total buckets reduction
-            // Otherwise, extract high bits for part selection and compute bucket within part
-
-            if (_bucketFunction.IsLinear)
-            {
-                return _remBucketsTotal.Reduce(hx.High());
-            }
-
-            // Extract the high bits for part selection; do normal bucket
-            // computation within the part using the remaining bits.
-            var (part, remainder) = _remParts.ReduceWithRemainder(hx.High());
-            var bucket = BucketInPart(remainder);
-            return part * _bucketsPerPart + bucket;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private nuint BucketInPart(ulong x)
-        {
-            // Linear: reduce directly; B_OUTPUT: use bucket function result;
-            // Otherwise: reduce the bucket function result
-
-            if (_bucketFunction.IsLinear)
-            {
-                return _remBuckets.Reduce(x);
-            }
-            else if (_bucketFunction.BOutput)
-            {
-                return (nuint)_bucketFunction.Call(x);
-            }
-            else
-            {
-                return _remBuckets.Reduce(_bucketFunction.Call(x));
-            }
-        }
-
-        private nuint Slot(HashValue hx, ulong pilot)
-        {
-            // Algorithm: (part * slots_per_part) + slot_in_part
-            return (GetPart(hx) * _slotsPerPart) + SlotInPart(hx, pilot);
-        }
-
-        private nuint SlotInPart(HashValue hx, ulong pilot)
-        {
-            // self.slot_in_part_hp(hx, self.hash_pilot(pilot))
-            return SlotInPartHp(hx, HashPilot(pilot));
-        }
-
-        private nuint SlotInPartHp(HashValue hx, ulong hp)
-        {
-            // Use low 64 bits XORed with hash pilot, reduced to [0, S)
-            return _remSlots.Reduce(hx.Low() ^ hp);
-        }
-
-        private nuint GetPart(HashValue hx)
-        {
-            // Use high 64 bits to determine part index [0, P)
-            return _remParts.Reduce(hx.High());
-        }
-
-        private ulong HashPilot(ulong pilot)
+        private static ulong HashPilot(ulong pilot, ulong seed)
         {
             const ulong C = 0x51_7c_c1_b7_27_22_0a_95UL;
-            return C * (pilot ^ _seed);
+            return C * (pilot ^ seed);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static nuint GetPart(HashValue hx, FastReduce remParts)
+        {
+            return remParts.Reduce(hx.High());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static nuint BucketInPart(ulong x, FastReduce remBuckets, TBucketFunction bucketFunction)
+        {
+            if (bucketFunction.IsLinear)
+                return remBuckets.Reduce(x);
+            else if (bucketFunction.BOutput)
+                return (nuint)bucketFunction.Call(x);
+            else
+                return remBuckets.Reduce(bucketFunction.Call(x));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static nuint Bucket(HashValue hx, FastReduce remBucketsTotal, FastReduce remParts, nuint bucketsPerPart, FastReduce remBuckets, TBucketFunction bucketFunction)
+        {
+            if (bucketFunction.IsLinear)
+                return remBucketsTotal.Reduce(hx.High());
+            var (part, remainder) = remParts.ReduceWithRemainder(hx.High());
+            var bucket = BucketInPart(remainder, remBuckets, bucketFunction);
+            return part * bucketsPerPart + bucket;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static nuint SlotInPartHp(HashValue hx, ulong hp, FM32 remSlots)
+        {
+            return remSlots.Reduce(hx.Low() ^ hp);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static nuint SlotInPart(HashValue hx, ulong pilot, ulong seed, FM32 remSlots)
+        {
+            return SlotInPartHp(hx, HashPilot(pilot, seed), remSlots);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static nuint Slot(HashValue hx, ulong pilot, ulong seed, FastReduce remParts, nuint slotsPerPart, FM32 remSlots)
+        {
+            return (GetPart(hx, remParts) * slotsPerPart) + SlotInPart(hx, pilot, seed, remSlots);
         }
 
         #endregion
@@ -488,13 +471,20 @@ namespace PtrHash.CSharp.Port.Core
             uint B         = (uint)default(TPrefetchDistance).Value; // JIT constant after specialization
             var useMinimal = default(TMinimal).Value;
             var numKeys    = _numKeys;
-            // Capture fields accessed directly in this method body as locals.
+            // Capture ALL fields the hot loop touches as locals.
             // The JIT reloads instance fields from `this` on every iteration because
-            // it cannot prove they are unchanged across calls (no alias analysis).
-            // Locals break that chain and stay in registers for the loop duration.
-            ulong             seed         = _seed;
-            byte*             pilots       = _pilots;
-            TRemappingStorage remapStorage = _remapStorage;
+            // it cannot prove they are unchanged across pointer writes (no alias analysis).
+            // Locals live in registers or known stack slots, breaking that dependency.
+            ulong             seed            = _seed;
+            byte*             pilots          = _pilots;
+            TRemappingStorage remapStorage    = _remapStorage;
+            FastReduce        remBuckets      = _remBuckets;
+            FastReduce        remBucketsTotal = _remBucketsTotal;
+            FastReduce        remParts        = _remParts;
+            FM32              remSlots        = _remSlots;
+            nuint             slotsPerPart    = _slotsPerPart;
+            nuint             bucketsPerPart  = _bucketsPerPart;
+            TBucketFunction   bucketFunction  = _bucketFunction;
 
             HashValue* hashBuf   = stackalloc HashValue[(int)B];
             ulong*     bucketBuf = stackalloc ulong[(int)B];
@@ -507,11 +497,11 @@ namespace PtrHash.CSharp.Port.Core
             uint initCount = (uint)Math.Min((int)B, keys.Length);
             for (uint i = 0; i < initCount; i++)
             {
-                var hash     = THasher.Hash(Unsafe.Add(ref keysRef, (int)i), seed);
+                var hash   = THasher.Hash(Unsafe.Add(ref keysRef, (int)i), seed);
                 hashBuf[i]   = hash;
                 bucketBuf[i] = typeof(TPart) == typeof(SinglePart)
-                    ? BucketInPart(hash.High())
-                    : Bucket(hash);
+                    ? (ulong)BucketInPart(hash.High(), remBuckets, bucketFunction)
+                    : (ulong)Bucket(hash, remBucketsTotal, remParts, bucketsPerPart, remBuckets, bucketFunction);
                 Sse.Prefetch0(pilots + bucketBuf[i]);
             }
 
@@ -528,26 +518,24 @@ namespace PtrHash.CSharp.Port.Core
 
             while (processed < mainLoopEnd)
             {
-                // uint % B: JIT folds to & (B-1) when B is a power-of-2 constant — no explicit mask needed.
                 uint idx = processed % B;
 
                 var currentHash   = hashBuf[idx];
                 var currentBucket = bucketBuf[idx];
 
-                var nextHash   = THasher.Hash(Unsafe.Add(ref keysRef, (int)(processed + B)), seed);
-                var nextBucket = typeof(TPart) == typeof(SinglePart)
-                    ? BucketInPart(nextHash.High())
-                    : Bucket(nextHash);
+                var nextHash = THasher.Hash(Unsafe.Add(ref keysRef, (int)(processed + B)), seed);
+                ulong nextBucket = typeof(TPart) == typeof(SinglePart)
+                    ? (ulong)BucketInPart(nextHash.High(), remBuckets, bucketFunction)
+                    : (ulong)Bucket(nextHash, remBucketsTotal, remParts, bucketsPerPart, remBuckets, bucketFunction);
 
-                // Update ring buffer, then prefetch the look-ahead bucket.
                 hashBuf[idx]   = nextHash;
                 bucketBuf[idx] = nextBucket;
                 Sse.Prefetch0(pilots + nextBucket);
 
-                var pilot = (ulong)pilots[currentBucket]; // cache miss hidden by prefetch B iters ago
-                var slot  = typeof(TPart) == typeof(SinglePart)
-                    ? SlotInPart(currentHash, pilot)
-                    : Slot(currentHash, pilot);
+                ulong pilot = (ulong)pilots[currentBucket];
+                nuint slot  = typeof(TPart) == typeof(SinglePart)
+                    ? SlotInPart(currentHash, pilot, seed, remSlots)
+                    : Slot(currentHash, pilot, seed, remParts, slotsPerPart, remSlots);
 
                 if (useMinimal && slot >= numKeys)
                     slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
@@ -560,11 +548,11 @@ namespace PtrHash.CSharp.Port.Core
             // Process the last B entries still sitting in the ring buffer (no new prefetches).
             while (processed < (uint)keys.Length)
             {
-                uint idx  = processed % B;
-                var pilot = (ulong)pilots[bucketBuf[idx]];
-                var slot  = typeof(TPart) == typeof(SinglePart)
-                    ? SlotInPart(hashBuf[idx], pilot)
-                    : Slot(hashBuf[idx], pilot);
+                uint idx    = processed % B;
+                ulong pilot = (ulong)pilots[bucketBuf[idx]];
+                nuint slot  = typeof(TPart) == typeof(SinglePart)
+                    ? SlotInPart(hashBuf[idx], pilot, seed, remSlots)
+                    : Slot(hashBuf[idx], pilot, seed, remParts, slotsPerPart, remSlots);
 
                 if (useMinimal && slot >= numKeys)
                     slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
@@ -651,7 +639,7 @@ namespace PtrHash.CSharp.Port.Core
                     while (left < right)
                     {
                         int mid = (left + right) / 2;
-                        if (GetPart(hashBuffer[mid]) < part)
+                        if (GetPart(hashBuffer[mid], _remParts) < part)
                             left = mid + 1;
                         else
                             right = mid;
@@ -805,7 +793,7 @@ namespace PtrHash.CSharp.Port.Core
 
                             foreach (var hash in currentBucketHashes)
                             {
-                                var localSlot = SlotInPartHp(hash, hashPilot);
+                                var localSlot = SlotInPartHp(hash, hashPilot, _remSlots);
                                 slots[localSlot] = currentBucket;
                             }
                             continue;
@@ -820,14 +808,14 @@ namespace PtrHash.CSharp.Port.Core
                             for (int i = 0; i < currentBucketHashes.Length; i++)
                             {
                                 var hash = currentBucketHashes[i];
-                                var slot = SlotInPartHp(hash, HashPilot(0));
+                                var slot = SlotInPartHp(hash, HashPilot(0, _seed), _remSlots);
                                 DebugConstruction($"  0x{hash.Full():X16} -> slot {slot}");
                             }
                             return false;
                         }
 
                         partPilots[currentBucket] = (byte)bestPilot;
-                        var hp = HashPilot(bestPilot);
+                        var hp = HashPilot(bestPilot, _seed);
                         
                         var globalBucketId = (nuint)(part * (int)_bucketsPerPart + currentBucket);
                         partStats.Add(globalBucketId, _bucketsTotal, currentBucketHashes.Length, bestPilot, evictions);
@@ -836,7 +824,7 @@ namespace PtrHash.CSharp.Port.Core
 
                         foreach (var hash in currentBucketHashes)
                         {
-                            var localSlot = SlotInPartHp(hash, hp);
+                            var localSlot = SlotInPartHp(hash, hp, _remSlots);
                             var occupyingBucket = slots[localSlot];
 
                             if (occupyingBucket >= 0)
@@ -863,12 +851,12 @@ namespace PtrHash.CSharp.Port.Core
                                 evictionsThisRound++;
 
                                 var evictedPilot = (ulong)partPilots[occupyingBucket];
-                                var evictedHp = HashPilot(evictedPilot);
+                                var evictedHp = HashPilot(evictedPilot, _seed);
                                 var evictedHashes = partHashes.Slice(evictedStart, evictedSize);
 
                                 foreach (var evictedHash in evictedHashes)
                                 {
-                                    var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp);
+                                    var evictedLocalSlot = SlotInPartHp(evictedHash, evictedHp, _remSlots);
                                     slots[evictedLocalSlot] = -1;
                                     partTaken.Set(evictedLocalSlot, false);
                                 }
@@ -909,7 +897,7 @@ namespace PtrHash.CSharp.Port.Core
                 
                 while (end < partHashesSorted.Length)
                 {
-                    var globalBucket = (int)Bucket(partHashesSorted[end]);
+                    var globalBucket = (int)Bucket(partHashesSorted[end], _remBucketsTotal, _remParts, _bucketsPerPart, _remBuckets, _bucketFunction);
                     var localBucket = globalBucket - part * (int)_bucketsPerPart;
                     if (localBucket != b) break;
                     end++;
@@ -981,16 +969,16 @@ namespace PtrHash.CSharp.Port.Core
             for (ulong pilot = 0; pilot < kmax; pilot++)
             {
                 pilotsChecked++;
-                var hp = HashPilot(pilot);
+                var hp = HashPilot(pilot, _seed);
 
                 bool hasCollision = false;
-                
+
                 for (int i = 0; i < r; i += 4)
                 {
-                    nuint slot0 = SlotInPartHp(bucketHashes[i], hp);
-                    nuint slot1 = SlotInPartHp(bucketHashes[i + 1], hp);
-                    nuint slot2 = SlotInPartHp(bucketHashes[i + 2], hp);
-                    nuint slot3 = SlotInPartHp(bucketHashes[i + 3], hp);
+                    nuint slot0 = SlotInPartHp(bucketHashes[i], hp, _remSlots);
+                    nuint slot1 = SlotInPartHp(bucketHashes[i + 1], hp, _remSlots);
+                    nuint slot2 = SlotInPartHp(bucketHashes[i + 2], hp, _remSlots);
+                    nuint slot3 = SlotInPartHp(bucketHashes[i + 3], hp, _remSlots);
                     
                     bool t0 = taken.GetUnchecked(slot0);
                     bool t1 = taken.GetUnchecked(slot1);
@@ -1009,7 +997,7 @@ namespace PtrHash.CSharp.Port.Core
                 for (int i = r; i < actualSize; i++)
                 {
                     var hash = bucketHashes[i];
-                    var localSlot = SlotInPartHp(hash, hp);
+                    var localSlot = SlotInPartHp(hash, hp, _remSlots);
                     if (taken.GetUnchecked(localSlot)) // bad |= check(hx)
                     {
                         hasCollision = true;
@@ -1030,19 +1018,19 @@ namespace PtrHash.CSharp.Port.Core
 
         private unsafe bool TryTakePilotInPart(ReadOnlySpan<HashValue> bucketHashes, ulong pilot, BitVec taken)
         {
-            var hp = HashPilot(pilot);
+            var hp = HashPilot(pilot, _seed);
 
             for (int i = 0; i < bucketHashes.Length; i++)
             {
                 var hash = bucketHashes[i];
-                var localSlot = SlotInPartHp(hash, hp);
+                var localSlot = SlotInPartHp(hash, hp, _remSlots);
 
                 if (taken.GetUnchecked(localSlot))
                 {
                     for (int j = 0; j < i; j++)
                     {
                         var previousHash = bucketHashes[j];
-                        var previousSlot = SlotInPartHp(previousHash, hp);
+                        var previousSlot = SlotInPartHp(previousHash, hp, _remSlots);
                         taken.Set(previousSlot, false);
                     }
                     return false;
@@ -1077,11 +1065,11 @@ namespace PtrHash.CSharp.Port.Core
             {
                 bool DuplicateSlots(ReadOnlySpan<HashValue> bucketHashes, ulong pilot)
                 {
-                    var hp = HashPilot(pilot);
+                    var hp = HashPilot(pilot, _seed);
 
                     for (int i = 0; i < bucketHashes.Length; i++)
                     {
-                        slotsTmp[i] = SlotInPartHp(bucketHashes[i], hp);
+                        slotsTmp[i] = SlotInPartHp(bucketHashes[i], hp, _remSlots);
                     }
 
                     slotsTmp.AsSpan(0, bucketHashes.Length).Sort();
@@ -1100,14 +1088,14 @@ namespace PtrHash.CSharp.Port.Core
                 for (ulong delta = 0; delta < kmax; delta++)
                 {
                     var pilot = (startPilot + delta) % kmax;
-                    var hp = HashPilot(pilot);
+                    var hp = HashPilot(pilot, _seed);
 
                     var collisionScore = 0UL;
                     var shouldSkip = false;
 
                     foreach (var hash in bucketHashes)
                     {
-                        var localSlot = SlotInPartHp(hash, hp);
+                        var localSlot = SlotInPartHp(hash, hp, _remSlots);
                         var occupyingBucket = slots[localSlot];
 
                         if (occupyingBucket == -1)

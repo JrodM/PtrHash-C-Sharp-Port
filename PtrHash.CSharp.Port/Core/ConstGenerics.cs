@@ -178,13 +178,9 @@ namespace PtrHash.CSharp.Port.Core
     #endregion
 
     #region Prefetch Distance Constants
-    /// <summary>Prefetch 8 iterations ahead. Use for small datasets that fit mostly in L1/L2.</summary>
     public readonly struct PrefetchDistance8  : IPrefetchDistanceConstant { public uint Value => 8; }
-    /// <summary>Prefetch 16 iterations ahead.</summary>
     public readonly struct PrefetchDistance16 : IPrefetchDistanceConstant { public uint Value => 16; }
-    /// <summary>Prefetch 32 iterations ahead. Matches Rust default (<c>index_stream::&lt;32, ..&gt;</c>).</summary>
     public readonly struct PrefetchDistance32 : IPrefetchDistanceConstant { public uint Value => 32; }
-    /// <summary>Prefetch 64 iterations ahead. Use when the pilots table is large and DRAM latency dominates.</summary>
     public readonly struct PrefetchDistance64 : IPrefetchDistanceConstant { public uint Value => 64; }
     #endregion
 }

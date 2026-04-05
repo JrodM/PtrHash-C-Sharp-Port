@@ -25,15 +25,14 @@ namespace PtrHash.Benchmarks
         {
             public Config()
             {
-                // Add configuration for better benchmarking
                 WithOption(ConfigOptions.JoinSummary, true);
             }
         }
 
-        [Params(2_000_000)]  // Match LookupPerformanceScalingBenchmark
+        [Params(10_000_000)]  // Match LookupPerformanceScalingBenchmark
         public int KeyCount { get; set; }
 
-        [Params(1_000, 50_000, 100_000)]  // Match LookupPerformanceScalingBenchmark
+        [Params(1_000, 10_000, 50_000)]  // Match LookupPerformanceScalingBenchmark
         public int LookupCount { get; set; }
 
         private ulong[] _keys = null!;
@@ -110,8 +109,7 @@ namespace PtrHash.Benchmarks
         }
 
         // === MULTI-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
-        
-        // Multi-Part: Native vs Port Point Lookups
+
         [Benchmark]
         public ulong PtrHashNative_MultiPart_Point_GetIndex()
         {
@@ -183,8 +181,7 @@ namespace PtrHash.Benchmarks
         }
 
         // === SINGLE-PART COMPARISONS (FxHasher + Linear + U32Vec) ===
-        
-        // Single-Part: Native vs Port Point Lookups
+
         [Benchmark]
         public ulong PtrHashNative_SinglePart_Point_GetIndex()
         {
@@ -256,8 +253,7 @@ namespace PtrHash.Benchmarks
         }
 
         // === NO REMAP METHODS (Perfect Hash - no minimal remapping) ===
-        
-        // Multi-Part: Port Point GetIndexNoRemap
+
         [Benchmark]
         public ulong PtrHashPort_MultiPart_Point_GetIndexNoRemap()
         {
@@ -269,7 +265,6 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // Single-Part: Port Point GetIndexNoRemap
         [Benchmark]
         public ulong PtrHashPort_SinglePart_Point_GetIndexNoRemap()
         {
@@ -281,7 +276,6 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // Multi-Part: Port Stream GetIndicesStreamNoRemap
         [Benchmark]
         public ulong PtrHashPort_MultiPart_Stream_GetIndicesStreamNoRemap()
         {
@@ -297,7 +291,6 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // Single-Part: Port Stream GetIndicesStreamNoRemap
         [Benchmark]
         public ulong PtrHashPort_SinglePart_Stream_GetIndicesStreamNoRemap()
         {

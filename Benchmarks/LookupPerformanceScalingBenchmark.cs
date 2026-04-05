@@ -24,8 +24,8 @@ namespace PtrHash.Benchmarks
         private class Config : ManualConfig
         {
             public Config()
-        {
-        }
+            {
+            }
         }
 
         [Params(1_500_000)]

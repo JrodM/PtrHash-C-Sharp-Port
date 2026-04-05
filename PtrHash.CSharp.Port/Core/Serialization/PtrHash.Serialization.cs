@@ -32,11 +32,11 @@ namespace PtrHash.CSharp.Port.Core
                 BucketFunctionType = (uint)PtrHashGenericTypes.ResolveBucketFunction<TBucketFunction>(),
                 RemappingStorageType = (uint)PtrHashGenericTypes.ResolveRemappingStorage<TRemappingStorage>(),
                 KeyHasherType = (uint)PtrHashGenericTypes.ResolveKeyHasher<THasher>(),
-                
+
                 // Still in cache line 1: Cold-path serialization fields
                 SlotsTotal = _slotsTotal,
                 // RemapOffset and RemapCount set below after calculation
-                
+
                 // Cache Line 2: Hot-path lookup data
                 Seed = _seed,
                 BucketsPerPart = _bucketsPerPart,
