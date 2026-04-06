@@ -45,12 +45,13 @@ namespace PtrHash.CSharp.Port.Core.Serialization
             public uint BucketFunctionType;
             public uint RemappingStorageType;
             public uint KeyHasherType;
+            public uint PartType;
 
             public ulong SlotsTotal;
             public ulong RemapOffset;
             public ulong RemapCount;
 
-            private fixed byte _padding[16];
+            private fixed byte _padding[12];
 
             // Cache line 2
             public ulong Seed;
@@ -61,7 +62,7 @@ namespace PtrHash.CSharp.Port.Core.Serialization
             public ulong Parts;
             public ulong BucketsTotal;
 
-            public uint PartType;
+            private uint _reserved2a;
             private uint _reserved2b;
             private uint _reserved2c;
             private uint _reserved2d;
