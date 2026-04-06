@@ -461,20 +461,19 @@ namespace PtrHash.CSharp.Port.Core
             }
         }
 
-        public unsafe void GetIndicesStreamPrefetch<TMinimal, TPrefetchDistance>(ReadOnlySpan<TKey> keys, Span<nuint> results)
+        public void GetIndicesStreamPrefetch<TMinimal, TPrefetchDistance>(ReadOnlySpan<TKey> keys, Span<nuint> results)
             where TMinimal : struct, IBoolConstant
             where TPrefetchDistance : struct, IPrefetchDistanceConstant
         {
             if (keys.Length != results.Length)
                 throw new ArgumentException("Keys and results spans must have the same length");
 
-            uint B         = (uint)default(TPrefetchDistance).Value; // JIT constant after specialization
+            uint B         = default(TPrefetchDistance).Value; // JIT constant after specialization
             var useMinimal = default(TMinimal).Value;
             var numKeys    = _numKeys;
+            
             // Capture ALL fields the hot loop touches as locals.
-            // The JIT reloads instance fields from `this` on every iteration because
-            // it cannot prove they are unchanged across pointer writes (no alias analysis).
-            // Locals live in registers or known stack slots, breaking that dependency.
+            // The JIT reloads instance fields from `this` on every iteration.
             ulong             seed            = _seed;
             byte*             pilots          = _pilots;
             TRemappingStorage remapStorage    = _remapStorage;
@@ -501,7 +500,7 @@ namespace PtrHash.CSharp.Port.Core
                 hashBuf[i]   = hash;
                 bucketBuf[i] = typeof(TPart) == typeof(SinglePart)
                     ? (ulong)BucketInPart(hash.High(), remBuckets, bucketFunction)
-                    : (ulong)Bucket(hash, remBucketsTotal, remParts, bucketsPerPart, remBuckets, bucketFunction);
+                    : Bucket(hash, remBucketsTotal, remParts, bucketsPerPart, remBuckets, bucketFunction);
                 Sse.Prefetch0(pilots + bucketBuf[i]);
             }
 
@@ -526,13 +525,13 @@ namespace PtrHash.CSharp.Port.Core
                 var nextHash = THasher.Hash(Unsafe.Add(ref keysRef, (int)(processed + B)), seed);
                 ulong nextBucket = typeof(TPart) == typeof(SinglePart)
                     ? (ulong)BucketInPart(nextHash.High(), remBuckets, bucketFunction)
-                    : (ulong)Bucket(nextHash, remBucketsTotal, remParts, bucketsPerPart, remBuckets, bucketFunction);
+                    : Bucket(nextHash, remBucketsTotal, remParts, bucketsPerPart, remBuckets, bucketFunction);
 
                 hashBuf[idx]   = nextHash;
                 bucketBuf[idx] = nextBucket;
                 Sse.Prefetch0(pilots + nextBucket);
 
-                ulong pilot = (ulong)pilots[currentBucket];
+                ulong pilot = pilots[currentBucket];
                 nuint slot  = typeof(TPart) == typeof(SinglePart)
                     ? SlotInPart(currentHash, pilot, seed, remSlots)
                     : Slot(currentHash, pilot, seed, remParts, slotsPerPart, remSlots);
@@ -549,7 +548,7 @@ namespace PtrHash.CSharp.Port.Core
             while (processed < (uint)keys.Length)
             {
                 uint idx    = processed % B;
-                ulong pilot = (ulong)pilots[bucketBuf[idx]];
+                ulong pilot = pilots[bucketBuf[idx]];
                 nuint slot  = typeof(TPart) == typeof(SinglePart)
                     ? SlotInPart(hashBuf[idx], pilot, seed, remSlots)
                     : Slot(hashBuf[idx], pilot, seed, remParts, slotsPerPart, remSlots);

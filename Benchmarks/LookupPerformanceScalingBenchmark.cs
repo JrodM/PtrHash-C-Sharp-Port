@@ -161,139 +161,139 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // [Benchmark]
-        // public ulong PtrHashPort_MultiPart_Point_TryGetValue()
-        // {
-        //     ulong sum = 0;
-        //     foreach (var key in _lookupKeys)
-        //     {
-        //         if (_multiPartPtrHashDict.TryGetValue(key, out var value))
-        //             sum += value;
-        //     }
-        //     return sum;
-        // }
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_Point_TryGetValue()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_multiPartPtrHashDict.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            return sum;
+        }
 
-        // [Benchmark]
-        // public ulong PtrHashPort_SinglePart_Point_TryGetValue()
-        // {
-        //     ulong sum = 0;
-        //     foreach (var key in _lookupKeys)
-        //     {
-        //         if (_singlePartPtrHashDict.TryGetValue(key, out var value))
-        //             sum += value;
-        //     }
-        //     return sum;
-        // }
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_Point_TryGetValue()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_singlePartPtrHashDict.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            return sum;
+        }
 
-        // [Benchmark]
-        // public ulong PtrHashNative_MultiPart_Point_TryGetValue()
-        // {
-        //     ulong sum = 0;
-        //     foreach (var key in _lookupKeys)
-        //     {
-        //         if (_nativeMultiPartInterop.TryGetValue(key, out var value))
-        //             sum += value;
-        //     }
-        //     return sum;
-        // }
+        [Benchmark]
+        public ulong PtrHashNative_MultiPart_Point_TryGetValue()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_nativeMultiPartInterop.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            return sum;
+        }
 
-        // [Benchmark]
-        // public ulong PtrHashNative_SinglePart_Point_TryGetValue()
-        // {
-        //     ulong sum = 0;
-        //     foreach (var key in _lookupKeys)
-        //     {
-        //         if (_nativeSinglePartInterop.TryGetValue(key, out var value))
-        //             sum += value;
-        //     }
-        //     return sum;
-        // }
+        [Benchmark]
+        public ulong PtrHashNative_SinglePart_Point_TryGetValue()
+        {
+            ulong sum = 0;
+            foreach (var key in _lookupKeys)
+            {
+                if (_nativeSinglePartInterop.TryGetValue(key, out var value))
+                    sum += value;
+            }
+            return sum;
+        }
 
         // === STREAM LOOKUPS (Batch processing) ===
-        // [Benchmark]
-        // public ulong PtrHashNative_MultiPart_Stream_TryGetValueStream()
-        // {
-        //     ulong sum = 0;
-        //     _nativeMultiPartInterop.TryGetValueStream(
-        //         _lookupKeys.AsSpan(),
-        //         _valuesBuffer1.AsSpan());
-        //
-        //     for (int i = 0; i < _valuesBuffer1.Length; i++)
-        //     {
-        //         ulong v = _valuesBuffer1[i];
-        //         if (v != _nativeMultiPartInterop.Sentinel)
-        //             sum += v;
-        //     }
-        //     return sum;
-        // }
+        [Benchmark]
+        public ulong PtrHashNative_MultiPart_Stream_TryGetValueStream()
+        {
+            ulong sum = 0;
+            _nativeMultiPartInterop.TryGetValueStream(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer1.AsSpan());
 
-        // [Benchmark]
-        // public ulong PtrHashNative_SinglePart_Stream_TryGetValueStream()
-        // {
-        //     ulong sum = 0;
-        //     _nativeSinglePartInterop.TryGetValueStream(
-        //         _lookupKeys.AsSpan(),
-        //         _valuesBuffer2.AsSpan());
-        //
-        //     for (int i = 0; i < _valuesBuffer2.Length; i++)
-        //     {
-        //         ulong v = _valuesBuffer2[i];
-        //         if (v != _nativeSinglePartInterop.Sentinel)
-        //             sum += v;
-        //     }
-        //     return sum;
-        // }
+            for (int i = 0; i < _valuesBuffer1.Length; i++)
+            {
+                ulong v = _valuesBuffer1[i];
+                if (v != _nativeMultiPartInterop.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
 
-        // [Benchmark]
-        // public ulong PtrHashPort_MultiPart_Stream_TryGetValueStream()
-        // {
-        //     ulong sum = 0;
-        //     _multiPartPtrHashDict.TryGetValueStream(
-        //         _lookupKeys.AsSpan(),
-        //         _valuesBuffer3);
-        //
-        //     for (int i = 0; i < _valuesBuffer3.Length; i++)
-        //     {
-        //         ulong v = _valuesBuffer3[i];
-        //         if (v != _multiPartPtrHashDict.Sentinel)
-        //             sum += v;
-        //     }
-        //     return sum;
-        // }
+        [Benchmark]
+        public ulong PtrHashNative_SinglePart_Stream_TryGetValueStream()
+        {
+            ulong sum = 0;
+            _nativeSinglePartInterop.TryGetValueStream(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer2.AsSpan());
 
-        // [Benchmark]
-        // public ulong PtrHashPort_SinglePart_Stream_TryGetValueStream()
-        // {
-        //     ulong sum = 0;
-        //     _singlePartPtrHashDict.TryGetValueStream(
-        //         _lookupKeys.AsSpan(),
-        //         _valuesBuffer4);
-        //
-        //     for (int i = 0; i < _valuesBuffer4.Length; i++)
-        //     {
-        //         ulong v = _valuesBuffer4[i];
-        //         if (v != _singlePartPtrHashDict.Sentinel)
-        //             sum += v;
-        //     }
-        //     return sum;
-        // }
+            for (int i = 0; i < _valuesBuffer2.Length; i++)
+            {
+                ulong v = _valuesBuffer2[i];
+                if (v != _nativeSinglePartInterop.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
 
-        // [Benchmark]
-        // public ulong PtrHashPort_SinglePartU64Storage_Stream_TryGetValueStream()
-        // {
-        //     ulong sum = 0;
-        //     _singlePartU64PtrHashDict.TryGetValueStream(
-        //         _lookupKeys.AsSpan(),
-        //         _valuesBuffer5);
-        //
-        //     for (int i = 0; i < _valuesBuffer5.Length; i++)
-        //     {
-        //         ulong v = _valuesBuffer5[i];
-        //         if (v != _singlePartU64PtrHashDict.Sentinel)
-        //             sum += v;
-        //     }
-        //     return sum;
-        // }
+        [Benchmark]
+        public ulong PtrHashPort_MultiPart_Stream_TryGetValueStream()
+        {
+            ulong sum = 0;
+            _multiPartPtrHashDict.TryGetValueStream(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer3);
+
+            for (int i = 0; i < _valuesBuffer3.Length; i++)
+            {
+                ulong v = _valuesBuffer3[i];
+                if (v != _multiPartPtrHashDict.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHashPort_SinglePart_Stream_TryGetValueStream()
+        {
+            ulong sum = 0;
+            _singlePartPtrHashDict.TryGetValueStream(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer4);
+
+            for (int i = 0; i < _valuesBuffer4.Length; i++)
+            {
+                ulong v = _valuesBuffer4[i];
+                if (v != _singlePartPtrHashDict.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHashPort_SinglePartU64Storage_Stream_TryGetValueStream()
+        {
+            ulong sum = 0;
+            _singlePartU64PtrHashDict.TryGetValueStream(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer5);
+
+            for (int i = 0; i < _valuesBuffer5.Length; i++)
+            {
+                ulong v = _valuesBuffer5[i];
+                if (v != _singlePartU64PtrHashDict.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
 
         [Benchmark]
         public ulong PtrHash_Stream_TryGetValueStreamPrefetch()
