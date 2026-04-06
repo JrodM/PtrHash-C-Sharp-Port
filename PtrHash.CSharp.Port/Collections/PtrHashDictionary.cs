@@ -9,6 +9,7 @@ using PtrHash.CSharp.Port.KeyHashers;
 using PtrHash.CSharp.Port.BucketFunctions;
 using PtrHash.CSharp.Port.Storage;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 
 namespace PtrHash.CSharp.Port.Collections
 {
@@ -20,7 +21,7 @@ namespace PtrHash.CSharp.Port.Collections
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
-        where TKey : notnull
+        where TKey : notnull, IEquatable<TKey>
     {
         private readonly PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, SinglePart> _ptrHash;
         private readonly KeyValuePair<TKey, TValue>[] _keyValuePairs;
@@ -174,14 +175,14 @@ namespace PtrHash.CSharp.Port.Collections
             if ((uint)idx < (uint)_keyValuePairs.Length)
             {
                 ref var kvp = ref _keyValuePairs[idx];
-                
-                if (_keyComparer.Equals(kvp.Key, key))
+
+                if (key.Equals(kvp.Key))
                 {
                     value = kvp.Value;
                     return true;
                 }
             }
-            
+
             value = _sentinel;
             return false;
         }
@@ -260,8 +261,59 @@ namespace PtrHash.CSharp.Port.Collections
         }
 
         /// <summary>
-        /// Gets information about the underlying PtrHash structure
+        /// Two-pass prefetch lookup: pass 1 prefetches pilots to get indices,
+        /// pass 2 prefetches the backing array to get key/value pairs.
         /// </summary>
+        public void TryGetValueStreamPrefetch2Pass(
+            ReadOnlySpan<TKey> keys,
+            Span<TValue> values)
+        {
+            TryGetValueStreamPrefetch2Pass<PrefetchDistance32>(keys, values);
+        }
+
+        public void TryGetValueStreamPrefetch2Pass<TPass2Prefetch>(
+            ReadOnlySpan<TKey> keys,
+            Span<TValue> values)
+            where TPass2Prefetch : struct, IPrefetchDistanceConstant
+        {
+            if (keys.Length != values.Length)
+                throw new ArgumentException("Key and value spans must have the same length");
+
+            if (keys.Length <= MAX_STACK_SIZE)
+            {
+                Span<nuint> indices = stackalloc nuint[keys.Length];
+                _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indices);
+                ProcessIndicesPrefetch<TPass2Prefetch>(keys, indices, values);
+            }
+            else
+            {
+                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
+                try
+                {
+                    var indicesSpan = indices.AsSpan(0, keys.Length);
+                    _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indicesSpan);
+                    ProcessIndicesPrefetch<TPass2Prefetch>(keys, indicesSpan, values);
+                }
+                finally
+                {
+                    ArrayPool<nuint>.Shared.Return(indices);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Pass 2 only: prefetch-streams over pre-computed indices to do key comparison
+        /// and value retrieval from the backing array. Accepts indices from any pass 1 variant
+        /// so the two passes can be benchmarked independently.
+        /// </summary>
+        public void ProcessIndicesPrefetch(
+            ReadOnlySpan<TKey> keys,
+            ReadOnlySpan<nuint> indices,
+            Span<TValue> values)
+        {
+            ProcessIndicesPrefetch<PrefetchDistance32>(keys, indices, values);
+        }
+
         public PtrHashInfo GetInfo() => _ptrHash.GetInfo();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -270,14 +322,11 @@ namespace PtrHash.CSharp.Port.Collections
             ReadOnlySpan<nuint> indices,
             Span<TValue> values)
         {
-            // Hoist fields into locals
             var kvps = _keyValuePairs;
-            var comparer = _keyComparer;
             var sentinel = _sentinel;
             int kvpCount = kvps.Length;
             int len = keys.Length;
 
-            // Get raw refs to spans to remove bounds checks
             ref TKey keyRef = ref MemoryMarshal.GetReference(keys);
             ref nuint idxRef = ref MemoryMarshal.GetReference(indices);
             ref TValue valRef = ref MemoryMarshal.GetReference(values);
@@ -285,18 +334,81 @@ namespace PtrHash.CSharp.Port.Collections
             for (int i = 0; i < len; i++)
             {
                 nuint uidx = Unsafe.Add(ref idxRef, i);
-                
+
                 TValue result = sentinel;
-                
+
                 if (uidx < (nuint)kvpCount)
                 {
                     ref var kvp = ref kvps[(int)uidx];
 
-                    if (comparer.Equals(Unsafe.Add(ref keyRef, i), kvp.Key))
+                    if (Unsafe.Add(ref keyRef, i).Equals(kvp.Key))
                         result = kvp.Value;
                 }
 
                 Unsafe.Add(ref valRef, i) = result;
+            }
+        }
+
+        private unsafe void ProcessIndicesPrefetch<TPrefetchDistance>(
+            ReadOnlySpan<TKey> keys,
+            ReadOnlySpan<nuint> indices,
+            Span<TValue> values)
+            where TPrefetchDistance : struct, IPrefetchDistanceConstant
+        {
+            uint B = (uint)default(TPrefetchDistance).Value;
+
+            var sentinel = _sentinel;
+            uint len = (uint)keys.Length;
+
+            ref TKey keyRef = ref MemoryMarshal.GetReference(keys);
+            ref nuint idxRef = ref MemoryMarshal.GetReference(indices);
+            ref TValue valRef = ref MemoryMarshal.GetReference(values);
+            ref KeyValuePair<TKey, TValue> kvpRef = ref MemoryMarshal.GetArrayDataReference(_keyValuePairs);
+
+            nuint* ring = stackalloc nuint[(int)B];
+
+            // Init: fill ring buffer and prefetch backing array entries
+            uint initCount = Math.Min(B, len);
+            for (uint i = 0; i < initCount; i++)
+            {
+                nuint idx = Unsafe.Add(ref idxRef, (int)i);
+                ring[i] = idx;
+                Sse.Prefetch0(Unsafe.AsPointer(ref Unsafe.Add(ref kvpRef, (nint)idx)));
+            }
+
+            // Main loop: process current entry, issue prefetch for lookahead
+            uint mainEnd = (uint)Math.Max(0, (int)len - (int)B);
+            uint processed = 0;
+
+            while (processed < mainEnd)
+            {
+                uint ringIdx = processed % B;
+                nuint currentIndex = ring[ringIdx];
+
+                nuint nextIndex = Unsafe.Add(ref idxRef, (int)(processed + B));
+                ring[ringIdx] = nextIndex;
+                Sse.Prefetch0(Unsafe.AsPointer(ref Unsafe.Add(ref kvpRef, (nint)nextIndex)));
+
+                ref var kvp = ref Unsafe.Add(ref kvpRef, (nint)currentIndex);
+                TValue result = Unsafe.Add(ref keyRef, (int)processed).Equals(kvp.Key)
+                    ? kvp.Value
+                    : sentinel;
+                Unsafe.Add(ref valRef, (int)processed) = result;
+                processed++;
+            }
+
+            // Drain: process remaining entries in ring buffer
+            while (processed < len)
+            {
+                uint ringIdx = processed % B;
+                nuint currentIndex = ring[ringIdx];
+
+                ref var kvp = ref Unsafe.Add(ref kvpRef, (nint)currentIndex);
+                TValue result = Unsafe.Add(ref keyRef, (int)processed).Equals(kvp.Key)
+                    ? kvp.Value
+                    : sentinel;
+                Unsafe.Add(ref valRef, (int)processed) = result;
+                processed++;
             }
         }
 

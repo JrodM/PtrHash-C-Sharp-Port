@@ -181,6 +181,7 @@ namespace PtrHash.CSharp.Port.Core
     public readonly struct PrefetchDistance8  : IPrefetchDistanceConstant { public uint Value => 8; }
     public readonly struct PrefetchDistance16 : IPrefetchDistanceConstant { public uint Value => 16; }
     public readonly struct PrefetchDistance32 : IPrefetchDistanceConstant { public uint Value => 32; }
-    public readonly struct PrefetchDistance64 : IPrefetchDistanceConstant { public uint Value => 64; }
+    public readonly struct PrefetchDistance64  : IPrefetchDistanceConstant { public uint Value => 64; }
+    public readonly struct PrefetchDistance128 : IPrefetchDistanceConstant { public uint Value => 128; }
     #endregion
 }
