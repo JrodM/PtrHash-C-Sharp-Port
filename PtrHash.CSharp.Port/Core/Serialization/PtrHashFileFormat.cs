@@ -26,8 +26,6 @@ namespace PtrHash.CSharp.Port.Core.Serialization
         {
             None = 0,
             IsMinimal = 1 << 0,
-            IsSinglePart = 1 << 1,
-            // Bits 2-15 reserved for future use
         }
 
         // Cache line 1 (64 bytes): Header identification + serialization metadata
@@ -63,7 +61,7 @@ namespace PtrHash.CSharp.Port.Core.Serialization
             public ulong Parts;
             public ulong BucketsTotal;
 
-            private uint _reserved2a;
+            public uint PartType;
             private uint _reserved2b;
             private uint _reserved2c;
             private uint _reserved2d;
@@ -83,6 +81,9 @@ namespace PtrHash.CSharp.Port.Core.Serialization
                     return false;
 
                 if (SlotsTotal != Parts * SlotsPerPart)
+                    return false;
+
+                if (!Enum.IsDefined(typeof(PtrHashGenericTypes.PartMode), PartType))
                     return false;
 
                 if (!Enum.IsDefined(typeof(PtrHashGenericTypes.BucketFunction), BucketFunctionType))
