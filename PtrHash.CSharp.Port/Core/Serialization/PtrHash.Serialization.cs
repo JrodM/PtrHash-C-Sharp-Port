@@ -40,6 +40,7 @@ namespace PtrHash.CSharp.Port.Core
                 NumKeys = _numKeys,
                 Parts = _parts,
                 BucketsTotal = _bucketsTotal,
+                PartType = (uint)PtrHashGenericTypes.ResolvePartMode<TPart>(),
             };
             
             if (_minimal)
@@ -128,11 +129,10 @@ namespace PtrHash.CSharp.Port.Core
             if (header.RemappingStorageType != expectedStorageType)
                 throw new InvalidOperationException($"Remapping storage type mismatch. Expected {typeof(TRemappingStorage).Name}, found type ID {header.RemappingStorageType}");
 
-            bool fileSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
-            bool typeSinglePart = typeof(TPart) == typeof(SinglePart);
+            var expectedPartMode = (uint)PtrHashGenericTypes.ResolvePartMode<TPart>();
 
-            if (fileSinglePart != typeSinglePart)
-                throw new InvalidOperationException($"Part mode mismatch. File is {(fileSinglePart ? "SinglePart" : "MultiPart")}, but deserializing as {typeof(TPart).Name}");
+            if (header.PartType != expectedPartMode)
+                throw new InvalidOperationException($"Part mode mismatch. Expected {typeof(TPart).Name}, found type ID {header.PartType}");
         }
         
         private static PtrHashFileFormat.FileHeader ReadHeader(Stream stream)
@@ -186,10 +186,7 @@ namespace PtrHash.CSharp.Port.Core
             
             if (_minimal)
                 flags |= PtrHashFileFormat.HeaderFlags.IsMinimal;
-                
-            if (typeof(TPart) == typeof(SinglePart))
-                flags |= PtrHashFileFormat.HeaderFlags.IsSinglePart;
-                
+
             return flags;
         }
         

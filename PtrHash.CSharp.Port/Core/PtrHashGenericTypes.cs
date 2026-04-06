@@ -66,6 +66,12 @@ namespace PtrHash.CSharp.Port.Core
             CacheLineEF = 4
         }
         
+        public enum PartMode : uint
+        {
+            MultiPart = 0,
+            SinglePart = 1
+        }
+
         public static BucketFunction ResolveBucketFunction<TBucketFunction>()
         {
             return typeof(TBucketFunction) switch
@@ -98,6 +104,15 @@ namespace PtrHash.CSharp.Port.Core
                 Type t when t == typeof(UInt64VectorRemappingStorage) => RemappingStorage.VecU64,
                 Type t when t == typeof(CachelineEfVec) => RemappingStorage.CacheLineEF,
                 Type t => throw new NotSupportedException($"Unsupported remapping storage type: {t.Name}")
+            };
+        }
+        public static PartMode ResolvePartMode<TPart>()
+        {
+            return typeof(TPart) switch
+            {
+                Type t when t == typeof(SinglePart) => PartMode.SinglePart,
+                Type t when t == typeof(MultiPart) => PartMode.MultiPart,
+                Type t => throw new NotSupportedException($"Unsupported part mode type: {t.Name}")
             };
         }
     }
