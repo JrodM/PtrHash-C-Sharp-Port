@@ -301,19 +301,6 @@ namespace PtrHash.CSharp.Port.Collections
             }
         }
 
-        /// <summary>
-        /// Pass 2 only: prefetch-streams over pre-computed indices to do key comparison
-        /// and value retrieval from the backing array. Accepts indices from any pass 1 variant
-        /// so the two passes can be benchmarked independently.
-        /// </summary>
-        public void ProcessIndicesPrefetch(
-            ReadOnlySpan<TKey> keys,
-            ReadOnlySpan<nuint> indices,
-            Span<TValue> values)
-        {
-            ProcessIndicesPrefetch<PrefetchDistance32>(keys, indices, values);
-        }
-
         public PtrHashInfo GetInfo() => _ptrHash.GetInfo();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
