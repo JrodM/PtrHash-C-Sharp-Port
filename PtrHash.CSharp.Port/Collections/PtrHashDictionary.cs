@@ -26,7 +26,6 @@ namespace PtrHash.CSharp.Port.Collections
         private readonly PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, SinglePart> _ptrHash;
         private readonly KeyValuePair<TKey, TValue>[] _keyValuePairs;
         private readonly TValue _sentinel;
-        private readonly IEqualityComparer<TKey> _keyComparer;
         private bool _disposed;
         
         const int MAX_STACK_SIZE = 4096; // 32KB on stack (8 bytes × 4096)
@@ -43,13 +42,11 @@ namespace PtrHash.CSharp.Port.Collections
         /// <param name="values">Array of values corresponding to keys</param>
         /// <param name="notFoundSentinel">Value to return when key is not found</param>
         /// <param name="parameters">PtrHash construction parameters</param>
-        /// <param name="keyComparer">Custom equality comparer for keys (optional, uses default if null)</param>
         public PtrHashDictionary(
             TKey[] keys,
             TValue[] values,
             TValue notFoundSentinel,
-            PtrHashParams? parameters = null,
-            IEqualityComparer<TKey>? keyComparer = null)
+            PtrHashParams? parameters = null)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (values == null) throw new ArgumentNullException(nameof(values));
@@ -57,7 +54,6 @@ namespace PtrHash.CSharp.Port.Collections
                 throw new ArgumentException("Keys and values must have same length");
 
             _sentinel = notFoundSentinel;
-            _keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
             
             var optimizedParams = parameters ?? new PtrHashParams
             {

@@ -137,6 +137,12 @@ namespace PtrHash.CSharp.Port.Core
             
             if (header.RemappingStorageType != expectedStorageType)
                 throw new InvalidOperationException($"Remapping storage type mismatch. Expected {typeof(TRemappingStorage).Name}, found type ID {header.RemappingStorageType}");
+
+            bool fileSinglePart = (header.Flags & PtrHashFileFormat.HeaderFlags.IsSinglePart) != 0;
+            bool typeSinglePart = typeof(TPart) == typeof(SinglePart);
+
+            if (fileSinglePart != typeSinglePart)
+                throw new InvalidOperationException($"Part mode mismatch. File is {(fileSinglePart ? "SinglePart" : "MultiPart")}, but deserializing as {typeof(TPart).Name}");
         }
         
         private static PtrHashFileFormat.FileHeader ReadHeader(Stream stream)
