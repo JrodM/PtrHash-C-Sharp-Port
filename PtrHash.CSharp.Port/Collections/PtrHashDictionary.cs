@@ -264,13 +264,6 @@ namespace PtrHash.CSharp.Port.Collections
         /// Two-pass prefetch lookup: pass 1 prefetches pilots to get indices,
         /// pass 2 prefetches the backing array to get key/value pairs.
         /// </summary>
-        public void TryGetValueStreamPrefetch2Pass(
-            ReadOnlySpan<TKey> keys,
-            Span<TValue> values)
-        {
-            TryGetValueStreamPrefetch2Pass<PrefetchDistance32>(keys, values);
-        }
-
         public void TryGetValueStreamPrefetch2Pass<TPass2Prefetch>(
             ReadOnlySpan<TKey> keys,
             Span<TValue> values)
