@@ -304,7 +304,6 @@ namespace PtrHash.CSharp.Port.Collections
         {
             var kvps = _keyValuePairs;
             var sentinel = _sentinel;
-            int kvpCount = kvps.Length;
             int len = keys.Length;
 
             ref TKey keyRef = ref MemoryMarshal.GetReference(keys);
@@ -315,15 +314,10 @@ namespace PtrHash.CSharp.Port.Collections
             {
                 nuint uidx = Unsafe.Add(ref idxRef, i);
 
-                TValue result = sentinel;
-
-                if (uidx < (nuint)kvpCount)
-                {
-                    ref var kvp = ref kvps[(int)uidx];
-
-                    if (Unsafe.Add(ref keyRef, i).Equals(kvp.Key))
-                        result = kvp.Value;
-                }
+                ref var kvp = ref kvps[(int)uidx];
+                TValue result = Unsafe.Add(ref keyRef, i).Equals(kvp.Key)
+                    ? kvp.Value
+                    : sentinel;
 
                 Unsafe.Add(ref valRef, i) = result;
             }

@@ -469,7 +469,6 @@ namespace PtrHash.CSharp.Port.Core
                 throw new ArgumentException("Keys and results spans must have the same length");
 
             uint B         = default(TPrefetchDistance).Value; // JIT constant after specialization
-            var useMinimal = default(TMinimal).Value;
             var numKeys    = _numKeys;
             
             // Capture ALL fields the hot loop touches as locals.
@@ -536,7 +535,7 @@ namespace PtrHash.CSharp.Port.Core
                     ? SlotInPart(currentHash, pilot, seed, remSlots)
                     : Slot(currentHash, pilot, seed, remParts, slotsPerPart, remSlots);
 
-                if (useMinimal && slot >= numKeys)
+                if (typeof(TMinimal) == typeof(UseMinimal) && slot >= numKeys)
                     slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
 
                 Unsafe.Add(ref resultsRef, (int)processed) = slot;
@@ -553,7 +552,7 @@ namespace PtrHash.CSharp.Port.Core
                     ? SlotInPart(hashBuf[idx], pilot, seed, remSlots)
                     : Slot(hashBuf[idx], pilot, seed, remParts, slotsPerPart, remSlots);
 
-                if (useMinimal && slot >= numKeys)
+                if (typeof(TMinimal) == typeof(UseMinimal) && slot >= numKeys)
                     slot = TRemappingStorage.Index(remapStorage, slot - numKeys);
 
                 Unsafe.Add(ref resultsRef, (int)processed) = slot;
