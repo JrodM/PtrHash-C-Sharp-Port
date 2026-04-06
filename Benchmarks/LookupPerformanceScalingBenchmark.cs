@@ -24,36 +24,40 @@ namespace PtrHash.Benchmarks
         private class Config : ManualConfig
         {
             public Config()
-        {
-        }
+            {
+            }
         }
 
-        [Params(2_000_000)]
+        [Params(1_500_000)]
         public int KeyCount { get; set; }
 
-        [Params(1_000, 50_000, 100_000, 1_000_000, 10_000_000)]
+        [Params(1_000, 10_000, 50_000, 100_000)]
         public int LookupCount { get; set; }
 
         private ulong[] _keys = null!;
         private ulong[] _values = null!;
         private ulong[] _lookupKeys = null!;
         private Dictionary<ulong, ulong> _dictionary = null!;
-        
+
         // Native interop dictionaries
         private PtrHashInteropDictionary<ulong, ulong, ULongDispatcher> _nativeMultiPartInterop = null!;
         private PtrHashInteropDictionary<ulong, ulong, ULongDispatcher> _nativeSinglePartInterop = null!;
-        
+
         // C# port dictionaries
         private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage> _multiPartPtrHashDict = null!;
         private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage> _singlePartPtrHashDict = null!;
         private PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt64VectorRemappingStorage> _singlePartU64PtrHashDict = null!;
-        
+
         private ulong[] _valuesBuffer1 = null!;
         private ulong[] _valuesBuffer2 = null!;
         private ulong[] _valuesBuffer3 = null!;
         private ulong[] _valuesBuffer4 = null!;
         private ulong[] _valuesBuffer5 = null!;
         private ulong[] _valuesBuffer6 = null!;
+
+        // Stride-write this buffer before each iteration to evict working set from cache.
+        // 64MB > typical L3, so pilots + backing array start cold every iteration.
+        private byte[] _cacheFlush = null!;
 
         [GlobalSetup]
         public void Setup()
@@ -71,11 +75,11 @@ namespace PtrHash.Benchmarks
             // Create lookup keys - half found, half not found
             _lookupKeys = new ulong[LookupCount];
             var halfCount = LookupCount / 2;
-            
+
             // First half: keys that exist in the set
             for (int i = 0; i < halfCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
-            
+
             // Second half: keys that don't exist in the set
             var usedKeys = new HashSet<ulong>(_keys);
             for (int i = halfCount; i < LookupCount; i++)
@@ -88,6 +92,9 @@ namespace PtrHash.Benchmarks
                 _lookupKeys[i] = notFoundKey;
             }
 
+            // Shuffle to interleave hits/misses — avoids branch predictor skew from sequential pattern
+            _lookupKeys = _lookupKeys.OrderBy(_ => random.Next()).ToArray();
+
             // Standard Dictionary
             _dictionary = new Dictionary<ulong, ulong>(KeyCount);
             for (int i = 0; i < KeyCount; i++)
@@ -99,7 +106,7 @@ namespace PtrHash.Benchmarks
                 _values,
                 ulong.MaxValue,
                 PtrHashNative.FFIParams.Fast);
-            
+
             // Native interop dictionaries - single-part
             var singlePartNativeParams = PtrHashNative.FFIParams.FastWithOverrides(singlePart: true);
             _nativeSinglePartInterop = new PtrHashInteropDictionary<ulong, ulong, ULongDispatcher>(
@@ -107,17 +114,15 @@ namespace PtrHash.Benchmarks
                 _values,
                 ulong.MaxValue,
                 singlePartNativeParams);
-            
+
             // Multi-part C# port dictionary
             _multiPartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
-            
+
             // Single-part C# port dictionary (U32 storage)
-            var singlePartPortParams = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartPortParams);
-            
+            _singlePartPtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt32VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
+
             // Single-part C# port dictionary (U64 storage)
-            var singlePartU64Params = PtrHashParams.DefaultFast with { SinglePart = true };
-            _singlePartU64PtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt64VectorRemappingStorage>(_keys, _values, ulong.MaxValue, singlePartU64Params);
+            _singlePartU64PtrHashDict = new PtrHashDictionary<ulong, ulong, FxHasher, Linear, UInt64VectorRemappingStorage>(_keys, _values, ulong.MaxValue, PtrHashParams.DefaultFast);
 
             _valuesBuffer1 = new ulong[LookupCount];
             _valuesBuffer2 = new ulong[LookupCount];
@@ -125,6 +130,14 @@ namespace PtrHash.Benchmarks
             _valuesBuffer4 = new ulong[LookupCount];
             _valuesBuffer5 = new ulong[LookupCount];
             _valuesBuffer6 = new ulong[LookupCount];
+            _cacheFlush = new byte[64 * 1024 * 1024];
+        }
+
+        [IterationSetup]
+        public void FlushCache()
+        {
+            for (int i = 0; i < _cacheFlush.Length; i += 64)
+                _cacheFlush[i] = 1;
         }
 
         [GlobalCleanup]
@@ -282,6 +295,56 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
+        [Benchmark]
+        public ulong PtrHash_Stream_TryGetValueStreamPrefetch()
+        {
+            ulong sum = 0;
+            _singlePartPtrHashDict.TryGetValueStreamPrefetch(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer1);
+
+            for (int i = 0; i < _valuesBuffer1.Length; i++)
+            {
+                ulong v = _valuesBuffer1[i];
+                if (v != _singlePartPtrHashDict.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHash_Stream_TryGetValueStreamPrefetch2Pass_B64()
+        {
+            ulong sum = 0;
+            _singlePartPtrHashDict.TryGetValueStreamPrefetch2Pass<PrefetchDistance64>(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer2);
+
+            for (int i = 0; i < _valuesBuffer2.Length; i++)
+            {
+                ulong v = _valuesBuffer2[i];
+                if (v != _singlePartPtrHashDict.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
+
+        [Benchmark]
+        public ulong PtrHash_Stream_TryGetValueStreamPrefetch2Pass_B32()
+        {
+            ulong sum = 0;
+            _singlePartPtrHashDict.TryGetValueStreamPrefetch2Pass<PrefetchDistance32>(
+                _lookupKeys.AsSpan(),
+                _valuesBuffer2);
+
+            for (int i = 0; i < _valuesBuffer2.Length; i++)
+            {
+                ulong v = _valuesBuffer2[i];
+                if (v != _singlePartPtrHashDict.Sentinel)
+                    sum += v;
+            }
+            return sum;
+        }
 
     }
 }

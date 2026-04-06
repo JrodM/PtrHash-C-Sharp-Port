@@ -16,7 +16,8 @@ namespace PtrHash.CSharp.Port.Tests;
 public readonly record struct TestConfig(
     string Name,
     PtrHashParams Parameters,
-    PtrHashGenericTypes.RemappingStorage StorageType
+    PtrHashGenericTypes.RemappingStorage StorageType,
+    bool SinglePart
 );
 
 
@@ -24,27 +25,22 @@ public static class PtrHashTestHelpers
 {
     public static readonly TestConfig[] AllConfigurations = GenerateAllConfigurations();
 
-    /// <summary>
-    /// Generate all test configurations dynamically
-    /// </summary>
     private static TestConfig[] GenerateAllConfigurations()
     {
         var configs = new List<TestConfig>();
-    
+
         var paramSets = new[]
         {
-            ("Fast", PtrHashParams.DefaultFast),
+            ("Fast",    PtrHashParams.DefaultFast),
             ("Compact", PtrHashParams.DefaultCompact)
         };
-        
- 
+
         var storageTypes = new[]
         {
             PtrHashGenericTypes.RemappingStorage.VecU32,
             PtrHashGenericTypes.RemappingStorage.VecU64,
             PtrHashGenericTypes.RemappingStorage.CacheLineEF
         };
-        
 
         foreach (var (paramName, baseParams) in paramSets)
         {
@@ -54,13 +50,12 @@ public static class PtrHashTestHelpers
                 {
                     var partName = singlePart ? "SinglePart" : "MultiPart";
                     var name = $"{paramName}-{partName}-{storageType}";
-                    var parameters = baseParams with { SinglePart = singlePart };
-                    
-                    configs.Add(new TestConfig(name, parameters, storageType));
+
+                    configs.Add(new TestConfig(name, baseParams, storageType, SinglePart: singlePart));
                 }
             }
         }
-        
+
         return configs.ToArray();
     }
 
@@ -72,7 +67,7 @@ public static class PtrHashTestHelpers
     {
         var keys = new ulong[count];
         var random = new Random(42); // Fixed seed for reproducibility
-        
+
         var used = new HashSet<ulong>();
         for (int i = 0; i < count; i++)
         {
@@ -82,10 +77,10 @@ public static class PtrHashTestHelpers
                 key = ((ulong)random.Next() << 32) | (uint)random.Next();
             }
             while (!used.Add(key));
-            
+
             keys[i] = key;
         }
-        
+
         return keys;
     }
 
@@ -96,7 +91,7 @@ public static class PtrHashTestHelpers
     {
         var keys = new string[count];
         var random = new Random(42);
-        
+
         var used = new HashSet<string>();
         for (int i = 0; i < count; i++)
         {
@@ -106,10 +101,10 @@ public static class PtrHashTestHelpers
                 key = $"key_{random.Next():X8}_{i:X6}";
             }
             while (!used.Add(key));
-            
+
             keys[i] = key;
         }
-        
+
         return keys;
     }
 
@@ -121,29 +116,63 @@ public static class PtrHashTestHelpers
     {
         if (typeof(TKey) == typeof(ulong))
         {
-            return config.StorageType switch
+            var ulongKeys = keys as ulong[];
+            if (config.SinglePart)
             {
-                PtrHashGenericTypes.RemappingStorage.VecU32 => 
-                    new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys as ulong[], config.Parameters) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.VecU64 => 
-                    new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>(keys as ulong[], config.Parameters) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
-                    new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec>(keys as ulong[], config.Parameters) as IPtrHash<TKey>,
-                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
-            } ?? throw new InvalidOperationException();
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, SinglePart>(ulongKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, SinglePart>(ulongKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, SinglePart>(ulongKeys!, config.Parameters) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
+            else
+            {
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(ulongKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        new PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, MultiPart>(ulongKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        new PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, MultiPart>(ulongKeys!, config.Parameters) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
         }
         else if (typeof(TKey) == typeof(string))
         {
-            return config.StorageType switch
+            var stringKeys = keys as string[];
+            if (config.SinglePart)
             {
-                PtrHashGenericTypes.RemappingStorage.VecU32 => 
-                    new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>(keys as string[], config.Parameters) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.VecU64 => 
-                    new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage>(keys as string[], config.Parameters) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
-                    new PtrHash<string, StringHasher, Linear, CachelineEfVec>(keys as string[], config.Parameters) as IPtrHash<TKey>,
-                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
-            } ?? throw new InvalidOperationException();
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, SinglePart>(stringKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, SinglePart>(stringKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        new PtrHash<string, StringHasher, Linear, CachelineEfVec, SinglePart>(stringKeys!, config.Parameters) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
+            else
+            {
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        new PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(stringKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        new PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, MultiPart>(stringKeys!, config.Parameters) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        new PtrHash<string, StringHasher, Linear, CachelineEfVec, MultiPart>(stringKeys!, config.Parameters) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
         }
         else
         {
@@ -174,30 +203,30 @@ public static class PtrHashTestHelpers
         for (int i = 0; i < keys.Length; i++)
         {
             var index = ptrhash.GetIndex(keys[i]);
-            
-            Assert.IsTrue(index < keyCount, 
+
+            Assert.IsTrue(index < keyCount,
                 $"Config {configName}: Index {index} >= key count {keyCount} for key {keys[i]}");
-            
-            Assert.IsTrue(indices.Add(index), 
+
+            Assert.IsTrue(indices.Add(index),
                 $"Config {configName}: Duplicate index {index} for key {keys[i]}");
         }
 
-        // Test 2: All keys map to unique indices in [0, MaxIndex) for GetIndexNoRemap  
+        // Test 2: All keys map to unique indices in [0, MaxIndex) for GetIndexNoRemap
         for (int i = 0; i < keys.Length; i++)
         {
             var noRemapIndex = ptrhash.GetIndexNoRemap(keys[i]);
-            
-            Assert.IsTrue(noRemapIndex < info.MaxIndex, 
+
+            Assert.IsTrue(noRemapIndex < info.MaxIndex,
                 $"Config {configName}: NoRemap index {noRemapIndex} >= MaxIndex {info.MaxIndex} for key {keys[i]}");
-            
-            Assert.IsTrue(noRemapIndices.Add(noRemapIndex), 
+
+            Assert.IsTrue(noRemapIndices.Add(noRemapIndex),
                 $"Config {configName}: Duplicate NoRemap index {noRemapIndex} for key {keys[i]}");
         }
 
         // Test 3: Verify we got exactly n unique indices for both methods
-        Assert.AreEqual(keys.Length, indices.Count, 
+        Assert.AreEqual(keys.Length, indices.Count,
             $"Config {configName}: Expected {keys.Length} unique minimal indices, got {indices.Count}");
-        Assert.AreEqual(keys.Length, noRemapIndices.Count, 
+        Assert.AreEqual(keys.Length, noRemapIndices.Count,
             $"Config {configName}: Expected {keys.Length} unique NoRemap indices, got {noRemapIndices.Count}");
 
         // Test 4: Test streaming interface matches individual lookups
@@ -222,19 +251,27 @@ public static class PtrHashTestHelpers
     {
         var streamMinimal = new nuint[keys.Length];
         var streamNoRemap = new nuint[keys.Length];
-        
-        ptrhash.GetIndicesStream(keys, streamMinimal, minimal: true);
-        ptrhash.GetIndicesStream(keys, streamNoRemap, minimal: false);
-        
+        var streamPrefetchMinimal = new nuint[keys.Length];
+        var streamPrefetchNoRemap = new nuint[keys.Length];
+
+        ptrhash.GetIndicesStream<UseMinimal>(keys, streamMinimal);
+        ptrhash.GetIndicesStream<NoMinimal>(keys, streamNoRemap);
+        ptrhash.GetIndicesStreamPrefetch<UseMinimal, PrefetchDistance32>(keys, streamPrefetchMinimal);
+        ptrhash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, streamPrefetchNoRemap);
+
         for (int i = 0; i < keys.Length; i++)
         {
             var individualMinimal = ptrhash.GetIndex(keys[i]);
             var individualNoRemap = ptrhash.GetIndexNoRemap(keys[i]);
-            
-            Assert.AreEqual(individualMinimal, streamMinimal[i], 
+
+            Assert.AreEqual(individualMinimal, streamMinimal[i],
                 $"Config {configName}: Stream minimal {streamMinimal[i]} != individual minimal {individualMinimal} for key {keys[i]}");
-            Assert.AreEqual(individualNoRemap, streamNoRemap[i], 
+            Assert.AreEqual(individualNoRemap, streamNoRemap[i],
                 $"Config {configName}: Stream NoRemap {streamNoRemap[i]} != individual NoRemap {individualNoRemap} for key {keys[i]}");
+            Assert.AreEqual(individualMinimal, streamPrefetchMinimal[i],
+                $"Config {configName}: StreamPrefetch minimal {streamPrefetchMinimal[i]} != individual minimal {individualMinimal} for key {keys[i]}");
+            Assert.AreEqual(individualNoRemap, streamPrefetchNoRemap[i],
+                $"Config {configName}: StreamPrefetch NoRemap {streamPrefetchNoRemap[i]} != individual NoRemap {individualNoRemap} for key {keys[i]}");
         }
     }
 
@@ -244,7 +281,6 @@ public static class PtrHashTestHelpers
     public static void TestEdgeCases<TKey>(TestConfig config)
         where TKey : notnull
     {
-        // Test empty keys
         Assert.ThrowsException<ArgumentException>(() =>
         {
             var emptyKeys = Array.Empty<TKey>();
@@ -279,29 +315,61 @@ public static class PtrHashTestHelpers
     {
         if (typeof(TKey) == typeof(ulong))
         {
-            return config.StorageType switch
+            if (config.SinglePart)
             {
-                PtrHashGenericTypes.RemappingStorage.VecU32 => 
-                    PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.VecU64 => 
-                    PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>.Deserialize(stream) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
-                    PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec>.Deserialize(stream) as IPtrHash<TKey>,
-                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
-            } ?? throw new InvalidOperationException();
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, SinglePart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, SinglePart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, SinglePart>.Deserialize(stream) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
+            else
+            {
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, MultiPart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, MultiPart>.Deserialize(stream) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
         }
         else if (typeof(TKey) == typeof(string))
         {
-            return config.StorageType switch
+            if (config.SinglePart)
             {
-                PtrHashGenericTypes.RemappingStorage.VecU32 => 
-                    PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.VecU64 => 
-                    PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage>.Deserialize(stream) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
-                    PtrHash<string, StringHasher, Linear, CachelineEfVec>.Deserialize(stream) as IPtrHash<TKey>,
-                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
-            } ?? throw new InvalidOperationException();
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, SinglePart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, SinglePart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<string, StringHasher, Linear, CachelineEfVec, SinglePart>.Deserialize(stream) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
+            else
+            {
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, MultiPart>.Deserialize(stream) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<string, StringHasher, Linear, CachelineEfVec, MultiPart>.Deserialize(stream) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
         }
         else
         {
@@ -317,34 +385,65 @@ public static class PtrHashTestHelpers
     {
         if (typeof(TKey) == typeof(ulong))
         {
-            return config.StorageType switch
+            if (config.SinglePart)
             {
-                PtrHashGenericTypes.RemappingStorage.VecU32 => 
-                    PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.VecU64 => 
-                    PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
-                    PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
-                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
-            } ?? throw new InvalidOperationException();
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, SinglePart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, SinglePart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, SinglePart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
+            else
+            {
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, UInt64VectorRemappingStorage, MultiPart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<ulong, StrongerIntHasher, Linear, CachelineEfVec, MultiPart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
         }
         else if (typeof(TKey) == typeof(string))
         {
-            return config.StorageType switch
+            if (config.SinglePart)
             {
-                PtrHashGenericTypes.RemappingStorage.VecU32 => 
-                    PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.VecU64 => 
-                    PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
-                PtrHashGenericTypes.RemappingStorage.CacheLineEF => 
-                    PtrHash<string, StringHasher, Linear, CachelineEfVec>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
-                _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
-            } ?? throw new InvalidOperationException();
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, SinglePart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, SinglePart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<string, StringHasher, Linear, CachelineEfVec, SinglePart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
+            else
+            {
+                return config.StorageType switch
+                {
+                    PtrHashGenericTypes.RemappingStorage.VecU32 =>
+                        PtrHash<string, StringHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.VecU64 =>
+                        PtrHash<string, StringHasher, Linear, UInt64VectorRemappingStorage, MultiPart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    PtrHashGenericTypes.RemappingStorage.CacheLineEF =>
+                        PtrHash<string, StringHasher, Linear, CachelineEfVec, MultiPart>.DeserializeFromMemoryMap(ptr, dataSize) as IPtrHash<TKey>,
+                    _ => throw new NotSupportedException($"Storage type {config.StorageType} not supported")
+                } ?? throw new InvalidOperationException();
+            }
         }
         else
         {
             throw new NotSupportedException($"Key type {typeof(TKey)} not supported in tests");
         }
     }
-
 }

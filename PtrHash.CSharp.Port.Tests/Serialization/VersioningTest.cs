@@ -27,7 +27,7 @@ public class VersioningTest
         using var stream = new MemoryStream();
         
         // Create and serialize
-        using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, PtrHashParams.DefaultCompact))
+        using (var ptrhash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(keys, PtrHashParams.DefaultCompact))
         {
             ptrhash.Serialize(stream);
         }
@@ -57,14 +57,14 @@ public class VersioningTest
         using var stream = new MemoryStream();
         
         // Create and serialize with current version
-        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(keys, PtrHashParams.DefaultCompact))
+        using (var original = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(keys, PtrHashParams.DefaultCompact))
         {
             original.Serialize(stream);
         }
-        
+
         // Deserialize should work with same version
         stream.Position = 0;
-        using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>.Deserialize(stream);
+        using var loaded = PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>.Deserialize(stream);
         
         // Verify it works
         Assert.AreEqual(keys[0], 1UL);

@@ -9,10 +9,11 @@ using PtrHash.CSharp.Port.BucketFunctions;
 namespace PtrHash.CSharp.Port.Core
 {
     // Partial class containing serialization methods
-    public unsafe partial class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>
+    public unsafe partial class PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart>
         where THasher : struct, IKeyHasher<TKey>
         where TBucketFunction : struct, IBucketFunction
         where TRemappingStorage : struct, IRemappingStorage<TRemappingStorage>
+        where TPart : struct, IPartConstant
     {
         public void Serialize(Stream stream)
         {
@@ -31,11 +32,11 @@ namespace PtrHash.CSharp.Port.Core
                 BucketFunctionType = (uint)PtrHashGenericTypes.ResolveBucketFunction<TBucketFunction>(),
                 RemappingStorageType = (uint)PtrHashGenericTypes.ResolveRemappingStorage<TRemappingStorage>(),
                 KeyHasherType = (uint)PtrHashGenericTypes.ResolveKeyHasher<THasher>(),
-                
+
                 // Still in cache line 1: Cold-path serialization fields
                 SlotsTotal = _slotsTotal,
                 // RemapOffset and RemapCount set below after calculation
-                
+
                 // Cache Line 2: Hot-path lookup data
                 Seed = _seed,
                 BucketsPerPart = _bucketsPerPart,
@@ -77,7 +78,7 @@ namespace PtrHash.CSharp.Port.Core
             Serialize(fileStream);
         }
         
-        public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> Deserialize(Stream stream)
+        public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart> Deserialize(Stream stream)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
@@ -85,21 +86,21 @@ namespace PtrHash.CSharp.Port.Core
                 throw new ArgumentException("Stream must be readable", nameof(stream));
 
             var header = ReadHeader(stream);
-            
-            return new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(stream, header);
+
+            return new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart>(stream, header);
         }
-        
-        public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> DeserializeFromFile(string filePath)
+
+        public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart> DeserializeFromFile(string filePath)
         {
             using var fileStream = File.OpenRead(filePath);
             return Deserialize(fileStream);
         }
-        
+
         /// <summary>
         /// Deserialize a PtrHash from memory-mapped data (zero-copy).
         /// The caller is responsible for managing the memory mapping lifetime.
         /// </summary>
-        public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage> DeserializeFromMemoryMap(
+        public static PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart> DeserializeFromMemoryMap(
             byte* mappedDataPtr,
             nuint dataSize)
         {
@@ -112,7 +113,7 @@ namespace PtrHash.CSharp.Port.Core
             if (!header.Validate())
                 throw new InvalidOperationException("Invalid PtrHash file header");
                 
-            return new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage>(mappedDataPtr, dataSize, header);
+            return new PtrHash<TKey, THasher, TBucketFunction, TRemappingStorage, TPart>(mappedDataPtr, dataSize, header);
         }
         
         #region Serialization Helper Methods
@@ -190,7 +191,7 @@ namespace PtrHash.CSharp.Port.Core
             if (_minimal)
                 flags |= PtrHashFileFormat.HeaderFlags.IsMinimal;
                 
-            if (_isSinglePart)
+            if (typeof(TPart) == typeof(SinglePart))
                 flags |= PtrHashFileFormat.HeaderFlags.IsSinglePart;
                 
             return flags;

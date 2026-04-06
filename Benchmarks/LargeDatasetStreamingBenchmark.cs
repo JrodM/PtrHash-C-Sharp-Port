@@ -33,7 +33,7 @@ namespace PtrHash.Benchmarks
         private ulong[] _keys = null!;
         private ulong[] _lookupKeys = null!;
         
-        private PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage> _multiPartPtrHash = null!;
+        private PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart> _multiPartPtrHash = null!;
         
         private nuint[] _indicesBuffer = null!;
 
@@ -51,7 +51,7 @@ namespace PtrHash.Benchmarks
             for (int i = 0; i < actualLookupCount; i++)
                 _lookupKeys[i] = _keys[random.Next(KeyCount)];
 
-            _multiPartPtrHash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage>(_keys, PtrHashParams.DefaultFast);
+            _multiPartPtrHash = new PtrHash<ulong, StrongerIntHasher, Linear, UInt32VectorRemappingStorage, MultiPart>(_keys, PtrHashParams.DefaultFast);
 
             _indicesBuffer = new nuint[actualLookupCount];
         }
@@ -66,10 +66,9 @@ namespace PtrHash.Benchmarks
         public ulong PtrHashPort_MultiPart_StrongerIntHasher_Linear_U32Vec_Stream_GetIndicesStream()
         {
             ulong sum = 0;
-            _multiPartPtrHash.GetIndicesStream(
+            _multiPartPtrHash.GetIndicesStream<UseMinimal>(
                 _lookupKeys.AsSpan(),
-                _indicesBuffer,
-                minimal: true);
+                _indicesBuffer);
 
             for (int i = 0; i < _indicesBuffer.Length; i++)
             {

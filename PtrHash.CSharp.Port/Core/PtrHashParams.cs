@@ -13,7 +13,6 @@ namespace PtrHash.CSharp.Port.Core
         public double Alpha { get; init; }
         public double Lambda { get; init; }
         public bool Minimal { get; init; }
-        public bool SinglePart { get; init; }
 
         /// <summary>
         /// Default fast parameters: 3.0 bits/key, optimized for query speed
@@ -23,9 +22,8 @@ namespace PtrHash.CSharp.Port.Core
             Alpha = 0.99,
             Lambda = 3.0,
             Minimal = true,
-            SinglePart = false,
         };
-        
+
         /// <summary>
         /// Most compact parameters: 2.1 bits/key, maximum compression
         /// Uses CacheLineEF storage
@@ -35,7 +33,6 @@ namespace PtrHash.CSharp.Port.Core
             Alpha = 0.99,
             Lambda = 3.5,
             Minimal = true,
-            SinglePart = false
         };
     }
 

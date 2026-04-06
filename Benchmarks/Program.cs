@@ -29,6 +29,7 @@ namespace PtrHash.Benchmarks
                 Console.WriteLine("  construct              - Data structure construction time benchmark");
                 Console.WriteLine("  core                   - Native vs Port performance comparison");
                 Console.WriteLine("  stream                 - Large dataset streaming benchmark");
+                Console.WriteLine("  disasm                 - Prefetch stream disassembly (JIT asm output)");
                 Console.WriteLine("  all                    - Run all benchmarks");
                 Console.WriteLine();
                 Console.WriteLine("Usage: dotnet run [benchmark]");
@@ -68,6 +69,11 @@ namespace PtrHash.Benchmarks
                 case "stream":
                     Console.WriteLine("Running Large Dataset Streaming benchmark...");
                     BenchmarkRunner.Run<LargeDatasetStreamingBenchmark>(config);
+                    break;
+
+                case "disasm":
+                    Console.WriteLine("Running prefetch disassembly benchmark...");
+                    BenchmarkRunner.Run<DisasmTest.PrefetchDisasm>(config);
                     break;
 
                 case "all":

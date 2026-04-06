@@ -166,6 +166,8 @@ namespace PtrHash.CSharp.Interop.Native
         internal static extern FFIResultInfo ptrhash_info_u64(
             IntPtr handle);
 
+        #endregion
+
         #region String Key Functions
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -206,6 +208,8 @@ namespace PtrHash.CSharp.Interop.Native
             nuint prefetchDistance,
             [MarshalAs(UnmanagedType.U1)] bool minimal);
 
+        #endregion
+
         #region Memory Management
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -213,6 +217,8 @@ namespace PtrHash.CSharp.Interop.Native
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern void ptrhash_free_error(IntPtr errorMsg, nuint errorLen);
+
+        #endregion
 
         #region Hash Function Testing
 
