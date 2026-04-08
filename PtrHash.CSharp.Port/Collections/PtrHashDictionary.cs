@@ -325,60 +325,63 @@ namespace PtrHash.CSharp.Port.Collections
             Span<TValue> values)
             where TPrefetchDistance : struct, IPrefetchDistanceConstant
         {
-            uint B = (uint)default(TPrefetchDistance).Value;
+            int B = (int)default(TPrefetchDistance).Value;
 
             var sentinel = _sentinel;
-            uint len = (uint)keys.Length;
+            int len = keys.Length;
+            int kvpLen = _keyValuePairs.Length;
 
             ref TKey keyRef = ref MemoryMarshal.GetReference(keys);
             ref nuint idxRef = ref MemoryMarshal.GetReference(indices);
             ref TValue valRef = ref MemoryMarshal.GetReference(values);
             ref KeyValuePair<TKey, TValue> kvpRef = ref MemoryMarshal.GetArrayDataReference(_keyValuePairs);
 
-            nuint* ring = stackalloc nuint[(int)B];
-
-            // Init: fill ring buffer and prefetch backing array entries
-            uint initCount = Math.Min(B, len);
-            for (uint i = 0; i < initCount; i++)
+            // Init: prefetch the first B entries before processing any
+            int initCount = Math.Min(B, len);
+            for (int i = 0; i < initCount; i++)
             {
-                nuint idx = Unsafe.Add(ref idxRef, (int)i);
-                ring[i] = idx;
-                Sse.Prefetch0(Unsafe.AsPointer(ref Unsafe.Add(ref kvpRef, (nint)idx)));
+                nuint idx = Unsafe.Add(ref idxRef, i);
+                if (idx < (nuint)kvpLen)
+                    Sse.Prefetch0(Unsafe.AsPointer(ref Unsafe.Add(ref kvpRef, (nint)idx)));
             }
 
-            // Main loop: process current entry, issue prefetch for lookahead
-            uint mainEnd = (uint)Math.Max(0, (int)len - (int)B);
-            uint processed = 0;
-
-            while (processed < mainEnd)
+            // Main: process i, prefetch i+B
+            int mainEnd = len - B;
+            for (int i = 0; i < mainEnd; i++)
             {
-                uint ringIdx = processed % B;
-                nuint currentIndex = ring[ringIdx];
+                nuint prefetchIdx = Unsafe.Add(ref idxRef, i + B);
+                if (prefetchIdx < (nuint)kvpLen)
+                    Sse.Prefetch0(Unsafe.AsPointer(ref Unsafe.Add(ref kvpRef, (nint)prefetchIdx)));
 
-                nuint nextIndex = Unsafe.Add(ref idxRef, (int)(processed + B));
-                ring[ringIdx] = nextIndex;
-                Sse.Prefetch0(Unsafe.AsPointer(ref Unsafe.Add(ref kvpRef, (nint)nextIndex)));
-
-                ref var kvp = ref Unsafe.Add(ref kvpRef, (nint)currentIndex);
-                TValue result = Unsafe.Add(ref keyRef, (int)processed).Equals(kvp.Key)
-                    ? kvp.Value
-                    : sentinel;
-                Unsafe.Add(ref valRef, (int)processed) = result;
-                processed++;
+                nuint idx = Unsafe.Add(ref idxRef, i);
+                TValue result;
+                if (idx < (nuint)kvpLen)
+                {
+                    ref var kvp = ref Unsafe.Add(ref kvpRef, (nint)idx);
+                    result = Unsafe.Add(ref keyRef, i).Equals(kvp.Key) ? kvp.Value : sentinel;
+                }
+                else
+                {
+                    result = sentinel;
+                }
+                Unsafe.Add(ref valRef, i) = result;
             }
 
-            // Drain: process remaining entries in ring buffer
-            while (processed < len)
+            // Drain: process remaining entries already prefetched
+            for (int i = Math.Max(0, mainEnd); i < len; i++)
             {
-                uint ringIdx = processed % B;
-                nuint currentIndex = ring[ringIdx];
-
-                ref var kvp = ref Unsafe.Add(ref kvpRef, (nint)currentIndex);
-                TValue result = Unsafe.Add(ref keyRef, (int)processed).Equals(kvp.Key)
-                    ? kvp.Value
-                    : sentinel;
-                Unsafe.Add(ref valRef, (int)processed) = result;
-                processed++;
+                nuint idx = Unsafe.Add(ref idxRef, i);
+                TValue result;
+                if (idx < (nuint)kvpLen)
+                {
+                    ref var kvp = ref Unsafe.Add(ref kvpRef, (nint)idx);
+                    result = Unsafe.Add(ref keyRef, i).Equals(kvp.Key) ? kvp.Value : sentinel;
+                }
+                else
+                {
+                    result = sentinel;
+                }
+                Unsafe.Add(ref valRef, i) = result;
             }
         }
 
