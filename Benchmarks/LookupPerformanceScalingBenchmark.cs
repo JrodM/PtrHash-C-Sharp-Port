@@ -295,57 +295,5 @@ namespace PtrHash.Benchmarks
             return sum;
         }
 
-        // === PREFETCH LOOKUPS ===
-        [Benchmark]
-        public ulong Port_Single_Prefetch()
-        {
-            ulong sum = 0;
-            _singlePartPtrHashDict.TryGetValueStreamPrefetch(
-                _lookupKeys.AsSpan(),
-                _valuesBuffer1);
-
-            for (int i = 0; i < _valuesBuffer1.Length; i++)
-            {
-                ulong v = _valuesBuffer1[i];
-                if (v != _singlePartPtrHashDict.Sentinel)
-                    sum += v;
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong Port_Single_Prefetch2Pass_B64()
-        {
-            ulong sum = 0;
-            _singlePartPtrHashDict.TryGetValueStreamPrefetch2Pass<PrefetchDistance64>(
-                _lookupKeys.AsSpan(),
-                _valuesBuffer2);
-
-            for (int i = 0; i < _valuesBuffer2.Length; i++)
-            {
-                ulong v = _valuesBuffer2[i];
-                if (v != _singlePartPtrHashDict.Sentinel)
-                    sum += v;
-            }
-            return sum;
-        }
-
-        [Benchmark]
-        public ulong Port_Single_Prefetch2Pass_B32()
-        {
-            ulong sum = 0;
-            _singlePartPtrHashDict.TryGetValueStreamPrefetch2Pass<PrefetchDistance32>(
-                _lookupKeys.AsSpan(),
-                _valuesBuffer2);
-
-            for (int i = 0; i < _valuesBuffer2.Length; i++)
-            {
-                ulong v = _valuesBuffer2[i];
-                if (v != _singlePartPtrHashDict.Sentinel)
-                    sum += v;
-            }
-            return sum;
-        }
-
     }
 }
