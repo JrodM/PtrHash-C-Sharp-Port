@@ -187,58 +187,21 @@ namespace PtrHash.CSharp.Port.Collections
 
 
         /// <summary>
-        /// Performs batch lookup using streaming for better performance on large datasets.
-        /// Uses GetIndicesStream (no prefetch) for optimal performance.
+        /// Two-pass prefetch batch lookup: pass 1 prefetches pilots to get indices,
+        /// pass 2 prefetches the backing array to get key/value pairs.
         /// </summary>
-        /// <param name="keys">Keys to look up</param>
-        /// <param name="values">Output array for values (must be same length as keys)</param>
         public void TryGetValueStream(
             ReadOnlySpan<TKey> keys,
             Span<TValue> values)
         {
             if (keys.Length != values.Length)
                 throw new ArgumentException("Key and value spans must have the same length");
-            
-            if (keys.Length <= MAX_STACK_SIZE)
-            {
-                Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStream<NoMinimal>(keys, indices);
-                ProcessIndices(keys, indices, values);
-            }
-            else
-            {
-                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
-                try
-                {
-                    var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStream<NoMinimal>(keys, indicesSpan);
-                    ProcessIndices(keys, indicesSpan, values);
-                }
-                finally
-                {
-                    ArrayPool<nuint>.Shared.Return(indices);
-                }
-            }
-        }
 
-        /// <summary>
-        /// Performs batch lookup using streaming with prefetch for better performance on large datasets.
-        /// Uses GetIndicesStreamPrefetch for memory-intensive workloads.
-        /// </summary>
-        /// <param name="keys">Keys to look up</param>
-        /// <param name="values">Output array for values (must be same length as keys)</param>
-        public void TryGetValueStreamPrefetch(
-            ReadOnlySpan<TKey> keys,
-            Span<TValue> values)
-        {
-            if (keys.Length != values.Length)
-                throw new ArgumentException("Key and value spans must have the same length");
-            
             if (keys.Length <= MAX_STACK_SIZE)
             {
                 Span<nuint> indices = stackalloc nuint[keys.Length];
                 _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indices);
-                ProcessIndices(keys, indices, values);
+                ProcessIndicesPrefetch(keys, indices, values);
             }
             else
             {
@@ -247,41 +210,7 @@ namespace PtrHash.CSharp.Port.Collections
                 {
                     var indicesSpan = indices.AsSpan(0, keys.Length);
                     _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indicesSpan);
-                    ProcessIndices(keys, indicesSpan, values);
-                }
-                finally
-                {
-                    ArrayPool<nuint>.Shared.Return(indices);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Two-pass prefetch lookup: pass 1 prefetches pilots to get indices,
-        /// pass 2 prefetches the backing array to get key/value pairs.
-        /// </summary>
-        public void TryGetValueStreamPrefetch2Pass<TPass2Prefetch>(
-            ReadOnlySpan<TKey> keys,
-            Span<TValue> values)
-            where TPass2Prefetch : struct, IPrefetchDistanceConstant
-        {
-            if (keys.Length != values.Length)
-                throw new ArgumentException("Key and value spans must have the same length");
-
-            if (keys.Length <= MAX_STACK_SIZE)
-            {
-                Span<nuint> indices = stackalloc nuint[keys.Length];
-                _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indices);
-                ProcessIndicesPrefetch<TPass2Prefetch>(keys, indices, values);
-            }
-            else
-            {
-                var indices = ArrayPool<nuint>.Shared.Rent(keys.Length);
-                try
-                {
-                    var indicesSpan = indices.AsSpan(0, keys.Length);
-                    _ptrHash.GetIndicesStreamPrefetch<NoMinimal, PrefetchDistance32>(keys, indicesSpan);
-                    ProcessIndicesPrefetch<TPass2Prefetch>(keys, indicesSpan, values);
+                    ProcessIndicesPrefetch(keys, indicesSpan, values);
                 }
                 finally
                 {
@@ -292,40 +221,12 @@ namespace PtrHash.CSharp.Port.Collections
 
         public PtrHashInfo GetInfo() => _ptrHash.GetInfo();
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ProcessIndices(
+        private unsafe void ProcessIndicesPrefetch(
             ReadOnlySpan<TKey> keys,
             ReadOnlySpan<nuint> indices,
             Span<TValue> values)
         {
-            var kvps = _keyValuePairs;
-            var sentinel = _sentinel;
-            int len = keys.Length;
-
-            ref TKey keyRef = ref MemoryMarshal.GetReference(keys);
-            ref nuint idxRef = ref MemoryMarshal.GetReference(indices);
-            ref TValue valRef = ref MemoryMarshal.GetReference(values);
-
-            for (int i = 0; i < len; i++)
-            {
-                nuint uidx = Unsafe.Add(ref idxRef, i);
-
-                ref var kvp = ref kvps[(int)uidx];
-                TValue result = Unsafe.Add(ref keyRef, i).Equals(kvp.Key)
-                    ? kvp.Value
-                    : sentinel;
-
-                Unsafe.Add(ref valRef, i) = result;
-            }
-        }
-
-        private unsafe void ProcessIndicesPrefetch<TPrefetchDistance>(
-            ReadOnlySpan<TKey> keys,
-            ReadOnlySpan<nuint> indices,
-            Span<TValue> values)
-            where TPrefetchDistance : struct, IPrefetchDistanceConstant
-        {
-            int B = (int)default(TPrefetchDistance).Value;
+            const int B = 32;
 
             var sentinel = _sentinel;
             int len = keys.Length;
